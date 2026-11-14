@@ -117,21 +117,21 @@ const MAX_SYNC_DAYS = 365;
     :host { display:flex; flex-direction:column; gap:10px; height:auto; }
     .head { display:flex; align-items:center; gap:10px; }
     .head .sec-title { margin:0; }
-    .environment { padding:3px 10px; border-radius:6px; font-size:11.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; background:var(--orange-pale); color:var(--orange-dark); }
-    .environment.test { background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; }
-    .hint { margin:0; font-size:12.5px; color:var(--gray-500); line-height:1.6; }
-    .notice { padding:10px 12px; border-radius:9px; font-size:12.5px; line-height:1.5; background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; }
+    .environment { padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; background:var(--orange-pale); color:var(--orange-dark); }
+    .environment.test { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); border:1px solid #FCD34D; }
+    .hint { margin:0; font-size:12px; color:var(--gray-500); line-height:1.6; }
+    .notice { padding:12px 16px; border-radius:10px; font-size:12px; line-height:1.5; background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border:1px solid #FDE68A; color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .sync-days { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .sync-days .fl { margin:0; }
     .days { width:90px; }
     .group { width:auto; min-width:220px; max-width:100%; }
     .nowrap { white-space:nowrap; }
     .status { background:var(--orange-pale); color:var(--orange-dark); white-space:nowrap; }
-    .status.invalid, .status.error { background:#FEE2E2; color:#B91C1C; }
-    .last-error { display:block; margin-top:3px; font-size:11.5px; color:#B91C1C; overflow-wrap:anywhere; max-width:320px; }
+    .status.invalid, .status.error { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); }
+    .last-error { display:block; margin-top:4px; font-size:12px; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); overflow-wrap:anywhere; max-width:320px; }
     .actions { text-align:right; white-space:nowrap; }
-    .link { border:none; background:none; padding:0; margin-left:10px; font-size:12.5px; cursor:pointer; font-family:inherit; color:var(--accent-blue, #3B82F6); }
-    .link.danger { color:#B91C1C; }
+    .link { border:none; background:none; padding:0; margin-left:10px; font-size:12px; cursor:pointer; font-family:inherit; color:var(--accent-blue, oklch(from #3b82f6 max(l, var(--text-min-l)) c h)); }
+    .link.danger { color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); }
     .link:disabled { opacity:.5; cursor:not-allowed; }
   `],
 })

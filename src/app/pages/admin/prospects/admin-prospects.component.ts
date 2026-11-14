@@ -256,8 +256,8 @@ interface DiscoveredCompany {
     </div>
 
     @if (navBack.ctx(); as ctx) {
-      <div style="padding:5px 16px;background:#f8fafc;border-bottom:1px solid #e5e7eb">
-        <button (click)="navigateBack()" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:white;border:1px solid #e2e8f0;border-radius:6px;color:#64748b;font-size:12px;font-weight:500;cursor:pointer;line-height:1">
+      <div style="padding:8px 24px;background:var(--gray-50);border-bottom:1px solid var(--gray-200)">
+        <button class="btn btn-g btn-sm" (click)="navigateBack()">
           ← {{ctx.label}}
         </button>
       </div>
@@ -268,7 +268,7 @@ interface DiscoveredCompany {
       <!-- Import CSV -->
       <div class="card" style="margin-bottom:16px;padding:16px">
         <div style="font-weight:600;margin-bottom:10px">{{ t('admin.import.heading') }}</div>
-        <div style="font-size:12px;color:#6b7280;margin-bottom:10px">
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px">
           {{ t('admin.import.requiredLabel') }} <code>nip</code>, <code>BAZA</code> — {{ t('admin.import.baseColumnHint') }}
           {{ t('admin.import.optionalLabel') }} <code>{{ t('admin.import.optionalColumns') }}</code>.
           {{ t('admin.import.wwwHint') }}
@@ -281,7 +281,7 @@ interface DiscoveredCompany {
               (change)="onFileSelected($event)">
           </label>
           @if (importFile()) {
-            <span style="font-size:13px;color:#374151">{{ importFile()!.name }}</span>
+            <span style="font-size:14px;color:var(--gray-700)">{{ importFile()!.name }}</span>
             <button class="btn btn-p" [disabled]="importing()" (click)="doImport()">
               @if (importing()) { {{ t('admin.import.importing') }} } @else { {{ t('admin.import.submit') }} }
             </button>
@@ -289,28 +289,28 @@ interface DiscoveredCompany {
         </div>
         @if (importResult()) {
           @if (importResult()!.fatal_error) {
-            <div style="margin-top:10px;font-size:13px;padding:8px 12px;border-radius:6px;
-                        border:1px solid #fca5a5;background:#fee2e2;color:#991b1b">
+            <div style="margin-top:12px;font-size:14px;padding:8px 12px;border-radius:12px;
+                        border:1px solid #fca5a5;background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">
               ✗ {{ t('admin.import.fatalError') }} <b>{{ importResult()!.fatal_error }}</b>
             </div>
           } @else {
-            <div style="margin-top:10px;font-size:13px;padding:8px 12px;border-radius:6px;border:1px solid"
-              [style.background]="importResult()!.errors! > 0 ? '#fef3c7' : '#f0fdf4'"
+            <div style="margin-top:12px;font-size:14px;padding:8px 12px;border-radius:12px;border:1px solid"
+              [style.background]="importResult()!.errors! > 0 ? 'color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface))' : 'var(--gray-50)'"
               [style.borderColor]="importResult()!.errors! > 0 ? '#fcd34d' : '#86efac'"
-              [style.color]="importResult()!.errors! > 0 ? '#92400e' : '#166534'">
+              [style.color]="importResult()!.errors! > 0 ? 'oklch(from #92400e max(l, var(--text-min-l)) c h)' : 'oklch(from #166534 max(l, var(--text-min-l)) c h)'">
               ✓ {{ t('admin.import.added') }} <b>{{ importResult()!.added }}</b> &nbsp;|&nbsp;
               {{ t('admin.import.skipped') }} <b>{{ importResult()!.skipped }}</b> &nbsp;|&nbsp;
               {{ t('admin.import.errors') }} <b>{{ importResult()!.errors }}</b> &nbsp;|&nbsp;
               {{ t('admin.import.totalRows') }} <b>{{ importResult()!.total }}</b>
               @if (importResult()!.detected_encoding) {
-                <div style="margin-top:6px;font-size:11px;opacity:0.8">
+                <div style="margin-top:6px;font-size:12px;opacity:0.8">
                   {{ t('admin.import.encoding') }} <b>{{ importResult()!.detected_encoding }}</b>
                   @if (importResult()!.detected_columns?.length) {
                     &nbsp;|&nbsp; {{ t('admin.import.columns') }} {{ importResult()!.detected_columns!.join(', ') }}
                   }
                 </div>
               } @else if (importResult()!.detected_columns?.length) {
-                <div style="margin-top:6px;font-size:11px;opacity:0.8">
+                <div style="margin-top:6px;font-size:12px;opacity:0.8">
                   {{ t('admin.import.detectedColumns') }} {{ importResult()!.detected_columns!.join(', ') }}
                 </div>
               }
@@ -328,8 +328,8 @@ interface DiscoveredCompany {
       </div>
 
       <!-- Filtry -->
-      <div class="card" style="margin-bottom:16px;padding:16px">
-        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
+      <div class="card filter-card">
+        <div style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end">
 
           <div class="fld">
             <label>{{ t('admin.filters.search') }}</label>
@@ -388,11 +388,11 @@ interface DiscoveredCompany {
               (ngModelChange)="onFilterChange()">
           </div>
 
-          <button class="btn btn-g" style="margin-bottom:1px" (click)="resetFilters()">
+          <button class="btn btn-g" style="height:36px" (click)="resetFilters()">
             {{ t('admin.filters.reset') }}
           </button>
 
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151;cursor:pointer;margin-bottom:1px;user-select:none">
+          <label style="display:flex;align-items:center;gap:8px;height:36px;font-size:14px;color:var(--gray-700);cursor:pointer;user-select:none">
             <input type="checkbox"
               [checked]="showArchived()"
               (change)="showArchived.set(!showArchived()); page.set(1); load()">
@@ -407,7 +407,7 @@ interface DiscoveredCompany {
         <div class="bulk-bar">
           <span class="bulk-count">{{ t('admin.bulk.selected', { count: selectedIds().size }) }}</span>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkSetStatus('hold')">
-            ⏸ {{ t('admin.status.hold') }}
+            ⏸️ {{ t('admin.status.hold') }}
           </button>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkSetStatus('archived')">
             📦 {{ t('admin.bulk.archive') }}
@@ -419,7 +419,7 @@ interface DiscoveredCompany {
             🔄 Re-process
           </button>
           <span style="flex:1"></span>
-          <button class="btn bulk-delete-btn" [disabled]="bulkActioning()" (click)="bulkDelete()">
+          <button class="btn btn-d" [disabled]="bulkActioning()" (click)="bulkDelete()">
             🗑 {{ t('admin.bulk.deleteSelected') }}
           </button>
           <button class="btn btn-g" (click)="clearSelection()">✕ {{ t('admin.bulk.cancel') }}</button>
@@ -427,10 +427,10 @@ interface DiscoveredCompany {
       }
 
       <!-- Podsumowanie -->
-      <div style="font-size:13px;color:#6b7280;margin-bottom:10px">
-        {{ t('admin.summary.shown') }} <b style="color:#374151">{{ total() }}</b> / <b style="color:#374151">{{ grandTotal() }}</b>
+      <div style="font-size:14px;color:var(--gray-500);margin-bottom:10px">
+        {{ t('admin.summary.shown') }} <b style="color:var(--gray-700)">{{ total() }}</b> / <b style="color:var(--gray-700)">{{ grandTotal() }}</b>
         @if (batch().running) {
-          &nbsp;|&nbsp; <span style="color:var(--orange)">
+          &nbsp;|&nbsp; <span style="color: var(--orange-text)">
             ⏳ {{ t('admin.summary.inProgress', { done: batch().done, total: batch().total }) }}
             {{ t('admin.summary.errorCount', { count: batch().errors }) }}
           </span>
@@ -442,6 +442,7 @@ interface DiscoveredCompany {
         <div class="loading-overlay"><div class="spinner"></div></div>
       }
 
+      <div class="tbl-card">
       <table class="tbl">
         <thead>
           <tr>
@@ -502,49 +503,49 @@ interface DiscoveredCompany {
                   @if (p.has_partner) {
                     <button (click)="$event.stopPropagation(); goToPartner(p.partner_nav_id!, p.nip)"
                       [title]="t('admin.table.partnerBadgeTooltip')"
-                      style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;background:#d1fae5;border:1px solid #6ee7b7;color:#065f46;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
+                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface));border:1px solid #6ee7b7;color:oklch(from #065f46 max(l, var(--text-min-l)) c h);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🤝 Partner
                     </button>
                   } @else if (p.crm_lead_id) {
                     <button (click)="$event.stopPropagation(); goToLead(p.crm_lead_id!, p.nip)"
                       [title]="t('admin.table.convertedLeadTooltip')"
-                      style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;background:#dbeafe;border:1px solid #93c5fd;color:#1d4ed8;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
+                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));border:1px solid #93c5fd;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🏷 Lead
                     </button>
                   } @else if (p.has_lead) {
                     <button (click)="$event.stopPropagation(); goToLead(p.lead_id!, p.nip)"
                       [title]="t('admin.table.leadBadgeTooltip')"
-                      style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;background:#dbeafe;border:1px solid #93c5fd;color:#1d4ed8;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
+                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));border:1px solid #93c5fd;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🏷 Lead
                     </button>
                   }
                 </div>
                 @if (p.legal_form) {
-                  <div style="font-size:11px;color:#9ca3af">{{ p.legal_form }}</div>
+                  <div style="font-size:12px;color:var(--gray-400)">{{ p.legal_form }}</div>
                 }
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px">
                   @if (p.website_url) {
                     <span style="display:inline-flex;align-items:center;gap:2px">
                       <a [href]="p.website_url" target="_blank"
-                        style="font-size:11px;color:var(--orange);text-decoration:none" (click)="$event.stopPropagation()">
+                        style="font-size:12px;color: var(--orange-text);text-decoration:none" (click)="$event.stopPropagation()">
                         🌐 {{ shortUrl(p.website_url) }}
                       </a>
                       @if (p.website_status === 'ok') {
-                        <span style="font-size:10px;color:#16a34a;font-weight:700;line-height:1" [title]="t('admin.website.okShort')">✓</span>
+                        <span style="font-size:10px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-weight:700;line-height:1" [title]="t('admin.website.okShort')">✓</span>
                       } @else if (p.website_status === 'blocked') {
-                        <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" [title]="t('admin.website.blockedShort')">!</span>
+                        <span style="font-size:10px;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);font-weight:700;line-height:1" [title]="t('admin.website.blockedShort')">!</span>
                       } @else if (p.website_status === 'failed') {
-                        <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" [title]="t('admin.website.failedShort')">!</span>
+                        <span style="font-size:10px;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);font-weight:700;line-height:1" [title]="t('admin.website.failedShort')">!</span>
                       } @else if (p.website_status === 'not_found') {
-                        <span style="font-size:10px;color:#9ca3af;font-weight:700;line-height:1" [title]="t('admin.website.notFoundShort')">–</span>
+                        <span style="font-size:10px;color:var(--gray-400);font-weight:700;line-height:1" [title]="t('admin.website.notFoundShort')">–</span>
                       } @else if (p.website_status === 'unconfirmed') {
-                        <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" [title]="t('admin.website.unconfirmedShort')">?</span>
+                        <span style="font-size:10px;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);font-weight:700;line-height:1" [title]="t('admin.website.unconfirmedShort')">?</span>
                       }
                     </span>
                   }
                   @if (p.facebook_url) {
                     <a [href]="p.facebook_url" target="_blank" title="Facebook"
-                      style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:#1877f2;color:#fff;font-size:11px;font-weight:700;text-decoration:none"
+                      style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:#1877f2;color:#fff;font-size:12px;font-weight:700;text-decoration:none"
                       (click)="$event.stopPropagation()">f</a>
                   }
                   @if (p.linkedin_url) {
@@ -568,7 +569,7 @@ interface DiscoveredCompany {
                 } @else {
                   <div style="display:flex;align-items:center;gap:6px">
                     @if (p.icp_score != null) {
-                      <div style="width:44px;height:6px;border-radius:3px;background:#e5e7eb;overflow:hidden">
+                      <div style="width:44px;height:6px;border-radius:3px;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));overflow:hidden">
                         <div [style.width.%]="p.icp_score"
                           [style.background]="scoreColor(p.icp_score)"
                           style="height:100%"></div>
@@ -586,7 +587,7 @@ interface DiscoveredCompany {
               <td style="font-size:12px">
                 @if (p.branches_count != null) {
                   {{ p.branches_count }}
-                  <span style="color:#9ca3af">({{ p.branches_scope }})</span>
+                  <span style="color:var(--gray-400)">({{ p.branches_scope }})</span>
                 } @else { <span style="color:#d1d5db">—</span> }
               </td>
               @for (s of signalDefs(); track s.key) {
@@ -616,25 +617,25 @@ interface DiscoveredCompany {
               </td>
               <td (click)="$event.stopPropagation()">
                 @if (p.has_partner) {
-                  <button class="btn btn-g" style="font-size:11px;padding:3px 8px;background:#d1fae5;color:#065f46;border-color:#6ee7b7"
+                  <button class="btn btn-g btn-sm" style="background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface));color:oklch(from #065f46 max(l, var(--text-min-l)) c h);border-color:#6ee7b7"
                     (click)="goToPartner(p.partner_nav_id!, p.nip)"
                     [title]="t('admin.table.goToPartnerTooltip')">
                     ↗ {{ t('admin.table.partner') }}
                   </button>
                 } @else if (p.crm_lead_id) {
-                  <button class="btn btn-g" style="font-size:11px;padding:3px 8px"
+                  <button class="btn btn-g btn-sm"
                     (click)="goToLead(p.crm_lead_id!, p.nip)"
                     [title]="t('admin.table.goToCrmTooltip')">
                     ↗ CRM
                   </button>
                 } @else if (p.has_lead) {
-                  <button class="btn btn-g" style="font-size:11px;padding:3px 8px;background:#dbeafe;color:#1d4ed8;border-color:#93c5fd"
+                  <button class="btn btn-g btn-sm" style="background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-color:#93c5fd"
                     (click)="goToLead(p.lead_id!, p.nip)"
                     [title]="t('admin.table.goToLeadTooltip')">
                     ↗ {{ t('admin.table.lead') }}
                   </button>
                 } @else {
-                  <button class="btn btn-p" style="font-size:11px;padding:3px 8px"
+                  <button class="btn btn-p btn-sm"
                     [disabled]="toLeadLoading() === p.id || !qualifiesForLead(p)"
                     [style.opacity]="qualifiesForLead(p) ? '1' : '0.4'"
                     (click)="toLead(p)"
@@ -658,15 +659,15 @@ interface DiscoveredCompany {
             <!-- Rozwinięty wiersz ze szczegółami -->
             @if (expanded() === p.id) {
               <tr class="detail-row">
-                <td colspan="17" style="background:#fafafa;padding:14px 20px">
+                <td colspan="17" style="background:var(--gray-50);padding:14px 20px">
 
                   <!-- NOTATKA WALIDACYJNA -->
-                  <div style="margin-bottom:14px;padding:10px 14px;background:white;border:1px solid #e5e7eb;border-radius:8px"
+                  <div style="margin-bottom:16px;padding:12px 16px;background:var(--surface);border-radius:14px;box-shadow:var(--shadow-sm)"
                        (click)="$event.stopPropagation()">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                      <span style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em">{{ t('admin.note.heading') }}</span>
+                      <span style="font-size:12px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em">{{ t('admin.note.heading') }}</span>
                       @if (p.note_author) {
-                        <span style="font-size:11px;color:#9ca3af">
+                        <span style="font-size:12px;color:var(--gray-400)">
                           {{ p.note_author }} · {{ p.note_updated_at | date:'dd.MM.yyyy HH:mm' }}
                         </span>
                       }
@@ -678,11 +679,11 @@ interface DiscoveredCompany {
                       maxlength="500"
                       rows="3"
                       [placeholder]="t('admin.note.placeholder')"
-                      style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;line-height:1.5;resize:vertical;color:#374151;font-family:inherit;outline:none"
+                      style="width:100%;box-sizing:border-box;padding:8px 12px;border:1px solid var(--gray-200);border-radius:12px;font-size:14px;line-height:1.5;resize:vertical;color:var(--gray-700);font-family:inherit;outline:none"
                       onfocus="this.style.borderColor='#3BAA5D'"
-                      onblur="this.style.borderColor='#d1d5db'"
+                      onblur="this.style.borderColor='var(--gray-200)'"
                     ></textarea>
-                    <div style="text-align:right;font-size:11px;color:#9ca3af;margin-top:2px">
+                    <div style="text-align:right;font-size:12px;color:var(--gray-400);margin-top:2px">
                       {{ (noteEdits.get(p.id) ?? (p.note ?? '')).length }} / 500
                     </div>
                   </div>
@@ -694,7 +695,7 @@ interface DiscoveredCompany {
                       @if (p.ai_summary) {
                         <div style="margin-bottom:12px">
                           <div class="detail-label">{{ t('admin.detail.aiSummary') }}</div>
-                          <div style="font-size:13px;line-height:1.5">{{ p.ai_summary }}</div>
+                          <div style="font-size:14px;line-height:1.5">{{ p.ai_summary }}</div>
                         </div>
                       }
                       @if (p.icp_signals?.length) {
@@ -703,9 +704,9 @@ interface DiscoveredCompany {
                           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
                             @for (s of signalDefs(); track s.key) {
                               <span [title]="s.desc" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 8px;border-radius:12px;border:1px solid"
-                                [style.background]="getSignal(p, s.key) === true ? '#bbf7d0' : getSignal(p, s.key) === false ? '#fee2e2' : '#f3f4f6'"
+                                [style.background]="getSignal(p, s.key) === true ? 'color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface))' : getSignal(p, s.key) === false ? 'color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface))' : 'var(--gray-100)'"
                                 [style.borderColor]="getSignal(p, s.key) === true ? '#4ade80' : getSignal(p, s.key) === false ? '#fca5a5' : '#d1d5db'"
-                                [style.color]="getSignal(p, s.key) === true ? '#166534' : getSignal(p, s.key) === false ? '#991b1b' : '#6b7280'">
+                                [style.color]="getSignal(p, s.key) === true ? 'oklch(from #166534 max(l, var(--text-min-l)) c h)' : getSignal(p, s.key) === false ? 'oklch(from #991b1b max(l, var(--text-min-l)) c h)' : 'var(--gray-500)'">
                                 {{ getSignal(p, s.key) === true ? '✓' : getSignal(p, s.key) === false ? '✗' : '—' }}
                                 {{ s.label }}
                               </span>
@@ -713,7 +714,7 @@ interface DiscoveredCompany {
                           </div>
                         </div>
                       }
-                      <div style="font-size:12px;display:flex;flex-direction:column;gap:5px">
+                      <div style="font-size:12px;display:flex;flex-direction:column;gap:4px">
                         @if (p.industry) {
                           <div><b>{{ t('admin.detail.industry') }}</b> {{ p.industry }}</div>
                         }
@@ -738,7 +739,7 @@ interface DiscoveredCompany {
                           <div>
                             <b>{{ t('admin.detail.pkdGus') }}</b>
                             @for (code of (p.enrichment_log?.gus?.pkd_codes ?? []); track code) {
-                              <span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:3px;font-size:11px;font-family:monospace">{{ code }}</span>
+                              <span style="display:inline-block;margin:1px 4px 1px 0;padding:0 4px;background:var(--gray-100);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:3px;font-size:12px;font-family:monospace">{{ code }}</span>
                             }
                           </div>
                         }
@@ -755,23 +756,23 @@ interface DiscoveredCompany {
                         @if (p.website_url) {
                           <div style="display:flex;align-items:center;gap:8px">
                             <a [href]="p.website_url" target="_blank" (click)="$event.stopPropagation()"
-                              style="color:var(--orange);text-decoration:none;font-size:12px">
+                              style="color: var(--orange-text);text-decoration:none;font-size:12px">
                               🌐 {{ p.website_url }}
                             </a>
                             @if (p.website_status === 'ok') {
-                              <span style="font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.website.ok')">✓ {{ t('admin.website.fetched') }}</span>
                             } @else if (p.website_status === 'blocked') {
-                              <span style="font-size:10px;font-weight:600;color:#d97706;white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.website.blocked')">⚠ Cloudflare</span>
                             } @else if (p.website_status === 'failed') {
-                              <span style="font-size:10px;font-weight:600;color:#d97706;white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.website.failed')">⚠ {{ t('admin.website.noContent') }}</span>
                             } @else if (p.website_status === 'not_found') {
-                              <span style="font-size:10px;font-weight:600;color:#9ca3af;white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:var(--gray-400);white-space:nowrap"
                                 [title]="t('admin.website.notFound')">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
                             } @else if (p.website_status === 'unconfirmed') {
-                              <span style="font-size:10px;font-weight:600;color:#d97706;white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.website.unconfirmed')">⚠ {{ t('admin.website.unconfirmedLabel') }}</span>
                             }
                           </div>
@@ -779,7 +780,7 @@ interface DiscoveredCompany {
                         @if (p.facebook_url) {
                           <div>
                             <a [href]="p.facebook_url" target="_blank" (click)="$event.stopPropagation()"
-                              style="color:#1877f2;text-decoration:none;font-size:12px">
+                              style="color:oklch(from #1877f2 max(l, var(--text-min-l)) c h);text-decoration:none;font-size:12px">
                               <b>f</b> {{ p.facebook_url }}
                             </a>
                           </div>
@@ -787,28 +788,28 @@ interface DiscoveredCompany {
                         @if (p.linkedin_url) {
                           <div style="display:flex;align-items:center;gap:8px">
                             <a [href]="p.linkedin_url" target="_blank" (click)="$event.stopPropagation()"
-                              style="color:#0a66c2;text-decoration:none;font-size:12px">
+                              style="color:oklch(from #0a66c2 max(l, var(--text-min-l)) c h);text-decoration:none;font-size:12px">
                               <b>in</b> {{ p.linkedin_url }}
                             </a>
                             @if (p.linkedin_status === 'ok') {
-                              <span style="font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.linkedin.ok')">✓ {{ t('admin.website.fetched') }}</span>
                             } @else if (p.linkedin_status === 'blocked') {
-                              <span style="font-size:10px;font-weight:600;color:#d97706;white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.linkedin.blocked')">⚠ {{ t('admin.linkedin.blockedLabel') }}</span>
                             } @else if (p.linkedin_status === 'not_found') {
-                              <span style="font-size:10px;font-weight:600;color:#9ca3af;white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:var(--gray-400);white-space:nowrap"
                                 [title]="t('admin.linkedin.notFound')">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
                             }
                           </div>
                         }
                         @if (p.enrichment_status === 'no_website') {
-                          <div style="color:#92400e;background:#fef3c7;padding:5px 8px;border-radius:5px;margin-top:4px;font-size:11px">
+                          <div style="color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));padding:4px 8px;border-radius:8px;margin-top:4px;font-size:12px">
                             ⚠ {{ t('admin.detail.noWebsiteHalted') }}
                           </div>
                         }
                         @if (p.enrichment_error) {
-                          <div style="color:#dc2626;margin-top:4px">
+                          <div style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-top:4px">
                             <b>{{ t('admin.detail.enrichmentError') }}</b> {{ p.enrichment_error }}
                           </div>
                         }
@@ -819,7 +820,7 @@ interface DiscoveredCompany {
                     <div>
                       <div style="margin-bottom:10px">
                         <div class="detail-label">{{ t('admin.detail.decisionMaker') }}</div>
-                        <div style="border:1px solid #fbd0b6;border-radius:6px;padding:8px 10px;background:#fff7ed;font-size:12px">
+                        <div style="border:1px solid color-mix(in srgb, #fbd0b6 var(--tint-mix), var(--surface));border-radius:6px;padding:8px 10px;background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));font-size:12px">
                           @if (isEditingContactField(p, 'name')) {
                             <div style="display:flex;gap:4px;align-items:center" (click)="$event.stopPropagation()">
                               <input class="inp inp-sm" style="flex:1" [maxlength]="contactTextMaxLength"
@@ -835,7 +836,7 @@ interface DiscoveredCompany {
                             </div>
                           }
                           @if (p.decision_maker_title) {
-                            <div style="color:#6b7280">{{ p.decision_maker_title }}{{ p.decision_maker_dept ? ' · ' + p.decision_maker_dept : '' }}</div>
+                            <div style="color:var(--gray-500)">{{ p.decision_maker_title }}{{ p.decision_maker_dept ? ' · ' + p.decision_maker_dept : '' }}</div>
                           }
                           <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;align-items:center">
                             @if (isEditingContactField(p, 'email')) {
@@ -850,12 +851,12 @@ interface DiscoveredCompany {
                               <span style="display:inline-flex;align-items:center;gap:4px">
                                 @if (p.decision_maker_email) {
                                   <a [href]="'mailto:' + p.decision_maker_email"
-                                    style="color:var(--orange);text-decoration:none"
+                                    style="color: var(--orange-text);text-decoration:none"
                                     (click)="$event.stopPropagation()">
                                     ✉ {{ p.decision_maker_email }}
                                   </a>
                                 } @else {
-                                  <span style="color:#9ca3af">✉ —</span>
+                                  <span style="color:var(--gray-400)">✉ —</span>
                                 }
                                 <button class="icon-btn" [title]="t('admin.edit.editEmail')" (click)="startEditContactField(p, 'email', $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
                               </span>
@@ -870,20 +871,20 @@ interface DiscoveredCompany {
                               </div>
                             } @else {
                               <span style="display:inline-flex;align-items:center;gap:4px">
-                                <span style="color:#374151;font-size:12px">📞 {{ p.decision_maker_phone || '—' }}</span>
+                                <span style="color:var(--gray-700);font-size:12px">📞 {{ p.decision_maker_phone || '—' }}</span>
                                 <button class="icon-btn" [title]="t('admin.edit.editPhone')" (click)="startEditContactField(p, 'phone', $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
                               </span>
                             }
                             @if (p.decision_maker_linkedin) {
                               <a [href]="p.decision_maker_linkedin" target="_blank"
-                                style="color:#0a66c2;text-decoration:none;font-weight:600"
+                                style="color:oklch(from #0a66c2 max(l, var(--text-min-l)) c h);text-decoration:none;font-weight:600"
                                 (click)="$event.stopPropagation()">
                                 in LI
                               </a>
                             }
                             @if (p.decision_maker_facebook) {
                               <a [href]="p.decision_maker_facebook" target="_blank"
-                                style="color:#1877f2;text-decoration:none;font-weight:600"
+                                style="color:oklch(from #1877f2 max(l, var(--text-min-l)) c h);text-decoration:none;font-weight:600"
                                 (click)="$event.stopPropagation()">
                                 f FB
                               </a>
@@ -901,7 +902,7 @@ interface DiscoveredCompany {
                       @if (editingKeyContactsId() === p.id) {
                         <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px" (click)="$event.stopPropagation()">
                           @for (c of keyContactsDraft(); track $index) {
-                            <div style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;background:#fafafa;font-size:12px;display:flex;flex-direction:column;gap:5px">
+                            <div style="border:1px solid var(--gray-300);border-radius:6px;padding:8px 10px;background:var(--gray-50);font-size:12px;display:flex;flex-direction:column;gap:5px">
                               <div style="display:flex;gap:6px">
                                 <input class="inp inp-sm" style="flex:1" [maxlength]="contactTextMaxLength"
                                   [placeholder]="t('admin.edit.contactName')" [(ngModel)]="c.name">
@@ -915,7 +916,7 @@ interface DiscoveredCompany {
                                 <input class="inp inp-sm" type="tel" style="flex:1" [maxlength]="contactPhoneMaxLength"
                                   [placeholder]="t('admin.edit.contactPhone')" [(ngModel)]="c.phone">
                               </div>
-                              <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;cursor:pointer">
+                              <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray-700);cursor:pointer">
                                 <input type="checkbox" [checked]="c.role === 'decision_maker'" (change)="setKeyContactDecisionMaker($index, $event)">
                                 {{ t('admin.edit.decisionMaker') }}
                               </label>
@@ -924,7 +925,7 @@ interface DiscoveredCompany {
                           @if (keyContactsDraft().length < maxKeyContacts) {
                             <button class="btn btn-g btn-sm" style="align-self:flex-start" (click)="addKeyContactDraft($event)">{{ t('admin.edit.addContact') }}</button>
                           } @else {
-                            <div style="font-size:11px;color:#6b7280">{{ t('admin.edit.maxContacts', { max: maxKeyContacts }) }}</div>
+                            <div style="font-size:11px;color:var(--gray-500)">{{ t('admin.edit.maxContacts', { max: maxKeyContacts }) }}</div>
                           }
                           <div style="display:flex;gap:6px;margin-top:2px">
                             <button class="btn btn-p btn-sm" [disabled]="isSavingKeyContacts()" (click)="saveKeyContacts(p, $event)">{{ t('admin.edit.save') }}</button>
@@ -934,8 +935,8 @@ interface DiscoveredCompany {
                       } @else if (p.key_contacts?.length) {
                         <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
                           @for (c of p.key_contacts!; track $index) {
-                            <div style="border:1px solid #e5e7eb;border-radius:6px;
-                                        padding:8px 10px;background:#fff;font-size:12px">
+                            <div style="border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:6px;
+                                        padding:8px 10px;background:var(--surface);font-size:12px">
                               @if (c.name || c.role === 'decision_maker') {
                                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
                                   @if (c.name) {
@@ -947,19 +948,19 @@ interface DiscoveredCompany {
                                 </div>
                               }
                               @if (c.title) {
-                                <div style="color:#6b7280;margin-bottom:4px">{{ c.title }}</div>
+                                <div style="color:var(--gray-500);margin-bottom:4px">{{ c.title }}</div>
                               }
                               <div style="display:flex;flex-wrap:wrap;gap:8px">
                                 @if (c.email) {
                                   <a [href]="'mailto:' + c.email"
-                                    style="color:var(--orange);text-decoration:none"
+                                    style="color: var(--orange-text);text-decoration:none"
                                     (click)="$event.stopPropagation()">
                                     ✉ {{ c.email }}
                                   </a>
                                 }
                                 @if (c.phone) {
                                   <a [href]="'tel:' + c.phone"
-                                    style="color:#374151;text-decoration:none"
+                                    style="color:var(--gray-700);text-decoration:none"
                                     (click)="$event.stopPropagation()">
                                     📞 {{ c.phone }}
                                   </a>
@@ -969,7 +970,7 @@ interface DiscoveredCompany {
                           }
                         </div>
                       } @else if (p.enrichment_status === 'done') {
-                        <div style="font-size:12px;color:#9ca3af;padding-top:4px">
+                        <div style="font-size:12px;color:var(--gray-400);padding-top:4px">
                           {{ t('admin.detail.noKeyContacts') }}
                         </div>
                       }
@@ -982,7 +983,7 @@ interface DiscoveredCompany {
                     <div class="enrich-log">
                       <div class="detail-label" style="margin-bottom:10px">
                         {{ t('admin.log.heading') }}
-                        <span style="font-weight:400;color:#9ca3af;margin-left:8px;text-transform:none;letter-spacing:0">
+                        <span style="font-weight:400;color:var(--gray-400);margin-left:8px;text-transform:none;letter-spacing:0">
                           {{ p.enrichment_log.timestamp | date:'dd.MM.yyyy HH:mm' }}
                         </span>
                       </div>
@@ -1004,7 +1005,7 @@ interface DiscoveredCompany {
                                   @if (expandedGusIds().has(p.id)) {
                                     <span style="display:inline-flex;flex-wrap:wrap;gap:2px;margin-left:4px;vertical-align:middle">
                                       @for (code of (p.enrichment_log?.gus?.pkd_codes ?? []); track code) {
-                                        <span style="padding:0 4px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:3px;font-size:10px;font-family:monospace">{{ code }}</span>
+                                        <span style="padding:0 4px;background:var(--gray-100);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:3px;font-size:10px;font-family:monospace">{{ code }}</span>
                                       }
                                     </span>
                                     <button class="log-expand-btn" (click)="toggleGusExpand(p.id, $event)">{{ t('admin.log.collapse') }}</button>
@@ -1107,13 +1108,14 @@ interface DiscoveredCompany {
             }
           } @empty {
             <tr>
-              <td colspan="16" style="text-align:center;color:#9ca3af;padding:40px">
+              <td colspan="16" style="text-align:center;color:var(--gray-400);padding:40px">
                 {{ t('admin.table.empty') }}
               </td>
             </tr>
           }
         </tbody>
       </table>
+      </div>
 
       <!-- Paginacja -->
       @if (pages() > 1) {
@@ -1121,7 +1123,7 @@ interface DiscoveredCompany {
           <button class="btn btn-g" [disabled]="page() <= 1" (click)="setPage(page() - 1)">
             ‹ {{ t('admin.pager.previous') }}
           </button>
-          <span style="line-height:32px;font-size:13px">
+          <span style="line-height:32px;font-size:14px">
             {{ page() }} / {{ pages() }}
           </span>
           <button class="btn btn-g" [disabled]="page() >= pages()" (click)="setPage(page() + 1)">
@@ -1141,7 +1143,7 @@ interface DiscoveredCompany {
 
         @if (activeMenuProspect()!.enrichment_status !== 'hold') {
           <button class="mi" (click)="setStatus(activeMenuProspect()!, 'hold'); closeMenu()">
-            ⏸ {{ t('admin.status.hold') }}
+            ⏸️ {{ t('admin.status.hold') }}
           </button>
         } @else {
           <button class="mi" (click)="setStatus(activeMenuProspect()!, 'pending'); closeMenu()">
@@ -1181,36 +1183,36 @@ interface DiscoveredCompany {
     @if (toLeadDialog() != null) {
       <div class="inspect-overlay" (click)="toLeadDialog.set(null)"></div>
       <div class="inspect-modal" style="max-width:420px;padding:24px" (click)="$event.stopPropagation()">
-        <div style="font-weight:600;font-size:15px;margin-bottom:4px">{{ t('admin.toLead.heading') }}</div>
-        <div style="font-size:13px;color:#6b7280;margin-bottom:16px">
+        <div style="font-weight:600;font-size:16px;margin-bottom:4px">{{ t('admin.toLead.heading') }}</div>
+        <div style="font-size:14px;color:var(--gray-500);margin-bottom:16px">
           {{ toLeadDialog()!.company_name || toLeadDialog()!.nip }}
         </div>
 
-        <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:4px">
           {{ t('admin.toLead.taxIdLabel') }}
         </label>
         <div style="position:relative;margin-bottom:4px">
-          <input class="inp" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:14px;letter-spacing:0.05em"
+          <input class="inp" style="width:100%;box-sizing:border-box"
             [(ngModel)]="toLeadNipValue"
             maxlength="13"
             placeholder="0000000000">
           @if (toLeadNipDigits !== toLeadDialog()!.nip) {
-            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#d97706;font-weight:600">
+            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);font-weight:600">
               {{ t('admin.toLead.changed') }}
             </span>
           }
         </div>
-        <div style="font-size:11px;color:#6b7280;margin-bottom:16px">
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:16px">
           {{ t('admin.toLead.taxIdHint') }}
           @if (toLeadNipDigits !== toLeadDialog()!.nip && toLeadNipDigits.length === 10) {
-            <span style="color:#d97706"> {{ t('admin.toLead.prospectWillUpdate') }}</span>
+            <span style="color:oklch(from #d97706 max(l, var(--text-min-l)) c h)"> {{ t('admin.toLead.prospectWillUpdate') }}</span>
           }
         </div>
 
-        <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:6px">
           {{ t('admin.toLead.assignTo') }}
         </label>
-        <select style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;margin-bottom:20px"
+        <select style="width:100%;height:36px;margin-bottom:20px"
           [ngModel]="toLeadAssignedTo()"
           (ngModelChange)="toLeadAssignedTo.set($event)">
           <option value="">{{ t('admin.toLead.assignToSelf') }}</option>
@@ -1219,7 +1221,7 @@ interface DiscoveredCompany {
           }
         </select>
 
-        <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:4px">
           {{ t('admin.toLead.tagLabel') }}
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:20px"
@@ -1228,17 +1230,17 @@ interface DiscoveredCompany {
           [placeholder]="t('admin.toLead.tagPlaceholder')">
 
         @if (toLeadDuplicateError()) {
-          <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#991b1b">
+          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #fecdd3 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">
             {{ t('admin.toLead.duplicateWarning') }}
             <strong>{{ toLeadDuplicateError()!.src === 'lead' ? t('admin.table.lead') : t('admin.table.partner') }}</strong>:
             „{{ toLeadDuplicateError()!.company }}"
           </div>
         }
 
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button style="padding:7px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px"
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn btn-g"
             (click)="toLeadDialog.set(null)">{{ t('admin.bulk.cancel') }}</button>
-          <button style="padding:7px 16px;border:none;border-radius:6px;background:var(--orange);color:#fff;cursor:pointer;font-size:13px;font-weight:600"
+          <button class="btn btn-p"
             [disabled]="toLeadNipDigits.length !== 10 || !!toLeadLoading()"
             (click)="confirmToLead()">
             {{ toLeadLoading() ? t('admin.toLead.creating') : toLeadDuplicateError() ? t('admin.toLead.createAnyway') : t('admin.toLead.create') }}
@@ -1254,7 +1256,7 @@ interface DiscoveredCompany {
 
         <div class="inspect-header">
           <div class="inspect-title">
-            <span style="font-size:12px;color:#6b7280;font-weight:500">🔍 {{ t('admin.inspect.heading') }}</span>
+            <span style="font-size:12px;color:var(--gray-500);font-weight:500">🔍 {{ t('admin.inspect.heading') }}</span>
             <span class="inspect-company">{{ inspectTarget()!.company_name || inspectTarget()!.nip }}</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
@@ -1274,7 +1276,7 @@ interface DiscoveredCompany {
         @if (inspectView() === 'prompt') {
           <div class="inspect-prompt-view">
             @if (inspectPromptLoading()) {
-              <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ca3af;font-size:13px">
+              <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--gray-400);font-size:14px">
                 <span class="row-spin"></span> {{ t('admin.inspect.loadingPrompt') }}
               </div>
             } @else if (inspectPrompt()) {
@@ -1289,7 +1291,7 @@ interface DiscoveredCompany {
         @if (inspectView() === 'scoring') {
           <div class="inspect-prompt-view">
             @if (inspectScoringRulesLoading()) {
-              <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ca3af;font-size:13px">
+              <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--gray-400);font-size:14px">
                 <span class="row-spin"></span> {{ t('admin.inspect.loadingScoring') }}
               </div>
             } @else if (inspectScoringRules()) {
@@ -1332,9 +1334,9 @@ interface DiscoveredCompany {
                     @if (inspectTarget()!.enrichment_log?.gus?.pkd_codes?.length) {
                       <div class="inspect-row" style="align-items:flex-start">
                         <span class="ik">{{ t('admin.inspect.pkdCodes') }}</span>
-                        <span class="iv" style="display:flex;flex-wrap:wrap;gap:3px">
+                        <span class="iv" style="display:flex;flex-wrap:wrap;gap:4px">
                           @for (code of (inspectTarget()!.enrichment_log?.gus?.pkd_codes ?? []); track code) {
-                            <span style="padding:1px 6px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:3px;font-size:10px;font-family:monospace"
+                            <span style="padding:1px 6px;background:var(--gray-100);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:3px;font-size:10px;font-family:monospace"
                               [class.inspect-highlight]="code === inspectTarget()!.enrichment_log?.gus?.pkd_main">{{ code }}</span>
                           }
                         </span>
@@ -1435,9 +1437,9 @@ interface DiscoveredCompany {
 
             <!-- Model AI -->
             @if (inspectTarget()!.enrichment_log!.claude) {
-              <div class="inspect-card" style="background:#f0f9ff;border-color:#bae6fd">
+              <div class="inspect-card" style="background:var(--gray-50);border-color:color-mix(in srgb, #bae6fd var(--tint-mix), var(--surface))">
                 <div class="inspect-card-header">
-                  <span class="inspect-badge" style="background:#e0e7ff;color:#3730a3">AI</span>
+                  <span class="inspect-badge" style="background:color-mix(in srgb, #e0e7ff var(--tint-mix), var(--surface));color:oklch(from #3730a3 max(l, var(--text-min-l)) c h)">AI</span>
                   <span style="font-size:12px">Claude</span>
                 </div>
                 <div class="inspect-kv">
@@ -1509,7 +1511,7 @@ interface DiscoveredCompany {
                   <span class="sb-value">= {{ sb.total }}</span>
                 </div>
                 @if (sb.actualScore != null && sb.actualScore !== sb.total) {
-                  <div class="sb-row" style="font-size:11px;color:#9ca3af;background:#fafafa">
+                  <div class="sb-row" style="font-size:11px;color:var(--gray-400);background:var(--gray-50)">
                     <span class="sb-label">{{ t('admin.inspect.savedScore') }}</span>
                     <span class="sb-value">{{ sb.actualScore }}</span>
                   </div>
@@ -1526,8 +1528,8 @@ interface DiscoveredCompany {
 
             @if (inspectTarget()!.ai_summary) {
               <div>
-                <div class="inspect-section-title" style="margin-bottom:5px">{{ t('admin.detail.aiSummary') }}</div>
-                <div style="font-size:12px;line-height:1.6;color:#374151">{{ inspectTarget()!.ai_summary }}</div>
+                <div class="inspect-section-title" style="margin-bottom:4px">{{ t('admin.detail.aiSummary') }}</div>
+                <div style="font-size:12px;line-height:1.6;color:var(--gray-700)">{{ inspectTarget()!.ai_summary }}</div>
               </div>
             }
 
@@ -1541,14 +1543,14 @@ interface DiscoveredCompany {
               <div style="display:flex;flex-wrap:wrap;gap:8px">
                 @for (c of inspectTarget()!.key_contacts!; track $index) {
                   <div class="inspect-contact-card">
-                    @if (c.name) { <div style="font-weight:600;font-size:12px;color:#111827;margin-bottom:1px">{{ c.name }}</div> }
-                    @if (c.title) { <div style="font-size:11px;color:#6b7280;margin-bottom:5px">{{ c.title }}</div> }
+                    @if (c.name) { <div style="font-weight:600;font-size:12px;color:var(--gray-800);margin-bottom:1px">{{ c.name }}</div> }
+                    @if (c.title) { <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">{{ c.title }}</div> }
                     <div style="display:flex;flex-direction:column;gap:2px">
                       @if (c.email) {
-                        <a [href]="'mailto:' + c.email" style="color:var(--orange);text-decoration:none;font-size:11px" (click)="$event.stopPropagation()">✉ {{ c.email }}</a>
+                        <a [href]="'mailto:' + c.email" style="color: var(--orange-text);text-decoration:none;font-size:12px" (click)="$event.stopPropagation()">✉ {{ c.email }}</a>
                       }
                       @if (c.phone) {
-                        <span style="color:#374151;font-size:11px">📞 {{ c.phone }}</span>
+                        <span style="color:var(--gray-700);font-size:12px">📞 {{ c.phone }}</span>
                       }
                     </div>
                   </div>
@@ -1570,44 +1572,44 @@ interface DiscoveredCompany {
         <div class="reprocess-dialog-title">
           Re-process: {{ reprocessTarget()!.company_name || reprocessTarget()!.nip }}
         </div>
-        <div style="font-size:12px;color:#6b7280;margin-bottom:14px">
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px">
           {{ t('admin.reprocess.hint') }}
         </div>
 
-        <label style="font-size:12px;font-weight:500;color:#374151;display:block;margin-bottom:4px">
-          {{ t('admin.table.taxId') }} <span style="font-weight:400;color:#6b7280">{{ t('admin.reprocess.taxIdHint') }}</span>
+        <label style="font-size:12px;font-weight:500;color:var(--gray-700);display:block;margin-bottom:4px">
+          {{ t('admin.table.taxId') }} <span style="font-weight:400;color:var(--gray-500)">{{ t('admin.reprocess.taxIdHint') }}</span>
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:12px"
           [(ngModel)]="reprocessNipValue"
           placeholder="{{ reprocessTarget()!.nip }}"
           maxlength="12">
 
-        <label style="font-size:12px;font-weight:500;color:#374151;display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <label style="font-size:12px;font-weight:500;color:var(--gray-700);display:flex;align-items:center;gap:8px;margin-bottom:4px">
           {{ t('admin.reprocess.website') }}
           @if (reprocessTarget()?.website_status === 'ok') {
-            <span style="font-size:10px;font-weight:600;color:#16a34a">✓ {{ t('admin.website.fetched') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">✓ {{ t('admin.website.fetched') }}</span>
           } @else if (reprocessTarget()?.website_status === 'blocked') {
-            <span style="font-size:10px;font-weight:600;color:#d97706" [title]="t('admin.website.blockedShort')">⚠ Cloudflare</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)" [title]="t('admin.website.blockedShort')">⚠ Cloudflare</span>
           } @else if (reprocessTarget()?.website_status === 'failed') {
-            <span style="font-size:10px;font-weight:600;color:#d97706">⚠ {{ t('admin.website.noContent') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)">⚠ {{ t('admin.website.noContent') }}</span>
           } @else if (reprocessTarget()?.website_status === 'not_found') {
-            <span style="font-size:10px;font-weight:600;color:#9ca3af">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
+            <span style="font-size:10px;font-weight:600;color:var(--gray-400)">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
           } @else if (reprocessTarget()?.website_status === 'unconfirmed') {
-            <span style="font-size:10px;font-weight:600;color:#d97706">⚠ {{ t('admin.website.unconfirmedLabel') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)">⚠ {{ t('admin.website.unconfirmedLabel') }}</span>
           }
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:12px"
           [(ngModel)]="reprocessUrlValue"
           placeholder="https://www.firma.pl">
 
-        <label style="font-size:12px;font-weight:500;color:#374151;display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <label style="font-size:12px;font-weight:500;color:var(--gray-700);display:flex;align-items:center;gap:8px;margin-bottom:4px">
           LinkedIn
           @if (reprocessTarget()?.linkedin_status === 'ok') {
-            <span style="font-size:10px;font-weight:600;color:#16a34a">✓ {{ t('admin.website.fetched') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">✓ {{ t('admin.website.fetched') }}</span>
           } @else if (reprocessTarget()?.linkedin_status === 'blocked') {
-            <span style="font-size:10px;font-weight:600;color:#d97706">⚠ {{ t('admin.linkedin.blockedLabel') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)">⚠ {{ t('admin.linkedin.blockedLabel') }}</span>
           } @else if (reprocessTarget()?.linkedin_status === 'not_found') {
-            <span style="font-size:10px;font-weight:600;color:#9ca3af">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
+            <span style="font-size:10px;font-weight:600;color:var(--gray-400)">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
           }
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:10px"
@@ -1617,9 +1619,9 @@ interface DiscoveredCompany {
         <label style="display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer">
           <input type="checkbox" [(ngModel)]="reprocessDoLinkedin"
             style="width:14px;height:14px;accent-color:#3BAA5D;cursor:pointer">
-          <span style="font-size:12px;color:#374151">
+          <span style="font-size:12px;color:var(--gray-700)">
             {{ t('admin.reprocess.analyzeLinkedin') }}
-            <span style="color:#6b7280">{{ t('admin.reprocess.analyzeLinkedinHint') }}</span>
+            <span style="color:var(--gray-500)">{{ t('admin.reprocess.analyzeLinkedinHint') }}</span>
           </span>
         </label>
 
@@ -1637,18 +1639,17 @@ interface DiscoveredCompany {
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div>
-            <div style="font-weight:700;font-size:15px;color:#111827">🔍 {{ t('admin.discovery') }}</div>
-            <div style="font-size:12px;color:#6b7280;margin-top:2px">
+            <div style="font-weight:700;font-size:16px;color:var(--gray-800)">🔍 {{ t('admin.discovery') }}</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:2px">
               {{ t('admin.discoveryModal.subtitle') }}
             </div>
           </div>
-          <button (click)="cancelDiscovery()"
-            style="background:none;border:none;font-size:18px;cursor:pointer;color:#6b7280;padding:4px 8px">✕</button>
+          <button class="inspect-close" (click)="cancelDiscovery()">✕</button>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 160px;gap:8px;margin-bottom:10px">
           <div>
-            <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">{{ t('admin.discoveryModal.companyName') }}</label>
+            <label style="font-size:12px;font-weight:600;color:var(--gray-700);display:block;margin-bottom:4px">{{ t('admin.discoveryModal.companyName') }}</label>
             <input class="inp" style="width:100%;box-sizing:border-box"
               [(ngModel)]="discoverySeedName"
               [placeholder]="t('admin.discoveryModal.companyNamePlaceholder')"
@@ -1656,7 +1657,7 @@ interface DiscoveredCompany {
               (keydown.enter)="startDiscovery()">
           </div>
           <div>
-            <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">{{ t('admin.discoveryModal.taxId') }}</label>
+            <label style="font-size:12px;font-weight:600;color:var(--gray-700);display:block;margin-bottom:4px">{{ t('admin.discoveryModal.taxId') }}</label>
             <input class="inp" style="width:100%;box-sizing:border-box"
               [(ngModel)]="discoverySeedNip"
               placeholder="1234567890"
@@ -1667,16 +1668,16 @@ interface DiscoveredCompany {
 
         @if (discoveryLoading()) {
           <div style="margin-bottom:12px">
-            <div style="height:4px;background:#f3f4f6;border-radius:2px;overflow:hidden">
+            <div style="height:4px;background:var(--gray-100);border-radius:2px;overflow:hidden">
               <div class="discovery-progress-bar"></div>
             </div>
             @if (discoveryResults().length > 0) {
-              <div style="font-size:11px;color:#6b7280;margin-top:5px">
+              <div style="font-size:12px;color:var(--gray-500);margin-top:4px">
                 ⏳ {{ t('admin.discoveryModal.searching') }}
-                <b style="color:var(--orange)"> {{ t('admin.discoveryModal.foundCount', { count: discoveryResults().length }) }}</b>
+                <b style="color: var(--orange-text)"> {{ t('admin.discoveryModal.foundCount', { count: discoveryResults().length }) }}</b>
               </div>
             } @else {
-              <div style="font-size:11px;color:#6b7280;margin-top:5px">⏳ {{ t('admin.discoveryModal.searching') }}</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:4px">⏳ {{ t('admin.discoveryModal.searching') }}</div>
             }
           </div>
         }
@@ -1690,15 +1691,15 @@ interface DiscoveredCompany {
           </button>
           <button class="btn btn-g" (click)="cancelDiscovery()">{{ t('admin.bulk.cancel') }}</button>
           @if (discoveryResults().length > 0 && !discoveryLoading()) {
-            <span style="align-self:center;font-size:12px;color:#6b7280">
-              {{ t('admin.detail.industry') }} <b style="color:#374151">{{ discoveryIndustry() || '—' }}</b>
+            <span style="align-self:center;font-size:12px;color:var(--gray-500)">
+              {{ t('admin.detail.industry') }} <b style="color:var(--gray-700)">{{ discoveryIndustry() || '—' }}</b>
             </span>
           }
         </div>
 
         @if (discoveryResults().length > 0) {
-          <div style="border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;margin-bottom:10px">
-            <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;background:#f9fafb;border-bottom:1px solid #e5e7eb;padding:6px 10px;font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em">
+          <div style="border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:12px;overflow:hidden;margin-bottom:12px">
+            <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;background:var(--gray-50);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:6px 10px;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.04em">
               <label style="display:flex;align-items:center;cursor:pointer">
                 <input type="checkbox"
                   [checked]="discoveryAllSelected()"
@@ -1713,8 +1714,8 @@ interface DiscoveredCompany {
             </div>
 
             @for (c of discoveryResults(); track $index) {
-              <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;padding:7px 10px;border-bottom:1px solid #f3f4f6;font-size:12px;align-items:center"
-                [style.background]="c.selected ? 'var(--orange-pale)' : 'white'">
+              <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;padding:8px 10px;border-bottom:1px solid var(--gray-100);font-size:12px;align-items:center"
+                [style.background]="c.selected ? 'var(--orange-pale)' : 'var(--surface)'">
 
                 <label style="display:flex;align-items:center;cursor:pointer">
                   <input type="checkbox"
@@ -1725,29 +1726,29 @@ interface DiscoveredCompany {
                 </label>
 
                 <div>
-                  <div style="font-weight:500;color:#111827;line-height:1.3">{{ c.company_name }}</div>
+                  <div style="font-weight:500;color:var(--gray-800);line-height:1.3">{{ c.company_name }}</div>
                   @if (c.regon) {
-                    <div style="font-size:10px;color:#9ca3af">REGON {{ c.regon }}</div>
+                    <div style="font-size:10px;color:var(--gray-400)">REGON {{ c.regon }}</div>
                   }
                 </div>
 
                 <div>
                   @if (c.nip_verified) {
-                    <span style="font-family:monospace;font-size:11px;color:#374151">{{ c.nip }}</span>
-                    <span style="margin-left:4px;font-size:10px;color:#16a34a" [title]="t('admin.discoveryModal.verifiedInGus')">✓</span>
+                    <span style="font-family:monospace;font-size:12px;color:var(--gray-700)">{{ c.nip }}</span>
+                    <span style="margin-left:4px;font-size:10px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)" [title]="t('admin.discoveryModal.verifiedInGus')">✓</span>
                   } @else {
-                    <input class="inp" style="width:100px;font-size:11px;padding:2px 5px;height:24px;font-family:monospace"
+                    <input class="inp" style="width:100px;font-size:12px;padding:2px 4px;height:24px"
                       [(ngModel)]="c.nip_edit"
                       [placeholder]="t('admin.table.taxId')"
                       [title]="t('admin.discoveryModal.enterTaxIdManually')">
                     @if (c.nip) {
-                      <div style="font-size:9px;color:#f59e0b;margin-top:1px">⚠ {{ t('admin.discoveryModal.unverified') }}</div>
+                      <div style="font-size:10px;color:oklch(from #f59e0b max(l, var(--text-min-l)) c h);margin-top:1px">⚠ {{ t('admin.discoveryModal.unverified') }}</div>
                     }
                     <!-- Wyszukiwanie NIP-u w internecie jest płatne, więc odpala
                          się tylko z tego przycisku — nigdy automatycznie dla
                          całej listy wyników. -->
                     <button class="btn btn-g"
-                      style="font-size:9px;padding:1px 5px;height:20px;margin-top:2px"
+                      style="font-size:10px;padding:1px 4px;height:20px;margin-top:2px"
                       [disabled]="c.resolvingNip"
                       (click)="resolveNip($index)"
                       [title]="t('admin.discoveryModal.resolveTaxIdTooltip')">
@@ -1759,47 +1760,47 @@ interface DiscoveredCompany {
                 <div>
                   @if (c.website_url && !c.website_edit) {
                     <a [href]="c.website_url" target="_blank" rel="noopener"
-                      style="color:var(--orange);text-decoration:none;font-size:11px;word-break:break-all"
+                      style="color: var(--orange-text);text-decoration:none;font-size:12px;word-break:break-all"
                       (click)="$event.stopPropagation()">
                       {{ c.website_url | slice:0:22 }}…
                     </a>
                   } @else {
-                    <input class="inp" style="width:130px;font-size:11px;padding:2px 5px;height:24px"
+                    <input class="inp" style="width:130px;font-size:12px;padding:2px 4px;height:24px"
                       [(ngModel)]="c.website_edit"
                       [placeholder]="c.website_url || 'https://…'"
                       [title]="t('admin.discoveryModal.editWebsite')">
                   }
                 </div>
 
-                <div style="font-size:11px;color:#374151">
+                <div style="font-size:12px;color:var(--gray-700)">
                   @if (c.pkd_main) {
-                    <span style="background:#eff6ff;color:#1d4ed8;border-radius:3px;padding:1px 5px;font-size:10px">{{ c.pkd_main }}</span>
+                    <span style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:3px;padding:1px 4px;font-size:10px">{{ c.pkd_main }}</span>
                   } @else {
-                    <span style="color:#9ca3af">—</span>
+                    <span style="color:var(--gray-400)">—</span>
                   }
                 </div>
 
                 <!-- Obecność WYŁĄCZNIE w zasobach tego tenanta — backend filtruje
                      po tenant_id, front nigdy nie widzi danych innego klienta. -->
-                <div style="display:flex;flex-wrap:wrap;gap:3px">
+                <div style="display:flex;flex-wrap:wrap;gap:4px">
                   @if (c.in_prospects) { <span class="badge-cp">P</span> }
                   @if (c.in_leads)     { <span class="badge-cl">L</span> }
                   @if (c.in_partners)  { <span class="badge-cpa">PA</span> }
                   @if (!c.in_prospects && !c.in_leads && !c.in_partners) {
-                    <span style="font-size:10px;color:#9ca3af">{{ t('admin.discoveryModal.newCompany') }}</span>
+                    <span style="font-size:10px;color:var(--gray-400)">{{ t('admin.discoveryModal.newCompany') }}</span>
                   }
                 </div>
               </div>
             }
           </div>
 
-          <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid #e5e7eb">
-            <span style="font-size:12px;color:#6b7280">
-              {{ t('admin.discoveryModal.selectedLabel') }} <b style="color:#111827">{{ discoverySelectedCount() }}</b>
+          <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))">
+            <span style="font-size:12px;color:var(--gray-500)">
+              {{ t('admin.discoveryModal.selectedLabel') }} <b style="color:var(--gray-800)">{{ discoverySelectedCount() }}</b>
             </span>
             <span class="tsp"></span>
             @if (discoveryDone()) {
-              <div style="font-size:12px;padding:6px 12px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;color:#166534">
+              <div style="font-size:12px;padding:8px 12px;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border:1px solid #86efac;border-radius:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
                 ✓ {{ t('admin.discoveryModal.addedPrefix') }} <b>{{ discoveryDone()!.added }}</b> {{ t('admin.discoveryModal.addedSuffix') }}
                 <b>„{{ discoveryDone()!.source_database }}"</b>
                 @if (discoveryDone()!.batchStarted) { {{ t('admin.discoveryModal.andEnrichmentStarted') }} }
@@ -1815,7 +1816,7 @@ interface DiscoveredCompany {
         }
 
         @if (!discoveryLoading() && discoveryResults().length === 0 && discoverySeedName.trim()) {
-          <div style="padding:20px;text-align:center;color:#6b7280;font-size:12px">
+          <div style="padding:20px;text-align:center;color:var(--gray-500);font-size:12px">
             {{ t('admin.discoveryModal.emptyHint') }}
           </div>
         }
@@ -1845,13 +1846,13 @@ interface DiscoveredCompany {
       position:fixed; z-index:2001;
       top:50%; left:50%; transform:translate(-50%,-50%);
       width:860px; max-width:95vw; max-height:90vh; overflow-y:auto;
-      background:white; border-radius:12px; padding:22px 24px;
-      box-shadow:0 8px 32px rgba(0,0,0,0.22);
+      background:var(--surface); border-radius:14px; padding:24px;
+      box-shadow:0 7px 29px rgba(0,0,0,0.198);
     }
     /* Obecność w zasobach TEGO tenanta: P = prospekt, L = lead, PA = partner */
-    .badge-cp  { background:var(--orange-pale);color:var(--orange);border:1px solid #a7d8b6;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700 }
-    .badge-cl  { background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700 }
-    .badge-cpa { background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700 }
+    .badge-cp  { background:var(--orange-pale);color: var(--orange-text);border:1px solid #a7d8b6;border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
+    .badge-cl  { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border:1px solid #93c5fd;border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
+    .badge-cpa { background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h);border:1px solid color-mix(in srgb, #c4b5fd var(--tint-mix), var(--surface));border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
 
     .reprocess-overlay {
       position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.35);
@@ -1859,17 +1860,17 @@ interface DiscoveredCompany {
     .reprocess-dialog {
       position:fixed; z-index:2001;
       top:50%; left:50%; transform:translate(-50%,-50%);
-      background:#fff; border-radius:10px; padding:24px;
+      background:var(--surface); border-radius:14px; padding:24px;
       width:400px; max-width:calc(100vw - 32px);
-      box-shadow:0 8px 32px rgba(0,0,0,0.22);
+      box-shadow:0 7px 29px rgba(0,0,0,0.198);
     }
     .reprocess-dialog-title {
-      font-weight:600; font-size:14px; color:#111827;
+      font-weight:600; font-size:14px; color:var(--gray-800);
       margin-bottom:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     }
 
     #topbar {
-      height:60px; background:white; border-bottom:1px solid var(--gray-200);
+      height:60px; background:var(--surface); border-bottom:1px solid var(--gray-200);
       display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0;
     }
 
@@ -1878,49 +1879,51 @@ interface DiscoveredCompany {
       padding:20px 24px 32px; display:flex; flex-direction:column; gap:0;
     }
 
-    .fld { display:flex; flex-direction:column; gap:3px; }
-    .fld label { font-size:11px; font-weight:500; color:#6b7280; }
-    .inp { height:32px; border:1px solid #d1d5db; border-radius:6px;
-           padding:0 8px; font-size:13px; background:#fff; }
-    .inp:focus { outline:none; border-color:var(--orange); }
-    .inp-sm { height:26px; font-size:12px; padding:0 6px; }
+    .fld { display:flex; flex-direction:column; gap:4px; }
+    .fld label { font-size:12px; font-weight:500; color:var(--gray-500); }
+    .inp { box-sizing:border-box; height:36px; border:1px solid var(--gray-200); border-radius:12px;
+           padding:0 14px; font-size:14px; background:var(--surface); box-shadow:0 1px 2px rgba(0,0,0,.05); }
+    .inp:focus { outline:none; border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
+    .filter-card { margin-bottom:16px; padding:12px 18px; border-radius:14px; }
+    .inp-sm { height:28px; font-size:12px; padding:0 8px; border-radius:8px; }
 
     .icon-btn {
       border:none; background:transparent; cursor:pointer; padding:0 2px;
-      font-size:12px; line-height:1; color:#6b7280; opacity:.7;
+      font-size:12px; line-height:1; color:var(--gray-500); opacity:.7;
     }
     .icon-btn:hover { opacity:1; }
-    .icon-btn-danger { color:#dc2626; }
+    .icon-btn-danger { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .dm-badge {
-      background:var(--orange-pale); color:var(--orange); font-size:10px; font-weight:700;
+      background:var(--orange-pale); color: var(--orange-text); font-size:10px; font-weight:700;
       padding:1px 6px; border-radius:4px;
     }
 
     /* Pasek akcji masowych */
     .bulk-bar {
       display: flex; align-items: center; gap: 8px;
-      padding: 8px 14px; margin-bottom: 10px;
-      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;
-      font-size: 13px;
+      padding: 8px 16px; margin-bottom: 12px; flex-wrap: wrap;
+      background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border: 1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius: 14px;
+      font-size: 14px;
     }
-    .bulk-count { font-weight: 600; color: #1d4ed8; margin-right: 4px; white-space: nowrap; }
-    .bulk-delete-btn { color: #991b1b !important; border-color: #fca5a5 !important; }
-    .bulk-delete-btn:hover:not(:disabled) { background: #fee2e2 !important; }
+    .bulk-count { font-weight: 600; color: oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); margin-right: 4px; white-space: nowrap; }
 
-    .tbl { width:100%; border-collapse:collapse; font-size:13px; }
+    /* overflow: clip rounds the corners without creating a scroll box, so the
+       sticky table header keeps sticking to the page scroll. */
+    .tbl-card { background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow:clip; }
+    .tbl { width:100%; border-collapse:collapse; font-size:12px; }
     .tbl th {
-      background:#f9fafb; text-align:left; padding:8px 10px 14px;
-      border-bottom:1px solid #e5e7eb; font-size:11px;
-      font-weight:600; color:#6b7280; white-space:nowrap; position:sticky; top:0; z-index:1;
+      background:var(--gray-50); text-align:left; padding:8px 10px 14px;
+      border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); font-size:12px;
+      font-weight:600; color:var(--gray-500); white-space:nowrap; position:sticky; top:0; z-index:1;
       vertical-align:bottom;
     }
-    .tbl td { padding:8px 10px; border-bottom:1px solid #f3f4f6; vertical-align:top; }
-    .tbl tr:hover td { background:#fafafa; }
-    .tbl tr.expanded td { background:#f0f9ff; }
-    .tbl tr.row-selected td { background:#eff6ff !important; }
-    .tbl tr.row-selected:hover td { background:#dbeafe !important; }
-    .tbl tr.detail-row td { background:#fafafa !important; }
-    .tbl tr.detail-row:hover td { background:#fafafa !important; }
+    .tbl td { padding:8px 10px; border-bottom:1px solid var(--gray-100); vertical-align:top; }
+    .tbl tr:hover td { background:var(--gray-50); }
+    .tbl tr.expanded td { background:color-mix(in srgb, #f0f9ff var(--tint-mix), var(--surface)); }
+    .tbl tr.row-selected td { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)) !important; }
+    .tbl tr.row-selected:hover td { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)) !important; }
+    .tbl tr.detail-row td { background:var(--gray-50) !important; }
+    .tbl tr.detail-row:hover td { background:var(--gray-50) !important; }
 
     /* Kolumna checkbox */
     .cb-th { width: 36px; min-width: 36px; max-width: 36px; text-align: center; padding: 8px 4px 14px !important; vertical-align: bottom; }
@@ -1942,9 +1945,9 @@ interface DiscoveredCompany {
       writing-mode: vertical-rl;
       transform: rotate(180deg);
       display: inline-block;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
-      color: #6b7280;
+      color: var(--gray-500);
       cursor: default;
       letter-spacing: 0.3px;
     }
@@ -1954,20 +1957,20 @@ interface DiscoveredCompany {
       position: relative;
       display: flex;
       justify-content: center;
-      margin-top: 5px;
+      margin-top: 4px;
     }
     .sig-info {
       width: 15px; height: 15px;
       border-radius: 50%;
-      border: 1px solid #d1d5db;
-      background: #f9fafb;
-      color: #9ca3af;
-      font-size: 9px; font-weight: 700;
+      border: 1px solid var(--gray-300);
+      background: var(--gray-50);
+      color: var(--gray-400);
+      font-size: 10px; font-weight: 700;
       cursor: help;
       display: flex; align-items: center; justify-content: center;
       padding: 0; line-height: 1;
     }
-    .sig-info:hover { background: #f0f9ff; border-color: var(--orange); color: var(--orange); }
+    .sig-info:hover { background: color-mix(in srgb, #f0f9ff var(--tint-mix), var(--surface)); border-color: var(--orange); color: var(--orange-text); }
     .sig-info-tip {
       display: none;
       position: absolute;
@@ -1992,9 +1995,9 @@ interface DiscoveredCompany {
     }
     .sig-info-tip-title {
       font-weight: 700;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
       color: #fff;
-      font-size: 13px;
+      font-size: 14px;
     }
     .sig-info-wrap:hover .sig-info-tip { display: block; }
 
@@ -2009,25 +2012,25 @@ interface DiscoveredCompany {
       width: 16px;
       height: 16px;
       border-radius: 4px;
-      background: #e5e7eb;
-      border: 1px solid #d1d5db;
+      background: color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
+      border: 1px solid var(--gray-300);
     }
     .sig-yes {
-      background: #bbf7d0 !important;
+      background: color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface)) !important;
       border-color: #4ade80 !important;
     }
     .sig-no {
-      background: #fee2e2 !important;
+      background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)) !important;
       border-color: #fca5a5 !important;
     }
 
     .detail-label {
-      font-size:11px; font-weight:600; color:#6b7280;
+      font-size:12px; font-weight:600; color:var(--gray-500);
       text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;
     }
 
     .tag { display:inline-block; padding:2px 6px; border-radius:4px;
-           font-size:11px; background:#fff7ed; color:#c2410c; }
+           font-size:12px; background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); }
     .tag-sm { font-size:10px; }
 
     /* Zasięg geograficzny */
@@ -2037,69 +2040,69 @@ interface DiscoveredCompany {
       font-size: 14px; cursor: default;
       border: 1px solid transparent;
     }
-    .scope-local    { background: #f3f4f6; border-color: #e5e7eb; }
-    .scope-national { background: #eff6ff; border-color: #bfdbfe; }
-    .scope-eu       { background: #ede9fe; border-color: #c4b5fd; }
-    .scope-global   { background: #f0fdf4; border-color: #86efac; }
+    .scope-local    { background: var(--gray-100); border-color: color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); }
+    .scope-national { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border-color: color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); }
+    .scope-eu       { background: color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); border-color: color-mix(in srgb, #c4b5fd var(--tint-mix), var(--surface)); }
+    .scope-global   { background: color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface)); border-color: #86efac; }
 
     /* Spinner na poziomie wiersza — zastępuje badge statusu podczas przetwarzania */
     @keyframes row-spin { to { transform: rotate(360deg); } }
     .row-spin {
       display: inline-block;
       width: 16px; height: 16px;
-      border: 2px solid #fbd0b6;
+      border: 2px solid color-mix(in srgb, #fbd0b6 var(--tint-mix), var(--surface));
       border-top-color: var(--orange);
       border-radius: 50%;
       animation: row-spin 0.75s linear infinite;
       vertical-align: middle;
     }
 
-    .badge { display:inline-block; padding:2px 7px; border-radius:10px; font-size:11px; font-weight:500; }
-    .badge-pending   { background:#fef3c7; color:#92400e; }
-    .badge-done      { background:#d1fae5; color:#065f46; }
-    .badge-error     { background:#fee2e2; color:#991b1b; }
-    .badge-no_website { background:#f3f4f6; color:#6b7280; }
-    .badge-no_krs    { background:#f3f4f6; color:#6b7280; }
-    .badge-hold      { background:#e0e7ff; color:#3730a3; }
-    .badge-archived  { background:#f3f4f6; color:#6b7280; }
-    .badge-lead      { background:#dbeafe; color:#1e40af; }
-    .badge-db        { background:#fef0e9; color:#c2410c; font-size:10px; padding:1px 6px; border-radius:8px; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:500; }
+    .badge-pending   { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .badge-done      { background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color:oklch(from #065f46 max(l, var(--text-min-l)) c h); }
+    .badge-error     { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .badge-no_website { background:var(--gray-100); color:var(--gray-500); }
+    .badge-no_krs    { background:var(--gray-100); color:var(--gray-500); }
+    .badge-hold      { background:color-mix(in srgb, #e0e7ff var(--tint-mix), var(--surface)); color:oklch(from #3730a3 max(l, var(--text-min-l)) c h); }
+    .badge-archived  { background:var(--gray-100); color:var(--gray-500); }
+    .badge-lead      { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
+    .badge-db        { background:color-mix(in srgb, #fef0e9 var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); font-size:10px; padding:1px 6px; border-radius:8px; }
 
     .btn-menu {
-      width:28px; height:28px; border:1px solid #e5e7eb; border-radius:6px;
+      width:28px; height:28px; border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:10px;
       background:none; cursor:pointer; font-size:16px; line-height:1;
       display:flex; align-items:center; justify-content:center;
-      color:#6b7280; transition:background .12s, border-color .12s;
+      color:var(--gray-500); transition:background .12s, border-color .12s;
     }
-    .btn-menu:hover:not(:disabled) { background:#f3f4f6; border-color:#d1d5db; color:#111; }
-    .btn-menu-active { background:#f3f4f6; border-color:var(--orange); color:var(--orange) !important; }
+    .btn-menu:hover:not(:disabled) { background:var(--gray-100); border-color:var(--gray-300); color:var(--ink-strong); }
+    .btn-menu-active { background:var(--gray-100); border-color:var(--orange); color: var(--orange-text) !important; }
     .btn-menu:disabled { opacity:.4; cursor:default; }
 
     /* Dropdown — position:fixed, poza flow tabeli */
     .row-menu {
       position:fixed; z-index:9999;
-      background:white; border:1px solid #e5e7eb; border-radius:8px;
-      box-shadow:0 4px 16px rgba(0,0,0,.12); padding:4px;
+      background:var(--surface); border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:14px;
+      box-shadow:0 4px 16px rgba(0,0,0,.12); padding:8px;
       min-width:180px;
     }
     .mi {
-      display:block; width:100%; text-align:left; padding:7px 12px;
-      border:none; background:none; cursor:pointer; font-size:13px;
-      border-radius:5px; color:#374151; white-space:nowrap;
+      display:block; width:100%; text-align:left; padding:8px 12px;
+      border:none; background:none; cursor:pointer; font-size:14px; font-family:inherit;
+      border-radius:10px; color:var(--gray-700); white-space:nowrap;
     }
-    .mi:hover { background:#f3f4f6; }
-    .mi-danger { color:#991b1b; }
-    .mi-danger:hover { background:#fee2e2; }
-    .mi-sep { height:1px; background:#f3f4f6; margin:3px 0; }
+    .mi:hover { background:var(--gray-100); }
+    .mi-danger { color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .mi-danger:hover { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); }
+    .mi-sep { height:1px; background:var(--gray-100); margin:4px 0; }
 
-    code { font-family:monospace; background:#f3f4f6; padding:1px 4px;
+    code { font-family:monospace; background:var(--gray-100); padding:1px 4px;
            border-radius:3px; font-size:12px; }
 
     /* Log enrichmentu */
     .enrich-log {
       margin-top: 16px;
       padding-top: 14px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
     }
     .log-steps { display: flex; flex-direction: column; gap: 6px; }
     .log-step {
@@ -2116,50 +2119,50 @@ interface DiscoveredCompany {
       border-radius: 4px;
       font-size: 10px; font-weight: 700;
       display: flex; align-items: center; justify-content: center;
-      background: #f3f4f6; color: #6b7280;
+      background: var(--gray-100); color: var(--gray-500);
     }
-    .log-badge-ok  { background: #d1fae5; color: #065f46; }
-    .log-badge-err { background: #fee2e2; color: #991b1b; }
+    .log-badge-ok  { background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: oklch(from #065f46 max(l, var(--text-min-l)) c h); }
+    .log-badge-err { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .log-step-body { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; flex: 1; }
-    .log-ok   { color: #065f46; font-weight: 500; }
-    .log-err  { color: #991b1b; font-weight: 500; }
-    .log-detail { color: #374151; }
-    .log-muted  { color: #9ca3af; font-style: italic; }
+    .log-ok   { color: oklch(from #065f46 max(l, var(--text-min-l)) c h); font-weight: 500; }
+    .log-err  { color: oklch(from #991b1b max(l, var(--text-min-l)) c h); font-weight: 500; }
+    .log-detail { color: var(--gray-700); }
+    .log-muted  { color: var(--gray-400); font-style: italic; }
     .log-expand-btn {
       background: none; border: none; padding: 0 0 0 4px; margin: 0;
-      color: #6b7280; font-size: 11px; font-style: italic; cursor: pointer;
-      &:hover { color: #3BAA5D; text-decoration: underline; }
+      color: var(--gray-500); font-size: 12px; font-style: italic; cursor: pointer;
+      &:hover { color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); text-decoration: underline; }
     }
 
     /* Sekcja sygnałów w logu Claude */
     .log-signals {
       width: 100%; margin-top: 8px;
-      display: flex; flex-direction: column; gap: 5px;
+      display: flex; flex-direction: column; gap: 4px;
     }
     .log-signal-row {
       display: flex; align-items: baseline; gap: 8px;
       padding: 4px 8px;
-      background: #fff; border: 1px solid #f3f4f6; border-radius: 5px;
+      background: var(--surface); border: 1px solid var(--gray-100); border-radius: 5px;
     }
     .log-sig-dot {
       width: 10px; height: 10px; flex-shrink: 0;
       border-radius: 3px;
-      background: #e5e7eb; border: 1px solid #d1d5db;
-      margin-top: 3px;
+      background: color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border: 1px solid var(--gray-300);
+      margin-top: 4px;
     }
     .log-signal-key {
       flex-shrink: 0;
       width: 68px;
-      font-weight: 600; font-size: 11px; color: #374151;
+      font-weight: 600; font-size: 12px; color: var(--gray-700);
     }
-    .log-signal-reason { font-size: 12px; color: #6b7280; line-height: 1.4; }
+    .log-signal-reason { font-size: 12px; color: var(--gray-500); line-height: 1.4; }
     .log-branches {
       margin-top: 6px;
       font-size: 12px;
       display: flex; flex-wrap: wrap; gap: 4px;
       align-items: baseline;
       padding: 4px 8px;
-      background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 5px;
+      background: var(--gray-50); border: 1px solid color-mix(in srgb, #bae6fd var(--tint-mix), var(--surface)); border-radius: 5px;
     }
 
     /* ── Inspect modal ─────────────────────────────── */
@@ -2172,38 +2175,39 @@ interface DiscoveredCompany {
       top: 4vh; left: 50%; transform: translateX(-50%);
       width: min(920px, calc(100vw - 32px));
       max-height: 92vh;
-      background: #fff; border-radius: 12px;
-      box-shadow: 0 16px 48px rgba(0,0,0,0.28);
+      background: var(--surface); border-radius: 14px;
+      box-shadow: 0 14px 43px rgba(0,0,0,0.252);
       display: flex; flex-direction: column;
       overflow: hidden;
     }
     .inspect-header {
       display: flex; align-items: flex-start; justify-content: space-between;
       padding: 16px 20px 12px;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
       flex-shrink: 0;
     }
     .inspect-title {
       display: flex; flex-direction: column; gap: 2px;
     }
     .inspect-company {
-      font-size: 16px; font-weight: 700; color: var(--orange);
+      font-size: 16px; font-weight: 700; color: var(--orange-text);
     }
     .inspect-close {
       flex-shrink: 0; margin-top: 2px;
       width: 28px; height: 28px;
-      border: 1px solid #e5e7eb; border-radius: 6px;
+      border: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius: 10px;
       background: none; cursor: pointer; font-size: 14px;
-      color: #6b7280; line-height: 1;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--gray-500); line-height: 1;
     }
-    .inspect-close:hover { background: #f3f4f6; color: #111; }
+    .inspect-close:hover { background: var(--gray-100); color: var(--ink-strong); }
     .inspect-body {
       display: grid; grid-template-columns: 250px 1fr;
       overflow: hidden; flex: 1 1 auto; min-height: 0;
     }
     .inspect-col-left {
       padding: 14px;
-      border-right: 1px solid #e5e7eb;
+      border-right: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
       overflow-y: auto;
       display: flex; flex-direction: column; gap: 10px;
     }
@@ -2212,93 +2216,93 @@ interface DiscoveredCompany {
       overflow-y: auto;
     }
     .inspect-section-title {
-      font-size: 10px; font-weight: 700; color: #9ca3af;
+      font-size: 10px; font-weight: 700; color: var(--gray-400);
       text-transform: uppercase; letter-spacing: 0.6px;
       margin-bottom: 8px;
     }
     .inspect-card {
-      border: 1px solid #e5e7eb; border-radius: 8px;
-      padding: 9px 11px; background: #fafafa;
+      border: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius: 12px;
+      padding: 8px 12px; background: var(--gray-50);
     }
     .inspect-card-header {
       display: flex; align-items: center; gap: 8px;
-      margin-bottom: 7px;
+      margin-bottom: 8px;
     }
     .inspect-badge {
       padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700;
-      background: #f3f4f6; color: #6b7280; flex-shrink: 0;
+      background: var(--gray-100); color: var(--gray-500); flex-shrink: 0;
     }
-    .inspect-badge-ok  { background: #d1fae5; color: #065f46; }
-    .inspect-badge-err { background: #fee2e2; color: #991b1b; }
+    .inspect-badge-ok  { background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: oklch(from #065f46 max(l, var(--text-min-l)) c h); }
+    .inspect-badge-err { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .inspect-kv { display: flex; flex-direction: column; gap: 4px; }
     .inspect-row { display: flex; gap: 6px; font-size: 12px; line-height: 1.4; }
-    .ik { color: #6b7280; flex-shrink: 0; min-width: 84px; }
-    .iv { color: #111827; flex: 1; word-break: break-all; }
-    .inspect-highlight { color: var(--orange); font-weight: 600; }
-    .inspect-muted { color: #9ca3af; font-style: italic; }
-    .inspect-link { color: var(--orange); text-decoration: none; word-break: break-all; }
+    .ik { color: var(--gray-500); flex-shrink: 0; min-width: 84px; }
+    .iv { color: var(--gray-800); flex: 1; word-break: break-all; }
+    .inspect-highlight { color: var(--orange-text); font-weight: 600; }
+    .inspect-muted { color: var(--gray-400); font-style: italic; }
+    .inspect-link { color: var(--orange-text); text-decoration: none; word-break: break-all; }
     .inspect-link:hover { text-decoration: underline; }
 
     .inspect-signals { display: flex; flex-direction: column; gap: 4px; }
     .inspect-signal-row {
       display: flex; align-items: flex-start; gap: 10px;
-      padding: 7px 10px; border-radius: 6px;
-      border: 1px solid #f3f4f6; background: #fafafa;
+      padding: 8px 12px; border-radius: 10px;
+      border: 1px solid var(--gray-100); background: var(--gray-50);
     }
-    .inspect-signal-true  { background: #f0fdf4; border-color: #bbf7d0; }
-    .inspect-signal-false { background: #fff5f5; border-color: #fecaca; }
-    .inspect-sig-dot { margin-top: 3px; flex-shrink: 0; }
+    .inspect-signal-true  { background: var(--gray-50); border-color: color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface)); }
+    .inspect-signal-false { background: var(--gray-50); border-color: color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); }
+    .inspect-sig-dot { margin-top: 4px; flex-shrink: 0; }
     .inspect-signal-body { flex: 1; min-width: 0; }
-    .inspect-signal-name  { font-size: 12px; font-weight: 600; color: #374151; }
-    .inspect-signal-reason { font-size: 11px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
+    .inspect-signal-name  { font-size: 12px; font-weight: 600; color: var(--gray-700); }
+    .inspect-signal-reason { font-size: 12px; color: var(--gray-500); margin-top: 2px; line-height: 1.4; }
     .inspect-signal-val {
       flex-shrink: 0; font-size: 10px; font-family: monospace;
-      padding: 1px 5px; border-radius: 4px;
-      background: #f3f4f6; color: #374151; align-self: flex-start;
+      padding: 1px 4px; border-radius: 4px;
+      background: var(--gray-100); color: var(--gray-700); align-self: flex-start;
       border: none;
     }
 
     .inspect-score-breakdown {
-      border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;
+      border: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius: 12px; overflow: hidden;
     }
     .sb-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 6px 12px; font-size: 12px; color: #374151;
-      border-bottom: 1px solid #f3f4f6;
+      padding: 6px 12px; font-size: 12px; color: var(--gray-700);
+      border-bottom: 1px solid var(--gray-100);
     }
     .sb-row:last-child { border-bottom: none; }
     .sb-total {
-      background: #fef0e9; font-weight: 700; font-size: 14px;
-      border-top: 2px solid #fbd0b6 !important;
+      background: color-mix(in srgb, #fef0e9 var(--tint-mix), var(--surface)); font-weight: 700; font-size: 14px;
+      border-top: 2px solid color-mix(in srgb, #fbd0b6 var(--tint-mix), var(--surface)) !important;
     }
     .sb-value { font-weight: 600; }
-    .sb-plus { color: #16a34a; }
-    .sb-minus { color: #dc2626; }
+    .sb-plus { color: oklch(from #16a34a max(l, var(--text-min-l)) c h); }
+    .sb-minus { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
 
     .inspect-footer {
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
       padding: 14px 20px;
       overflow-y: auto;
       flex-shrink: 0;
       max-height: 220px;
-      background: #fafafa;
+      background: var(--gray-50);
     }
     .inspect-contact-card {
-      border: 1px solid #e5e7eb; border-radius: 6px;
-      padding: 8px 10px; background: #fff;
+      border: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius: 10px;
+      padding: 8px 12px; background: var(--surface);
       min-width: 160px; max-width: 240px;
     }
     .inspect-tabs {
       display: flex; gap: 2px;
-      background: #f3f4f6; padding: 3px; border-radius: 8px;
+      background: var(--gray-100); padding: 4px; border-radius: 12px;
     }
     .inspect-tab {
-      padding: 4px 14px; border-radius: 6px; border: none;
+      padding: 4px 14px; border-radius: 9px; border: none; font-family: inherit;
       background: none; cursor: pointer; font-size: 12px;
-      font-weight: 500; color: #6b7280; transition: all .12s;
+      font-weight: 500; color: var(--gray-500); transition: all .12s;
     }
-    .inspect-tab:hover { background: #e5e7eb; color: #374151; }
-    .inspect-tab-active { background: #fff !important; color: #111827 !important; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+    .inspect-tab:hover { background: color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); color: var(--gray-700); }
+    .inspect-tab-active { background: var(--surface) !important; color: var(--gray-800) !important; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
     .inspect-prompt-view {
       flex: 1 1 auto; min-height: 0; overflow: hidden;
       display: flex; flex-direction: column;
@@ -2307,10 +2311,10 @@ interface DiscoveredCompany {
       flex: 1 1 auto; overflow: auto;
       margin: 0; padding: 16px 20px;
       font-family: 'Consolas', 'Fira Mono', monospace; font-size: 12px;
-      line-height: 1.6; color: #1f2937;
+      line-height: 1.6; color: var(--gray-800);
       white-space: pre-wrap; word-break: break-word;
-      background: #f9fafb;
-      border-top: 1px solid #e5e7eb;
+      background: var(--gray-50);
+      border-top: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
     }
   `],
 })

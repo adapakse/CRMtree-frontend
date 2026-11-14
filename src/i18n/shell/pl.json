@@ -42,7 +42,11 @@
   },
   "sidebar": {
     "collapse": "Zwiń menu",
-    "expand": "Rozwiń menu"
+    "doneEditing": "Gotowe",
+    "editMenu": "Edytuj menu",
+    "expand": "Rozwiń menu",
+    "hideItem": "Ukryj",
+    "showItem": "Pokaż"
   },
   "user": {
     "admin": "Administrator",

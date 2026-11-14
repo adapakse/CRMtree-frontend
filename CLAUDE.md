@@ -359,3 +359,6 @@ przed dodaniem jakiegokolwiek tekstu widocznego dla użytkownika.
 - Never interpolate user input directly into HTML (XSS risk).
 - Never log sensitive data (passwords, tokens, personal data) to the console.
 - Validate all data at system boundaries (API responses, user inputs).
+
+## Styl interfejsu
+Zasady wyglądu (kolory, tekst #333333, siatka 2px, ikony, tryb ciemny, gotowe elementy, grupowanie list): **`docs/ui-style.md`** — przeczytaj przed każdą zmianą widoczną w UI i trzymaj się jej.

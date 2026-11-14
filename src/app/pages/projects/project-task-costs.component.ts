@@ -105,14 +105,14 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
   styles: [PROJECT_FINANCE_STYLES, `
     :host { display:flex; flex-direction:column; gap:8px; }
     .items { list-style:none; margin:0; padding:0; border:1px solid var(--gray-200); border-radius:9px; }
-    .item { display:grid; grid-template-columns:82px 1fr auto auto; gap:10px; align-items:baseline; padding:8px 12px; font-size:13px; color:var(--gray-800); }
+    .item { display:grid; grid-template-columns:82px 1fr auto auto; gap:10px; align-items:baseline; padding:8px 12px; font-size:14px; color:var(--gray-800); }
     .item + .item { border-top:1px solid var(--gray-100); }
-    .date { font-size:12.5px; color:var(--gray-600); white-space:nowrap; }
+    .date { font-size:12px; color:var(--gray-600); white-space:nowrap; }
     .what { overflow-wrap:anywhere; }
-    .invoice { display:block; margin-top:3px; }
+    .invoice { display:block; margin-top:4px; }
     .note { grid-column:1 / -1; }
     .ksef-action { margin-right:10px; }
-    .total { display:flex; justify-content:flex-end; gap:10px; font-size:13px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
+    .total { display:flex; justify-content:flex-end; gap:10px; font-size:14px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
     .total strong { color:var(--gray-900); }
   `],
 })

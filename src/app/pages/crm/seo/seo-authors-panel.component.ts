@@ -32,10 +32,10 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
             <label class="field-label">{{ t('seo.authors.fields.linkedinProfile') }}</label>
             <input class="field-input" [(ngModel)]="editLinkedinUrl" placeholder="https://linkedin.com/in/...">
             <div class="author-edit-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="saveEdit(a.id)" [disabled]="!editName.trim() || savingEdit()">
+              <button type="button" class="btn btn-g btn-sm" (click)="saveEdit(a.id)" [disabled]="!editName.trim() || savingEdit()">
                 @if (savingEdit()) { {{ t('seo.authors.actions.saving') }} } @else { {{ 'actions.save' | transloco }} }
               </button>
-              <button type="button" class="btn-ghost btn-sm" (click)="cancelEdit()">{{ 'actions.cancel' | transloco }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="cancelEdit()">{{ 'actions.cancel' | transloco }}</button>
             </div>
           } @else {
             <div class="author-card-top">
@@ -55,11 +55,11 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
             }
             @if (!a.is_active) { <span class="author-inactive-badge">{{ t('seo.authors.inactiveBadge') }}</span> }
             <div class="author-card-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(a)">{{ t('seo.authors.actions.edit') }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="startEdit(a)">{{ t('seo.authors.actions.edit') }}</button>
               @if (a.is_active) {
-                <button type="button" class="btn-warn btn-sm" (click)="toggleActive(a)">{{ t('seo.authors.actions.deactivate') }}</button>
+                <button type="button" class="btn btn-g btn-sm" (click)="toggleActive(a)">{{ t('seo.authors.actions.deactivate') }}</button>
               } @else {
-                <button type="button" class="btn-ghost btn-sm" (click)="toggleActive(a)">{{ t('seo.authors.actions.activate') }}</button>
+                <button type="button" class="btn btn-g btn-sm" (click)="toggleActive(a)">{{ t('seo.authors.actions.activate') }}</button>
               }
               <button type="button" class="btn-delete" (click)="remove(a.id)" [title]="t('seo.authors.actions.delete')" [attr.aria-label]="t('seo.authors.actions.delete')">
                 <svg lucideTrash2 [size]="14"></svg>
@@ -82,10 +82,10 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
           <label class="field-label">{{ t('seo.authors.fields.linkedinProfile') }}</label>
           <input class="field-input" [(ngModel)]="newLinkedinUrl" placeholder="https://linkedin.com/in/...">
           <div class="author-edit-actions">
-            <button type="button" class="btn-ghost btn-sm" (click)="add()" [disabled]="!newName.trim() || savingNew()">
+            <button type="button" class="btn btn-g btn-sm" (click)="add()" [disabled]="!newName.trim() || savingNew()">
               @if (savingNew()) { {{ t('seo.authors.actions.adding') }} } @else { {{ t('seo.authors.actions.add') }} }
             </button>
-            <button type="button" class="btn-ghost btn-sm" (click)="adding.set(false)">{{ 'actions.cancel' | transloco }}</button>
+            <button type="button" class="btn btn-g btn-sm" (click)="adding.set(false)">{{ 'actions.cancel' | transloco }}</button>
           </div>
         } @else {
           <button type="button" class="btn-add-author" (click)="adding.set(true)">{{ t('seo.authors.actions.addNew') }}</button>
@@ -99,7 +99,7 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
   `,
   styles: [`
     .author-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; align-items: start; }
-    .author-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: #fff; }
+    .author-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: var(--surface); }
     .author-card.inactive { opacity: 0.6; }
     .author-card-top { display:flex; align-items:center; gap: 0.6rem; }
     .author-photo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
@@ -107,7 +107,7 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
     .author-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
     .author-job-title { font-size: 0.72rem; color: var(--gray-500); }
     .author-bio { font-size: 0.78rem; color: var(--gray-600); margin: 0.5rem 0 0; line-height: 1.4; }
-    .author-linkedin { display: inline-flex; align-items: center; margin-top: 0.5rem; color: #0A66C2; }
+    .author-linkedin { display: inline-flex; align-items: center; margin-top: 0.5rem; color: oklch(from #0a66c2 max(l, var(--text-min-l)) c h); }
     .author-linkedin:hover { opacity: 0.75; }
     .linkedin-icon { flex-shrink: 0; }
     .author-inactive-badge {
@@ -119,22 +119,19 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
     .author-card .field-label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--gray-700); margin: 0.45rem 0 0.2rem; }
     .author-card .field-label:first-child { margin-top: 0; }
     .author-card .field-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.55rem; font-family: inherit; font-size: 0.8rem; }
-    .required-star { color: #DC2626; }
+    .required-star { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .author-card-new { display: flex; flex-direction: column; justify-content: center; border-style: dashed; }
     .btn-add-author {
       border: none; background: transparent; color: var(--gray-500); font-weight: 600; font-size: 0.85rem;
       cursor: pointer; padding: 1rem 0; width: 100%; text-align: center;
     }
     .btn-add-author:hover { color: var(--orange-dark); }
-    .btn-ghost { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--gray-100); color: var(--gray-800); }
-    .btn-warn { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: #FEF3C7; color: #92400E; }
-    .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.82rem; white-space: nowrap; }
     .btn-delete {
       display: inline-flex; align-items: center; justify-content: center;
-      border: none; border-radius: 8px; background: #FEE2E2; color: #991B1B;
-      cursor: pointer; padding: 0.5rem 0.6rem; flex-shrink: 0;
+      border: none; border-radius: 9px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h);
+      cursor: pointer; padding: 4px 10px; flex-shrink: 0;
     }
-    .btn-delete:hover { background: #FECACA; }
+    .btn-delete:hover { background: color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); }
     .empty { color: var(--gray-500); font-size: 0.82rem; margin: 0.75rem 0 0; }
     .photo-upload-row { display: flex; align-items: center; gap: 0.6rem; }
     .photo-upload-row input[type="file"] { font-size: 0.75rem; flex: 1; min-width: 0; }

@@ -187,7 +187,7 @@ export interface SavedProvider {
             {{ busy() ? t('settings.ai.verifying') : t('settings.ai.saveAndVerify') }}
           </button>
           @if (config()) {
-            <button class="btn btn-g" [disabled]="busy()" (click)="remove()">
+            <button class="btn btn-d" [disabled]="busy()" (click)="remove()">
               {{ t('settings.ai.remove') }}
             </button>
           }
@@ -196,23 +196,23 @@ export interface SavedProvider {
     </div>
   `,
   styles: [`
-    .pr { padding:14px 0; border-top:1px solid var(--gray-100); }
+    .pr { padding:16px 0; border-top:1px solid var(--gray-100); }
     .pr:first-of-type { border-top:0; }
-    .pr-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-    .pr-name { font-size:13.5px; font-weight:600; color:var(--gray-800); }
-    .badge { font-size:11px; padding:2px 8px; border-radius:999px; font-weight:600; }
-    .badge.ok   { background:#DCFCE7; color:#166534; }
-    .badge.bad  { background:#FEE2E2; color:#991B1B; }
-    .badge.warn { background:#FEF3C7; color:#92400E; }
+    .pr-head { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .pr-name { font-size:14px; font-weight:600; color:var(--gray-800); }
+    .badge { font-size:12px; padding:2px 8px; border-radius:999px; font-weight:600; }
+    .badge.ok   { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .badge.bad  { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .badge.warn { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .badge.off  { background:var(--gray-100); color:var(--gray-500); }
 
     .pr-grid {
       display:grid; grid-template-columns:110px minmax(0,1fr); gap:8px 12px; align-items:center;
     }
-    .lbl { font-size:12.5px; color:var(--gray-600); }
+    .lbl { font-size:12px; color:var(--gray-600); }
     .cell { display:flex; align-items:center; gap:10px; min-width:0; flex-wrap:wrap; }
     .cell .fi, .cell .fsel { flex:1; min-width:200px; max-width:420px; }
-    .prov { font-size:13px; font-weight:600; color:var(--gray-800); }
+    .prov { font-size:14px; font-weight:600; color:var(--gray-800); }
 
     /* Zapisany klucz jako plakietka, nie puste pole hasła z placeholderem —
        pole wyglądające na niewypełnione sugeruje, że klucza nie ma. */
@@ -223,7 +223,7 @@ export interface SavedProvider {
     }
     .chip {
       font-size:12px; padding:4px 10px; border-radius:999px; cursor:pointer;
-      border:1px solid var(--gray-200); background:white; color:var(--gray-700);
+      border:1px solid var(--gray-200); background:var(--surface); color:var(--gray-700);
     }
     .chip:hover:not(:disabled) { border-color:var(--orange); color:var(--orange-dark); }
     .linkbtn {
@@ -232,17 +232,17 @@ export interface SavedProvider {
     }
     .linkbtn:disabled { color:var(--gray-400); cursor:default; }
 
-    .note { font-size:11.5px; color:var(--gray-400); }
+    .note { font-size:12px; color:var(--gray-400); }
     .note.wide { flex-basis:100%; }
-    .ok-text { color:#166534; }
-    .warn-text { color:#92400E; }
+    .ok-text { color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .warn-text { color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .pr-note {
       font-size:12px; color:var(--gray-500); background:var(--gray-50);
-      border:1px dashed var(--gray-200); border-radius:8px; padding:8px 10px;
+      border:1px dashed var(--gray-200); border-radius:12px; padding:8px 12px;
     }
     .pr-error {
-      font-size:11.5px; color:#B91C1C; background:#FEF2F2; border:1px solid #FECACA;
-      border-radius:8px; padding:7px 10px; margin-bottom:10px;
+      font-size:12px; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface));
+      border-radius:12px; padding:8px 12px; margin-bottom:12px;
       overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:help;
     }
     /* Przyciski biorą globalny system aplikacji (.btn + .btn-p / .btn-g ze
@@ -250,7 +250,7 @@ export interface SavedProvider {
        „btn-primary" i „btn-danger-sm", które istnieją WYŁĄCZNIE wewnątrz
        komponentu ustawień — w osobnym komponencie nie dosięgały ich żadne style
        i przyciski wyglądały jak surowe, systemowe. */
-    .pr-actions { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+    .pr-actions { display:flex; gap:8px; margin-top:20px; flex-wrap:wrap; }
     @media (max-width: 720px) { .pr-grid { grid-template-columns:1fr; } }
   `],
 })

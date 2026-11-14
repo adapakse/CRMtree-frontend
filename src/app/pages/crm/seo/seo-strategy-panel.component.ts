@@ -24,10 +24,10 @@ import { ToastService } from '../../../core/services/toast.service';
             <label class="field-label">{{ t('seo.strategy.pillars.keywordTheme') }}</label>
             <input class="field-input" [(ngModel)]="editTheme">
             <div class="pillar-edit-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="saveEdit(p.id)" [disabled]="!editName.trim() || savingEdit()">
+              <button type="button" class="btn btn-g btn-sm" (click)="saveEdit(p.id)" [disabled]="!editName.trim() || savingEdit()">
                 @if (savingEdit()) { {{ t('seo.strategy.pillars.saving') }} } @else { {{ 'actions.save' | transloco }} }
               </button>
-              <button type="button" class="btn-ghost btn-sm" (click)="cancelEdit()">{{ 'actions.cancel' | transloco }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="cancelEdit()">{{ 'actions.cancel' | transloco }}</button>
             </div>
           } @else {
             <div class="pillar-card-top">
@@ -37,7 +37,7 @@ import { ToastService } from '../../../core/services/toast.service';
             <p class="pillar-desc">{{ p.description }}</p>
             <span class="pillar-theme">{{ p.target_keyword_theme }}</span>
             <div class="pillar-card-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(p)">{{ t('seo.strategy.pillars.edit') }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="startEdit(p)">{{ t('seo.strategy.pillars.edit') }}</button>
               <button type="button" class="btn-remove" (click)="removePillar(p.id)" [attr.aria-label]="t('seo.strategy.pillars.removeAria')">&times;</button>
             </div>
           }
@@ -52,10 +52,10 @@ import { ToastService } from '../../../core/services/toast.service';
           <label class="field-label">{{ t('seo.strategy.pillars.keywordTheme') }}</label>
           <input class="field-input" [(ngModel)]="newPillarTheme" [placeholder]="t('seo.strategy.pillars.keywordThemePlaceholder')">
           <div class="pillar-edit-actions">
-            <button type="button" class="btn-ghost btn-sm" (click)="addPillar()" [disabled]="!newPillarName.trim() || savingNewPillar()">
+            <button type="button" class="btn btn-g btn-sm" (click)="addPillar()" [disabled]="!newPillarName.trim() || savingNewPillar()">
               @if (savingNewPillar()) { {{ t('seo.strategy.pillars.adding') }} } @else { {{ t('seo.strategy.pillars.add') }} }
             </button>
-            <button type="button" class="btn-ghost btn-sm" (click)="addingPillar.set(false)">{{ 'actions.cancel' | transloco }}</button>
+            <button type="button" class="btn btn-g btn-sm" (click)="addingPillar.set(false)">{{ 'actions.cancel' | transloco }}</button>
           </div>
         } @else {
           <button type="button" class="btn-add-pillar" (click)="addingPillar.set(true)">{{ t('seo.strategy.pillars.addOwn') }}</button>
@@ -83,7 +83,7 @@ import { ToastService } from '../../../core/services/toast.service';
       <div class="competitor-form">
         <input class="competitor-input" [(ngModel)]="newUrl" [placeholder]="t('seo.strategy.competitors.urlPlaceholder')">
         <input class="competitor-input" [(ngModel)]="newNotes" [placeholder]="t('seo.strategy.competitors.notesPlaceholder')">
-        <button type="button" class="btn-ghost btn-sm" (click)="add()" [disabled]="!newUrl.trim()">{{ t('seo.strategy.competitors.add') }}</button>
+        <button type="button" class="btn btn-g btn-sm" (click)="add()" [disabled]="!newUrl.trim()">{{ t('seo.strategy.competitors.add') }}</button>
       </div>
     </div>
 
@@ -97,7 +97,7 @@ import { ToastService } from '../../../core/services/toast.service';
         {{ t('seo.strategy.backlinks.optIn') }}
       </label>
       @if (optIn()) {
-        <button type="button" class="btn-ghost btn-sm" (click)="findCandidates()" [disabled]="findingCandidates()">
+        <button type="button" class="btn btn-g btn-sm" (click)="findCandidates()" [disabled]="findingCandidates()">
           @if (findingCandidates()) { {{ t('seo.strategy.backlinks.searching') }} } @else { {{ t('seo.strategy.backlinks.findCandidates') }} }
         </button>
       }
@@ -107,8 +107,8 @@ import { ToastService } from '../../../core/services/toast.service';
             <span class="backlink-desc">{{ b.from_title }} &rarr; {{ b.to_title }}</span>
             <span class="backlink-status" [attr.data-status]="b.status">{{ statusLabel(b.status) }}</span>
             @if (b.status === 'suggested') {
-              <button type="button" class="btn-ghost btn-sm" (click)="accept(b.id)">{{ t('seo.strategy.backlinks.accept') }}</button>
-              <button type="button" class="btn-ghost btn-sm" (click)="reject(b.id)">{{ t('seo.strategy.backlinks.reject') }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="accept(b.id)">{{ t('seo.strategy.backlinks.accept') }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="reject(b.id)">{{ t('seo.strategy.backlinks.reject') }}</button>
             }
           </div>
         }
@@ -125,7 +125,7 @@ import { ToastService } from '../../../core/services/toast.service';
        the 24px gap between main SEO sections lives on the parent .seo-sections in crm-seo.component.ts. */
     .strategy-sections { display: flex; flex-direction: column; gap: 0.75rem; }
     .pillar-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; }
-    .pillar-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: #fff; }
+    .pillar-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: var(--surface); }
     .pillar-card-top { display:flex; align-items:center; justify-content:space-between; gap: 0.5rem; }
     .pillar-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
     .pillar-count { font-size: 0.72rem; color: var(--gray-500); white-space: nowrap; }
@@ -143,7 +143,7 @@ import { ToastService } from '../../../core/services/toast.service';
     }
     .btn-add-pillar:hover { color: var(--orange-dark); }
 
-    .competitors-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
+    .competitors-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: var(--surface); }
     .competitors-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
     .hint { font-size: 0.78rem; color: var(--gray-500); margin: 0 0 0.75rem; }
     .competitors-list { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem; }
@@ -159,14 +159,12 @@ import { ToastService } from '../../../core/services/toast.service';
       border: none; background: transparent; color: var(--gray-400); font-size: 1.1rem;
       cursor: pointer; line-height: 1; padding: 0 0.3rem; flex-shrink: 0;
     }
-    .btn-remove:hover { color: #991B1B; }
+    .btn-remove:hover { color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .competitor-form { display: flex; gap: 0.5rem; }
     .competitor-input { flex: 1; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.5rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
-    .btn-ghost { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--gray-100); color: var(--gray-800); }
-    .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.82rem; white-space: nowrap; }
     .empty { color: var(--gray-500); font-size: 0.82rem; margin: 0; }
 
-    .backlinks-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
+    .backlinks-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: var(--surface); }
     .backlinks-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
     .opt-in-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--gray-700); margin: 0.5rem 0 0.75rem; cursor: pointer; }
     .backlinks-list { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.75rem; }
@@ -180,7 +178,7 @@ import { ToastService } from '../../../core/services/toast.service';
       padding: 0.15em 0.55em; border-radius: 4px; background: var(--gray-100); color: var(--gray-600);
     }
     .backlink-status[data-status="accepted"] { background: var(--orange-pale); color: var(--orange-dark); }
-    .backlink-status[data-status="rejected"] { background: #FEE2E2; color: #991B1B; }
+    .backlink-status[data-status="rejected"] { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
   `],
 })
 export class SeoStrategyPanelComponent implements OnInit {

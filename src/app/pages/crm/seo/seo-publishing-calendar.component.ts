@@ -53,7 +53,7 @@ const EMPTY_CONFIG: SeoCalendarConfig = {
             <input type="date" class="field-input end-date-input" [(ngModel)]="endDateInput">
           }
         </div>
-        <button type="button" class="btn-ghost btn-sm" (click)="saveConfig()" [disabled]="savingConfig()">
+        <button type="button" class="btn btn-p btn-sm" (click)="saveConfig()" [disabled]="savingConfig()">
           @if (savingConfig()) { {{ t('seo.publishingCalendar.config.saving') }} } @else { {{ t('seo.publishingCalendar.config.save') }} }
         </button>
       </div>
@@ -120,20 +120,19 @@ const EMPTY_CONFIG: SeoCalendarConfig = {
     </ng-container>
   `,
   styles: [`
+    .config-panel > .btn { margin-top: 0.9rem; }
     .calendar-box { display: flex; flex-direction: column; gap: 1rem; }
-    .config-panel { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
+    .config-panel { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: var(--surface); }
     .config-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
     .config-header h3 { font-size: 0.95rem; margin: 0; }
     .enable-toggle { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: var(--gray-700); cursor: pointer; }
-    .warning-note { font-size: 0.78rem; color: #92400E; background: #FEF3C7; border-radius: 8px; padding: 0.5rem 0.7rem; margin: 0.6rem 0 0; }
+    .warning-note { font-size: 0.78rem; color: oklch(from #92400e max(l, var(--text-min-l)) c h); background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); border-radius: 8px; padding: 0.5rem 0.7rem; margin: 0.6rem 0 0; }
     .weekday-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-top: 0.9rem; }
     .weekday-cell .field-label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.25rem; text-align: center; }
     .count-input { width: 100%; text-align: center; }
     .field-input { border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.45rem 0.5rem; font-family: inherit; font-size: 0.85rem; }
     .end-date-row { display: flex; align-items: center; gap: 0.7rem; margin-top: 0.85rem; flex-wrap: wrap; }
     .end-date-checkbox { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--gray-700); cursor: pointer; }
-    .btn-ghost { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--gray-100); color: var(--gray-800); }
-    .btn-sm { padding: 0.5rem 0.9rem; font-size: 0.82rem; margin-top: 0.9rem; }
 
     .calendar-grid { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 1rem; align-items: start; }
     .week-title { font-size: 0.82rem; font-weight: 700; color: var(--gray-700); margin: 0 0 0.5rem; }
@@ -145,7 +144,7 @@ const EMPTY_CONFIG: SeoCalendarConfig = {
     .day-card.locked { background: var(--gray-100); opacity: 0.75; }
     .day-label { font-size: 0.68rem; font-weight: 700; color: var(--gray-500); text-align: center; }
     .article-chip {
-      border: 1px solid var(--gray-200); border-radius: 6px; background: #fff; padding: 0.35rem 0.45rem;
+      border: 1px solid var(--gray-200); border-radius: 6px; background: var(--surface); padding: 0.35rem 0.45rem;
       display: flex; flex-direction: column; gap: 0.15rem; cursor: grab; font-size: 0.72rem;
     }
     .day-card.locked .article-chip { cursor: default; }

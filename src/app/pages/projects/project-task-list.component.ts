@@ -102,12 +102,12 @@ import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
     .scroll { overflow-x:auto; }
     .task-row { cursor:pointer; }
     .task-row:hover td { background:var(--gray-50); }
-    .task-name { display:flex; align-items:center; gap:7px; }
-    .parent-icon { width:15px; height:15px; color:var(--orange); flex-shrink:0; }
+    .task-name { display:flex; align-items:center; gap:8px; }
+    .parent-icon { width:15px; height:15px; color: var(--orange-text); flex-shrink:0; }
     .child-icon { width:14px; height:14px; color:var(--gray-400); flex-shrink:0; }
     .root-name { font-weight:600; }
-    .assignees { color:var(--gray-600); font-size:12.5px; }
-    .date { white-space:nowrap; font-size:12.5px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
+    .assignees { color:var(--gray-600); font-size:12px; }
+    .date { white-space:nowrap; font-size:12px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
   `],
 })
 export class ProjectTaskListComponent {

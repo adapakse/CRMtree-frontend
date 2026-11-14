@@ -64,16 +64,16 @@ function parseOptions(text: string): string[] {
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:8px; }
-    .hint { margin:0 0 4px; font-size:12.5px; color:var(--gray-500); line-height:1.6; }
-    .muted { margin:0; font-size:13px; color:var(--gray-400); }
+    .hint { margin:0 0 4px; font-size:12px; color:var(--gray-500); line-height:1.6; }
+    .muted { margin:0; font-size:14px; color:var(--gray-400); }
     .row { display:flex; align-items:center; gap:8px; }
     .row.inactive .name { opacity:.55; text-decoration:line-through; }
     .row.add { padding-top:8px; border-top:1px dashed var(--gray-200); }
     .name { flex:1; min-width:0; }
-    .type { width:130px; font-size:12.5px; color:var(--gray-600); flex-shrink:0; }
+    .type { width:130px; font-size:12px; color:var(--gray-600); flex-shrink:0; }
     .type-select { width:160px; flex-shrink:0; }
     .options { flex:1.4; min-width:0; }
-    .active-toggle { display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--gray-600); white-space:nowrap; }
+    .active-toggle { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gray-600); white-space:nowrap; }
   `],
 })
 export class ProjectFieldsEditorComponent {

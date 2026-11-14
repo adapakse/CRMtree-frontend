@@ -52,13 +52,13 @@ const MAX_MESSAGE_LENGTH = 4000;
     .message { flex-shrink:0; }
     .message { align-self:flex-start; max-width:80%; background:var(--gray-100); border-radius:10px; padding:8px 12px; }
     .message.own { align-self:flex-end; background:var(--orange-pale); }
-    .meta { display:flex; gap:8px; font-size:11px; color:var(--gray-500); margin-bottom:2px; }
+    .meta { display:flex; gap:8px; font-size:12px; color:var(--gray-500); margin-bottom:2px; }
     .meta strong { color:var(--gray-700); }
-    .body { font-size:13.5px; color:var(--gray-800); white-space:pre-wrap; overflow-wrap:anywhere; }
-    .empty { font-size:13px; color:var(--gray-400); padding:12px 0; }
+    .body { font-size:14px; color:var(--gray-800); white-space:pre-wrap; overflow-wrap:anywhere; }
+    .empty { font-size:14px; color:var(--gray-400); padding:12px 0; }
     .composer { display:flex; gap:8px; align-items:flex-end; }
     .composer textarea { min-height:44px; }
-    .hint { font-size:11px; color:var(--gray-400); }
+    .hint { font-size:12px; color:var(--gray-400); }
   `],
 })
 export class ProjectChatComponent implements OnInit {

@@ -44,8 +44,8 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
       </div>
       <div class="field-hint">🔤 = {{ t('csvImport.hints.dictionaryValuesTooltip') }} · <strong>agent_*</strong>: {{ t('csvImport.hints.agentFields') }}</div>
       <div style="display:flex;gap:8px">
-        <button class="btn-outline" (click)="downloadTemplate('leads')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
-        <button class="btn-outline btn-export" (click)="exportData('leads')" [disabled]="exportingType==='leads'">
+        <button class="btn btn-g btn-sm" (click)="downloadTemplate('leads')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
+        <button class="btn btn-g btn-sm" (click)="exportData('leads')" [disabled]="exportingType==='leads'">
           {{ exportingType==='leads' ? '⏳…' : '📤 ' + t('csvImport.actions.exportData') }}
         </button>
       </div>
@@ -104,8 +104,8 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
       </div>
       <div class="field-hint">🔤 = {{ t('csvImport.hints.dictionaryValuesHover') }} · <strong>partner_number</strong>: {{ t('csvImport.hints.partnerNumber') }} · <strong>tags</strong>: {{ t('csvImport.hints.tagsSeparator') }} <code>|</code></div>
       <div style="display:flex;gap:8px">
-        <button class="btn-outline" (click)="downloadTemplate('partners')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
-        <button class="btn-outline btn-export" (click)="exportData('partners')" [disabled]="exportingType==='partners'">
+        <button class="btn btn-g btn-sm" (click)="downloadTemplate('partners')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
+        <button class="btn btn-g btn-sm" (click)="exportData('partners')" [disabled]="exportingType==='partners'">
           {{ exportingType==='partners' ? '⏳…' : '📤 ' + t('csvImport.actions.exportData') }}
         </button>
       </div>
@@ -155,8 +155,8 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
       </div>
       <div class="field-hint">🔤 = {{ t('csvImport.hints.dictionaryValues') }} · <strong>entities</strong>: {{ t('csvImport.hints.entitiesSeparator') }} <code>|</code> ({{ t('csvImport.hints.example') }} "{{ t('csvImport.hints.entitiesExample') }}") · <strong>group_name</strong>: {{ t('csvImport.hints.documentGroupName') }}</div>
       <div style="display:flex;gap:8px">
-        <button class="btn-outline" (click)="downloadTemplate('documents')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
-        <button class="btn-outline btn-export" (click)="exportData('documents')" [disabled]="exportingType==='documents'">
+        <button class="btn btn-g btn-sm" (click)="downloadTemplate('documents')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
+        <button class="btn btn-g btn-sm" (click)="exportData('documents')" [disabled]="exportingType==='documents'">
           {{ exportingType==='documents' ? '⏳…' : '📤 ' + t('csvImport.actions.exportData') }}
         </button>
       </div>
@@ -212,7 +212,7 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
         <strong>numer_partnera</strong>: {{ t('csvImport.hints.salesPartnerNumber') }} ({{ t('csvImport.hints.example') }} <code>P-0001</code>) &nbsp;·&nbsp;
         <strong>produkt</strong>: hotel | transport_flight | car_rental | transfer | visa | {{ t('csvImport.hints.otherProducts') }}
       </div>
-      <button class="btn-outline" (click)="downloadSalesTemplate()">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
+      <button class="btn btn-g btn-sm" (click)="downloadSalesTemplate()">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
       <div class="drop-zone"
            [class.drag-over]="isDraggingSales"
            [class.uploading]="uploadingSales"
@@ -274,56 +274,52 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
     .import-page { padding:20px; max-width:1100px; height:100%; overflow-y:auto; box-sizing:border-box; }
     .import-header { margin-bottom:24px; }
     .import-header h1 { font-size:20px; font-weight:700; margin:0 0 4px; }
-    .sub { color:#6b7280; font-size:13px; margin:0; }
+    .sub { color:var(--gray-500); font-size:14px; margin:0; }
     .import-cards { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:32px; }
-    .field-list span.hint { background:#fef9c3; color:#713f12; cursor:help; border:1px dashed #fcd34d; }
+    .field-list span.hint { background:color-mix(in srgb, #fef9c3 var(--tint-mix), var(--surface)); color:oklch(from #713f12 max(l, var(--text-min-l)) c h); cursor:help; border:1px dashed #fcd34d; }
     @media(max-width:720px) { .import-cards { grid-template-columns:1fr; } }
-    .import-card { border:1px solid #e5e7eb; border-radius:12px; padding:20px; display:flex; flex-direction:column; gap:12px; }
+    .import-card { background:var(--surface); border:none; border-radius:12px; box-shadow:var(--shadow-sm); padding:24px; display:flex; flex-direction:column; gap:12px; }
     .card-icon { font-size:28px; }
     .import-card h2 { font-size:16px; font-weight:700; margin:0; }
-    .card-desc { font-size:12px; color:#6b7280; margin:0; line-height:1.5; }
-    .field-hint { font-size:11.5px; color:#6b7280; background:#f9fafb; border-radius:6px; padding:6px 10px; } .field-hint code { font-family:monospace; background:#f3f4f6; padding:1px 4px; border-radius:3px; }
+    .card-desc { font-size:12px; color:var(--gray-500); margin:0; line-height:1.5; }
+    .field-hint { font-size:12px; color:var(--gray-500); background:var(--gray-50); border-radius:6px; padding:6px 10px; } .field-hint code { font-family:monospace; background:var(--gray-100); padding:1px 4px; border-radius:3px; }
     .field-list { display:flex; flex-wrap:wrap; gap:4px; }
-    .field-list span { background:#f3f4f6; border-radius:6px; padding:2px 8px; font-size:11px; font-family:monospace; }
-    .field-list span.required { background:#fef3c7; color:#92400e; font-weight:700; }
-    .field-list span.key { background:#dbeafe; color:#1e40af; font-weight:700; }
-    .btn-outline { display:inline-block; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; text-decoration:none; color:#374151; text-align:center; cursor:pointer; }
-    .btn-export { border-color:var(--orange); color:var(--orange); }
-    .btn-export:hover:not(:disabled) { background:var(--orange-pale); }
-    .btn-export:disabled { opacity:.6; cursor:not-allowed; }
-    .btn-outline:hover { border-color:var(--orange); color:var(--orange); }
-    .drop-zone { border:2px dashed #d1d5db; border-radius:10px; padding:28px; text-align:center; cursor:pointer; font-size:13px; color:#9ca3af; transition:.2s; }
-    .drop-zone:hover, .drop-zone.drag-over { border-color:var(--orange); color:var(--orange); background:var(--orange-pale); }
-    .drop-zone.uploading { border-color:var(--orange); background:var(--orange-pale); color:var(--orange); }
-    .result-panel { border:1px solid #e5e7eb; border-radius:8px; padding:12px; }
+    .field-list span { background:var(--gray-100); border-radius:6px; padding:2px 8px; font-size:12px; font-family:monospace; }
+    .field-list span.required { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); font-weight:700; }
+    .field-list span.key { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); font-weight:700; }
+    .card-icon svg { width:28px; height:28px; color: var(--orange-text); }
+    .drop-zone { background:var(--gray-50); border:1.5px dashed var(--gray-300); border-radius:14px; padding:28px; text-align:center; cursor:pointer; font-size:12px; color:var(--gray-400); transition:.2s; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color:var(--orange); color: var(--orange-text); background:var(--orange-pale); }
+    .drop-zone.uploading { border-color:var(--orange); background:var(--orange-pale); color: var(--orange-text); }
+    .result-panel { background:var(--gray-50); border:none; border-radius:12px; padding:14px; }
     .result-stats { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
-    .stat { font-size:12px; font-weight:700; padding:3px 10px; border-radius:8px; }
-    .stat.green { background:#dcfce7; color:#166534; }
-    .stat.gray { background:#f3f4f6; color:#374151; }
-    .stat.red { background:#fee2e2; color:#991b1b; }
-    .stat.muted { background:#f9fafb; color:#6b7280; }
+    .stat { font-size:12px; font-weight:700; padding:4px 10px; border-radius:8px; }
+    .stat.green { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .stat.gray { background:var(--gray-100); color:var(--gray-700); }
+    .stat.red { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .stat.muted { background:var(--gray-50); color:var(--gray-500); }
     .errors-table { width:100%; border-collapse:collapse; font-size:12px; }
-    .errors-table th { text-align:left; padding:4px 8px; color:#9ca3af; font-weight:600; border-bottom:1px solid #f3f4f6; }
-    .errors-table td { padding:4px 8px; border-bottom:1px solid #f9fafb; vertical-align:top; }
-    .err-msg { color:#dc2626; }
+    .errors-table th { text-align:left; padding:4px 8px; color:var(--gray-400); font-weight:600; border-bottom:1px solid var(--gray-100); }
+    .errors-table td { padding:4px 8px; border-bottom:1px solid var(--gray-50); vertical-align:top; }
+    .err-msg { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .history-section { margin-top:8px; }
-    .history-section h3 { font-size:15px; font-weight:700; margin:0 0 12px; }
-    .history-table { width:100%; border-collapse:collapse; font-size:13px; }
-    .history-table th { text-align:left; padding:8px 12px; font-size:11px; color:#6b7280; border-bottom:2px solid #f3f4f6; white-space:nowrap; }
-    .history-table td { padding:8px 12px; border-bottom:1px solid #f3f4f6; vertical-align:middle; }
-    .type-badge { padding:2px 8px; border-radius:8px; font-size:11px; font-weight:700; }
-    .type-leads { background:#dbeafe; color:#1e40af; }
-    .type-partners { background:#dcfce7; color:#166534; }
-    .type-sales { background:#fef3c7; color:#92400e; }
-    .type-docs { background:#f3e8ff; color:#6b21a8; }
-    .filename { font-size:12px; color:#374151; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .history-section h3 { font-size:16px; font-weight:700; margin:0 0 12px; }
+    .history-table { width:100%; border-collapse:collapse; font-size:14px; }
+    .history-table th { text-align:left; padding:8px 12px; font-size:12px; color:var(--gray-500); border-bottom:2px solid var(--gray-100); white-space:nowrap; }
+    .history-table td { padding:8px 12px; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
+    .type-badge { padding:2px 8px; border-radius:8px; font-size:12px; font-weight:700; }
+    .type-leads { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
+    .type-partners { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .type-sales { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .type-docs { background:color-mix(in srgb, #f3e8ff var(--tint-mix), var(--surface)); color:oklch(from #6b21a8 max(l, var(--text-min-l)) c h); }
+    .filename { font-size:12px; color:var(--gray-700); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .num { text-align:right; }
-    .has-errors { color:#dc2626; font-weight:700; }
-    .status-dot { font-size:11px; font-weight:600; }
-    .status-dot.done { color:#16a34a; }
-    .status-dot.error { color:#dc2626; }
-    .muted { color:#9ca3af; font-size:12px; }
-    .empty { color:#9ca3af; padding:20px; text-align:center; }
+    .has-errors { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); font-weight:700; }
+    .status-dot { font-size:12px; font-weight:600; }
+    .status-dot.done { color:oklch(from #16a34a max(l, var(--text-min-l)) c h); }
+    .status-dot.error { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
+    .muted { color:var(--gray-400); font-size:12px; }
+    .empty { color:var(--gray-400); padding:20px; text-align:center; }
   `],
 })
 export class CrmImportComponent implements OnInit {

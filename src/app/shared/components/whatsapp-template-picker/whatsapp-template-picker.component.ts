@@ -71,17 +71,17 @@ const INVALID_VARIABLE_RE = /[\n\t]| {5,}/;
   `,
   styles: [`
     :host { display: flex; flex-direction: column; gap: 8px; }
-    .field { font-size: 12px; font-weight: 600; display: flex; flex-direction: column; gap: 3px; }
-    select, input { border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: inherit; outline: none; background: white; }
-    .hint { font-size: 11.5px; color: #6b7280; }
-    .warn { font-size: 11.5px; color: #b45309; }
-    .error { font-size: 12px; color: #ef4444; background: #fef2f2; border-radius: 6px; padding: 6px 10px; }
-    .link { background: none; border: none; color: #3BAA5D; font-weight: 600; cursor: pointer; padding: 0 0 0 6px; font-size: 12px; }
-    .preview-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #6b7280; }
-    .preview { background: #E6F4EA; border-radius: 8px; padding: 10px; font-size: 12px; line-height: 1.6; color: #374151; white-space: pre-wrap; display: flex; flex-direction: column; gap: 4px; }
-    .footer { font-size: 11px; color: #6b7280; }
+    .field { font-size: 12px; font-weight: 600; display: flex; flex-direction: column; gap: 4px; }
+    select, input { border: 1px solid var(--gray-300); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: inherit; outline: none; background: var(--surface); }
+    .hint { font-size: 12px; color: var(--gray-500); }
+    .warn { font-size: 12px; color: oklch(from #b45309 max(l, var(--text-min-l)) c h); }
+    .error { font-size: 12px; color: oklch(from #ef4444 max(l, var(--text-min-l)) c h); background: color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); border-radius: 6px; padding: 6px 10px; }
+    .link { background: none; border: none; color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); font-weight: 600; cursor: pointer; padding: 0 0 0 6px; font-size: 12px; }
+    .preview-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); }
+    .preview { background: color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface)); border-radius: 8px; padding: 10px; font-size: 12px; line-height: 1.6; color: var(--gray-700); white-space: pre-wrap; display: flex; flex-direction: column; gap: 4px; }
+    .footer { font-size: 12px; color: var(--gray-500); }
     .buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-    .buttons span { background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 2px 8px; font-size: 11px; color: #3BAA5D; }
+    .buttons span { background: var(--surface); border: 1px solid var(--gray-300); border-radius: 6px; padding: 2px 8px; font-size: 12px; color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); }
   `],
 })
 export class WhatsappTemplatePickerComponent implements OnInit {

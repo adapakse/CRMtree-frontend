@@ -28,25 +28,25 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                [(ngModel)]="search" (ngModelChange)="onSearch()">
       </div>
       @if (isAdmin()) {
-        <button class="btn btn-p" style="margin-left:8px" (click)="openNew()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <button class="btn btn-p" (click)="openNew()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           {{ t('users.newUser') }}
         </button>
       }
     </div>
 
     <div id="content">
-      <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center">
-        <select class="sel" [(ngModel)]="filterGroup" (ngModelChange)="load()">
+      <div class="filters">
+        <select class="fsel filter-select" [(ngModel)]="filterGroup" (ngModelChange)="load()">
           <option value="">{{ t('users.filters.allGroups') }}</option>
           @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
         </select>
-        <select class="sel" [(ngModel)]="filterActive" (ngModelChange)="load()">
+        <select class="fsel filter-select" [(ngModel)]="filterActive" (ngModelChange)="load()">
           <option value="">{{ t('users.filters.allUsers') }}</option>
           <option value="true">{{ t('users.filters.activeOnly') }}</option>
           <option value="false">{{ t('users.filters.inactiveOnly') }}</option>
         </select>
-        <span style="font-size:12.5px;color:var(--gray-400)">{{ t('users.count', { count: total() }) }}</span>
+        <span style="font-size:12px;color:var(--gray-400)">{{ t('users.count', { count: total() }) }}</span>
       </div>
 
       <div class="tw">
@@ -81,12 +81,12 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                   </span>
                 }
                 @if (rolesOverflow(user) > 0) {
-                  <span style="font-size:11px;color:var(--gray-400)">+{{ rolesOverflow(user) }}</span>
+                  <span style="font-size:12px;color:var(--gray-400)">+{{ rolesOverflow(user) }}</span>
                 }
                 <!-- Grant widoczności NIE jest przynależnością do grupy — osobna
                      pigułka, żeby admin nie pomylił jej z rolą grupową. -->
                 @for (grant of user.visibility_grants ?? []; track grant.id) {
-                  <span style="font-size:10px;background:#dbeafe;color:#1e40af;padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap"
+                  <span style="font-size:10px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1e40af max(l, var(--text-min-l)) c h);padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap"
                         [title]="grantTooltip(grant)">
                     👁 {{ grant.group_display || grant.group_name }}
                     <span style="opacity:.7">{{ grant.access_level }}</span>
@@ -96,11 +96,11 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
             </div>
             <div class="td">
               @if (user.crm_role === 'sales_manager') {
-                <span style="font-size:10px;background:#dbeafe;color:#1e40af;padding:2px 7px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.managerShort') }}</span>
+                <span style="font-size:10px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1e40af max(l, var(--text-min-l)) c h);padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.managerShort') }}</span>
               } @else if (user.crm_role === 'salesperson') {
-                <span style="font-size:10px;background:#dcfce7;color:#166534;padding:2px 7px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.salespersonShort') }}</span>
+                <span style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.salespersonShort') }}</span>
               } @else {
-                <span style="font-size:11px;color:var(--gray-300)">—</span>
+                <span style="font-size:12px;color:var(--gray-300)">—</span>
               }
             </div>
             <div class="td" style="font-size:12px;color:var(--gray-400)">
@@ -123,7 +123,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
       @if (totalPages() > 1) {
         <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:flex-end">
           <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page()-1)">{{ t('users.pagination.previous') }}</button>
-          <span style="font-size:12.5px;color:var(--gray-500)">{{ t('users.pagination.page', { page: page(), total: totalPages() }) }}</span>
+          <span style="font-size:12px;color:var(--gray-500)">{{ t('users.pagination.page', { page: page(), total: totalPages() }) }}</span>
           <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page()+1)">{{ t('users.pagination.next') }}</button>
         </div>
       }
@@ -149,17 +149,17 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
           <div style="padding:24px">
             <div class="fgrid">
               <div class="fg">
-                <label class="fl">{{ t('users.fields.firstName') }} <span style="color:var(--orange)">*</span></label>
+                <label class="fl">{{ t('users.fields.firstName') }} <span style="color: var(--orange-text)">*</span></label>
                 <input class="fi" [(ngModel)]="newFirst" [placeholder]="t('users.create.firstNamePlaceholder')" [class.fi-err]="submitted && !newFirst">
                 @if (submitted && !newFirst) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
               <div class="fg">
-                <label class="fl">{{ t('users.fields.lastName') }} <span style="color:var(--orange)">*</span></label>
+                <label class="fl">{{ t('users.fields.lastName') }} <span style="color: var(--orange-text)">*</span></label>
                 <input class="fi" [(ngModel)]="newLast" [placeholder]="t('users.create.lastNamePlaceholder')" [class.fi-err]="submitted && !newLast">
                 @if (submitted && !newLast) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
               <div class="fg" style="grid-column:1/-1">
-                <label class="fl">{{ t('users.fields.email') }} <span style="color:var(--orange)">*</span></label>
+                <label class="fl">{{ t('users.fields.email') }} <span style="color: var(--orange-text)">*</span></label>
                 <input class="fi" type="email" [(ngModel)]="newEmail" [placeholder]="t('users.create.emailPlaceholder')" [class.fi-err]="submitted && !newEmail">
                 @if (submitted && !newEmail) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
@@ -212,7 +212,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                        [placeholder]="t('users.password.placeholder')" autocomplete="new-password">
               </div>
               <div class="fg" style="grid-column:1/-1">
-                <span style="font-size:11px;color:var(--gray-500)">{{ t('users.password.createHint') }}</span>
+                <span style="font-size:12px;color:var(--gray-500)">{{ t('users.password.createHint') }}</span>
                 @if (newUserPasswordError) {
                   <span class="ferr">{{ newUserPasswordError }}</span>
                 }
@@ -255,12 +255,12 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 </div>
               }
             </div>
-            <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px 14px;margin-top:12px;font-size:12px;color:var(--gray-500);line-height:1.6">
+            <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;margin-top:16px;font-size:12px;color:var(--gray-500);line-height:1.6">
               <strong style="color:var(--gray-700)">{{ t('users.create.ssoNoteLabel') }}</strong> {{ t('users.create.ssoNoteText') }}
             </div>
           </div>
 
-          <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end;background:var(--gray-50)">
+          <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:8px;justify-content:flex-end;background:var(--gray-50)">
             <button class="btn btn-g" (click)="showNew.set(false)">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn btn-p" [disabled]="saving()" (click)="createUser()">{{ t('users.create.submit') }}</button>
           </div>
@@ -305,7 +305,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                   @if (emailError) {
                     <span class="ferr">{{ emailError }}</span>
                   }
-                  <span style="font-size:11px;color:var(--gray-400);margin-top:2px;line-height:1.5">
+                  <span style="font-size:12px;color:var(--gray-400);margin-top:2px;line-height:1.5">
                     {{ t('users.edit.emailHint') }}
                   </span>
                 </div>
@@ -333,7 +333,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                   </select>
                 </div>
                 <div class="fg" style="grid-column:1/-1">
-                  <div class="sec-title" style="margin-top:16px">{{ t('users.sections.projectFields') }}</div>
+                  <div class="sec-title" style="margin-top:8px">{{ t('users.sections.projectFields') }}</div>
                 </div>
                 <div class="fg">
                   <label class="fl">{{ t('users.fields.phone') }}</label>
@@ -367,9 +367,9 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                   }
                 }
               </div>
-              <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">{{ t('users.edit.saveChanges') }}</button>
+              <button class="btn btn-p" style="margin-top:20px" (click)="saveUser()">{{ t('users.edit.saveChanges') }}</button>
 
-              <div class="sec-title" style="margin-top:24px">{{ t('users.password.title') }}</div>
+              <div class="sec-title" style="margin-top:32px">{{ t('users.password.title') }}</div>
               <div class="fgrid">
                 <div class="fg">
                   <label class="fl">{{ t('users.password.new') }}</label>
@@ -383,7 +383,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 </div>
               </div>
               @if (passwordError) { <span class="ferr">{{ passwordError }}</span> }
-              <button class="btn btn-p btn-sm" style="margin-top:4px" [disabled]="passwordSaving()" (click)="setPassword()">
+              <button class="btn btn-p" style="margin-top:20px" [disabled]="passwordSaving()" (click)="setPassword()">
                 {{ passwordSaving() ? t('users.saving') : t('users.password.submit') }}
               </button>
             }
@@ -392,7 +392,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
             @if (isSalesManager() && selected()!.crm_role === 'salesperson') {
               <div class="sec-title" style="margin-top:24px">💼 {{ t('users.budgets.title') }}</div>
 
-              <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-end">
+              <div style="display:flex;gap:12px;margin-bottom:16px;align-items:flex-end">
                 <div class="fg" style="flex:1">
                   <label class="fl">{{ t('users.budgets.year') }}</label>
                   <select class="fsel" [(ngModel)]="budgetYear" (ngModelChange)="loadBudgets()">
@@ -415,11 +415,11 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
               <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"
                    [style.grid-template-columns]="budgetPeriodType === 'quarter' ? 'repeat(2,1fr)' : 'repeat(3,1fr)'">
                 @for (p of budgetPeriods(); track p.num) {
-                  <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:8px">
+                  <div style="background:var(--gray-50);border-radius:12px;padding:8px">
                     <div style="font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;margin-bottom:4px">{{ p.label }}</div>
                     <div style="display:flex;gap:4px;align-items:center">
                       <input type="number" min="0" step="1000"
-                             class="fi" style="width:100%;box-sizing:border-box;font-size:12px;padding:5px 8px;text-align:right"
+                             class="fi" style="width:100%;box-sizing:border-box;font-size:12px;padding:4px 8px;text-align:right"
                              [value]="getBudgetAmount(p.num)"
                              (change)="onBudgetAmountChange(p.num, $event)">
                     </div>
@@ -428,10 +428,10 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
               </div>
 
               <!-- Waluta + Suma roczna -->
-              <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+              <div style="display:flex;gap:12px;align-items:flex-end">
                 <div class="fg" style="width:100px">
                   <label class="fl">{{ t('users.budgets.currency') }}</label>
-                  <select class="fsel" [(ngModel)]="budgetCurrency" style="font-size:12px;padding:5px 8px">
+                  <select class="fsel" [(ngModel)]="budgetCurrency">
                     <option value="PLN">PLN</option>
                     <option value="EUR">EUR</option>
                     <option value="USD">USD</option>
@@ -439,18 +439,18 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                     <option value="CHF">CHF</option>
                   </select>
                 </div>
-                <div style="flex:1;background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+                <div style="flex:1;background:var(--orange-pale);border-radius:12px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center">
                   <span style="font-size:12px;font-weight:700;color:var(--orange-dark)">{{ t('users.budgets.annualTotal') }}</span>
-                  <span style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--orange)">{{ budgetAnnualTotal | number:'1.0-0' }} {{ budgetCurrency }}</span>
+                  <span style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color: var(--orange-text)">{{ budgetAnnualTotal | number:'1.0-0' }} {{ budgetCurrency }}</span>
                 </div>
               </div>
 
               @if (budgetDirty) {
-                <div style="display:flex;gap:8px">
-                  <button class="btn btn-p btn-sm" style="flex:1" [disabled]="budgetSaving" (click)="saveBudgets()">
+                <div style="display:flex;gap:8px;margin-top:20px">
+                  <button class="btn btn-p" style="flex:1" [disabled]="budgetSaving" (click)="saveBudgets()">
                     {{ budgetSaving ? t('users.saving') : '💾 ' + t('users.budgets.save') }}
                   </button>
-                  <button class="btn btn-g btn-sm" (click)="loadBudgets()">{{ 'actions.cancel' | transloco }}</button>
+                  <button class="btn btn-g" (click)="loadBudgets()">{{ 'actions.cancel' | transloco }}</button>
                 </div>
               }
 
@@ -461,7 +461,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
             @if (isAdmin()) {
               <div class="sec-title" style="margin-top:24px">{{ t('users.roles.title', { count: (selected()!.roles ?? []).length }) }}</div>
               @for (role of selected()!.roles ?? []; track role.role_id) {
-                <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+                <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
                   <wt-group-pill [name]="role.group_display || role.group_name" />
                   <span class="badge" [class]="role.access_level === 'full' ? 's-signed' : 's-new'">{{ role.access_level }}</span>
                   <span style="flex:1"></span>
@@ -469,7 +469,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 </div>
               }
 
-              <div class="sec-title" style="margin-top:20px">{{ t('users.roles.assignTitle') }}</div>
+              <div class="sec-title" style="margin-top:24px">{{ t('users.roles.assignTitle') }}</div>
               <div style="display:flex;gap:8px;align-items:flex-end">
                 <div class="fg" style="flex:1">
                   <label class="fl">{{ t('users.roles.group') }}</label>
@@ -495,16 +495,16 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 {{ t('users.grants.title', { count: (selected()!.visibility_grants ?? []).length }) }}
               </div>
               @for (grant of selected()!.visibility_grants ?? []; track grant.id) {
-                <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+                <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
                   <wt-group-pill [name]="grant.group_display || grant.group_name" />
-                  <span style="font-size:11px;color:var(--gray-600)">{{ moduleLabel(grant.module) }}</span>
+                  <span style="font-size:12px;color:var(--gray-600)">{{ moduleLabel(grant.module) }}</span>
                   <span class="badge" [class]="grant.access_level === 'full' ? 's-signed' : 's-new'">{{ grant.access_level }}</span>
                   <span style="flex:1"></span>
                   <button class="btn btn-d btn-sm" (click)="removeVisibilityGrant(grant.id)">{{ t('users.remove') }}</button>
                 </div>
               }
 
-              <div class="sec-title" style="margin-top:20px">{{ t('users.grants.addTitle') }}</div>
+              <div class="sec-title" style="margin-top:24px">{{ t('users.grants.addTitle') }}</div>
               <div style="display:flex;gap:8px;align-items:flex-end">
                 <div class="fg" style="flex:1">
                   <label class="fl">{{ t('users.grants.group') }}</label>
@@ -529,7 +529,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 </div>
                 <button class="btn btn-p" [disabled]="!newGrantGroup" (click)="addVisibilityGrant()">{{ t('users.grants.add') }}</button>
               </div>
-              <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+              <div style="font-size:12px;color:var(--gray-500);margin-top:8px">
                 {{ t('users.grants.hint') }}
               </div>
 
@@ -537,7 +537,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 <div class="sec-title" style="margin-top:24px">{{ t('users.featureAccess.title') }}</div>
               }
               @if (tenantHasProspects()) {
-                <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--gray-100);border-radius:8px;margin-top:8px">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--gray-50);border-radius:12px;margin-top:8px">
                   <div style="flex:1">
                     <div style="font-weight:600">{{ t('users.featureAccess.prospects') }}</div>
                     <div style="font-size:12px;color:var(--gray-500)">{{ t('users.featureAccess.prospectsHint') }}</div>
@@ -551,7 +551,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                    Admin tenanta ma dostęp zawsze, więc przełącznik nic by u niego
                    nie zmienił i celowo go nie pokazujemy. -->
               @if (tenantHasCallAnalysis() && !selected()!.is_admin) {
-                <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--gray-100);border-radius:8px;margin-top:8px">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--gray-50);border-radius:12px;margin-top:8px">
                   <div style="flex:1">
                     <div style="font-weight:600">{{ t('users.featureAccess.callAnalysis') }}</div>
                     <div style="font-size:12px;color:var(--gray-500)">{{ t('users.featureAccess.callAnalysisHint') }}</div>
@@ -577,49 +577,46 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 </ng-container>
   `,
   styles: [`
-    #topbar { height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }
-    .page-title { font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:var(--gray-900); }
+    #topbar { height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }
+    .page-title { font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-900); }
     .tsp { flex:1; }
     .srch-wrap { position:relative;display:flex;align-items:center; }
     .srch-wrap svg { position:absolute;left:10px;width:15px;height:15px;color:var(--gray-400);pointer-events:none; }
-    .srch { background:var(--gray-100);border:1px solid var(--gray-200);border-radius:8px;padding:7px 14px 7px 34px;font-size:13px;width:260px;outline:none;font-family:inherit; }
-    .srch:focus { border-color:var(--orange);background:white; }
     #content { flex:1;overflow-y:auto;padding:24px; }
+    .filter-select { width:auto; min-width:200px; }
+    .filters { display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 18px;margin-bottom:16px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-sm); }
     .thead { display:grid;background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:0 16px; }
-    .th { padding:10px 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);display:flex;align-items:center;gap:4px; }
+    .th { padding:10px 8px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);display:flex;align-items:center;gap:4px; }
     .sortable { cursor:pointer;user-select:none; }
     .sortable:hover { color:var(--gray-700); }
     .si { font-size:10px;color:var(--gray-400); }
     .tr { display:grid;padding:0 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s;align-items:center; }
     .tr:hover { background:var(--gray-50); }
-    .td { padding:11px 8px;font-size:13px;color:var(--gray-700);overflow:hidden; }
+    .td { padding:12px 8px;font-size:14px;color:var(--gray-700);overflow:hidden; }
     .overlay { position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:flex-end; }
-    .panel { width:580px;height:100vh;background:white;box-shadow:var(--shadow-lg);overflow-y:auto;display:flex;flex-direction:column;animation:slideIn .2s ease; }
-    .ph { padding:20px 24px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;background:white;position:sticky;top:0;z-index:1; }
+    .panel { width:580px;height:100vh;background:var(--surface);box-shadow:var(--shadow-lg);overflow-y:auto;display:flex;flex-direction:column;animation:slideIn .2s ease; }
+    .ph { padding:20px 24px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;background:var(--surface);position:sticky;top:0;z-index:1; }
     .pt { font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-900); }
     .ps { font-size:12px;color:var(--gray-500);margin-top:2px; }
     .pc { margin-left:auto;cursor:pointer;color:var(--gray-400);padding:4px;border-radius:6px; }
     .pc:hover { background:var(--gray-100); }
     .pb { padding:24px;flex:1; }
-    .pf { padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end;background:var(--gray-50);position:sticky;bottom:0; }
+    .pf { padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:8px;justify-content:flex-end;background:var(--gray-50);position:sticky;bottom:0; }
     .mol { position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px); }
-    .mo { background:white;border-radius:14px;width:540px;max-width:95vw;box-shadow:var(--shadow-lg);overflow:hidden; }
+    .mo { background:var(--surface);border-radius:12px;width:540px;max-width:95vw;box-shadow:var(--shadow-lg);overflow:hidden; }
     .moh { padding:20px 24px 16px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px; }
     .moico { width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-    .mot { font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--gray-900); }
+    .mot { font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-900); }
     .mos { font-size:12px;color:var(--gray-500);margin-top:2px; }
     .mox { margin-left:auto;cursor:pointer;color:var(--gray-400);padding:4px;border-radius:6px; }
     .mox:hover { background:var(--gray-100); }
-    .fgrid { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
+    .fgrid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
     .fg { display:flex;flex-direction:column;gap:4px; }
-    .check-field { grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray-800);cursor:pointer; }
+    .check-field { grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--gray-800);cursor:pointer; }
     .fl { font-size:12px;font-weight:600;color:var(--gray-600); }
-    .fi { border:1px solid var(--gray-200);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none;transition:border .15s; }
-    .fi:focus { border-color:var(--orange); }
     .fi-err { border-color:#ef4444 !important; }
-    .fsel { border:1px solid var(--gray-200);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none;background:white; }
-    .ferr { font-size:11px;color:#ef4444; }
-    .sec-title { font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-500);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--gray-100); }
+    .ferr { font-size:14px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
+    .sec-title { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-500);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--gray-100); }
   `],
 })
 export class UsersComponent implements OnInit {

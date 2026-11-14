@@ -41,11 +41,11 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
       <span class="page-title">{{ t('workflow.title') }}</span>
       <span class="tsp"></span>
       @if (view === 'kanban' && refreshIntervalSec() > 0) {
-        <span style="font-size:11.5px;color:var(--gray-400);margin-right:4px">
+        <span style="font-size:12px;color:var(--gray-400);margin-right:4px">
           {{ t('workflow.autoRefresh', { seconds: refreshIntervalSec() }) }}
         </span>
       }
-      <div class="tabs" style="margin-bottom:0;width:320px">
+      <div class="tabs seg" style="margin-bottom:0;min-width:320px">
         <button class="tab-btn" [class.active]="view==='mine'"   (click)="switchView('mine')">{{ t('labels.myTasks') }}</button>
         <button class="tab-btn" [class.active]="view==='kanban'" (click)="switchView('kanban')">{{ t('workflow.kanbanTab') }}</button>
       </div>
@@ -60,7 +60,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
       @if (view === 'mine') {
         @if (myTasks().length === 0 && !loading()) {
           <div class="empty-state" style="margin-top:48px">
-            <div class="empty-icon">✅</div>
+            <div class="empty-tile" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
             <div class="empty-title">{{ t('labels.noPendingTasks') }}</div>
             <div>{{ t('workflow.mine.allDone') }}</div>
           </div>
@@ -70,7 +70,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
             <div class="card" style="padding:16px 20px;display:flex;align-items:center;gap:14px">
               <wt-task-badge [taskType]="task.task_type" />
               <div style="flex:1;min-width:0">
-                <div style="font-size:13.5px;font-weight:600;color:var(--gray-900);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                <div style="font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                   {{ task.document_name }}
                 </div>
                 <div style="font-size:12px;color:var(--gray-400);display:flex;align-items:center;gap:8px">
@@ -79,7 +79,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
                   <span>{{ t('labels.from', { name: task.assigner_name }) }}</span>
                   @if (task.group_name) { <span>· {{ task.group_name }}</span> }
                   @if (task.due_date) {
-                    <span [style.color]="isDue(task.due_date) ? '#DC2626' : '#065F46'">
+                    <span [style.color]="isDue(task.due_date) ? 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)' : 'oklch(from #065f46 max(l, var(--text-min-l)) c h)'">
                       · ⏰ {{ task.due_date | date:'dd.MM.yy' }}
                     </span>
                     <wt-add-to-calendar [entry]="calendarEntryOf(task)" (click)="$event.stopPropagation(); $event.preventDefault()" />
@@ -116,7 +116,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
                 <div class="coldot" [class]="'dot-' + col.id"></div>
                 <span style="font-size:12px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.5px">{{ t(col.labelKey) }}</span>
-                <span style="margin-left:auto;background:var(--gray-100);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:600;color:var(--gray-500)">
+                <span style="margin-left:auto;background:var(--gray-100);border-radius:10px;padding:1px 8px;font-size:12px;font-weight:600;color:var(--gray-500)">
                   {{ docsByColumn(col.id).length }}
                 </span>
               </div>
@@ -129,37 +129,37 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
                       <wt-status-badge [status]="doc.status" />
                       <span style="flex:1"></span>
                       @if (doc.active_task_count > 0) {
-                        <span style="font-size:10px;background:var(--orange-pale);color:var(--orange-dark);border-radius:8px;padding:1px 6px;font-weight:600">
+                        <span style="font-size:10px;background:var(--orange-pale);color:var(--orange-dark);border-radius:999px;padding:1px 6px;font-weight:600">
                           {{ t('workflow.kanban.taskCount', { count: doc.active_task_count }) }}
                         </span>
                       }
                     </div>
 
                     <!-- Document name + number -->
-                    <div style="font-size:13px;font-weight:600;color:var(--gray-900);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                    <div style="font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                       {{ doc.name }}
                     </div>
-                    <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px">{{ doc.doc_number }}</div>
+                    <div style="font-size:12px;color:var(--gray-400);margin-bottom:6px">{{ doc.doc_number }}</div>
 
                     <!-- Owner row -->
                     <div style="display:flex;align-items:center;gap:6px">
                       <wt-avatar [name]="doc.owner_name ?? ''" [size]="18" />
-                      <span style="font-size:11.5px;color:var(--gray-500)">{{ doc.owner_name }}</span>
+                      <span style="font-size:12px;color:var(--gray-500)">{{ doc.owner_name }}</span>
                       @if (doc.group_display ?? doc.group_name) {
-                        <span style="margin-left:auto;font-size:10.5px;color:var(--gray-400)">{{ doc.group_display ?? doc.group_name }}</span>
+                        <span style="margin-left:auto;font-size:10px;color:var(--gray-400)">{{ doc.group_display ?? doc.group_name }}</span>
                       }
                     </div>
 
                     <!-- Expiration date -->
                     @if (doc.expiration_date) {
-                      <div style="font-size:11px;margin-top:4px;display:flex;align-items:center;gap:4px"
+                      <div style="font-size:12px;margin-top:4px;display:flex;align-items:center;gap:4px"
                            [style.color]="expirationColor(doc.expiration_date)">
                         @if (isExpired(doc.expiration_date)) {
                           <span [title]="t(doc.doc_type === 'invoice' ? 'workflow.kanban.paymentOverdue' : 'workflow.kanban.expired')">⚠️</span>
                         }
                         {{ t(doc.doc_type === 'invoice' ? 'workflow.kanban.paymentDue' : 'workflow.kanban.expires', { date: (doc.expiration_date | date:'dd.MM.yy') }) }}
                         @if (isExpiringSoon(doc.expiration_date) && !isExpired(doc.expiration_date)) {
-                          <span style="font-size:9px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 4px;font-weight:600">{{ t('workflow.kanban.soon') }}</span>
+                          <span style="font-size:10px;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);border-radius:999px;padding:1px 6px;font-weight:600">{{ t('workflow.kanban.soon') }}</span>
                         }
                       </div>
                     }
@@ -187,7 +187,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
                   </div>
                 }
                 @if (docsByColumn(col.id).length === 0) {
-                  <div style="padding:20px;text-align:center;color:var(--gray-300);font-size:12px;border:1.5px dashed var(--gray-200);border-radius:8px">
+                  <div style="padding:20px;text-align:center;color:var(--gray-300);font-size:12px;border:1.5px dashed var(--gray-200);border-radius:12px">
                     {{ t('workflow.kanban.emptyColumn') }}
                   </div>
                 }
@@ -200,10 +200,10 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
     </ng-container>
   `,
   styles: [`
-    #topbar { height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }
-    .page-title { font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:var(--gray-900); }
+    #topbar { height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }
+    .page-title { font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-900); }
     .tsp { flex:1; }
-    #content { flex:1;overflow-y:auto;padding:24px; }
+    #content { flex:1;overflow-y:auto;padding:20px 24px 24px; }
     .coldot { width:8px;height:8px;border-radius:50%; }
     .dot-pending     { background:#F59E0B; }
     .dot-in_progress { background:#3B82F6; }
@@ -213,19 +213,19 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
     /* ── Kanban task row ── */
     .ktask-row {
       display: flex; align-items: center; gap: 4px;
-      background: #FFF8F0; border: 1px solid #FDDBB4;
-      border-radius: 5px; padding: 3px 6px;
+      background: var(--gray-50); border: 1px solid color-mix(in srgb, #fddbb4 var(--tint-mix), var(--surface));
+      border-radius: 5px; padding: 4px 6px;
     }
-    .ktask-name { font-size: 10.5px; font-weight: 600; color: #92400E; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .ktask-from { font-size: 9.5px; color: #B45309; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60px; flex-shrink: 0; }
-    .ktask-due  { font-size: 9.5px; font-weight: 700; color: #065F46; white-space: nowrap; flex-shrink: 0; }
-    .ktask-due.overdue { color: #DC2626; }
+    .ktask-name { font-size: 10px; font-weight: 600; color: oklch(from #92400e max(l, var(--text-min-l)) c h); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ktask-from { font-size: 10px; color: oklch(from #b45309 max(l, var(--text-min-l)) c h); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60px; flex-shrink: 0; }
+    .ktask-due  { font-size: 10px; font-weight: 700; color: oklch(from #065f46 max(l, var(--text-min-l)) c h); white-space: nowrap; flex-shrink: 0; }
+    .ktask-due.overdue { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
 
     /* ── Kanban task type badges ── */
-    .kbadge { display: inline-flex; align-items: center; font-size: 8.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
-    .kbadge-sign    { background: #EDE9FE; color: #5B21B6; }
-    .kbadge-edit    { background: #DBEAFE; color: #1E40AF; }
-    .kbadge-approve { background: #FEF3C7; color: #92400E; }
+    .kbadge { display: inline-flex; align-items: center; font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+    .kbadge-sign    { background: color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color: oklch(from #5b21b6 max(l, var(--text-min-l)) c h); }
+    .kbadge-edit    { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: oklch(from #1e40af max(l, var(--text-min-l)) c h); }
+    .kbadge-approve { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .kbadge-read    { background: var(--gray-100); color: var(--gray-600); }
   `],
 })

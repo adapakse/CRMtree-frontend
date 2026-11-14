@@ -115,6 +115,7 @@
     "title": "Calendarul activităților",
     "views": {
       "day": "Zi",
+      "label": "Vizualizare",
       "month": "Lună",
       "tasks": "Sarcini",
       "week": "Săptămână"
@@ -529,6 +530,26 @@
     "trainingMode": "Mod de instruire",
     "writeNew": "Scrieți un e-mail nou"
   },
+  "fieldErrors": {
+    "closeDate": "Alegeți data estimată de închidere",
+    "company": "Introduceți numele firmei",
+    "contactName": "Introduceți numele complet al persoanei de contact",
+    "contactTitle": "Alegeți funcția persoanei de contact",
+    "email": "Introduceți o adresă de e-mail, de ex. ion@firma.ro",
+    "firstContact": "Alegeți data primului contact",
+    "industry": "Alegeți un domeniu",
+    "lostReason": "Alegeți motivul pierderii",
+    "onlinePct": "Alegeți ponderea vânzărilor online",
+    "phone": "Introduceți un număr de telefon, de ex. +48 600 000 000",
+    "probability": "Alegeți șansa de câștig",
+    "salesperson": "Atribuiți un agent de vânzări",
+    "saveFailed": "Salvarea nu a reușit. Încercați din nou — dacă eroarea se repetă, anunțați administratorul.",
+    "source": "Alegeți de unde a venit lead-ul",
+    "value": "Introduceți o sumă — dacă nu o știți, scrieți 0",
+    "valueNegative": "Suma nu poate fi negativă",
+    "valueTooLarge": "Sumă prea mare — maximum 999.999.999.999",
+    "website": "Introduceți site-ul firmei, de ex. firma.ro"
+  },
   "history": {
     "activityAdded": "Activitate adăugată: {title}",
     "activityClosed": "Activitate închisă: {title}",
@@ -741,9 +762,14 @@
       "hot": "Fierbinte"
     },
     "history": {
+      "archived": "Lead mutat în arhivă",
       "converted": "Lead convertit în Partener",
       "created": "Lead creat",
       "deleted": "Lead șters",
+      "holdCancelled": "Așteptare anulată",
+      "holdSet": "În așteptare până la {date}",
+      "migrated": "Lead mutat",
+      "testAccount": "Cont de test",
       "updated": "Lead actualizat"
     },
     "hold": {
@@ -770,11 +796,11 @@
     },
     "loadError": "Eroare la încărcarea leadului.",
     "nip": {
-      "countryCodeRequired": "Introduceți codul de țară (2 litere), de ex. PL",
-      "duplicate": "Acest cod fiscal este deja atribuit unei alte înregistrări.",
-      "numberRequired": "Introduceți numărul după codul de țară",
-      "plTenDigits": "Pentru PL sunt necesare 10 cifre după codul de țară",
-      "required": "Codul fiscal este obligatoriu"
+      "countryCodeRequired": "Începeți cu codul de țară (2 litere), de ex. PL",
+      "duplicate": "Acest cod fiscal este deja atribuit altei firme în CRM",
+      "numberRequired": "După codul de țară introduceți numărul",
+      "plTenDigits": "Codul fiscal polonez are 10 cifre după „PL”, de ex. PL1234567890",
+      "required": "Introduceți codul fiscal al firmei, de ex. PL1234567890"
     },
     "notFound": "Leadul nu a fost găsit.",
     "onboarding": {
@@ -922,9 +948,13 @@
       "holdOnlyTitle": "Afișează doar leadurile în așteptare",
       "hot": "Fierbinți",
       "mine": "Ale mele",
+      "peopleGroup": "Persoane",
       "repChip": "Agent de vânzări: {name}",
       "reportFilter": "Filtru din raport: {label}",
       "repsGroup": "Agenți de vânzări",
+      "stagesClosed": "Închise",
+      "stagesOpen": "În lucru",
+      "teamsGroup": "Echipe",
       "wholeGroup": "Tot grupul: {group}"
     },
     "importCsv": "Import CSV",
@@ -975,6 +1005,7 @@
       "fillRequired": "Completați câmpurile obligatorii:",
       "fullName": "Prenume și nume",
       "hot": "Lead fierbinte",
+      "hotHint": "Clientul este aproape de cumpărare — lead-ul primește 🔥 în listă și în kanban",
       "namePlaceholder": "Ion Popescu",
       "noExtraContacts": "Niciun contact suplimentar",
       "notes": "Notițe",
@@ -985,10 +1016,11 @@
       "subtitle": "Adăugați o nouă oportunitate de vânzare",
       "taxId": "Cod fiscal",
       "taxIdErrors": {
-        "countryCode": "Introduceți codul de țară (2 litere), de ex. PL",
-        "numberMissing": "Introduceți numărul după codul de țară",
-        "polishDigits": "Pentru PL sunt necesare 10 cifre după codul de țară",
-        "required": "Codul fiscal este obligatoriu"
+        "countryCode": "Începeți cu codul de țară (2 litere), de ex. PL",
+        "duplicate": "Acest cod fiscal este deja atribuit altei firme în CRM",
+        "numberMissing": "După codul de țară introduceți numărul",
+        "polishDigits": "Codul fiscal polonez are 10 cifre după „PL”, de ex. PL1234567890",
+        "required": "Introduceți codul fiscal al firmei, de ex. PL1234567890"
       },
       "title": "Lead nou",
       "unassigned": "— neatribuit —",
@@ -1036,6 +1068,7 @@
     "title": "Leaduri de vânzări",
     "view": {
       "kanban": "Kanban",
+      "label": "Vizualizare",
       "table": "Tabel",
       "timeline": "Cronologie"
     }
@@ -1321,10 +1354,10 @@
     },
     "loadError": "Eroare la încărcare.",
     "nip": {
-      "countryCodeRequired": "Introduceți codul de țară (2 litere), de ex. PL",
-      "numberRequired": "Introduceți numărul după codul de țară",
-      "plTenDigits": "Pentru PL sunt necesare 10 cifre după codul de țară",
-      "required": "Codul fiscal este obligatoriu"
+      "countryCodeRequired": "Începeți cu codul de țară (2 litere), de ex. PL",
+      "numberRequired": "După codul de țară introduceți numărul",
+      "plTenDigits": "Codul fiscal polonez are 10 cifre după „PL”, de ex. PL1234567890",
+      "required": "Introduceți codul fiscal al firmei, de ex. PL1234567890"
     },
     "notFound": "Partenerul nu a fost găsit.",
     "onboarding": {
@@ -1477,11 +1510,11 @@
       "dwhTurnoverHint": "Cifră de afaceri brută YTD din DWH"
     },
     "taxIdErrors": {
-      "countryCode": "Introduceți codul de țară (2 litere), de ex. PL",
-      "duplicate": "Acest cod fiscal este deja atribuit unei alte înregistrări.",
-      "numberMissing": "Introduceți numărul după codul de țară",
-      "polishDigits": "Pentru PL sunt necesare 10 cifre după codul de țară",
-      "required": "Codul fiscal este obligatoriu"
+      "countryCode": "Începeți cu codul de țară (2 litere), de ex. PL",
+      "duplicate": "Acest cod fiscal este deja atribuit altei firme în CRM",
+      "numberMissing": "După codul de țară introduceți numărul",
+      "polishDigits": "Codul fiscal polonez are 10 cifre după „PL”, de ex. PL1234567890",
+      "required": "Introduceți codul fiscal al firmei, de ex. PL1234567890"
     },
     "title": "Registrul partenerilor",
     "toolbar": {
@@ -1495,6 +1528,7 @@
     },
     "view": {
       "cards": "Carduri",
+      "label": "Vizualizare",
       "table": "Tabel"
     }
   },
@@ -1913,6 +1947,8 @@
       "showAll": "Afișare toți partenerii cu risc de churn →"
     },
     "currency": {
+      "billionsPln": "{value} mld. PLN",
+      "millionsPln": "{value} mil. PLN",
       "pln": "{value} PLN",
       "thousandsPln": "{value} mii PLN"
     },

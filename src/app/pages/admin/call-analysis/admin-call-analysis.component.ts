@@ -49,25 +49,25 @@ interface CallAnalysisRow {
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
-<div style="display:flex;flex-direction:column;height:100%;background:#f9fafb" (click)="closeMenu()">
+<div style="display:flex;flex-direction:column;height:100%;background:var(--gray-50)" (click)="closeMenu()">
 
   <!-- HEADER -->
-  <div style="background:white;border-bottom:1px solid #e5e7eb;padding:14px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+  <div style="background:var(--surface);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:14px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0">
     <div style="flex:1">
-      <div style="font-size:18px;font-weight:700;color:#18181b">{{ t('callAnalysis.title') }}</div>
-      <div style="font-size:12px;color:#6b7280;margin-top:1px">{{ t('callAnalysis.subtitle') }}</div>
+      <div style="font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('callAnalysis.title') }}</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-top:1px">{{ t('callAnalysis.subtitle') }}</div>
     </div>
 
     <button *ngIf="rows.length && !batchProgress.running && pendingCount > 0"
             (click)="startBatch()"
-            style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:#3BAA5D;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
+            class="btn btn-p">
       ▶ {{ t('callAnalysis.header.analyze', { count: pendingCount }) }}
     </button>
     <button *ngIf="batchProgress.running" disabled
-            style="padding:8px 14px;background:#fed7aa;color:#9a3412;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:not-allowed">
+            class="btn btn-p">
       ⏳ {{ t('callAnalysis.header.analyzing') }}
     </button>
-    <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:#18181b;color:white;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
+    <label class="btn btn-g">
       ⬆ {{ t('callAnalysis.header.importCsv') }}
       <input type="file" accept=".csv" (change)="onFileChange($event)" style="display:none">
     </label>
@@ -75,8 +75,8 @@ interface CallAnalysisRow {
 
   <!-- BACK LINK -->
   @if (navBack.ctx(); as ctx) {
-    <div style="padding:5px 24px;background:#f8fafc;border-bottom:1px solid #e5e7eb;flex-shrink:0">
-      <button (click)="navigateBack()" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:white;border:1px solid #e2e8f0;border-radius:6px;color:#64748b;font-size:12px;font-weight:500;cursor:pointer;line-height:1">
+    <div style="padding:4px 24px;background:var(--gray-50);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));flex-shrink:0">
+      <button (click)="navigateBack()" class="btn btn-g btn-sm">
         ← {{ctx.label}}
       </button>
     </div>
@@ -84,19 +84,19 @@ interface CallAnalysisRow {
 
   <!-- PROGRESS BAR -->
   <div *ngIf="batchProgress.running || (batchProgress.total > 0 && !batchProgress.running)"
-       style="background:white;border-bottom:1px solid #e5e7eb;padding:10px 24px;flex-shrink:0">
+       style="background:var(--surface);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:10px 24px;flex-shrink:0">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <span style="font-size:12px;color:#374151;font-weight:500">
+      <span style="font-size:12px;color:var(--gray-700);font-weight:500">
         <ng-container *ngIf="batchProgress.running && batchStartedHere">{{ t('callAnalysis.progress.running') }}</ng-container>
         <ng-container *ngIf="batchProgress.running && !batchStartedHere">⚠ {{ t('callAnalysis.progress.runningOtherUser') }}</ng-container>
         <ng-container *ngIf="!batchProgress.running">{{ t('callAnalysis.progress.finished') }}</ng-container>
         &nbsp;{{ t('callAnalysis.progress.companies', { done: batchProgress.done, total: batchProgress.total }) }}
       </span>
-      <span *ngIf="batchProgress.errors > 0" style="font-size:11px;color:#ef4444">
+      <span *ngIf="batchProgress.errors > 0" style="font-size:12px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">
         {{ t('callAnalysis.progress.errors', { count: batchProgress.errors }) }}
       </span>
     </div>
-    <div style="height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden">
+    <div style="height:6px;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:3px;overflow:hidden">
       <div [style.width.%]="batchProgress.total ? ((batchProgress.done + batchProgress.errors) / batchProgress.total * 100) : 0"
            style="height:100%;background:#3BAA5D;border-radius:3px;transition:width 0.3s ease"></div>
     </div>
@@ -105,40 +105,38 @@ interface CallAnalysisRow {
   <!-- BULK ACTION BAR -->
   <div *ngIf="selectedCount > 0"
        style="background:#1e3a5f;color:white;padding:8px 24px;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap">
-    <span style="font-size:13px;font-weight:600;margin-right:4px">{{ t('callAnalysis.bulk.selected', { count: selectedCount }) }}</span>
+    <span style="font-size:14px;font-weight:600;margin-right:4px">{{ t('callAnalysis.bulk.selected', { count: selectedCount }) }}</span>
     <button (click)="bulkAction('set-status', 'hold')"
-            style="padding:5px 12px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
+            class="ca-bulk-btn">
       ⏸ {{ t('callAnalysis.bulk.hold') }}
     </button>
     <button (click)="bulkAction('set-status', 'archived')"
-            style="padding:5px 12px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
+            class="ca-bulk-btn">
       📦 {{ t('callAnalysis.actions.archive') }}
     </button>
     <button (click)="bulkAction('set-status', 'pending')"
-            style="padding:5px 12px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
+            class="ca-bulk-btn">
       ▶ {{ t('callAnalysis.bulk.restore') }}
     </button>
     <button (click)="bulkAction('re-analyze')"
-            style="padding:5px 12px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
+            class="ca-bulk-btn">
       🔄 {{ t('callAnalysis.actions.reanalyze') }}
     </button>
     <button (click)="bulkAction('delete')"
-            style="padding:5px 12px;background:rgba(239,68,68,0.3);color:#fca5a5;border:1px solid rgba(239,68,68,0.4);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
+            class="ca-bulk-btn ca-bulk-del">
       🗑 {{ t('callAnalysis.bulk.deleteSelected') }}
     </button>
     <button (click)="cancelSelection()"
-            style="padding:5px 12px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.2);border-radius:6px;font-size:12px;cursor:pointer;margin-left:auto">
+            class="ca-bulk-btn" style="margin-left:auto">
       ✕ {{ 'actions.cancel' | transloco }}
     </button>
   </div>
 
   <!-- FILTRY -->
-  <div style="background:white;border-bottom:1px solid #e5e7eb;padding:10px 24px;display:flex;gap:10px;align-items:center;flex-shrink:0;flex-wrap:wrap">
-    <input type="text" [placeholder]="t('callAnalysis.filters.searchPlaceholder')" [(ngModel)]="filters.search"
-           (ngModelChange)="onFilterChange()"
-           style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;width:220px">
-    <select [(ngModel)]="filters.status" (ngModelChange)="onFilterChange()"
-            style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
+  <div class="toolbar ca-filters">
+    <input type="search" [placeholder]="t('callAnalysis.filters.searchPlaceholder')" [(ngModel)]="filters.search"
+           (ngModelChange)="onFilterChange()" style="width:220px">
+    <select class="sel" [(ngModel)]="filters.status" (ngModelChange)="onFilterChange()">
       <option value="">{{ t('callAnalysis.filters.allStatuses') }}</option>
       <option value="pending">{{ t('callAnalysis.statuses.pending') }}</option>
       <option value="analyzing">{{ t('callAnalysis.filters.statusAnalyzing') }}</option>
@@ -147,76 +145,62 @@ interface CallAnalysisRow {
       <option value="hold">{{ t('callAnalysis.statuses.hold') }}</option>
       <option value="archived">{{ t('callAnalysis.statuses.archived') }}</option>
     </select>
-    <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151">
-      {{ t('callAnalysis.filters.score') }}
-      <input type="number" [placeholder]="t('callAnalysis.filters.scoreMin')" [(ngModel)]="filters.score_min" (ngModelChange)="onFilterChange()"
-             min="0" max="100" style="width:60px;padding:6px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
-      –
-      <input type="number" [placeholder]="t('callAnalysis.filters.scoreMax')" [(ngModel)]="filters.score_max" (ngModelChange)="onFilterChange()"
-             min="0" max="100" style="width:60px;padding:6px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
+    <div class="ca-grp">
+      <span class="ca-lbl">{{ t('callAnalysis.filters.score') }}</span>
+      <input type="number" [placeholder]="t('callAnalysis.filters.scoreMin')" [(ngModel)]="filters.score_min" (ngModelChange)="onFilterChange()" min="0" max="100" class="ca-num">
+      <span class="ca-sep">–</span>
+      <input type="number" [placeholder]="t('callAnalysis.filters.scoreMax')" [(ngModel)]="filters.score_max" (ngModelChange)="onFilterChange()" min="0" max="100" class="ca-num">
     </div>
-    <select [(ngModel)]="filters.follow_up" (ngModelChange)="onFilterChange()"
-            style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
+    <select class="sel" [(ngModel)]="filters.follow_up" (ngModelChange)="onFilterChange()">
       <option value="">{{ t('callAnalysis.filters.allFollowUps') }}</option>
       <option value="required">📞 {{ t('callAnalysis.filters.followUpRequired') }}</option>
       <option value="done">✓ {{ t('callAnalysis.filters.followUpDone') }}</option>
     </select>
-    <select [(ngModel)]="filters.salesperson" (ngModelChange)="onFilterChange()"
-            style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
+    <select class="sel" [(ngModel)]="filters.salesperson" (ngModelChange)="onFilterChange()">
       <option value="">{{ t('callAnalysis.filters.allSalespeople') }}</option>
       <option *ngFor="let u of crmUsers" [value]="u.display_name">{{u.display_name}}</option>
     </select>
-    <select [(ngModel)]="filters.link" (ngModelChange)="onFilterChange()"
-            style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
+    <select class="sel" [(ngModel)]="filters.link" (ngModelChange)="onFilterChange()">
       <option value="">{{ t('callAnalysis.filters.allLinks') }}</option>
       <option value="lead">🏷 {{ t('labels.sourceTypes.lead') }}</option>
       <option value="partner">🤝 {{ t('labels.sourceTypes.partner') }}</option>
       <option value="prospect">👁 {{ t('callAnalysis.links.prospect') }}</option>
-      <option value="none">— {{ t('callAnalysis.filters.noLinks') }}</option>
+      <option value="none">{{ t('callAnalysis.filters.noLinks') }}</option>
     </select>
-    <span style="font-size:12px;color:#6b7280;white-space:nowrap">{{ t('callAnalysis.filters.firstCall') }}</span>
-    <input type="date" [(ngModel)]="filters.first_call_from" (ngModelChange)="onFilterChange()"
-           style="padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
-    <span style="font-size:12px;color:#9ca3af">–</span>
-    <input type="date" [(ngModel)]="filters.first_call_to" (ngModelChange)="onFilterChange()"
-           style="padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
-    <span style="font-size:12px;color:#6b7280;white-space:nowrap">{{ t('callAnalysis.filters.lastCall') }}</span>
-    <input type="date" [(ngModel)]="filters.last_call_from" (ngModelChange)="onFilterChange()"
-           style="padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
-    <span style="font-size:12px;color:#9ca3af">–</span>
-    <input type="date" [(ngModel)]="filters.last_call_to" (ngModelChange)="onFilterChange()"
-           style="padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
+    <span class="ca-lbl">{{ t('callAnalysis.filters.firstCall') }}</span>
+    <input type="date" class="sel" [(ngModel)]="filters.first_call_from" (ngModelChange)="onFilterChange()">
+    <span class="ca-sep">–</span>
+    <input type="date" class="sel" [(ngModel)]="filters.first_call_to" (ngModelChange)="onFilterChange()">
+    <span class="ca-lbl">{{ t('callAnalysis.filters.lastCall') }}</span>
+    <input type="date" class="sel" [(ngModel)]="filters.last_call_from" (ngModelChange)="onFilterChange()">
+    <span class="ca-sep">–</span>
+    <input type="date" class="sel" [(ngModel)]="filters.last_call_to" (ngModelChange)="onFilterChange()">
 
     <!-- Follow-up date preset filter -->
-    <div style="display:flex;align-items:center;gap:4px;border-left:1px solid #e5e7eb;padding-left:10px">
-      <span style="font-size:12px;color:#6b7280;white-space:nowrap">{{ t('callAnalysis.filters.followUpDate') }}</span>
-      <button *ngFor="let p of followUpDatePresets"
+    <div class="ca-grp">
+      <span class="ca-lbl">{{ t('callAnalysis.filters.followUpDate') }}</span>
+      <button *ngFor="let p of followUpDatePresets" class="fchip"
               (click)="setFollowUpDatePreset(p.value)"
-              [style.background]="filters.follow_up_date_preset===p.value?'#3BAA5D':'white'"
-              [style.color]="filters.follow_up_date_preset===p.value?'white':'#374151'"
-              [style.border]="filters.follow_up_date_preset===p.value?'1px solid #3BAA5D':'1px solid #d1d5db'"
-              style="padding:5px 8px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">
+              [class.on]="filters.follow_up_date_preset===p.value">
         {{ t(p.labelKey) }}
       </button>
       <ng-container *ngIf="filters.follow_up_date_preset==='custom'">
-        <input type="date" [(ngModel)]="filters.follow_up_date_from" (ngModelChange)="onFilterChange()"
-               style="padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
-        <span style="font-size:12px;color:#9ca3af">–</span>
-        <input type="date" [(ngModel)]="filters.follow_up_date_to" (ngModelChange)="onFilterChange()"
-               style="padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
+        <input type="date" class="sel" [(ngModel)]="filters.follow_up_date_from" (ngModelChange)="onFilterChange()">
+        <span class="ca-sep">–</span>
+        <input type="date" class="sel" [(ngModel)]="filters.follow_up_date_to" (ngModelChange)="onFilterChange()">
       </ng-container>
     </div>
 
-    <span *ngIf="total > 0" style="font-size:12px;color:#6b7280;margin-left:auto">
+    <span *ngIf="total > 0" class="ca-lbl ca-total">
       {{ t('callAnalysis.filters.total', { count: total }) }}
     </span>
   </div>
 
   <!-- IMPORT FEEDBACK -->
-  <div *ngIf="importResult" [style.background]="importResult.error ? '#fef2f2' : '#f0fdf4'"
-       style="border-bottom:1px solid;padding:10px 24px;font-size:13px;flex-shrink:0"
+  <div *ngIf="importResult" [style.background]="importResult.error ? 'color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface))' : 'color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface))'"
+       style="border-bottom:1px solid;padding:10px 24px;font-size:14px;flex-shrink:0"
        [style.border-color]="importResult.error ? '#fca5a5' : '#86efac'"
-       [style.color]="importResult.error ? '#dc2626' : '#15803d'">
+       [style.color]="importResult.error ? 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)' : 'oklch(from #15803d max(l, var(--text-min-l)) c h)'">
     <span *ngIf="importResult.error">⚠ {{importResult.error}}</span>
     <span *ngIf="!importResult.error">
       ✓ {{ t(importResult.created !== undefined ? 'callAnalysis.import.resultCreated' : 'callAnalysis.import.resultUpserted', {
@@ -228,38 +212,38 @@ interface CallAnalysisRow {
   </div>
 
   <!-- TABELA -->
-  <div style="flex:1;overflow:auto">
-    <table style="width:100%;border-collapse:collapse;font-size:13px">
+  <div class="ca-table-card">
+    <table style="width:100%;border-collapse:collapse;font-size:14px">
       <thead>
-        <tr style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:1">
+        <tr style="background:var(--gray-100);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));position:sticky;top:0;z-index:1">
           <th style="padding:10px 12px;width:36px">
             <input type="checkbox" [checked]="allSelected && rows.length > 0" (change)="toggleSelectAll()"
                    style="cursor:pointer">
           </th>
-          <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
+          <th style="padding:10px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('company_name')">
             {{ t('callAnalysis.table.company') }} {{sortIcon('company_name')}}
           </th>
-          <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap">
+          <th style="padding:10px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;white-space:nowrap">
             {{ t('callAnalysis.table.taxId') }}
           </th>
-          <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
+          <th style="padding:10px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('salesperson')">
             {{ t('callAnalysis.table.salesperson') }} {{sortIcon('salesperson')}}
           </th>
-          <th style="padding:10px 8px;text-align:right;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
+          <th style="padding:10px 8px;text-align:right;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('calls_count')">
             {{ t('callAnalysis.table.calls') }} {{sortIcon('calls_count')}}
           </th>
-          <th style="padding:10px 8px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
+          <th style="padding:10px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('first_call_date')">
             {{ t('callAnalysis.table.firstCall') }} {{sortIcon('first_call_date')}}
           </th>
-          <th style="padding:10px 8px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
+          <th style="padding:10px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('last_call_end_date')">
             {{ t('callAnalysis.table.lastCall') }} {{sortIcon('last_call_end_date')}}
           </th>
-          <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
+          <th style="padding:10px 16px;text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('score')">
             {{ t('callAnalysis.table.potential') }} {{sortIcon('score')}}
             <div class="ca-info-wrap" (click)="$event.stopPropagation()">
@@ -276,14 +260,14 @@ interface CallAnalysisRow {
               </div>
             </div>
           </th>
-          <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap">
+          <th style="padding:10px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;white-space:nowrap">
             {{ t('callAnalysis.table.status') }}
           </th>
-          <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
+          <th style="padding:10px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('analyzed_at')">
             {{ t('callAnalysis.table.analyzedAt') }} {{sortIcon('analyzed_at')}}
           </th>
-          <th style="padding:10px 8px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;width:120px">{{ t('callAnalysis.table.links') }}</th>
+          <th style="padding:10px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;white-space:nowrap;width:120px">{{ t('callAnalysis.table.links') }}</th>
           <th style="padding:10px 8px;text-align:center;width:44px"></th>
         </tr>
       </thead>
@@ -291,124 +275,126 @@ interface CallAnalysisRow {
         <ng-container *ngFor="let r of rows">
           <!-- Wiersz główny -->
           <tr (click)="toggleExpand(r.nip)"
-              style="border-bottom:1px solid #f3f4f6;cursor:pointer;transition:background .1s"
-              [style.background]="expandedNip === r.nip ? '#fff7ed' : (isSelected(r.nip) ? '#eff6ff' : 'white')"
-              onmouseenter="this.style.background=this.getAttribute('data-expanded')==='true'?'#fff7ed':this.getAttribute('data-selected')==='true'?'#dbeafe':'#f9fafb'"
-              onmouseleave="this.style.background=this.getAttribute('data-expanded')==='true'?'#fff7ed':this.getAttribute('data-selected')==='true'?'#eff6ff':'white'"
+              style="border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s"
+              [style.background]="expandedNip === r.nip ? 'var(--gray-50)' : (isSelected(r.nip) ? 'color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))' : 'var(--surface)')"
+              onmouseenter="this.style.background=this.getAttribute('data-expanded')==='true'?'#F0FDF4':this.getAttribute('data-selected')==='true'?'#dbeafe':'#f9fafb'"
+              onmouseleave="this.style.background=this.getAttribute('data-expanded')==='true'?'#F0FDF4':this.getAttribute('data-selected')==='true'?'#eff6ff':'white'"
               [attr.data-expanded]="expandedNip === r.nip"
               [attr.data-selected]="isSelected(r.nip)">
             <td style="padding:10px 12px" (click)="$event.stopPropagation()">
               <input type="checkbox" [checked]="isSelected(r.nip)" (change)="toggleSelect(r.nip)"
                      style="cursor:pointer">
             </td>
-            <td style="padding:10px 16px;font-weight:600;color:#18181b">
+            <td style="padding:10px 16px;font-weight:600;color:var(--gray-800)">
               {{r.company_name || '—'}}
             </td>
-            <td style="padding:10px 16px;font-family:monospace;color:#374151">
+            <td style="padding:10px 16px;font-family:monospace;color:var(--gray-700)">
               {{r.nip}}
             </td>
-            <td style="padding:10px 16px;color:#374151;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+            <td style="padding:10px 16px;color:var(--gray-700);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
               {{r.salesperson || '—'}}
             </td>
-            <td style="padding:10px 8px;text-align:right;color:#374151">
+            <td style="padding:10px 8px;text-align:right;color:var(--gray-700)">
               {{r.calls_count}}
             </td>
-            <td style="padding:10px 8px;text-align:center;color:#6b7280;font-size:12px;white-space:nowrap">
+            <td style="padding:10px 8px;text-align:center;color:var(--gray-500);font-size:12px;white-space:nowrap">
               {{r.first_call_date ? (r.first_call_date | date:'dd.MM.yyyy') : '—'}}
             </td>
-            <td style="padding:10px 8px;text-align:center;color:#6b7280;font-size:12px;white-space:nowrap">
+            <td style="padding:10px 8px;text-align:center;color:var(--gray-500);font-size:12px;white-space:nowrap">
               {{r.last_call_end_date ? (r.last_call_end_date | date:'dd.MM.yyyy') : '—'}}
             </td>
             <td style="padding:10px 16px;text-align:center">
               <span *ngIf="r.score !== null"
                     [style.background]="scoreBg(r.score)"
                     [style.color]="scoreColor(r.score)"
-                    style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:26px;border-radius:20px;font-size:13px;font-weight:700">
+                    style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:26px;border-radius:16px;font-size:14px;font-weight:700">
                 {{r.score}}
               </span>
               <span *ngIf="r.score === null" style="color:#d1d5db">—</span>
             </td>
             <td style="padding:10px 16px">
-              <span [class]="statusClass(r.analysis_status)" style="font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px">
+              <span [class]="statusClass(r.analysis_status)" style="font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600">
                 {{statusLabel(r.analysis_status)}}
               </span>
               <button *ngIf="r.follow_up_required && !r.follow_up_done"
                       (click)="toggleFollowUpDone(r, $event)"
                       [title]="t('callAnalysis.followUp.markDoneTitle')"
-                      style="margin-left:6px;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;background:#fef3c7;color:#92400e;border:1px solid #fde68a;white-space:nowrap;cursor:pointer">
-                📞 {{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
+                      style="font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);border:1px solid #fde68a;white-space:nowrap;cursor:pointer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-1px;margin-right:4px"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>{{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
               </button>
               <button *ngIf="r.follow_up_done"
                       (click)="toggleFollowUpDone(r, $event)"
                       [title]="t('callAnalysis.followUp.undoTitle')"
-                      style="margin-left:6px;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;background:#f3f4f6;color:#9ca3af;border:1px solid #e5e7eb;white-space:nowrap;cursor:pointer;text-decoration:line-through">
-                📞 {{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
+                      style="font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600;background:var(--gray-100);color:var(--gray-400);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));white-space:nowrap;cursor:pointer;text-decoration:line-through">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-1px;margin-right:4px"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>{{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
               </button>
+              </div>
             </td>
-            <td style="padding:10px 16px;color:#9ca3af;font-size:12px">
+            <td style="padding:10px 16px;color:var(--gray-400);font-size:12px">
               {{r.analyzed_at ? (r.analyzed_at | date:'dd.MM.yyyy HH:mm') : '—'}}
             </td>
             <td style="padding:6px 8px;text-align:center">
-              <div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+              <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
                 <button *ngIf="r.has_prospect"
                         (click)="goToProspect(r.nip, $event)"
                         [title]="t('callAnalysis.links.goToProspect')"
-                        style="padding:2px 7px;background:#fff7ed;border:1px solid #fbd0b6;color:#c2410c;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">
+                        style="padding:2px 8px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">
                   ↗ {{ t('callAnalysis.links.prospect') }}
                 </button>
                 <button *ngIf="r.has_lead"
                         (click)="goToLead(r.lead_id, r.nip, $event)"
                         [title]="t('callAnalysis.links.goToLead')"
-                        style="padding:2px 7px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">
+                        style="padding:2px 8px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">
                   ↗ {{ t('labels.sourceTypes.lead') }}
                 </button>
                 <button *ngIf="r.has_partner"
                         (click)="goToPartner(r.partner_nav_id, r.nip, $event)"
                         [title]="t('callAnalysis.links.goToPartner')"
-                        style="padding:2px 7px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">
+                        style="padding:2px 8px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:oklch(from #15803d max(l, var(--text-min-l)) c h);border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">
                   ↗ {{ t('labels.sourceTypes.partner') }}
                 </button>
               </div>
             </td>
             <td style="padding:6px 8px;text-align:center" (click)="$event.stopPropagation()">
               <button (click)="openMenu(r.nip, $event)"
-                      style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:16px;padding:2px 8px;border-radius:4px;line-height:1"
-                      onmouseenter="this.style.color='#374151';this.style.background='#f3f4f6'"
-                      onmouseleave="this.style.color='#9ca3af';this.style.background='none'"
+                      style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:16px;padding:2px 8px;border-radius:4px;line-height:1"
+                      onmouseenter="this.style.color='var(--gray-700)';this.style.background='var(--gray-100)'"
+                      onmouseleave="this.style.color='var(--gray-400)';this.style.background='none'"
                       [title]="t('callAnalysis.table.actions')">⋮</button>
             </td>
           </tr>
 
           <!-- Rozwinięty panel szczegółów -->
           <tr *ngIf="expandedNip === r.nip">
-            <td colspan="12" style="padding:0;background:#fff7ed;border-bottom:2px solid #3BAA5D">
+            <td colspan="12" style="padding:0;background:color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface));border-bottom:2px solid #3BAA5D">
               <div style="padding:16px 24px">
                 <div *ngIf="r.analysis_status === 'error' && r.analysis_error"
-                     style="color:#dc2626;font-size:12px;margin-bottom:8px">
+                     style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-size:12px;margin-bottom:8px">
                   ⚠ {{r.analysis_error}}
                 </div>
-                <div *ngIf="r.ai_summary" style="color:#374151;font-size:13px;margin-bottom:12px;line-height:1.5">
+                <div *ngIf="r.ai_summary" style="color:var(--gray-700);font-size:14px;margin-bottom:12px;line-height:1.5">
                   {{r.ai_summary}}
                 </div>
                 <div style="display:flex;gap:24px;flex-wrap:wrap">
                   <div *ngIf="r.ai_signals?.length">
-                    <div style="font-size:11px;font-weight:700;color:#15803d;text-transform:uppercase;margin-bottom:6px">✓ {{ t('callAnalysis.details.positiveSignals') }}</div>
+                    <div style="font-size:12px;font-weight:700;color:oklch(from #15803d max(l, var(--text-min-l)) c h);text-transform:uppercase;margin-bottom:6px">✓ {{ t('callAnalysis.details.positiveSignals') }}</div>
                     <ul style="margin:0;padding:0 0 0 16px;list-style:none">
-                      <li *ngFor="let s of r.ai_signals" style="font-size:12px;color:#374151;margin-bottom:3px;padding-left:4px">
-                        <span style="color:#22c55e;margin-right:6px">●</span>{{s}}
+                      <li *ngFor="let s of r.ai_signals" style="font-size:12px;color:var(--gray-700);margin-bottom:4px;padding-left:4px">
+                        <span style="color:oklch(from #22c55e max(l, var(--text-min-l)) c h);margin-right:6px">●</span>{{s}}
                       </li>
                     </ul>
                   </div>
                   <div *ngIf="r.ai_objections?.length">
-                    <div style="font-size:11px;font-weight:700;color:#dc2626;text-transform:uppercase;margin-bottom:6px">✗ {{ t('callAnalysis.details.objections') }}</div>
+                    <div style="font-size:12px;font-weight:700;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);text-transform:uppercase;margin-bottom:6px">✗ {{ t('callAnalysis.details.objections') }}</div>
                     <ul style="margin:0;padding:0 0 0 16px;list-style:none">
-                      <li *ngFor="let o of r.ai_objections" style="font-size:12px;color:#374151;margin-bottom:3px;padding-left:4px">
-                        <span style="color:#ef4444;margin-right:6px">●</span>{{o}}
+                      <li *ngFor="let o of r.ai_objections" style="font-size:12px;color:var(--gray-700);margin-bottom:4px;padding-left:4px">
+                        <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);margin-right:6px">●</span>{{o}}
                       </li>
                     </ul>
                   </div>
                 </div>
-                <div style="margin-top:10px;font-size:11px;color:#9ca3af;display:flex;gap:16px">
+                <div style="margin-top:10px;font-size:12px;color:var(--gray-400);display:flex;gap:16px">
                   <span>{{ t('callAnalysis.details.callsLabel') }} {{r.calls_count}}</span>
                   <span *ngIf="r.last_call_date">{{ t('callAnalysis.details.lastCallLabel') }} {{r.last_call_date | date:'dd.MM.yyyy'}}</span>
                   <span *ngIf="r.imported_at">{{ t('callAnalysis.details.importedLabel') }} {{r.imported_at | date:'dd.MM.yyyy HH:mm'}}</span>
@@ -422,8 +408,8 @@ interface CallAnalysisRow {
                   </div>
                   <div *ngIf="transcriptExpanded.has(r.nip)">
                     <div *ngFor="let chunk of getTranscripts(r); let i = index"
-                         style="margin-bottom:12px;background:white;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
-                      <div style="background:#f9fafb;border-bottom:1px solid #e5e7eb;padding:6px 12px;font-size:11px;font-weight:600;color:#6b7280">
+                         style="margin-bottom:12px;background:var(--surface);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;overflow:hidden">
+                      <div style="background:var(--gray-50);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:6px 12px;font-size:12px;font-weight:600;color:var(--gray-500)">
                         {{ chunk.label || t('callAnalysis.transcript.callNumber', { number: i + 1 }) }}
                       </div>
                       <div class="transcript-body">{{ chunk.text }}</div>
@@ -436,7 +422,7 @@ interface CallAnalysisRow {
         </ng-container>
 
         <tr *ngIf="!loading && rows.length === 0">
-          <td colspan="12" style="padding:60px 24px;text-align:center;color:#9ca3af">
+          <td colspan="12" style="padding:60px 24px;text-align:center;color:var(--gray-400)">
             <div style="font-size:32px;margin-bottom:8px">{{ hasActiveFilters ? '🔍' : '📞' }}</div>
             <div style="font-size:14px;font-weight:500">{{ hasActiveFilters ? t('callAnalysis.empty.noResults') : t('callAnalysis.empty.noNotes') }}</div>
             <div *ngIf="!hasActiveFilters" style="font-size:12px;margin-top:4px">{{ t('callAnalysis.empty.hint') }}</div>
@@ -444,7 +430,7 @@ interface CallAnalysisRow {
         </tr>
 
         <tr *ngIf="loading">
-          <td colspan="12" style="padding:40px 24px;text-align:center;color:#9ca3af;font-size:13px">
+          <td colspan="12" style="padding:40px 24px;text-align:center;color:var(--gray-400);font-size:14px">
             {{ 'states.loading' | transloco }}
           </td>
         </tr>
@@ -453,14 +439,10 @@ interface CallAnalysisRow {
   </div>
 
   <!-- PAGINACJA -->
-  <div *ngIf="pages > 1" style="background:white;border-top:1px solid #e5e7eb;padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0">
-    <button [disabled]="page <= 1" (click)="goPage(page - 1)"
-            style="padding:5px 12px;border:1px solid #d1d5db;border-radius:6px;background:white;cursor:pointer;font-size:13px"
-            [style.opacity]="page <= 1 ? '0.4' : '1'">←</button>
-    <span style="font-size:13px;color:#374151">{{page}} / {{pages}}</span>
-    <button [disabled]="page >= pages" (click)="goPage(page + 1)"
-            style="padding:5px 12px;border:1px solid #d1d5db;border-radius:6px;background:white;cursor:pointer;font-size:13px"
-            [style.opacity]="page >= pages ? '0.4' : '1'">→</button>
+  <div *ngIf="pages > 1" style="background:var(--surface);border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0">
+    <button class="nav-btn" [disabled]="page <= 1" (click)="goPage(page - 1)">‹</button>
+    <span style="font-size:14px;color:var(--gray-700)">{{page}} / {{pages}}</span>
+    <button class="nav-btn" [disabled]="page >= pages" (click)="goPage(page + 1)">›</button>
   </div>
 
   <!-- MENU KONTEKSTOWE (⋮) -->
@@ -468,37 +450,37 @@ interface CallAnalysisRow {
        (click)="$event.stopPropagation()"
        [style.top.px]="menuPos.top"
        [style.left.px]="menuPos.left"
-       style="position:fixed;z-index:9999;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:190px;padding:4px 0">
+       style="position:fixed;z-index:9999;background:var(--surface);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:190px;padding:4px 0">
     <ng-container *ngFor="let r of rows">
       <ng-container *ngIf="r.nip === openMenuNip">
         <button (click)="setStatus(r.nip, r.analysis_status === 'hold' ? 'pending' : 'hold', $event)"
-                style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:13px;color:#374151;cursor:pointer"
-                onmouseenter="this.style.background='#f9fafb'"
+                style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:var(--gray-700);cursor:pointer"
+                onmouseenter="this.style.background='color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface))'"
                 onmouseleave="this.style.background='none'">
           {{r.analysis_status === 'hold' ? '▶ ' + t('callAnalysis.menu.restoreFromHold') : '⏸ ' + t('callAnalysis.menu.putOnHold')}}
         </button>
         <button (click)="setStatus(r.nip, r.analysis_status === 'archived' ? 'pending' : 'archived', $event)"
-                style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:13px;color:#374151;cursor:pointer"
-                onmouseenter="this.style.background='#f9fafb'"
+                style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:var(--gray-700);cursor:pointer"
+                onmouseenter="this.style.background='var(--gray-50)'"
                 onmouseleave="this.style.background='none'">
           {{r.analysis_status === 'archived' ? '📤 ' + t('callAnalysis.menu.restoreFromArchive') : '📦 ' + t('callAnalysis.actions.archive')}}
         </button>
         <button (click)="reAnalyze(r.nip, $event)"
-                style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:13px;color:#374151;cursor:pointer"
-                onmouseenter="this.style.background='#f9fafb'"
+                style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:var(--gray-700);cursor:pointer"
+                onmouseenter="this.style.background='var(--gray-50)'"
                 onmouseleave="this.style.background='none'">
           🔄 {{ t('callAnalysis.actions.reanalyze') }}
         </button>
         <button (click)="openInspect(r, $event)"
-                style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:13px;color:#374151;cursor:pointer"
-                onmouseenter="this.style.background='#f9fafb'"
+                style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:var(--gray-700);cursor:pointer"
+                onmouseenter="this.style.background='var(--gray-50)'"
                 onmouseleave="this.style.background='none'">
           🔍 {{ t('callAnalysis.menu.inspect') }}
         </button>
-        <div style="height:1px;background:#e5e7eb;margin:4px 0"></div>
+        <div style="height:1px;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));margin:4px 0"></div>
         <button (click)="deleteRow(r, $event)"
-                style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:13px;color:#dc2626;cursor:pointer"
-                onmouseenter="this.style.background='#fef2f2'"
+                style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);cursor:pointer"
+                onmouseenter="this.style.background='var(--gray-50)'"
                 onmouseleave="this.style.background='none'">
           🗑 {{ t('callAnalysis.menu.delete') }}
         </button>
@@ -516,38 +498,38 @@ interface CallAnalysisRow {
   <div *ngIf="inspectRow"
        (click)="$event.stopPropagation()"
        style="position:fixed;z-index:2001;top:4vh;left:50%;transform:translateX(-50%);
-              width:min(960px,calc(100vw - 32px));max-height:92vh;background:white;
-              border-radius:12px;box-shadow:0 16px 48px rgba(0,0,0,0.28);
+              width:min(960px,calc(100vw - 32px));max-height:92vh;background:var(--surface);
+              border-radius:12px;box-shadow:0 14px 43px rgba(0,0,0,0.252);
               display:flex;flex-direction:column;overflow:hidden">
 
     <!-- Header -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid #e5e7eb;flex-shrink:0">
-      <div style="display:flex;flex-direction:column;gap:3px">
-        <span style="font-size:10px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.6px">🔍 {{ t('callAnalysis.inspect.title') }}</span>
-        <span style="font-size:15px;font-weight:700;color:#3BAA5D">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));flex-shrink:0">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span style="font-size:10px;color:var(--gray-400);font-weight:700;text-transform:uppercase;letter-spacing:.6px">🔍 {{ t('callAnalysis.inspect.title') }}</span>
+        <span style="font-size:16px;font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">
           {{inspectRow.company_name || '—'}}
-          <span style="font-size:12px;font-weight:400;color:#9ca3af;font-family:monospace"> · {{inspectRow.nip}}</span>
+          <span style="font-size:12px;font-weight:400;color:var(--gray-400);font-family:monospace"> · {{inspectRow.nip}}</span>
         </span>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
-        <div style="display:flex;gap:2px;background:#f3f4f6;padding:3px;border-radius:8px">
+        <div style="display:flex;gap:2px;background:var(--gray-100);padding:4px;border-radius:8px">
           <button (click)="inspectView='analysis'"
-                  [style.background]="inspectView==='analysis'?'white':'transparent'"
+                  [style.background]="inspectView==='analysis'?'var(--surface)':'transparent'"
                   [style.box-shadow]="inspectView==='analysis'?'0 1px 3px rgba(0,0,0,.1)':'none'"
-                  [style.color]="inspectView==='analysis'?'#111827':'#6b7280'"
+                  [style.color]="inspectView==='analysis'?'var(--ink-strong)':'var(--gray-500)'"
                   style="padding:4px 14px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500">
             {{ t('callAnalysis.inspect.tabAnalysis') }}
           </button>
           <button (click)="switchInspectToPrompt()"
-                  [style.background]="inspectView==='prompt'?'white':'transparent'"
+                  [style.background]="inspectView==='prompt'?'var(--surface)':'transparent'"
                   [style.box-shadow]="inspectView==='prompt'?'0 1px 3px rgba(0,0,0,.1)':'none'"
-                  [style.color]="inspectView==='prompt'?'#111827':'#6b7280'"
+                  [style.color]="inspectView==='prompt'?'var(--ink-strong)':'var(--gray-500)'"
                   style="padding:4px 14px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500">
             {{ t('callAnalysis.inspect.tabPrompt') }}
           </button>
         </div>
         <button (click)="closeInspect()"
-                style="width:28px;height:28px;border:1px solid #e5e7eb;border-radius:6px;background:none;cursor:pointer;font-size:14px;color:#6b7280;line-height:1">
+                style="width:28px;height:28px;border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:6px;background:none;cursor:pointer;font-size:14px;color:var(--gray-500);line-height:1">
           ✕
         </button>
       </div>
@@ -558,13 +540,13 @@ interface CallAnalysisRow {
       <div style="display:grid;grid-template-columns:210px 1fr;flex:1;min-height:0;overflow:hidden">
 
         <!-- Lewa kolumna: score + follow-up + status -->
-        <div style="padding:14px;border-right:1px solid #e5e7eb;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+        <div style="padding:14px;border-right:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));overflow-y:auto;display:flex;flex-direction:column;gap:12px">
 
-          <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:12px">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.inspect.purchasePotential') }}</div>
+          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;padding:12px">
+            <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.inspect.purchasePotential') }}</div>
             <ng-container *ngIf="inspectRow.score !== null">
               <div style="display:flex;align-items:center;gap:10px">
-                <div style="flex:1;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden">
+                <div style="flex:1;height:8px;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:4px;overflow:hidden">
                   <div [style.width.%]="inspectRow.score" [style.background]="scoreColor(inspectRow.score)"
                        style="height:100%;border-radius:4px"></div>
                 </div>
@@ -572,31 +554,31 @@ interface CallAnalysisRow {
                   {{inspectRow.score}}
                 </span>
               </div>
-              <div style="font-size:11px;color:#6b7280;margin-top:5px">{{scoreLabel(inspectRow.score)}}</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:4px">{{scoreLabel(inspectRow.score)}}</div>
             </ng-container>
-            <div *ngIf="inspectRow.score === null" style="color:#9ca3af;font-size:13px">{{ t('callAnalysis.inspect.noScore') }}</div>
+            <div *ngIf="inspectRow.score === null" style="color:var(--gray-400);font-size:14px">{{ t('callAnalysis.inspect.noScore') }}</div>
           </div>
 
-          <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:12px">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.followUp.label') }}</div>
-            <div style="font-size:12px;display:flex;flex-direction:column;gap:5px">
-              <span [style.color]="inspectRow.follow_up_required?'#15803d':'#6b7280'" style="font-weight:600">
+          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;padding:12px">
+            <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.followUp.label') }}</div>
+            <div style="font-size:12px;display:flex;flex-direction:column;gap:4px">
+              <span [style.color]="inspectRow.follow_up_required?'oklch(from #15803d max(l, var(--text-min-l)) c h)':'var(--gray-500)'" style="font-weight:600">
                 {{inspectRow.follow_up_required ? '✓ ' + t('callAnalysis.followUp.required') : '— ' + t('callAnalysis.followUp.notRequired')}}
               </span>
-              <span *ngIf="inspectRow.follow_up_date" style="color:#374151">
+              <span *ngIf="inspectRow.follow_up_date" style="color:var(--gray-700)">
                 📅 {{inspectRow.follow_up_date | date:'dd.MM.yyyy'}}
               </span>
-              <span *ngIf="inspectRow.follow_up_done" style="color:#9ca3af;text-decoration:line-through;font-size:11px">✓ {{ t('callAnalysis.followUp.done') }}</span>
+              <span *ngIf="inspectRow.follow_up_done" style="color:var(--gray-400);text-decoration:line-through;font-size:12px">✓ {{ t('callAnalysis.followUp.done') }}</span>
             </div>
           </div>
 
-          <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:12px">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.inspect.analysisStatus') }}</div>
-            <div style="display:flex;flex-direction:column;gap:5px">
-              <span [class]="statusClass(inspectRow.analysis_status)" style="font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;align-self:flex-start">
+          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;padding:12px">
+            <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.inspect.analysisStatus') }}</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span [class]="statusClass(inspectRow.analysis_status)" style="font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600;align-self:flex-start">
                 {{statusLabel(inspectRow.analysis_status)}}
               </span>
-              <span *ngIf="inspectRow.analyzed_at" style="font-size:11px;color:#9ca3af">
+              <span *ngIf="inspectRow.analyzed_at" style="font-size:12px;color:var(--gray-400)">
                 {{inspectRow.analyzed_at | date:'dd.MM.yyyy HH:mm'}}
               </span>
             </div>
@@ -606,38 +588,38 @@ interface CallAnalysisRow {
         <!-- Prawa kolumna: summary + sygnały + obiekcje -->
         <div style="padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
           <div *ngIf="inspectRow.ai_summary">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">{{ t('callAnalysis.inspect.aiSummary') }}</div>
-            <div style="font-size:13px;line-height:1.6;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">{{ t('callAnalysis.inspect.aiSummary') }}</div>
+            <div style="font-size:14px;line-height:1.6;color:var(--gray-700);background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;padding:10px 12px">
               {{inspectRow.ai_summary}}
             </div>
           </div>
 
           <div *ngIf="inspectRow.ai_signals?.length">
-            <div style="font-size:10px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">
+            <div style="font-size:10px;font-weight:700;color:oklch(from #15803d max(l, var(--text-min-l)) c h);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">
               ✓ {{ t('callAnalysis.details.positiveSignals') }} ({{inspectRow.ai_signals.length}})
             </div>
             <div style="display:flex;flex-direction:column;gap:4px">
               <div *ngFor="let s of inspectRow.ai_signals"
-                   style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;font-size:12px;color:#374151">
-                <span style="color:#22c55e;font-weight:700;flex-shrink:0;margin-top:1px">●</span>{{s}}
+                   style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:6px;font-size:12px;color:var(--gray-700)">
+                <span style="color:oklch(from #22c55e max(l, var(--text-min-l)) c h);font-weight:700;flex-shrink:0;margin-top:1px">●</span>{{s}}
               </div>
             </div>
           </div>
 
           <div *ngIf="inspectRow.ai_objections?.length">
-            <div style="font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">
+            <div style="font-size:10px;font-weight:700;color:oklch(from #991b1b max(l, var(--text-min-l)) c h);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">
               ✗ {{ t('callAnalysis.details.objections') }} ({{inspectRow.ai_objections.length}})
             </div>
             <div style="display:flex;flex-direction:column;gap:4px">
               <div *ngFor="let o of inspectRow.ai_objections"
-                   style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;background:#fff5f5;border:1px solid #fecaca;border-radius:6px;font-size:12px;color:#374151">
-                <span style="color:#ef4444;font-weight:700;flex-shrink:0;margin-top:1px">●</span>{{o}}
+                   style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;background:var(--gray-50);border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface));border-radius:6px;font-size:12px;color:var(--gray-700)">
+                <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-weight:700;flex-shrink:0;margin-top:1px">●</span>{{o}}
               </div>
             </div>
           </div>
 
           <div *ngIf="!inspectRow.ai_summary && !inspectRow.ai_signals?.length && !inspectRow.ai_objections?.length"
-               style="text-align:center;color:#9ca3af;font-size:13px;padding:32px">
+               style="text-align:center;color:var(--gray-400);font-size:14px;padding:32px">
             {{ t('callAnalysis.inspect.noResults') }}
           </div>
         </div>
@@ -645,12 +627,12 @@ interface CallAnalysisRow {
 
       <!-- Stopka: notatki z rozmów -->
       <div *ngIf="inspectRow.notes_text"
-           style="border-top:1px solid #e5e7eb;background:#fafafa;flex-shrink:0;max-height:200px;overflow-y:auto">
+           style="border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));background:var(--gray-50);flex-shrink:0;max-height:200px;overflow-y:auto">
         <div style="padding:10px 14px">
-          <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">
+          <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">
             {{ t('callAnalysis.inspect.basis', { chars: inspectRow.notes_text.length, calls: getTranscripts(inspectRow).length }) }}
           </div>
-          <pre style="margin:0;font-family:monospace;font-size:11px;line-height:1.6;color:#374151;white-space:pre-wrap;word-break:break-word">{{inspectRow.notes_text}}</pre>
+          <pre style="margin:0;font-family:monospace;font-size:12px;line-height:1.6;color:var(--gray-700);white-space:pre-wrap;word-break:break-word">{{inspectRow.notes_text}}</pre>
         </div>
       </div>
     </ng-container>
@@ -659,11 +641,11 @@ interface CallAnalysisRow {
     <ng-container *ngIf="inspectView==='prompt'">
       <div style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column">
         <div *ngIf="inspectPromptLoading"
-             style="display:flex;align-items:center;justify-content:center;height:200px;gap:10px;color:#9ca3af;font-size:13px">
+             style="display:flex;align-items:center;justify-content:center;height:200px;gap:10px;color:var(--gray-400);font-size:14px">
           <span class="ca-spin"></span> {{ t('callAnalysis.inspect.promptLoading') }}
         </div>
         <pre *ngIf="!inspectPromptLoading && inspectPromptText"
-             style="flex:1;overflow:auto;margin:0;padding:16px 20px;font-family:monospace;font-size:11.5px;line-height:1.6;color:#1f2937;white-space:pre-wrap;word-break:break-word;background:#f9fafb">{{inspectPromptText}}</pre>
+             style="flex:1;overflow:auto;margin:0;padding:16px 20px;font-family:monospace;font-size:12px;line-height:1.6;color:var(--gray-800);white-space:pre-wrap;word-break:break-word;background:var(--gray-50)">{{inspectPromptText}}</pre>
       </div>
     </ng-container>
 
@@ -673,12 +655,28 @@ interface CallAnalysisRow {
 </ng-container>
   `,
   styles: [`
-    .status-pending   { background:#fef3c7;color:#92400e }
-    .status-analyzing { background:#dbeafe;color:#1e40af }
-    .status-done      { background:#dcfce7;color:#15803d }
-    .status-error     { background:#fee2e2;color:#991b1b }
-    .status-hold      { background:#f3f4f6;color:#374151 }
-    .status-archived  { background:#e5e7eb;color:#6b7280 }
+    /* Filter bar = same white shadow card as the leads list (border/shadow/padding from global .toolbar) */
+    .toolbar { background:var(--surface); display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; flex-shrink:0; margin:16px 24px 0; }
+    /* Same gutter as the filter card above, with a gap between them, as on Leads. */
+    .ca-table-card { flex:1; min-height:0; overflow:auto; margin:16px 24px 24px; background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow-sm); }
+    /* Selects and date fields use the global .sel / select look (36px, chevron, 12px radius) — only the number fields are local. */
+    .ca-grp { display:flex; align-items:center; gap:8px; white-space:nowrap; }
+    .ca-lbl { font-size:12px; font-weight:500; color:var(--gray-500); white-space:nowrap; }
+    .ca-sep { font-size:12px; color:var(--gray-400); }
+    .ca-total { margin-left:auto; }
+    .ca-grp .fchip { font-family:inherit; }
+    .ca-num { width:64px; height:36px; box-sizing:border-box; padding:0 12px; font-family:inherit; font-size:12px; border:1px solid var(--gray-200); border-radius:12px; background:var(--surface); box-shadow:0 1px 2px rgba(0,0,0,.05); color:var(--gray-800); }
+    .ca-num:focus { outline:none; border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
+    .ca-bulk-btn { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 14px; background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:10px; font-size:12px; font-weight:500; font-family:inherit; cursor:pointer; }
+    .ca-bulk-btn:hover { background:rgba(255,255,255,0.25); }
+    .ca-bulk-del { background:rgba(239,68,68,0.3); color:#fca5a5; border-color:rgba(239,68,68,0.4); }
+
+    .status-pending   { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h) }
+    .status-analyzing { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1e40af max(l, var(--text-min-l)) c h) }
+    .status-done      { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #15803d max(l, var(--text-min-l)) c h) }
+    .status-error     { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:oklch(from #991b1b max(l, var(--text-min-l)) c h) }
+    .status-hold      { background:var(--gray-100);color:var(--gray-700) }
+    .status-archived  { background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));color:var(--gray-500) }
 
     /* Tooltip "?" dla kolumny Potencjał */
     .ca-info-wrap {
@@ -691,15 +689,15 @@ interface CallAnalysisRow {
     .ca-info {
       width: 16px; height: 16px;
       border-radius: 50%;
-      border: 1px solid #d1d5db;
-      background: #f9fafb;
-      color: #9ca3af;
+      border: 1px solid var(--gray-300);
+      background: var(--gray-50);
+      color: var(--gray-400);
       font-size: 10px; font-weight: 700;
       cursor: help;
       display: inline-flex; align-items: center; justify-content: center;
       padding: 0; line-height: 1;
     }
-    .ca-info:hover { background: #f0f9ff; border-color: #3BAA5D; color: #3BAA5D; }
+    .ca-info:hover { background: color-mix(in srgb, #f0f9ff var(--tint-mix), var(--surface)); border-color: #3BAA5D; color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); }
     .ca-info-tip {
       display: none;
       position: absolute;
@@ -726,7 +724,7 @@ interface CallAnalysisRow {
       font-weight: 700;
       margin-bottom: 6px;
       color: #fff;
-      font-size: 13px;
+      font-size: 14px;
     }
     .ca-info-wrap:hover .ca-info-tip { display: block; }
 
@@ -736,21 +734,21 @@ interface CallAnalysisRow {
       display: flex;
       align-items: center;
       gap: 4px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
-      color: #6b7280;
+      color: var(--gray-500);
       text-transform: uppercase;
       letter-spacing: .5px;
       padding: 6px 0;
       margin-bottom: 8px;
       user-select: none;
     }
-    .transcript-toggle:hover { color: #3BAA5D; }
+    .transcript-toggle:hover { color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); }
     .transcript-body {
       padding: 12px 14px;
       font-size: 12px;
       line-height: 1.6;
-      color: #374151;
+      color: var(--gray-700);
       white-space: pre-wrap;
       word-break: break-word;
       max-height: 320px;
@@ -762,7 +760,7 @@ interface CallAnalysisRow {
     .ca-spin {
       display: inline-block;
       width: 16px; height: 16px;
-      border: 2px solid #bbf7d0;
+      border: 2px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));
       border-top-color: #3BAA5D;
       border-radius: 50%;
       animation: ca-spin-kf 0.75s linear infinite;
@@ -1267,7 +1265,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
   scoreColor(score: number): string {
     if (score >= 81) return '#15803d';
     if (score >= 61) return '#a16207';
-    if (score >= 41) return '#c2410c';
+    if (score >= 41) return '#166534';
     return '#b91c1c';
   }
 

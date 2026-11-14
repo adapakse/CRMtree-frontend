@@ -64,7 +64,7 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
                           — {{ s.author }}{{ s.author_role ? ', ' + s.author_role : '' }} ·
                           <a [href]="s.source_url" target="_blank" rel="noopener noreferrer">{{ s.source_title || s.source_url }}</a>
                         </p>
-                        <button type="button" class="btn-ghost btn-sm" (click)="useSuggestion(slot)">{{ t('seo.contentSlots.suggestion.use') }}</button>
+                        <button type="button" class="btn btn-g btn-sm" (click)="useSuggestion(slot)">{{ t('seo.contentSlots.suggestion.use') }}</button>
                       </div>
                     }
                     <label class="field-label" [for]="slot.id + '-text'">{{ t('seo.contentSlots.fields.quote') }}</label>
@@ -108,18 +108,18 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
                       <input #fileInput type="file" accept="image/png,image/jpeg,image/webp" (change)="newFile = fileInput.files?.[0] ?? null">
                       <label class="field-label" [for]="slot.id + '-caption'">{{ t('seo.contentSlots.fields.caption') }}</label>
                       <input class="field-input" [id]="slot.id + '-caption'" [(ngModel)]="newCaption">
-                      <button type="button" class="btn-ghost btn-sm" (click)="uploadAndSelect(slot)" [disabled]="!newFile || !newCaption.trim() || busy()">{{ t('seo.contentSlots.screenshots.uploadToLibrary') }}</button>
+                      <button type="button" class="btn btn-g btn-sm" (click)="uploadAndSelect(slot)" [disabled]="!newFile || !newCaption.trim() || busy()">{{ t('seo.contentSlots.screenshots.uploadToLibrary') }}</button>
                     </details>
                   }
                 }
                 <div class="slot-actions">
-                  <button type="button" class="btn-accent btn-sm" (click)="fill(slot)" [disabled]="busy()">{{ t('seo.contentSlots.actions.insert') }}</button>
-                  <button type="button" class="btn-ghost btn-sm" (click)="activeSlotId.set(null)">{{ 'actions.cancel' | transloco }}</button>
+                  <button type="button" class="btn btn-p btn-sm" (click)="fill(slot)" [disabled]="busy()">{{ t('seo.contentSlots.actions.insert') }}</button>
+                  <button type="button" class="btn btn-g btn-sm" (click)="activeSlotId.set(null)">{{ 'actions.cancel' | transloco }}</button>
                 </div>
               } @else {
                 <div class="slot-actions">
-                  <button type="button" class="btn-accent btn-sm" (click)="open(slot)">{{ t('seo.contentSlots.actions.fill') }}</button>
-                  <button type="button" class="btn-reject btn-sm" (click)="remove(slot)" [disabled]="busy()">{{ t('seo.contentSlots.actions.remove') }}</button>
+                  <button type="button" class="btn btn-p btn-sm" (click)="open(slot)">{{ t('seo.contentSlots.actions.fill') }}</button>
+                  <button type="button" class="btn btn-d btn-sm" (click)="remove(slot)" [disabled]="busy()">{{ t('seo.contentSlots.actions.remove') }}</button>
                 </div>
               }
             }
@@ -130,10 +130,10 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
     </ng-container>
   `,
   styles: [`
-    .slots-box { border: 1px solid #FCD34D; background: #FFFBEB; border-radius: var(--radius); padding: 0.9rem 1rem; margin-top: 0.9rem; }
+    .slots-box { border: 1px solid #FCD34D; background: color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border-radius: var(--radius); padding: 0.9rem 1rem; margin-top: 0.9rem; }
     .slots-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
     .hint { font-size: 0.78rem; color: var(--gray-600); margin: 0 0 0.6rem; }
-    .slot-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.7rem 0.8rem; margin-top: 0.5rem; }
+    .slot-card { background: var(--surface); border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.7rem 0.8rem; margin-top: 0.5rem; }
     .slot-card.done { opacity: 0.7; }
     .slot-head { display: flex; align-items: center; gap: 0.5rem; }
     .slot-type { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: var(--orange-dark); }
@@ -150,17 +150,13 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
     .suggestion-quote { font-style: italic; font-size: 0.85rem; margin: 0.3rem 0 0; }
     .suggestion-source { font-size: 0.78rem; color: var(--gray-600); margin: 0.25rem 0 0.4rem; }
     .shot-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.55rem; }
-    .shot-option { border: 2px solid var(--gray-200); border-radius: 8px; background: #fff; padding: 0.3rem; cursor: pointer; text-align: left; font-size: 0.72rem; color: var(--gray-700); }
+    .shot-option { border: 2px solid var(--gray-200); border-radius: 8px; background: var(--surface); padding: 0.3rem; cursor: pointer; text-align: left; font-size: 0.72rem; color: var(--gray-700); }
     .shot-option.selected { border-color: var(--orange); }
     .shot-option img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 4px; margin-bottom: 0.25rem; }
     .upload-new { margin-top: 0.6rem; font-size: 0.8rem; }
     .upload-new summary { cursor: pointer; color: var(--gray-700); font-weight: 600; }
     .upload-new input[type="file"] { margin-top: 0.4rem; font-size: 0.75rem; }
     .slot-actions { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
-    .btn-sm { padding: 0.45rem 0.8rem; font-size: 0.8rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    .btn-accent { background: var(--orange); color: #fff; }
-    .btn-ghost { background: var(--gray-100); color: var(--gray-800); }
-    .btn-reject { background: #FEE2E2; color: #991B1B; }
   `],
 })
 export class SeoContentSlotsComponent {

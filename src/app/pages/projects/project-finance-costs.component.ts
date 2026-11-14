@@ -173,11 +173,11 @@ interface FilterOption {
     </section>
   `,
   styles: [PROJECTS_SHARED_STYLES, PROJECT_FINANCE_STYLES, `
-    .filter { width:auto; max-width:200px; padding:5px 8px; font-size:12.5px; }
+    .filter { width:auto; max-width:200px; padding:4px 8px; font-size:12px; }
     .description { max-width:280px; white-space:pre-wrap; overflow-wrap:anywhere; }
     .ksef-action { margin-right:10px; }
-    .document { display:block; margin-top:3px; }
-    table.grid tr.has-note td { border-bottom:none; padding-bottom:3px; }
+    .document { display:block; margin-top:4px; }
+    table.grid tr.has-note td { border-bottom:none; padding-bottom:4px; }
     table.grid tr.note-row td { padding-top:0; }
   `],
 })

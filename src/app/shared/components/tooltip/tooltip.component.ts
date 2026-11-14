@@ -18,12 +18,12 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     .tt-icon {
       display:inline-flex; align-items:center; justify-content:center;
       width:15px; height:15px; border-radius:50%;
-      background:#e5e7eb; color:#9ca3af;
-      font-size:9px; font-weight:800; font-family:sans-serif;
-      cursor:default; margin-left:5px; flex-shrink:0; line-height:1;
+      background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); color:var(--gray-400);
+      font-size:10px; font-weight:800; font-family:sans-serif;
+      cursor:default; margin-left:4px; flex-shrink:0; line-height:1;
       transition:background .15s, color .15s; user-select:none;
     }
-    .tt-wrap:hover .tt-icon { background:#d1d5db; color:#374151; }
+    .tt-wrap:hover .tt-icon { background:var(--gray-300); color:var(--gray-700); }
   `],
 })
 export class TooltipComponent implements OnDestroy {

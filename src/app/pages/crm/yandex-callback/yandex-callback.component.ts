@@ -15,14 +15,14 @@ import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
-<div style="position:fixed;inset:0;background:#f9fafb;display:flex;align-items:center;justify-content:center;padding:24px">
-  <div style="background:white;border-radius:16px;padding:40px 48px;max-width:480px;width:100%;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.08)">
+<div style="position:fixed;inset:0;background:var(--gray-50);display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--surface);border-radius:12px;padding:40px 48px;max-width:480px;width:100%;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.08)">
 
     <!-- Success -->
     <ng-container *ngIf="status === 'connected'">
       <div style="font-size:48px;margin-bottom:16px">✅</div>
-      <div style="font-size:20px;font-weight:800;color:#111827;margin-bottom:8px">{{ t('mailCallback.connectedTitle', { provider: provider }) }}</div>
-      <div style="font-size:14px;color:#6b7280;margin-bottom:28px;line-height:1.6">
+      <div style="font-size:20px;font-weight:800;color:var(--gray-800);margin-bottom:8px">{{ t('mailCallback.connectedTitle', { provider: provider }) }}</div>
+      <div style="font-size:14px;color:var(--gray-500);margin-bottom:28px;line-height:1.6">
         {{ t('mailCallback.connectedBody', { provider: provider }) }}<br>
         {{ t('mailCallback.closeHint') }}
       </div>
@@ -35,11 +35,11 @@ import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
     <!-- Error -->
     <ng-container *ngIf="status === 'error'">
       <div style="font-size:48px;margin-bottom:16px">❌</div>
-      <div style="font-size:20px;font-weight:800;color:#111827;margin-bottom:8px">{{ t('mailCallback.errorTitle') }}</div>
-      <div style="font-size:14px;color:#6b7280;margin-bottom:8px;line-height:1.6">
+      <div style="font-size:20px;font-weight:800;color:var(--gray-800);margin-bottom:8px">{{ t('mailCallback.errorTitle') }}</div>
+      <div style="font-size:14px;color:var(--gray-500);margin-bottom:8px;line-height:1.6">
         {{ t('mailCallback.errorBody', { provider: provider }) }}
       </div>
-      <div *ngIf="reason" style="font-size:12px;color:#9ca3af;background:#f3f4f6;border-radius:6px;padding:6px 12px;margin-bottom:24px;font-family:monospace">
+      <div *ngIf="reason" style="font-size:12px;color:var(--gray-400);background:var(--gray-100);border-radius:6px;padding:6px 12px;margin-bottom:24px;font-family:monospace">
         {{reason}}
       </div>
       <button (click)="close()"
@@ -51,7 +51,7 @@ import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
     <!-- Loading / unknown state -->
     <ng-container *ngIf="status !== 'connected' && status !== 'error'">
       <div style="font-size:48px;margin-bottom:16px">⏳</div>
-      <div style="font-size:14px;color:#6b7280">{{ t('mailCallback.processing') }}</div>
+      <div style="font-size:14px;color:var(--gray-500)">{{ t('mailCallback.processing') }}</div>
     </ng-container>
 
   </div>

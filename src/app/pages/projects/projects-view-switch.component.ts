@@ -23,9 +23,15 @@ export type ProjectsView = 'projects' | 'my-tasks' | 'portfolio';
     </ng-container>
   `,
   styles: [`
-    :host { display:flex; gap:2px; background:var(--gray-100); border-radius:9px; padding:3px; }
-    .view { padding:6px 12px; border-radius:7px; font-size:12.5px; color:var(--gray-500); cursor:pointer; text-decoration:none; white-space:nowrap; }
-    .view.active { background:white; color:var(--orange); font-weight:600; box-shadow:var(--shadow-sm); }
+    /* The module's main views: a segmented control, one level above the filters. */
+    :host { display:inline-flex; gap:2px; padding:4px; background:var(--gray-100); border-radius:12px; }
+    .view {
+      display:inline-flex; align-items:center; height:30px; padding:0 14px; border-radius:9px;
+      font-size:12px; font-weight:500; color:var(--gray-500); text-decoration:none; white-space:nowrap;
+      transition:background .15s, color .15s, box-shadow .15s;
+    }
+    .view:hover { color:var(--gray-800); }
+    .view.active { background:var(--surface); color:var(--gray-900); box-shadow:0 1px 3px rgba(0,0,0,.10); }
   `],
 })
 export class ProjectsViewSwitchComponent {

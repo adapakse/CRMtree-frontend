@@ -18,7 +18,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 <div class="page">
   <div class="topbar">
     <h1>{{ t('partnerGroups.title') }}</h1>
-    <button class="btn-primary" *ngIf="isManager" (click)="openCreate()">+ {{ t('partnerGroups.newGroup') }}</button>
+    <button class="btn btn-p" *ngIf="isManager" (click)="openCreate()">+ {{ t('partnerGroups.newGroup') }}</button>
   </div>
 
   <div *ngIf="loading" class="loading">{{ 'states.loading' | transloco }}</div>
@@ -31,7 +31,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
         <div class="gc-icon">🏢</div>
         <div class="gc-title">
           <div class="gc-name">{{g.name}}
-            <span *ngIf="g.source==='dwh'" style="font-size:10px;font-weight:700;background:#dbeafe;color:#1d4ed8;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle">DWH</span>
+            <span *ngIf="g.source==='dwh'" class="dwh-tag">DWH</span>
           </div>
           <div class="gc-industry" *ngIf="g.industry">{{g.industry}}</div>
         </div>
@@ -64,7 +64,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
           <div class="vp-sub" *ngIf="viewingGroup.industry">{{viewingGroup.industry}}</div>
         </div>
         <div class="vp-header-actions">
-          <span *ngIf="viewingGroup.source==='dwh'" style="font-size:10px;font-weight:700;background:#dbeafe;color:#1d4ed8;border-radius:4px;padding:2px 8px;margin-right:4px">DWH</span>
+          <span *ngIf="viewingGroup.source==='dwh'" class="dwh-tag">DWH</span>
           <button class="icon-btn" *ngIf="isManager && viewingGroup.source !== 'dwh'" (click)="editGroup(viewingGroup)">✏️</button>
           <button class="close-btn" (click)="closeViewPanel()">✕</button>
         </div>
@@ -89,7 +89,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
         <div *ngIf="viewingGroup.partners.length === 0" class="vp-empty">{{ t('partnerGroups.details.empty') }}</div>
         <div *ngFor="let p of viewingGroup.partners" class="vp-partner-row" (click)="goToPartner(p.id!)">
           <div class="vp-partner-name">{{p.company}}</div>
-          <svg class="vp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="vp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="9,18 15,12 9,6"/>
           </svg>
         </div>
@@ -101,15 +101,15 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
   <div class="side-panel" *ngIf="showCreate || editingGroup" (click)="closePanel()">
     <div class="side-panel-inner" (click)="$event.stopPropagation()">
       <h3>{{editingGroup ? t('partnerGroups.form.editTitle') : t('partnerGroups.newGroup')}}</h3>
-      <label>{{ t('partnerGroups.form.name') }} *<input [(ngModel)]="form.name" [placeholder]="t('partnerGroups.form.namePlaceholder')"></label>
-      <label>{{ t('partnerGroups.form.industry') }}<input [(ngModel)]="form.industry"></label>
-      <label>{{ t('partnerGroups.form.description') }}<textarea [(ngModel)]="form.description" rows="3"></textarea></label>
+      <label>{{ t('partnerGroups.form.name') }} *<input class="fi" [(ngModel)]="form.name" [placeholder]="t('partnerGroups.form.namePlaceholder')"></label>
+      <label>{{ t('partnerGroups.form.industry') }}<input class="fi" [(ngModel)]="form.industry"></label>
+      <label>{{ t('partnerGroups.form.description') }}<textarea class="fta" [(ngModel)]="form.description" rows="3"></textarea></label>
       <div class="panel-actions">
-        <button class="btn-outline" (click)="closePanel()">{{ 'actions.cancel' | transloco }}</button>
-        <button class="btn-primary" (click)="saveGroup()" [disabled]="!form.name || saving">
+        <button class="btn btn-g" (click)="closePanel()">{{ 'actions.cancel' | transloco }}</button>
+        <button class="btn btn-p" (click)="saveGroup()" [disabled]="!form.name || saving">
           {{saving ? '…' : (editingGroup ? ('actions.save' | transloco) : t('partnerGroups.form.create'))}}
         </button>
-        <button class="btn-danger" *ngIf="editingGroup" (click)="deleteGroup()" [disabled]="saving">{{ t('partnerGroups.form.delete') }}</button>
+        <button class="btn btn-d" *ngIf="editingGroup" (click)="deleteGroup()" [disabled]="saving">{{ t('partnerGroups.form.delete') }}</button>
       </div>
     </div>
   </div>
@@ -118,63 +118,61 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
   `,
   styles: [`
     .page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
-    .topbar { display:flex; align-items:center; padding:14px 20px; border-bottom:1px solid #e5e7eb; flex-shrink:0; }
-    .topbar h1 { font-size:18px; font-weight:700; margin:0; flex:1; }
-    .btn-primary { background:var(--orange); color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
-    .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
-    .btn-danger { background:#fee2e2; color:#991b1b; border:1px solid #fecaca; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
-    .loading { padding:40px; text-align:center; color:#9ca3af; }
-    .groups-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; padding:16px 20px; align-content:start; }
-    .group-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; cursor:pointer; transition:box-shadow .15s, border-color .15s; }
-    .group-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.08); border-color:var(--orange-muted); }
-    .group-card.highlighted { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.15); }
-    .gc-header { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
-    .gc-icon { font-size:24px; }
+    .topbar { display:flex; align-items:center; gap:12px; height:60px; padding:0 24px; background:var(--surface); border-bottom:1px solid var(--gray-200); flex-shrink:0; }
+    .topbar h1 { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); margin:0; flex:1; }
+    .dwh-tag { font-size:10px; font-weight:700; background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:middle; }
+    .loading { padding:40px; text-align:center; color:var(--gray-400); }
+    .groups-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; padding:20px 24px 24px; align-content:start; }
+    .group-card { background:var(--surface); border-radius:12px; padding:16px; cursor:pointer; box-shadow:var(--shadow-sm); transition:box-shadow .15s, transform .15s; }
+    .group-card:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
+    .group-card.highlighted { box-shadow:0 0 0 2px var(--orange), var(--shadow-sm); }
+    .gc-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+    .gc-icon { width:40px; height:40px; border-radius:12px; background:var(--orange-pale); color:var(--orange-dark); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .gc-icon svg.ic { width:20px; height:20px; }
     .gc-title { flex:1; }
-    .gc-name { font-weight:700; font-size:15px; }
-    .gc-industry { font-size:11px; color:#9ca3af; }
+    .gc-name { font-weight:700; font-size:16px; }
+    .gc-industry { font-size:12px; color:var(--gray-400); }
     .gc-actions { }
-    .icon-btn { background:none; border:none; cursor:pointer; font-size:14px; opacity:.5; }
-    .icon-btn:hover { opacity:1; }
-    .gc-stats { display:flex; gap:12px; margin-bottom:6px; }
-    .gc-stat { font-size:12px; color:#6b7280; }
-    .gc-stat.accent strong { color:var(--orange); }
-    .gc-mgr { font-size:11px; color:#9ca3af; margin-bottom:6px; }
-    .gc-desc { font-size:11px; color:#6b7280; margin-bottom:8px; }
+    .icon-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; background:none; border:none; border-radius:999px; cursor:pointer; color:var(--gray-500); }
+    .icon-btn:hover { background:var(--gray-100); color:var(--orange-dark); }
+    .gc-stats { display:flex; gap:12px; margin-bottom:8px; }
+    .gc-stat { font-size:12px; color:var(--gray-500); }
+    .gc-stat.accent strong { color: var(--orange-text); }
+    .gc-mgr { display:flex; align-items:center; gap:4px; font-size:12px; color:var(--gray-400); margin-bottom:8px; }
+    .gc-desc { font-size:12px; color:var(--gray-500); margin-bottom:8px; }
     .gc-partners { display:flex; flex-wrap:wrap; gap:4px; }
-    .partner-chip { background:#f3f4f6; border-radius:8px; padding:2px 8px; font-size:10px; }
-    .partner-chip.more { color:#9ca3af; }
-    .no-groups { grid-column:1/-1; text-align:center; color:#9ca3af; padding:32px; }
+    .partner-chip { background:var(--gray-100); border-radius:999px; padding:2px 8px; font-size:10px; }
+    .partner-chip.more { color:var(--gray-400); }
+    .no-groups { grid-column:1/-1; text-align:center; color:var(--gray-400); padding:32px; }
     /* Side panels */
     .side-panel { position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:100; display:flex; justify-content:flex-end; }
-    .side-panel-inner { background:white; width:380px; height:100%; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:12px; }
+    .side-panel-inner { background:var(--surface); width:380px; height:100%; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-lg); }
     .side-panel-inner h3 { margin:0; font-size:16px; font-weight:700; }
     .side-panel-inner label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; }
-    .side-panel-inner input, .side-panel-inner textarea { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; resize:vertical; }
     .panel-actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
     /* View panel */
     .view-panel { gap:0; padding:0; }
-    .vp-header { display:flex; align-items:flex-start; justify-content:space-between; padding:20px 20px 16px; border-bottom:1px solid #f3f4f6; }
-    .vp-title { font-size:17px; font-weight:800; }
-    .vp-sub { font-size:12px; color:#9ca3af; margin-top:2px; }
-    .vp-header-actions { display:flex; gap:6px; align-items:center; }
-    .close-btn { background:none; border:none; font-size:18px; color:#9ca3af; cursor:pointer; line-height:1; }
-    .vp-stats { display:flex; gap:0; border-bottom:1px solid #f3f4f6; }
+    .vp-header { display:flex; align-items:flex-start; justify-content:space-between; padding:20px 20px 16px; border-bottom:1px solid var(--gray-100); }
+    .vp-title { display:flex; align-items:center; gap:8px; font-family:'Sora',sans-serif; font-size:16px; font-weight:700; }
+    .vp-sub { font-size:12px; color:var(--gray-400); margin-top:2px; }
+    .vp-header-actions { display:flex; gap:8px; align-items:center; }
+    .close-btn { background:none; border:none; font-size:18px; color:var(--gray-400); cursor:pointer; line-height:1; }
+    .vp-stats { display:flex; gap:0; border-bottom:1px solid var(--gray-100); }
     .vp-stat { flex:1; padding:14px 20px; text-align:center; }
-    .vp-stat:not(:last-child) { border-right:1px solid #f3f4f6; }
+    .vp-stat:not(:last-child) { border-right:1px solid var(--gray-100); }
     .vp-stat-val { font-size:20px; font-weight:800; }
-    .vp-stat-val.accent { color:var(--orange); }
-    .vp-stat-lbl { font-size:11px; color:#9ca3af; margin-top:2px; }
-    .vp-mgr { font-size:12px; color:#6b7280; padding:12px 20px 0; }
-    .vp-desc { font-size:12px; color:#6b7280; padding:8px 20px 0; white-space:pre-line; }
+    .vp-stat-val.accent { color: var(--orange-text); }
+    .vp-stat-lbl { font-size:12px; color:var(--gray-400); margin-top:2px; }
+    .vp-mgr { display:flex; align-items:center; gap:4px; font-size:12px; color:var(--gray-500); padding:12px 20px 0; }
+    .vp-desc { font-size:12px; color:var(--gray-500); padding:8px 20px 0; white-space:pre-line; }
     .vp-partners-section { padding:16px 20px; flex:1; }
-    .vp-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; }
-    .vp-empty { font-size:13px; color:#9ca3af; text-align:center; padding:20px; }
-    .vp-partner-row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:8px; cursor:pointer; transition:.12s; }
+    .vp-section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--gray-400); margin-bottom:10px; }
+    .vp-empty { font-size:14px; color:var(--gray-400); text-align:center; padding:20px; }
+    .vp-partner-row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:12px; cursor:pointer; transition:.12s; }
     .vp-partner-row:hover { background:var(--orange-pale); }
-    .vp-partner-name { font-size:13px; font-weight:600; }
-    .vp-arrow { width:16px; height:16px; color:#d1d5db; flex-shrink:0; }
-    .vp-partner-row:hover .vp-arrow { color:var(--orange); }
+    .vp-partner-name { font-size:14px; font-weight:600; }
+    .vp-chev { width:16px; height:16px; color:#d1d5db; flex-shrink:0; }
+    .vp-partner-row:hover .vp-chev { color: var(--orange-text); }
   `],
 })
 export class CrmGroupsComponent implements OnInit {

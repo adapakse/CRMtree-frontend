@@ -34,8 +34,9 @@ interface PbxUserRow {
     <div class="ap-page">
       <div class="ap-header">
         <h1 class="ap-title">{{ t('pbx.title') }}</h1>
-        <p class="ap-sub">{{ t('pbx.subtitle') }}</p>
       </div>
+      <div class="ap-body">
+      <p class="ap-sub">{{ t('pbx.subtitle') }}</p>
 
       @if (isLoading()) {
         <div class="ap-loading">{{ t('pbx.loading') }}</div>
@@ -48,6 +49,7 @@ interface PbxUserRow {
                  [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
         </div>
 
+        <div class="ap-card">
         <table class="ap-table">
           <thead>
             <tr>
@@ -96,11 +98,11 @@ interface PbxUserRow {
                 </td>
                 <td class="ap-actions">
                   <div class="ap-actions-row">
-                    <button class="ap-btn ap-btn-edit" (click)="openEdit(u)">
+                    <button class="btn btn-p btn-sm" (click)="openEdit(u)">
                       {{ u.has_pat ? t('pbx.actions.changeToken') : t('pbx.actions.setToken') }}
                     </button>
                     @if (u.has_pat) {
-                      <button class="ap-btn ap-btn-del" (click)="confirmDelete(u)">{{ t('pbx.actions.delete') }}</button>
+                      <button class="btn btn-d btn-sm" (click)="confirmDelete(u)">{{ t('pbx.actions.delete') }}</button>
                     }
                   </div>
                 </td>
@@ -108,7 +110,9 @@ interface PbxUserRow {
             }
           </tbody>
         </table>
+        </div>
       }
+      </div>
 
       @if (editUser()) {
         <div class="ap-overlay" (click)="closeEdit()">
@@ -132,12 +136,12 @@ interface PbxUserRow {
                 <div class="ap-input-row">
                   <!-- A password field makes browsers autofill the user filter as a
                        login and the PAT as a saved password. Mask a text field instead. -->
-                  <input id="pbx-pat-token" name="pbx-pat-token" type="text" [(ngModel)]="patToken"
+                  <input id="pbx-pat-token" name="pbx-pat-token" type="text" class="fi" [(ngModel)]="patToken"
                          [class.ap-token-masked]="!isTokenVisible"
                          [placeholder]="t('pbx.modal.patPlaceholder')" autocomplete="new-password"
                          autocapitalize="off" autocorrect="off" spellcheck="false"
                          data-1p-ignore data-lpignore="true" />
-                  <button class="ap-eye" type="button" (click)="isTokenVisible = !isTokenVisible">
+                  <button class="btn btn-g ap-eye" type="button" (click)="isTokenVisible = !isTokenVisible">
                     {{ isTokenVisible ? t('pbx.actions.hide') : t('pbx.actions.show') }}
                   </button>
                 </div>
@@ -146,8 +150,8 @@ interface PbxUserRow {
             </div>
 
             <div class="ap-modal-footer">
-              <button class="ap-btn ap-btn-cancel" (click)="closeEdit()">{{ t('pbx.actions.cancel') }}</button>
-              <button class="ap-btn ap-btn-save" [disabled]="isSaving() || !patToken.trim()"
+              <button class="btn btn-g" (click)="closeEdit()">{{ t('pbx.actions.cancel') }}</button>
+              <button class="btn btn-p" [disabled]="isSaving() || !patToken.trim()"
                       (click)="saveToken()">
                 {{ isSaving() ? t('pbx.actions.saving') : t('pbx.actions.save') }}
               </button>
@@ -167,8 +171,8 @@ interface PbxUserRow {
               <p>{{ t('pbx.deleteModal.body', { name: deleteUser()!.display_name }) }}</p>
             </div>
             <div class="ap-modal-footer">
-              <button class="ap-btn ap-btn-cancel" (click)="cancelDelete()">{{ t('pbx.actions.cancel') }}</button>
-              <button class="ap-btn ap-btn-del" [disabled]="isSaving()" (click)="deleteToken()">
+              <button class="btn btn-g" (click)="cancelDelete()">{{ t('pbx.actions.cancel') }}</button>
+              <button class="btn btn-d" [disabled]="isSaving()" (click)="deleteToken()">
                 {{ isSaving() ? t('pbx.actions.deleting') : t('pbx.actions.delete') }}
               </button>
             </div>
@@ -180,118 +184,80 @@ interface PbxUserRow {
   `,
   styles: [`
     :host { display: block; height: 100%; overflow-y: auto; }
-    .ap-page { padding: 28px 32px; max-width: 1000px; }
+    .ap-page { padding: 0; }
 
-    .ap-header { margin-bottom: 24px; }
-    .ap-title  { font-size: 22px; font-weight: 700; color: var(--text, #18181B); margin: 0 0 4px; }
-    .ap-sub    { font-size: 13px; color: var(--text-muted, #71717A); margin: 0; max-width: 620px; }
+    .ap-header { height: 60px; padding: 0 24px; display: flex; align-items: center; gap: 12px;
+                 background: var(--surface); border-bottom: 1px solid var(--gray-200); }
+    .ap-title  { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--text, var(--ink-strong)); margin: 0; }
+    .ap-body   { padding: 20px 24px 24px; max-width: 1000px; }
+    .ap-sub    { font-size: 12px; color: var(--text-muted, var(--gray-500)); margin: 0 0 16px; max-width: 620px; }
 
-    .ap-loading { padding: 48px; text-align: center; color: var(--text-muted, #71717A); }
-    .ap-error   { padding: 16px; background: #fee2e2; border-radius: 8px; color: #b91c1c; }
+    .ap-loading { padding: 48px; text-align: center; color: var(--text-muted, var(--gray-500)); }
+    .ap-error   { padding: 16px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); border-radius: 12px; color: oklch(from #b91c1c max(l, var(--text-min-l)) c h); }
 
-    .ap-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .ap-search  { padding: 8px 12px; border: 1px solid var(--border, #E4E4E7); border-radius: 8px;
-                  font-size: 13px; background: var(--bg-input, #fff); color: var(--text, #18181B);
-                  width: 260px; outline: none; }
-    .ap-search:focus { border-color: var(--orange, #3BAA5D); }
+    .ap-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 16px;
+                  padding: 12px 18px; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-sm); }
+    .ap-card    { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; }
     .ap-table th.ap-th-count { text-align: right; text-transform: none;
                                font-size: 12px; font-weight: 500; letter-spacing: normal;
                                white-space: nowrap; }
 
-    .ap-table   { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .ap-table th { padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 600;
+    .ap-table   { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .ap-table th { padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600;
                    text-transform: uppercase; letter-spacing: 0.05em;
-                   color: var(--text-muted, #71717A); border-bottom: 2px solid var(--border, #E4E4E7); }
-    .ap-table td { padding: 10px 12px; border-bottom: 1px solid var(--border, #E4E4E7); vertical-align: middle; }
-    .ap-table tr:hover td { background: var(--bg-hover, #FAFAFA); }
+                   color: var(--text-muted, var(--gray-500)); background: var(--gray-50); border-bottom: 1px solid var(--gray-200); }
+    .ap-table th:first-child, .ap-table td:first-child { padding-left: 16px; }
+    .ap-table th:last-child, .ap-table td:last-child { padding-right: 16px; }
+    .ap-table td { padding: 12px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+    .ap-table tbody tr:last-child td { border-bottom: none; }
+    .ap-table tr:hover td { background: var(--bg-hover, var(--gray-50)); }
     .ap-row-inactive td { opacity: 0.5; }
 
-    .ap-uname  { font-weight: 600; color: var(--text, #18181B); }
-    .ap-uemail { font-size: 11px; color: var(--text-muted, #71717A); margin-top: 2px; }
-    .ap-role   { font-size: 11px; background: var(--bg-muted, #F4F4F5);
-                 padding: 2px 8px; border-radius: 10px; color: var(--text, #18181B); }
-    .ap-phone  { font-weight: 600; color: var(--orange, #3BAA5D); font-family: monospace; }
-    .ap-none   { color: var(--text-muted, #71717A); }
-    .ap-date   { font-size: 12px; color: var(--text-muted, #71717A); }
+    .ap-uname  { font-weight: 600; color: var(--text, var(--ink-strong)); }
+    .ap-uemail { font-size: 12px; color: var(--text-muted, var(--gray-500)); margin-top: 2px; }
+    .ap-role   { font-size: 12px; background: var(--bg-muted, var(--gray-100));
+                 padding: 2px 8px; border-radius: 10px; color: var(--text, var(--ink-strong)); }
+    .ap-phone  { font-weight: 600; color: var(--orange, oklch(from #3baa5d max(l, var(--text-min-l)) c h)); font-family: monospace; }
+    .ap-none   { color: var(--text-muted, var(--gray-500)); }
+    .ap-date   { font-size: 12px; color: var(--text-muted, var(--gray-500)); }
 
-    .ap-badge      { font-size: 11px; padding: 3px 9px; border-radius: 10px; font-weight: 600; }
-    .ap-badge-ok   { background: #dcfce7; color: #166534; }
-    .ap-badge-warn { background: #fef3c7; color: #92400e; }
+    .ap-badge      { font-size: 12px; padding: 4px 8px; border-radius: 10px; font-weight: 600; }
+    .ap-badge-ok   { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .ap-badge-warn { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
 
     .ap-actions     { white-space: nowrap; text-align: right; }
-    .ap-actions-row { display: flex; gap: 6px; justify-content: flex-end; }
-    .ap-btn     { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
-                  cursor: pointer; border: none; transition: background .15s; }
-    .ap-btn:disabled { opacity: .5; cursor: not-allowed; }
-    .ap-btn-edit   { background: var(--orange, #3BAA5D); color: #fff; }
-    .ap-btn-edit:hover { background: var(--orange-dark, #2F8F4D); }
-    .ap-btn-del    { background: #fee2e2; color: #b91c1c; }
-    .ap-btn-del:hover { background: #fecaca; }
-    .ap-btn-cancel { background: var(--bg-muted, #F4F4F5); color: var(--text, #18181B); }
-    .ap-btn-save   { background: var(--orange, #3BAA5D); color: #fff; }
-    .ap-btn-save:hover:not(:disabled) { background: var(--orange-dark, #2F8F4D); }
+    .ap-actions-row { display: flex; gap: 8px; justify-content: flex-end; }
 
     .ap-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000;
                   display: flex; align-items: center; justify-content: center; }
-    .ap-modal   { background: var(--bg-card, #fff); border-radius: 12px; width: 480px;
-                  max-width: calc(100vw - 32px); box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    .ap-modal   { background: var(--bg-card, var(--surface)); border-radius: 16px; width: 480px;
+                  max-width: calc(100vw - 32px); box-shadow: 0 12px 39px rgba(0,0,0,0.163);
                   display: flex; flex-direction: column; }
     .ap-modal-sm { width: 400px; }
 
     .ap-modal-header { display: flex; align-items: flex-start; justify-content: space-between;
-                       padding: 20px 24px 16px; border-bottom: 1px solid var(--border, #E4E4E7); }
-    .ap-modal-title  { font-weight: 700; font-size: 16px; color: var(--text, #18181B); }
-    .ap-modal-sub    { font-size: 12px; color: var(--text-muted, #71717A); margin-top: 2px; }
+                       padding: 20px 24px 16px; border-bottom: 1px solid var(--border, var(--gray-200)); }
+    .ap-modal-title  { font-weight: 700; font-size: 16px; color: var(--text, var(--ink-strong)); }
+    .ap-modal-sub    { font-size: 12px; color: var(--text-muted, var(--gray-500)); margin-top: 2px; }
     .ap-close        { background: none; border: none; font-size: 18px; cursor: pointer;
-                       color: var(--text-muted, #71717A); padding: 0 4px; line-height: 1; }
+                       color: var(--text-muted, var(--gray-500)); padding: 0 4px; line-height: 1; }
 
     .ap-modal-body   { padding: 20px 24px; }
-    .ap-modal-footer { padding: 16px 24px; border-top: 1px solid var(--border, #E4E4E7);
+    .ap-modal-footer { padding: 16px 24px; border-top: 1px solid var(--border, var(--gray-200));
                        display: flex; justify-content: flex-end; gap: 8px; }
 
-    .ap-hint { background: var(--orange-pale, #E6F4EA); border-left: 3px solid var(--orange, #3BAA5D);
-               padding: 10px 14px; font-size: 12px; color: var(--text, #18181B);
-               border-radius: 4px; margin-bottom: 20px; line-height: 1.6; }
+    .ap-hint { background: var(--orange-pale, color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface))); border-left: 3px solid var(--orange, #3BAA5D);
+               padding: 10px 14px; font-size: 12px; color: var(--text, var(--ink-strong));
+               border-radius: 10px; margin-bottom: 20px; line-height: 1.6; }
 
     .ap-field       { display: flex; flex-direction: column; gap: 6px; }
-    .ap-field label { font-size: 12px; font-weight: 600; color: var(--text, #18181B); }
+    .ap-field label { font-size: 12px; font-weight: 600; color: var(--text, var(--ink-strong)); }
     .ap-input-row   { display: flex; gap: 8px; align-items: center; }
-    .ap-input-row input { flex: 1; padding: 9px 12px; border: 1px solid var(--border, #E4E4E7);
-                          border-radius: 6px; font-size: 13px; background: var(--bg-input, #fff);
-                          color: var(--text, #18181B); outline: none; font-family: monospace; }
-    .ap-input-row input:focus { border-color: var(--orange, #3BAA5D); }
+    .ap-input-row input { flex: 1; min-width: 0; }
     .ap-token-masked { -webkit-text-security: disc; }
-    .ap-field-hint  { font-size: 11px; color: var(--text-muted, #71717A); line-height: 1.5; }
-    .ap-eye         { background: none; border: 1px solid var(--border, #E4E4E7); border-radius: 6px;
-                      font-size: 11px; font-weight: 600; color: var(--text-muted, #71717A);
-                      cursor: pointer; padding: 6px 10px; white-space: nowrap; }
+    .ap-field-hint  { font-size: 12px; color: var(--text-muted, var(--gray-500)); line-height: 1.5; }
+    .ap-eye         { flex-shrink: 0; }
 
-    @media (prefers-color-scheme: dark) {
-      .ap-table tr:hover td { background: rgba(255,255,255,.04); }
-      .ap-modal            { background: #1e2535; }
-      .ap-modal-title      { color: #f1f5f9; }
-      .ap-modal-sub        { color: #94a3b8; }
-      .ap-close            { color: #94a3b8; }
-      .ap-hint             { background: rgba(59,170,93,.14); color: #e2e8f0; }
-      .ap-field label      { color: #e2e8f0; }
-      .ap-field-hint       { color: #94a3b8; }
-      .ap-btn-cancel       { color: #e2e8f0; }
-      .ap-badge-ok   { background: rgba(22,163,74,.2);   color: #86efac; }
-      .ap-badge-warn { background: rgba(234,179,8,.15);  color: #fde68a; }
-      .ap-btn-del    { background: rgba(239,68,68,.15);  color: #fca5a5; }
-    }
-    :root[data-theme="dark"] .ap-table tr:hover td { background: rgba(255,255,255,.04); }
-    :root[data-theme="dark"] .ap-modal            { background: #1e2535; }
-    :root[data-theme="dark"] .ap-modal-title      { color: #f1f5f9; }
-    :root[data-theme="dark"] .ap-modal-sub        { color: #94a3b8; }
-    :root[data-theme="dark"] .ap-close            { color: #94a3b8; }
-    :root[data-theme="dark"] .ap-hint             { background: rgba(59,170,93,.14); color: #e2e8f0; }
-    :root[data-theme="dark"] .ap-field label      { color: #e2e8f0; }
-    :root[data-theme="dark"] .ap-field-hint       { color: #94a3b8; }
-    :root[data-theme="dark"] .ap-btn-cancel       { color: #e2e8f0; }
-    :root[data-theme="dark"] .ap-badge-ok   { background: rgba(22,163,74,.2);   color: #86efac; }
-    :root[data-theme="dark"] .ap-badge-warn { background: rgba(234,179,8,.15);  color: #fde68a; }
-    :root[data-theme="dark"] .ap-btn-del    { background: rgba(239,68,68,.15);  color: #fca5a5; }
   `],
 })
 export class AdminPbxComponent implements OnInit {

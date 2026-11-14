@@ -51,23 +51,23 @@ const TYPE_LABELS: Record<string, string> = {
   <!-- Filtry globalne -->
   <input class="srch" type="search" [placeholder]="t('onboardingBoard.filters.searchPlaceholder')"
          [ngModel]="search()" (ngModelChange)="search.set($event); onFilterChange()">
-  <select class="sel" [ngModel]="filterPartner()" (ngModelChange)="filterPartner.set($event); onFilterChange()">
+  <select [ngModel]="filterPartner()" (ngModelChange)="filterPartner.set($event); onFilterChange()">
     <option value="">{{ t('onboardingBoard.filters.allPartners') }}</option>
     @for (p of partners(); track p.id) {
       <option [value]="p.id">{{ p.company }}</option>
     }
   </select>
-  <select class="sel" [ngModel]="filterUser()" (ngModelChange)="filterUser.set($event); onFilterChange()" *ngIf="isManager">
+  <select [ngModel]="filterUser()" (ngModelChange)="filterUser.set($event); onFilterChange()" *ngIf="isManager">
     <option value="">{{ t('onboardingBoard.filters.allAssignees') }}</option>
     @for (u of crmUsers; track u.id) {
       <option [value]="u.id">{{ u.display_name }}</option>
     }
   </select>
-  <div class="view-tabs">
-    <button [class.active]="view==='partners'" (click)="view='partners'">🏢 {{ t('onboardingBoard.views.partners') }}</button>
-    <button [class.active]="view==='kanban'"   (click)="view='kanban'">📋 {{ t('leadsList.view.kanban') }}</button>
-    <button [class.active]="view==='timeline'" (click)="view='timeline'">📅 {{ t('onboardingBoard.views.timeline') }}</button>
-    <button [class.active]="view==='calendar'" (click)="view='calendar'">🗓 {{ t('onboardingBoard.views.calendar') }}</button>
+  <div class="view-pills">
+    <button class="fchip" [class.on]="view==='partners'" (click)="view='partners'">🏢 {{ t('onboardingBoard.views.partners') }}</button>
+    <button class="fchip" [class.on]="view==='kanban'" (click)="view='kanban'">📋 {{ t('leadsList.view.kanban') }}</button>
+    <button class="fchip" [class.on]="view==='timeline'" (click)="view='timeline'">📅 {{ t('onboardingBoard.views.timeline') }}</button>
+    <button class="fchip" [class.on]="view==='calendar'" (click)="view='calendar'">🗓 {{ t('onboardingBoard.views.calendar') }}</button>
   </div>
 </div>
 
@@ -75,16 +75,16 @@ const TYPE_LABELS: Record<string, string> = {
 
   <!-- Launch success banner -->
   @if (launchResult()) {
-    <div style="background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
+    <div style="background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));border:1px solid #86efac;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
       <span style="font-size:22px">🎉</span>
       <div style="flex:1">
-        <div style="font-weight:700;color:#166534;font-size:14px">{{ t('onboardingBoard.launch.successTitle', { company: launchResult()!.company }) }}</div>
-        <div style="font-size:12px;color:#4ade80;margin-top:2px">{{ t('onboardingBoard.launch.successHint') }}</div>
+        <div style="font-weight:700;color:oklch(from #166534 max(l, var(--text-min-l)) c h);font-size:14px">{{ t('onboardingBoard.launch.successTitle', { company: launchResult()!.company }) }}</div>
+        <div style="font-size:12px;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);margin-top:2px">{{ t('onboardingBoard.launch.successHint') }}</div>
       </div>
       <a [routerLink]="['/crm/partners', launchResult()!.id]" style="background:#3BAA5D;color:white;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;text-decoration:none">
         → {{ t('onboardingBoard.launch.partnerProfile') }}
       </a>
-      <button (click)="launchResult.set(null)" style="background:none;border:none;color:#166534;font-size:18px;cursor:pointer;line-height:1">✕</button>
+      <button (click)="launchResult.set(null)" style="background:none;border:none;color:oklch(from #166534 max(l, var(--text-min-l)) c h);font-size:18px;cursor:pointer;line-height:1">✕</button>
     </div>
   }
 
@@ -92,8 +92,8 @@ const TYPE_LABELS: Record<string, string> = {
   @if (view === 'partners') {
     <!-- sub-toolbar: view toggle -->
     <div class="partners-toolbar">
-      <button class="btn-view" [class.active]="partnersView==='cards'" (click)="partnersView='cards'">⊞ {{ t('partnersList.view.cards') }}</button>
-      <button class="btn-view" [class.active]="partnersView==='table'" (click)="partnersView='table'">☰ {{ t('partnersList.view.table') }}</button>
+      <button class="fchip" [class.on]="partnersView==='cards'" (click)="partnersView='cards'">⊞ {{ t('partnersList.view.cards') }}</button>
+      <button class="fchip" [class.on]="partnersView==='table'" (click)="partnersView='table'">☰ {{ t('partnersList.view.table') }}</button>
     </div>
 
     @if (loadingPartners()) {
@@ -135,12 +135,12 @@ const TYPE_LABELS: Record<string, string> = {
             <div style="margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:flex-end">
               @if (p.lead_id) {
                 <a [routerLink]="['/crm/leads', p.lead_id]" (click)="$event.stopPropagation()"
-                   style="font-size:11px;color:#3b82f6;font-weight:600;text-decoration:none;border:1px solid #bfdbfe;border-radius:6px;padding:3px 8px;background:#eff6ff">
+                   style="font-size:12px;color:oklch(from #3b82f6 max(l, var(--text-min-l)) c h);font-weight:600;text-decoration:none;border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:6px;padding:4px 8px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))">
                   🎯 {{ t('onboardingBoard.partners.leadData') }}
                 </a>
               }
-              <button class="launch-btn"
-                      [class.launch-ready]="p.done_count >= p.task_count"
+              <button class="btn btn-sm"
+                      [class.btn-p]="p.done_count >= p.task_count" [class.btn-g]="p.done_count < p.task_count"
                       [disabled]="p.done_count < p.task_count || launching() === p.id"
                       (click)="$event.stopPropagation(); launchPartner(p)"
                       [title]="p.done_count < p.task_count ? t('onboardingBoard.launch.remainingTasks', { count: p.task_count - p.done_count }) : t('onboardingBoard.launch.moveToRegistry')">
@@ -190,8 +190,8 @@ const TYPE_LABELS: Record<string, string> = {
             <div class="pt-td pt-date">{{ p.created_at | date:'dd.MM.yy' }}</div>
             <!-- Akcja -->
             <div class="pt-td" (click)="$event.stopPropagation()">
-              <button class="launch-btn"
-                      [class.launch-ready]="p.done_count >= p.task_count"
+              <button class="btn btn-sm"
+                      [class.btn-p]="p.done_count >= p.task_count" [class.btn-g]="p.done_count < p.task_count"
                       [disabled]="p.done_count < p.task_count || launching() === p.id"
                       (click)="launchPartner(p)"
                       [title]="p.done_count < p.task_count ? t('onboardingBoard.launch.remainingTasks', { count: p.task_count - p.done_count }) : t('onboardingBoard.launch.moveToRegistry')">
@@ -309,9 +309,9 @@ const TYPE_LABELS: Record<string, string> = {
     } @else {
       <div class="cal-wrap">
         <div class="cal-nav">
-          <button class="btn btn-g btn-sm" (click)="prevMonth()">‹</button>
+          <button class="nav-btn" (click)="prevMonth()">‹</button>
           <span class="cal-month-label">{{ calMonthLabel() }}</span>
-          <button class="btn btn-g btn-sm" (click)="nextMonth()">›</button>
+          <button class="nav-btn" (click)="nextMonth()">›</button>
         </div>
         <div class="cal-grid">
           @for (d of weekdayLabels; track $index) {
@@ -389,7 +389,7 @@ const TYPE_LABELS: Record<string, string> = {
           </div>
           <!-- Przypisany -->
           <div class="fg full">
-            <label class="fl">{{ t('onboardingBoard.taskForm.assignedTo') }} <span style="color:var(--orange)">*</span></label>
+            <label class="fl">{{ t('onboardingBoard.taskForm.assignedTo') }} <span style="color: var(--orange-text)">*</span></label>
             <select class="fsel" [(ngModel)]="taskForm.assigned_to">
               <option value="">{{ t('onboardingBoard.taskForm.choosePerson') }}</option>
               @for (u of crmUsers; track u.id) {
@@ -405,7 +405,7 @@ const TYPE_LABELS: Record<string, string> = {
           <!-- Status -->
           @if (editingTask) {
             <div class="fg full">
-              <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+              <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">
                 <input type="checkbox" [(ngModel)]="taskForm.done" style="width:auto">
                 ✅ {{ t('onboardingBoard.taskForm.done') }}
               </label>
@@ -429,60 +429,49 @@ const TYPE_LABELS: Record<string, string> = {
 </ng-container>
   `,
   styles: [`
-    #topbar { display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--gray-200);flex-shrink:0;flex-wrap:wrap }
-    .page-title { font-size:16px;font-weight:700;color:var(--gray-900);white-space:nowrap }
+    #topbar { display:flex;align-items:center;gap:12px;height:60px;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--gray-200);flex-shrink:0 }
+    .page-title { font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-900);white-space:nowrap;display:inline-flex;align-items:center;gap:8px }
     .tsp { flex:1 }
-    .srch { border:1px solid var(--gray-200);border-radius:8px;padding:6px 10px;font-size:12.5px;outline:none;width:180px }
-    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
-    .sel:focus { border-color:var(--orange); }
-    .view-tabs { display:flex;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden }
-    .view-tabs button { padding:6px 12px;border:none;background:white;font-size:12px;cursor:pointer;color:var(--gray-600) }
-    .view-tabs button.active { background:var(--orange);color:white;font-weight:600 }
 
-    #content { flex:1;overflow:auto;padding:16px }
+    #content { flex:1;overflow:auto;padding:20px 24px 24px }
     .loading-state { display:flex;align-items:center;gap:10px;padding:40px;color:var(--gray-400);justify-content:center }
     .empty-state { text-align:center;padding:60px;color:var(--gray-400) }
 
     /* Partners Grid */
-    .partners-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px }
-    .partner-card { background:white;border:1px solid var(--gray-200);border-radius:12px;padding:16px;cursor:pointer;transition:box-shadow .15s,border-color .15s }
-    .partner-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.08);border-color:var(--orange-muted) }
+    .partners-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px }
+    .partner-card { background:var(--surface);border-radius:var(--radius);padding:16px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .15s }
+    .partner-card:hover { box-shadow:var(--shadow) }
     .pc-header { display:flex;align-items:flex-start;gap:10px;margin-bottom:12px }
-    .pc-icon { font-size:24px }
-    .pc-name { font-weight:700;font-size:15px }
-    .pc-nip  { font-size:11px;color:var(--gray-400);font-family:monospace }
-    .step-badge { background:var(--orange-pale);color:var(--orange-dark);border:1px solid var(--orange-muted);border-radius:8px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap }
+    .pc-icon { display:inline-flex;color: var(--orange-text) } .pc-icon svg { width:24px;height:24px }
+    .pc-name { font-weight:700;font-size:16px }
+    .pc-nip  { font-size:12px;color:var(--gray-400);font-family:monospace }
+    .step-badge { background:var(--orange-pale);color:var(--orange-dark);border:1px solid var(--orange-muted);border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700;white-space:nowrap }
     .pc-progress { display:flex;gap:4px;margin-bottom:10px }
     .pc-step { flex:1;text-align:center;padding:6px 2px;border-radius:6px;background:var(--gray-100);font-size:10px;color:var(--gray-500) }
-    .pc-step.done   { background:#dcfce7;color:#166534 }
+    .pc-step.done   { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h) }
     .pc-step.active { background:var(--orange-pale);color:var(--orange-dark);font-weight:700;border:1px solid var(--orange) }
-    .pc-step-lbl { display:block;font-size:9px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+    .pc-step-lbl { display:block;font-size:10px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
     .pc-tasks { display:flex;align-items:center;gap:8px;margin-bottom:6px }
     .pc-task-bar { flex:1;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden }
     .pc-task-fill { height:100%;background:#22c55e;border-radius:3px;transition:width .3s }
-    .pc-task-text { font-size:11px;color:var(--gray-500);white-space:nowrap }
-    .pc-mgr { font-size:11px;color:var(--gray-400) }
-    .launch-btn { border:1px solid var(--gray-300);background:var(--gray-100);color:var(--gray-400);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:not-allowed;transition:all .15s }
-    .launch-btn.launch-ready { background:var(--orange);border-color:var(--orange);color:white;cursor:pointer }
-    .launch-btn.launch-ready:hover { background:var(--orange-dark) }
-    .launch-btn:disabled:not(.launch-ready) { opacity:.6 }
+    .pc-task-text { font-size:12px;color:var(--gray-500);white-space:nowrap }
+    .pc-mgr { font-size:12px;color:var(--gray-400) }
 
     /* Partners sub-toolbar */
-    .partners-toolbar { display:flex;gap:6px;margin-bottom:12px }
-    .btn-view { background:none;border:1px solid var(--gray-200);border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;color:var(--gray-500) }
-    .btn-view.active { background:var(--orange-pale);border-color:var(--orange);color:var(--orange-dark);font-weight:700 }
+    .view-pills { display:flex;gap:8px;margin-left:auto }
+    .partners-toolbar { display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px }
 
     /* Partners table */
-    .pt-wrap { background:white;border:1px solid var(--gray-200);border-radius:10px;overflow:hidden }
-    .pt-head { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 150px;background:var(--gray-50);border-bottom:2px solid var(--gray-200);padding:0 12px }
-    .pt-th { padding:9px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-400);display:flex;align-items:center;gap:4px }
+    .pt-wrap { background:var(--surface);border:1px solid var(--gray-200);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm) }
+    .pt-head { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 150px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:0 12px }
+    .pt-th { padding:8px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-400);display:flex;align-items:center;gap:4px }
     .pt-th.sortable { cursor:pointer;user-select:none }
     .pt-th.sortable:hover { color:var(--gray-700) }
     .si { font-size:10px;color:var(--gray-300) }
     .pt-row { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 150px;padding:0 12px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s }
     .pt-row:last-child { border-bottom:none }
-    .pt-row:hover { background:var(--orange-pale) }
-    .pt-td { padding:10px 10px;font-size:13px;color:var(--gray-700);display:flex;flex-direction:column;justify-content:center;gap:2px }
+    .pt-row:hover { background:var(--gray-50) }
+    .pt-td { padding:10px 10px;font-size:14px;color:var(--gray-700);display:flex;flex-direction:column;justify-content:center;gap:2px }
     .pt-company { font-weight:600;color:var(--gray-900) }
     .pt-nip { font-size:10px;color:var(--gray-400);font-family:monospace;display:none }
     .pt-mono { font-family:monospace;font-size:12px;color:var(--gray-500) }
@@ -490,76 +479,76 @@ const TYPE_LABELS: Record<string, string> = {
     .pt-progress-cell { flex-direction:row !important;align-items:center;gap:8px }
     .pt-bar { flex:1;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden }
     .pt-fill { height:100%;background:#22c55e;border-radius:3px;transition:width .3s }
-    .pt-prog-txt { font-size:11px;color:var(--gray-500);white-space:nowrap }
+    .pt-prog-txt { font-size:12px;color:var(--gray-500);white-space:nowrap }
     .pt-date { font-size:12px;color:var(--gray-500) }
 
     /* Kanban */
-    .kanban-wrap { display:flex;gap:12px;height:calc(100vh - 140px);overflow-x:auto }
-    .kb-col { width:260px;flex-shrink:0;display:flex;flex-direction:column;background:var(--gray-50);border-radius:10px;overflow:hidden }
-    .kb-head { display:flex;align-items:center;gap:6px;padding:10px 12px;background:white;border-bottom:1px solid var(--gray-200);font-weight:600;font-size:13px }
+    .kanban-wrap { display:flex;gap:16px;height:calc(100vh - 140px);overflow-x:auto }
+    .kb-col { width:260px;flex-shrink:0;display:flex;flex-direction:column;background:var(--gray-50);border-radius:var(--radius);overflow:hidden }
+    .kb-head { display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--gray-200);font-weight:600;font-size:14px }
     .kb-icon { font-size:16px }
     .kb-title { flex:1 }
-    .kb-cnt { background:var(--gray-200);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700 }
+    .kb-cnt { background:var(--gray-200);border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700 }
     .kb-cards { flex:1;overflow-y:auto;padding:8px }
-    .kb-card { background:white;border:1px solid var(--gray-200);border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;transition:box-shadow .12s }
-    .kb-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.08);border-color:var(--orange-muted) }
+    .kb-card { background:var(--surface);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .12s }
+    .kb-card:hover { box-shadow:var(--shadow) }
     .kb-card.done { opacity:.6;background:var(--gray-50) }
     .kb-card-top { display:flex;align-items:center;gap:6px;margin-bottom:4px }
     .type-icon { font-size:14px }
     .kb-partner { flex:1;font-size:10px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
-    .kb-card-title { font-size:12.5px;font-weight:600;color:var(--gray-800);margin-bottom:4px }
-    .kb-due { font-size:11px;color:var(--gray-400) }
-    .kb-due.overdue { color:#ef4444;font-weight:600 }
-    .kb-assignee { font-size:11px;color:var(--gray-400);margin-top:2px }
+    .kb-card-title { font-size:12px;font-weight:600;color:var(--gray-800);margin-bottom:4px }
+    .kb-due { font-size:12px;color:var(--gray-400) }
+    .kb-due.overdue { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-weight:600 }
+    .kb-assignee { font-size:12px;color:var(--gray-400);margin-top:2px }
     .kb-empty { text-align:center;font-size:12px;color:var(--gray-400);padding:16px }
     .kb-add { width:100%;border:1px dashed var(--gray-300);background:none;border-radius:6px;padding:6px;font-size:12px;color:var(--gray-400);cursor:pointer;margin-top:4px }
     .kb-card-actions { display:flex;justify-content:flex-end;margin-top:4px }
     .kb-del-btn { background:none;border:none;font-size:12px;cursor:pointer;opacity:.3;padding:2px 4px;border-radius:4px }
-    .kb-del-btn:hover { opacity:1;background:#fee2e2 }
-    .kb-add:hover { border-color:var(--orange);color:var(--orange) }
-    .done-badge { background:#dcfce7;color:#166534;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700 }
+    .kb-del-btn:hover { opacity:1;background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)) }
+    .kb-add:hover { border-color:var(--orange);color: var(--orange-text) }
+    .done-badge { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);border-radius:4px;padding:1px 4px;font-size:10px;font-weight:700 }
 
     /* Timeline */
     .timeline-wrap { max-width:720px;margin:0 auto;padding-bottom:40px }
     .tl-group { margin-bottom:24px }
     .tl-date-label { display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px }
-    .tl-date-label.tl-today { color:var(--orange) }
+    .tl-date-label.tl-today { color: var(--orange-text) }
     .tl-date-label.tl-past  { color:var(--gray-300) }
     .tl-dot { width:10px;height:10px;border-radius:50%;background:var(--gray-300);flex-shrink:0 }
     .tl-today .tl-dot { background:var(--orange) }
-    .today-tag { background:var(--orange);color:white;border-radius:4px;padding:1px 6px;font-size:10px }
-    .tl-item { display:flex;gap:12px;padding:10px 12px;background:white;border:1px solid var(--gray-200);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:border-color .12s }
-    .tl-item:hover { border-color:var(--orange-muted) }
+    .today-tag { background:var(--orange-strong);color:white;border-radius:4px;padding:1px 6px;font-size:10px }
+    .tl-item { display:flex;gap:12px;padding:12px;background:var(--surface);border-radius:10px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .12s }
+    .tl-item:hover { box-shadow:var(--shadow) }
     .tl-item.tl-done { opacity:.6 }
     .tl-time { font-size:12px;font-weight:700;color:var(--gray-600);width:44px;flex-shrink:0;padding-top:2px }
     .tl-content { flex:1 }
-    .tl-top { display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-bottom:2px }
-    .tl-meta { font-size:11px;color:var(--gray-400) }
+    .tl-top { display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-bottom:2px }
+    .tl-meta { font-size:12px;color:var(--gray-400) }
     .tl-partner { font-weight:600;color:var(--gray-600) }
 
     /* Calendar */
-    .cal-wrap { background:white;border-radius:12px;border:1px solid var(--gray-200);overflow:hidden }
+    .cal-wrap { background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden }
     .cal-nav { display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--gray-200) }
-    .cal-month-label { font-size:15px;font-weight:700;flex:1;text-align:center }
+    .cal-month-label { font-size:16px;font-weight:700;flex:1;text-align:center }
     .cal-grid { display:grid;grid-template-columns:repeat(7,1fr) }
-    .cal-dow  { text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:var(--gray-500);border-bottom:1px solid var(--gray-200) }
+    .cal-dow  { text-align:center;padding:8px 4px;font-size:12px;font-weight:600;color:var(--gray-500);border-bottom:1px solid var(--gray-200) }
     .cal-cell { min-height:90px;padding:4px;border-right:1px solid var(--gray-100);border-bottom:1px solid var(--gray-100);overflow:hidden }
     .cal-cell.cal-other { background:var(--gray-50) }
     .cal-cell.cal-today { background:var(--orange-pale) }
-    .cal-day-num { font-size:11px;font-weight:600;color:var(--gray-400);margin-bottom:3px }
-    .cal-today .cal-day-num { color:var(--orange);font-weight:700 }
-    .cal-event { font-size:10px;padding:2px 4px;border-radius:4px;margin-bottom:2px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#eff6ff;color:#1d4ed8 }
+    .cal-day-num { font-size:12px;font-weight:600;color:var(--gray-400);margin-bottom:4px }
+    .cal-today .cal-day-num { color: var(--orange-text);font-weight:700 }
+    .cal-event { font-size:10px;padding:2px 4px;border-radius:4px;margin-bottom:2px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h) }
     .cal-event.cal-done { opacity:.5;text-decoration:line-through }
-    .cal-step-0 { background:#fef3c7;color:#92400e }
-    .cal-step-1 { background:#ede9fe;color:#5b21b6 }
-    .cal-step-2 { background:#dcfce7;color:#166534 }
-    .cal-step-3 { background:#ffedd5;color:#9a3412 }
+    .cal-step-0 { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h) }
+    .cal-step-1 { background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h) }
+    .cal-step-2 { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h) }
+    .cal-step-3 { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface));color:oklch(from #9a3412 max(l, var(--text-min-l)) c h) }
 
     /* Modal */
     .overlay { position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px) }
-    .modal { background:white;border-radius:14px;width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2) }
+    .modal { background:var(--surface);border-radius:14px;width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 12px 39px rgba(0,0,0,0.13) }
     .modal-head { display:flex;align-items:flex-start;gap:12px;padding:18px 20px;border-bottom:1px solid var(--gray-200) }
-    .modal-title { font-size:15px;font-weight:700 }
+    .modal-title { font-size:16px;font-weight:700 }
     .dp-close { background:none;border:none;font-size:18px;color:var(--gray-400);cursor:pointer;margin-left:auto;line-height:1 }
     .modal-body { padding:20px }
     .modal-foot { padding:14px 20px;border-top:1px solid var(--gray-200);display:flex;gap:8px;justify-content:flex-end }
@@ -567,17 +556,6 @@ const TYPE_LABELS: Record<string, string> = {
     .fg { display:flex;flex-direction:column }
     .fg.full { grid-column:1/-1 }
     .fl { font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:4px }
-    .fi  { border:1px solid var(--gray-200);border-radius:6px;padding:7px 10px;font-size:13px;outline:none;font-family:inherit }
-    .fsel{ border:1px solid var(--gray-200);border-radius:6px;padding:7px 10px;font-size:13px;outline:none;background:white }
-    .fta { border:1px solid var(--gray-200);border-radius:6px;padding:7px 10px;font-size:13px;outline:none;font-family:inherit;resize:vertical }
-    .btn { border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer }
-    .btn-g { background:var(--gray-100);color:var(--gray-700) }
-    .btn-g:hover { background:var(--gray-200) }
-    .btn-p { background:var(--orange);color:white }
-    .btn-p:hover { background:var(--orange-dark) }
-    .btn-p:disabled { opacity:.5;cursor:not-allowed }
-    .btn-d { background:#fee2e2;color:#991b1b }
-    .btn-sm { padding:5px 10px;font-size:12px }
   `],
 })
 export class CrmOnboardingComponent implements OnInit {

@@ -41,9 +41,9 @@ const GROUP_NOT_CONFIGURED_STATUS = 409;
   `,
   styles: [`
     :host { display:inline-block; }
-    .open { font-size:12.5px; color:var(--accent-blue, #3B82F6); text-decoration:none; white-space:nowrap; }
+    .open { font-size:12px; color:var(--accent-blue, oklch(from #3b82f6 max(l, var(--text-min-l)) c h)); text-decoration:none; white-space:nowrap; }
     .open:hover { text-decoration:underline; }
-    .registered { font-size:12.5px; color:var(--gray-600); }
+    .registered { font-size:12px; color:var(--gray-600); }
     .btn { white-space:nowrap; }
   `],
 })

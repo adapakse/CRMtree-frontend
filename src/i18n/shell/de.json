@@ -42,7 +42,11 @@
   },
   "sidebar": {
     "collapse": "Menü einklappen",
-    "expand": "Menü ausklappen"
+    "doneEditing": "Fertig",
+    "editMenu": "Menü bearbeiten",
+    "expand": "Menü ausklappen",
+    "hideItem": "Ausblenden",
+    "showItem": "Einblenden"
   },
   "user": {
     "admin": "Administrator",

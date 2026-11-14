@@ -115,6 +115,7 @@
     "title": "Aktivitätenkalender",
     "views": {
       "day": "Tag",
+      "label": "Ansicht",
       "month": "Monat",
       "tasks": "Aufgaben",
       "week": "Woche"
@@ -529,6 +530,26 @@
     "trainingMode": "Schulungsmodus",
     "writeNew": "Neue E-Mail schreiben"
   },
+  "fieldErrors": {
+    "closeDate": "Wählen Sie das voraussichtliche Abschlussdatum",
+    "company": "Geben Sie den Firmennamen ein",
+    "contactName": "Geben Sie den Vor- und Nachnamen der Kontaktperson ein",
+    "contactTitle": "Wählen Sie die Position der Kontaktperson",
+    "email": "Geben Sie eine E-Mail-Adresse ein, z. B. jan@firma.de",
+    "firstContact": "Wählen Sie das Datum des Erstkontakts",
+    "industry": "Wählen Sie eine Branche",
+    "lostReason": "Wählen Sie den Verlustgrund",
+    "onlinePct": "Wählen Sie den Online-Umsatzanteil",
+    "phone": "Geben Sie eine Telefonnummer ein, z. B. +48 600 000 000",
+    "probability": "Wählen Sie die Gewinnchance",
+    "salesperson": "Weisen Sie einen Vertriebsmitarbeiter zu",
+    "saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen – wenn der Fehler bleibt, melden Sie ihn Ihrem Administrator.",
+    "source": "Wählen Sie, woher der Lead kommt",
+    "value": "Geben Sie einen Betrag ein – wenn unbekannt, geben Sie 0 ein",
+    "valueNegative": "Der Betrag darf nicht negativ sein",
+    "valueTooLarge": "Betrag zu hoch – maximal 999.999.999.999",
+    "website": "Geben Sie die Website der Firma ein, z. B. firma.de"
+  },
   "history": {
     "activityAdded": "Aktivität hinzugefügt: {title}",
     "activityClosed": "Aktivität geschlossen: {title}",
@@ -741,9 +762,14 @@
       "hot": "Heiß"
     },
     "history": {
+      "archived": "Lead ins Archiv verschoben",
       "converted": "Lead in Partner umgewandelt",
       "created": "Lead erstellt",
       "deleted": "Lead gelöscht",
+      "holdCancelled": "Zurückstellung aufgehoben",
+      "holdSet": "Zurückgestellt bis {date}",
+      "migrated": "Lead verschoben",
+      "testAccount": "Testkonto",
       "updated": "Lead aktualisiert"
     },
     "hold": {
@@ -770,11 +796,11 @@
     },
     "loadError": "Fehler beim Laden des Leads.",
     "nip": {
-      "countryCodeRequired": "Geben Sie den Ländercode an (2 Buchstaben), z. B. PL",
-      "duplicate": "Diese Steuernummer ist bereits einem anderen Datensatz zugeordnet.",
-      "numberRequired": "Geben Sie die Nummer nach dem Ländercode an",
-      "plTenDigits": "Für PL sind 10 Ziffern nach dem Ländercode erforderlich",
-      "required": "Die Steuernummer ist erforderlich"
+      "countryCodeRequired": "Beginnen Sie mit dem Ländercode (2 Buchstaben), z. B. PL",
+      "duplicate": "Diese Steuernummer ist im CRM bereits einer anderen Firma zugeordnet",
+      "numberRequired": "Geben Sie nach dem Ländercode die Steuernummer ein",
+      "plTenDigits": "Eine polnische Steuernummer hat 10 Ziffern nach „PL“, z. B. PL1234567890",
+      "required": "Geben Sie die Steuernummer der Firma ein, z. B. PL1234567890"
     },
     "notFound": "Lead nicht gefunden.",
     "onboarding": {
@@ -922,9 +948,13 @@
       "holdOnlyTitle": "Nur zurückgestellte Leads anzeigen",
       "hot": "Heiße",
       "mine": "Meine",
+      "peopleGroup": "Personen",
       "repChip": "Vertriebsmitarbeiter: {name}",
       "reportFilter": "Filter aus Bericht: {label}",
       "repsGroup": "Vertriebsmitarbeiter",
+      "stagesClosed": "Abgeschlossen",
+      "stagesOpen": "In Bearbeitung",
+      "teamsGroup": "Teams",
       "wholeGroup": "Ganze Gruppe: {group}"
     },
     "importCsv": "CSV-Import",
@@ -975,6 +1005,7 @@
       "fillRequired": "Füllen Sie die Pflichtfelder aus:",
       "fullName": "Vor- und Nachname",
       "hot": "Heißer Lead",
+      "hotHint": "Der Kunde steht kurz vor dem Kauf – der Lead erhält 🔥 in der Liste und im Kanban",
       "namePlaceholder": "Max Mustermann",
       "noExtraContacts": "Keine weiteren Kontakte",
       "notes": "Notizen",
@@ -985,10 +1016,11 @@
       "subtitle": "Neue Verkaufschance hinzufügen",
       "taxId": "Steuernummer",
       "taxIdErrors": {
-        "countryCode": "Geben Sie den Ländercode an (2 Buchstaben), z. B. PL",
-        "numberMissing": "Geben Sie die Nummer nach dem Ländercode an",
-        "polishDigits": "Für PL sind 10 Ziffern nach dem Ländercode erforderlich",
-        "required": "Die Steuernummer ist erforderlich"
+        "countryCode": "Beginnen Sie mit dem Ländercode (2 Buchstaben), z. B. PL",
+        "duplicate": "Diese Steuernummer ist im CRM bereits einer anderen Firma zugeordnet",
+        "numberMissing": "Geben Sie nach dem Ländercode die Steuernummer ein",
+        "polishDigits": "Eine polnische Steuernummer hat 10 Ziffern nach „PL“, z. B. PL1234567890",
+        "required": "Geben Sie die Steuernummer der Firma ein, z. B. PL1234567890"
       },
       "title": "Neuer Lead",
       "unassigned": "— nicht zugewiesen —",
@@ -1036,6 +1068,7 @@
     "title": "Vertriebs-Leads",
     "view": {
       "kanban": "Kanban",
+      "label": "Ansicht",
       "table": "Tabelle",
       "timeline": "Zeitachse"
     }
@@ -1321,10 +1354,10 @@
     },
     "loadError": "Fehler beim Laden.",
     "nip": {
-      "countryCodeRequired": "Geben Sie den Ländercode an (2 Buchstaben), z. B. PL",
-      "numberRequired": "Geben Sie die Nummer nach dem Ländercode an",
-      "plTenDigits": "Für PL sind 10 Ziffern nach dem Ländercode erforderlich",
-      "required": "Die Steuernummer ist erforderlich"
+      "countryCodeRequired": "Beginnen Sie mit dem Ländercode (2 Buchstaben), z. B. PL",
+      "numberRequired": "Geben Sie nach dem Ländercode die Steuernummer ein",
+      "plTenDigits": "Eine polnische Steuernummer hat 10 Ziffern nach „PL“, z. B. PL1234567890",
+      "required": "Geben Sie die Steuernummer der Firma ein, z. B. PL1234567890"
     },
     "notFound": "Partner nicht gefunden.",
     "onboarding": {
@@ -1477,11 +1510,11 @@
       "dwhTurnoverHint": "Bruttoumsatz YTD aus dem DWH"
     },
     "taxIdErrors": {
-      "countryCode": "Geben Sie den Ländercode an (2 Buchstaben), z. B. PL",
-      "duplicate": "Diese Steuernummer ist bereits einem anderen Datensatz zugeordnet.",
-      "numberMissing": "Geben Sie die Nummer nach dem Ländercode an",
-      "polishDigits": "Für PL sind 10 Ziffern nach dem Ländercode erforderlich",
-      "required": "Die Steuernummer ist erforderlich"
+      "countryCode": "Beginnen Sie mit dem Ländercode (2 Buchstaben), z. B. PL",
+      "duplicate": "Diese Steuernummer ist im CRM bereits einer anderen Firma zugeordnet",
+      "numberMissing": "Geben Sie nach dem Ländercode die Steuernummer ein",
+      "polishDigits": "Eine polnische Steuernummer hat 10 Ziffern nach „PL“, z. B. PL1234567890",
+      "required": "Geben Sie die Steuernummer der Firma ein, z. B. PL1234567890"
     },
     "title": "Partnerregister",
     "toolbar": {
@@ -1495,6 +1528,7 @@
     },
     "view": {
       "cards": "Karten",
+      "label": "Ansicht",
       "table": "Tabelle"
     }
   },
@@ -1913,6 +1947,8 @@
       "showAll": "Alle Partner mit Abwanderungsrisiko anzeigen →"
     },
     "currency": {
+      "billionsPln": "{value} Mrd. PLN",
+      "millionsPln": "{value} Mio. PLN",
       "pln": "{value} PLN",
       "thousandsPln": "{value} Tsd. PLN"
     },

@@ -47,9 +47,9 @@ import { ATTACHMENT_ACCEPTED_EXTENSIONS, ATTACHMENT_MAX_SIZE_MB, formatAttachmen
       @if (!compact()) {
         <div class="attachment-head">
           <h3>{{ t('title') }} @if (list.result(); as result) { <span>({{ result.total }})</span> }</h3>
-          <button type="button" class="action" [disabled]="list.isLoading()" (click)="list.reload()">{{ t('refresh') }}</button>
+          <button type="button" class="btn btn-g btn-sm" [disabled]="list.isLoading()" (click)="list.reload()">{{ t('refresh') }}</button>
           @if (canUpload() && list.result()?.can_write) {
-            <label class="upload" [class.disabled]="isUploading()">
+            <label class="btn btn-p btn-sm upload" [class.disabled]="isUploading()">
               {{ t(isUploading() ? 'uploading' : 'add') }}
               <input type="file" multiple [accept]="acceptedExtensions" [disabled]="isUploading()" (change)="upload($event)" [attr.aria-label]="t('add')">
             </label>
@@ -57,7 +57,7 @@ import { ATTACHMENT_ACCEPTED_EXTENSIONS, ATTACHMENT_MAX_SIZE_MB, formatAttachmen
         </div>
         @if (aggregate()) { <p class="hint">{{ t('summaryHint') }}</p> }
         <div class="toolbar">
-          <div class="search-wrap">
+          <div class="search-wrap srch-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input id="attachments-filter-filename" class="search" type="search" [placeholder]="t('filename')" [attr.aria-label]="t('filename')" maxlength="300"
                    [value]="query.value('filename')" (change)="setFilter('filename', $event)" (keyup.enter)="setFilter('filename', $event)">
@@ -95,7 +95,7 @@ import { ATTACHMENT_ACCEPTED_EXTENSIONS, ATTACHMENT_MAX_SIZE_MB, formatAttachmen
         </div>
         @if (list.isLoading()) { <p class="state" role="status">{{ t('loading') }}</p> }
         @else if (hasLoadError()) {
-          <p class="state" role="alert">{{ t('loadFailed') }} <button type="button" class="action" (click)="list.reload()">{{ t('refresh') }}</button></p>
+          <p class="state" role="alert">{{ t('loadFailed') }} <button type="button" class="btn btn-g btn-sm" (click)="list.reload()">{{ t('refresh') }}</button></p>
         } @else {
           <div class="table-scroll">
             <table>
@@ -131,9 +131,9 @@ import { ATTACHMENT_ACCEPTED_EXTENSIONS, ATTACHMENT_MAX_SIZE_MB, formatAttachmen
                     <td>{{ file.author_name || '—' }}</td>
                     <td>{{ file.created_at | date:'dd.MM.yyyy HH:mm' }}</td>
                     <td class="actions">
-                      <button type="button" class="action" (click)="download(file)" [disabled]="busyIds().includes(file.id)">{{ t('download') }}</button>
+                      <button type="button" class="btn btn-g btn-sm" (click)="download(file)" [disabled]="busyIds().includes(file.id)">{{ t('download') }}</button>
                       @if (file.source_type === sourceType() && file.source_id === '' + sourceId() && canUpload() && list.result()?.can_write) {
-                        <button type="button" class="action danger" (click)="remove(file)" [disabled]="busyIds().includes(file.id)">{{ t('delete') }}</button>
+                        <button type="button" class="btn btn-d btn-sm" (click)="remove(file)" [disabled]="busyIds().includes(file.id)">{{ t('delete') }}</button>
                       }
                     </td>
                   </tr>
@@ -147,25 +147,28 @@ import { ATTACHMENT_ACCEPTED_EXTENSIONS, ATTACHMENT_MAX_SIZE_MB, formatAttachmen
     </section>
   `,
   styles: [`
-    :host{display:block;min-width:0;flex-shrink:0}section{padding:12px;min-width:0;color:var(--gray-700,#374151);font-size:12px}section.compact{padding:6px 0 0}
+    :host{display:block;min-width:0;flex-shrink:0}section{padding:12px;min-width:0;color:var(--gray-700,var(--gray-700));font-size:12px}section.compact{padding:6px 0 0}
     .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
-    .search-wrap{position:relative;display:flex;align-items:center}.search-wrap svg{position:absolute;left:10px;width:15px;height:15px;color:var(--gray-400,#9ca3af);pointer-events:none}
-    .search{background:var(--gray-100,#f3f4f6);border:1px solid var(--gray-200,#e5e7eb);border-radius:8px;padding:7px 14px 7px 34px;font-size:13px;width:220px;outline:none;font-family:inherit}.search:focus{border-color:var(--orange,#3BAA5D);background:white}
-    .sel{appearance:none;-webkit-appearance:none;background:var(--gray-100,#f3f4f6) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center;border:1px solid var(--gray-200,#e5e7eb);border-radius:8px;padding:6px 30px 6px 10px;font-size:12.5px;color:var(--gray-700,#374151);outline:none;font-family:inherit;cursor:pointer;max-width:240px}.sel:focus{border-color:var(--orange,#3BAA5D)}
-    .date-range{display:inline-flex;align-items:center;gap:4px}.date-range .sel{padding:5px 6px;width:128px;background-image:none}.date-range.on .sel{border-color:var(--orange,#3BAA5D)}
-    .date-range-lbl,.date-range-endpoint{font-size:12px;font-weight:500;color:var(--gray-500,#6b7280);white-space:nowrap}
-    .date-range-x{font:inherit;border:0;background:none;cursor:pointer;font-size:15px;line-height:1;color:var(--gray-400,#9ca3af);padding:0 2px}.date-range-x:hover{color:var(--orange,#3BAA5D)}
-    .attachment-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}h3{font-size:14px;margin:0;flex:1}h3 span{color:#6b7280;font-weight:400}
-    .hint{color:#6b7280;margin:0 0 12px;line-height:1.5}.table-scroll{overflow:auto;margin:12px 0}table{border-collapse:collapse;width:100%;text-align:left}th,td{padding:9px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top}th{font-size:11px;white-space:nowrap;background:#f9fafb}
-    .file{min-width:140px;max-width:220px}.file .file-link{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}small{display:block;color:#6b7280;margin-top:3px}.file-link,a{color:var(--orange-dark,#15803d);text-decoration:none}.file-link{font:inherit;border:0;background:none;cursor:pointer;text-align:left;padding:0;overflow-wrap:anywhere}
-    .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border-radius:8px;border:1px dashed transparent}.chips.drop-active{border-color:var(--orange,#3BAA5D);background:var(--orange-pale,#E6F4EA);padding:6px}
-    .chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;min-width:0;height:28px;padding:0 4px;border:1px solid #e5e7eb;border-radius:999px;background:#fff;font-size:12px;transition:border-color .15s,box-shadow .15s}.chip:hover{border-color:var(--orange,#3BAA5D);box-shadow:0 1px 2px rgba(0,0,0,.06)}.chip.busy{opacity:.6}
-    .chip-name{font:inherit;border:0;background:none;padding:0;cursor:pointer;color:var(--gray-800,#1f2937);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}.chip-name:hover{color:var(--orange-dark,#2F8F4D);text-decoration:underline}
-    .chip-size{color:#9ca3af;font-size:11px;white-space:nowrap}.chip-remove{font:inherit;border:0;background:none;color:#9ca3af;cursor:pointer;width:20px;height:20px;border-radius:50%;line-height:1;font-size:15px;padding:0}.chip-remove:hover{background:#fee2e2;color:#b91c1c}
-    .file-kind{padding-left:6px;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#9ca3af}
-    .chip.add{font:inherit;font-size:12px;color:var(--orange-dark,#2F8F4D);border-style:dashed;padding:0 10px;cursor:pointer;position:relative;overflow:hidden}.chip.add:hover{background:var(--orange-pale,#E6F4EA)}.chip.add input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}.chip.add:focus-within,.chip.add:focus-visible{outline:2px solid var(--orange,#3BAA5D);outline-offset:2px}
-    .chip-state{font:inherit;border:0;background:none;color:#6b7280;font-size:12px;padding:0 4px}
-    .action,.toggle,.upload{font:inherit;border:1px solid #d1d5db;border-radius:6px;background:white;padding:5px 8px;cursor:pointer;color:inherit}.upload{background:var(--orange-dark,#15803d);color:white;border-color:transparent;position:relative;overflow:hidden}.upload input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}.upload:focus-within{outline:2px solid var(--orange,#3BAA5D);outline-offset:2px}.disabled,button:disabled{opacity:.5;cursor:default}.danger{color:#b91c1c}.actions{white-space:nowrap}.actions button+button{margin-left:4px}.state{text-align:center;padding:20px;color:#6b7280}.badge{background:#f3f4f6;border-radius:4px;padding:3px 6px;white-space:nowrap}.group td{background:var(--orange-pale,#f0fdf4);font-weight:600;color:var(--orange-dark,#15803d)}
+    .search-wrap{position:relative;display:flex;align-items:center}.search-wrap svg{position:absolute;left:10px;width:15px;height:15px;color:var(--gray-400,var(--gray-400));pointer-events:none}
+    .search{background:var(--gray-100,var(--gray-100));border:1px solid var(--gray-200,color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)));border-radius:8px;padding:8px 14px 8px 34px;font-size:14px;width:220px;outline:none;font-family:inherit}.search:focus{border-color:var(--orange,#3BAA5D);background:var(--surface)}
+    .sel{appearance:none;-webkit-appearance:none;background:var(--gray-100,var(--gray-100)) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center;border:1px solid var(--gray-200,color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)));border-radius:8px;padding:6px 30px 6px 10px;font-size:12px;color:var(--gray-700,var(--gray-700));outline:none;font-family:inherit;cursor:pointer;max-width:240px}.sel:focus{border-color:var(--orange,#3BAA5D)}
+    .toolbar :is(.sel,.search){height:30px !important;min-height:30px !important;padding-top:0 !important;padding-bottom:0 !important;font-size:12px !important;border-radius:8px !important;box-sizing:border-box}
+    .toolbar .search{width:200px}
+    .toolbar .date-range input.sel[type=date]{width:128px;padding:0 10px !important;font-weight:500}
+    .date-range{display:inline-flex;align-items:center;gap:4px}.date-range .sel{padding:4px 6px;width:128px;background-image:none}.date-range.on .sel{border-color:var(--orange,#3BAA5D)}
+    .date-range-lbl,.date-range-endpoint{font-size:12px;font-weight:500;color:var(--gray-500,var(--gray-500));white-space:nowrap}
+    .date-range-x{font:inherit;border:0;background:none;cursor:pointer;font-size:16px;line-height:1;color:var(--gray-400,var(--gray-400));padding:0 2px}.date-range-x:hover{color:var(--orange,oklch(from #3baa5d max(l, var(--text-min-l)) c h))}
+    .attachment-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}h3{font-size:14px;margin:0;flex:1}h3 span{color:var(--gray-500);font-weight:400}
+    .hint{color:var(--gray-500);margin:0 0 12px;line-height:1.5}.table-scroll{overflow:auto;margin:12px 0}table{border-collapse:collapse;width:100%;text-align:left}th,td{padding:8px 8px;border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));vertical-align:top}th{font-size:12px;white-space:nowrap;background:var(--gray-50)}
+    .file{min-width:140px;max-width:220px}.file .file-link{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}small{display:block;color:var(--gray-500);margin-top:4px}.file-link,a{color:var(--orange-dark,oklch(from #15803d max(l, var(--text-min-l)) c h));text-decoration:none}.file-link{font:inherit;border:0;background:none;cursor:pointer;text-align:left;padding:0;overflow-wrap:anywhere}
+    .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border-radius:8px;border:1px dashed transparent}.chips.drop-active{border-color:var(--orange,#3BAA5D);background:var(--orange-pale,color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface)));padding:6px}
+    .chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;min-width:0;height:30px;padding:0 4px 0 10px;border:1px solid var(--gray-200,color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)));border-radius:999px;background:var(--gray-50,var(--gray-50));font-size:12px;box-shadow:0 2px 6px rgba(0,0,0,.06);transition:border-color .15s,box-shadow .15s}.chip:hover{border-color:var(--orange,#3BAA5D);box-shadow:0 1px 2px rgba(0,0,0,.06)}.chip.busy{opacity:.6}
+    .chip-name{font:inherit;border:0;background:none;padding:0;cursor:pointer;color:var(--gray-800,var(--gray-800));font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}.chip-name:hover{color:var(--orange-dark,oklch(from #2f8f4d max(l, var(--text-min-l)) c h));text-decoration:underline}
+    .chip-size{color:var(--gray-400);font-size:12px;white-space:nowrap}.chip-remove{font:inherit;border:0;background:none;color:var(--gray-400);cursor:pointer;width:20px;height:20px;border-radius:50%;line-height:1;font-size:16px;padding:0}.chip-remove:hover{background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:oklch(from #b91c1c max(l, var(--text-min-l)) c h)}
+    .file-kind{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)}
+    .chip.add{font:inherit;font-size:12px;font-weight:500;color:var(--orange-dark,oklch(from #2f8f4d max(l, var(--text-min-l)) c h));border:1px dashed var(--orange,#3BAA5D);background:var(--orange-pale,var(--gray-200));box-shadow:none;padding:0 12px;cursor:pointer;position:relative;overflow:hidden}.chip.add:hover{background:color-mix(in srgb, #d5eedd var(--tint-mix), var(--surface))}.chip.add input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}.chip.add:focus-within,.chip.add:focus-visible{outline:2px solid var(--orange,#3BAA5D);outline-offset:2px}
+    .chip-state{font:inherit;border:0;background:none;color:var(--gray-500);font-size:12px;padding:0 4px}
+    .upload{position:relative;overflow:hidden;cursor:pointer}.upload input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}.upload:focus-within{outline:2px solid var(--orange,#3BAA5D);outline-offset:2px}.disabled,button:disabled{opacity:.5;cursor:default}.danger{color:oklch(from #b91c1c max(l, var(--text-min-l)) c h)}.actions{white-space:nowrap}.actions button+button{margin-left:4px}.state{text-align:center;padding:20px;color:var(--gray-500)}.badge{background:var(--gray-100);border-radius:4px;padding:4px 6px;white-space:nowrap}.group td{background:var(--orange-pale,color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface)));font-weight:600;color:var(--orange-dark,oklch(from #15803d max(l, var(--text-min-l)) c h))}
   `],
 })
 export class EntityAttachmentsComponent {

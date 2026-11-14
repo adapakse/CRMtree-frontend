@@ -164,7 +164,7 @@ interface SelectOption { value: string; label: string; }
           @if (isInvoice) { <wt-invoice-fields [(value)]="invoice" /> }
 
           <!-- Dane kontaktowe ds. umowy -->
-          <div class="sec-title" style="margin-top:20px">{{ t('labels.fields.contactSection') }}</div>
+          <div class="sec-title" style="margin-top:24px">{{ t('labels.fields.contactSection') }}</div>
           <div class="fgrid">
             <div class="fg full">
               <label class="fl">{{ t('labels.fields.contactName') }}</label>
@@ -181,14 +181,14 @@ interface SelectOption { value: string; label: string; }
           </div>
 
           <!-- Tags -->
-          <div class="sec-title" style="margin-top:20px">{{ t('newDocument.tags.title') }}</div>
+          <div class="sec-title" style="margin-top:24px">{{ t('newDocument.tags.title') }}</div>
           @for (tag of form.tags; track $index) {
             <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
               <input class="fi" style="flex:1" [placeholder]="t('newDocument.tags.keyPlaceholder')" [(ngModel)]="tag.key">
-              <button class="btn btn-d btn-sm" (click)="removeTag($index)">✕</button>
+              <button class="btn btn-d" (click)="removeTag($index)">✕</button>
             </div>
           }
-          <button class="btn btn-g btn-sm" (click)="addTag()" style="margin-bottom:20px">+ {{ t('labels.addTag') }}</button>
+          <button class="btn btn-g" (click)="addTag()" style="margin-bottom:24px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('labels.addTag') }}</button>
 
           <!-- File Upload -->
           <div class="sec-title">{{ t('newDocument.file.title') }}</div>
@@ -202,8 +202,8 @@ interface SelectOption { value: string; label: string; }
               <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ formatSize(selectedFile.size) }}</div>
               <button class="btn btn-g btn-sm" style="margin-top:8px" (click)="$event.stopPropagation();selectedFile=null">{{ t('newDocument.file.remove') }}</button>
             } @else {
-              <div style="font-size:24px;margin-bottom:8px">📂</div>
-              <div style="font-size:13px;font-weight:600;color:var(--gray-700)">{{ t('newDocument.file.dropHint') }}</div>
+              <div style="margin-bottom:8px;color:var(--gray-400)">📂</div>
+              <div style="font-size:14px;font-weight:600;color:var(--gray-700)">{{ t('newDocument.file.dropHint') }}</div>
               <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ t('newDocument.file.formats') }}</div>
             }
           </div>
@@ -213,7 +213,7 @@ interface SelectOption { value: string; label: string; }
         <div class="pf">
           <button class="btn btn-g" (click)="close.emit()">{{ 'actions.cancel' | transloco }}</button>
           <button class="btn btn-p" [disabled]="!isValid() || saving()" (click)="save()">
-            @if (saving()) { <span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;display:inline-block"></span> }
+            @if (saving()) { <span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:var(--surface);display:inline-block"></span> }
             {{ t('newDocument.create') }}
           </button>
         </div>
@@ -223,14 +223,14 @@ interface SelectOption { value: string; label: string; }
   `,
   styles: [`
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; backdrop-filter: blur(2px); display: flex; align-items: flex-start; justify-content: flex-end; }
-    .panel { width: 640px; height: 100vh; background: white; box-shadow: var(--shadow-lg); overflow-y: auto; display: flex; flex-direction: column; animation: slideIn .2s ease; }
-    .ph { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: flex-start; gap: 12px; background: white; position: sticky; top: 0; z-index: 1; }
+    .panel { width: 640px; height: 100vh; background: var(--surface); box-shadow: var(--shadow-lg); overflow-y: auto; display: flex; flex-direction: column; animation: slideIn .2s ease; }
+    .ph { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: flex-start; gap: 12px; background: var(--surface); position: sticky; top: 0; z-index: 1; }
     .pt { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-900); }
-    .ps { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
+    .ps { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
     .pc { margin-left: auto; cursor: pointer; color: var(--gray-400); padding: 4px; border-radius: 6px; }
     .pc:hover { background: var(--gray-100); color: var(--gray-700); }
     .pb { padding: 24px; flex: 1; }
-    .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 10px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
+    .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
   `],
 })
 export class NewDocumentPanelComponent implements OnInit {

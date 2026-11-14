@@ -42,7 +42,7 @@ import { SeoService } from '../../../core/services/seo.service';
     .hero h1 { font-size:clamp(1.9rem, 4vw, 2.6rem); font-weight:700; line-height:1.2; margin:0 0 1rem; color:var(--gray-900); }
     .hero-sub { font-size:1.1rem; color:var(--gray-600); margin:0 0 2rem; }
     .hero-cta {
-      display:inline-block; background:var(--orange); color:#fff; text-decoration:none;
+      display:inline-block; background:var(--orange-strong); color:#fff; text-decoration:none;
       padding:0.85rem 1.8rem; border-radius:var(--radius); font-weight:600;
     }
     .features {

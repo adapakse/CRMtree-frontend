@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span *ngIf="count > 0"
-          style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">
+          style="background:var(--gray-100);border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">
       {{count}}
     </span>
   `,

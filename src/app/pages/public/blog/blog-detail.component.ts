@@ -151,7 +151,7 @@ import { renderSeoMarkdown } from '../../../shared/utils/seo-markdown.util';
     .post-content ::ng-deep th, .post-content ::ng-deep td {
       border:1px solid var(--gray-200); padding:0.6rem 0.8rem; text-align:left;
     }
-    .post-content ::ng-deep th { background:var(--gray-50, #f9fafb); font-weight:700; color:var(--gray-900); }
+    .post-content ::ng-deep th { background:var(--gray-50, var(--gray-50)); font-weight:700; color:var(--gray-900); }
     .post-content ::ng-deep blockquote {
       margin:1.8rem 0 0; padding:1rem 1.25rem; border-left:4px solid var(--orange);
       background:var(--orange-pale); border-radius:0 var(--radius) var(--radius) 0;
@@ -178,7 +178,7 @@ import { renderSeoMarkdown } from '../../../shared/utils/seo-markdown.util';
     .author-bio { font-size:0.88rem; color:var(--gray-600); line-height:1.5; margin:0.5rem 0 0; }
     .author-linkedin {
       display:inline-flex; align-items:center; gap:0.35rem; margin-top:0.5rem;
-      font-size:0.82rem; font-weight:600; color:#0A66C2; text-decoration:none;
+      font-size:0.82rem; font-weight:600; color:oklch(from #0a66c2 max(l, var(--text-min-l)) c h); text-decoration:none;
     }
     .author-linkedin:hover { text-decoration:underline; }
     .linkedin-icon { flex-shrink:0; }

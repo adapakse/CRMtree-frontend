@@ -119,9 +119,9 @@ const ALWAYS_SHOWN_COLUMN_COUNT = 8;
     .task-row { cursor:pointer; }
     .task-row:hover td { background:var(--gray-50); }
     .task-name { font-weight:600; }
-    .parent { font-size:11.5px; color:var(--gray-500); margin-top:2px; }
-    .secondary-cell { color:var(--gray-600); font-size:12.5px; }
-    .date { white-space:nowrap; font-size:12.5px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
+    .parent { font-size:12px; color:var(--gray-500); margin-top:2px; }
+    .secondary-cell { color:var(--gray-600); font-size:12px; }
+    .date { white-space:nowrap; font-size:12px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
     .amount { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
     .actions { text-align:right; }
     .state-cell { text-align:center; padding:36px 24px !important; color:var(--gray-400); }

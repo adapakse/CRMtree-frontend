@@ -55,16 +55,16 @@ type CallState = 'dialing' | 'connected' | 'ended';
 }
 .call-card {
   background: #1F2933; color: #fff;
-  border-radius: 20px; padding: 36px 40px;
+  border-radius: 16px; padding: 36px 40px;
   min-width: 280px; text-align: center;
   display: flex; flex-direction: column; align-items: center; gap: 10px;
-  box-shadow: 0 24px 60px rgba(0,0,0,.5);
+  box-shadow: 0 14px 39px rgba(0,0,0,0.325);
 }
 .call-icon { font-size: 48px; margin-bottom: 4px; }
 .call-icon-active { animation: ring .8s ease-in-out infinite alternate; }
 @keyframes ring { from { transform: rotate(-10deg); } to { transform: rotate(10deg); } }
-.call-label { font-size: 13px; color: #9ca3af; letter-spacing: .5px; }
-.call-connected { color: #3BAA5D; font-weight: 600; }
+.call-label { font-size: 14px; color: var(--gray-400); letter-spacing: .5px; }
+.call-connected { color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); font-weight: 600; }
 .call-number { font-size: 22px; font-weight: 700; letter-spacing: 1px; margin: 4px 0; }
 .call-timer { font-size: 28px; font-weight: 300; font-variant-numeric: tabular-nums; color: #e5e7eb; }
 .call-dots { display: flex; gap: 6px; margin: 4px 0; }
@@ -78,8 +78,8 @@ type CallState = 'dialing' | 'connected' | 'ended';
 .call-btn { border: none; cursor: pointer; border-radius: 50px; padding: 12px 32px; font-size: 14px; font-weight: 600; margin-top: 16px; }
 .call-btn-end { background: #ef4444; color: #fff; }
 .call-btn-end:hover { background: #dc2626; }
-.call-saving { font-size: 12px; color: #9ca3af; }
-.call-saved { font-size: 13px; color: #3BAA5D; font-weight: 600; }
+.call-saving { font-size: 12px; color: var(--gray-400); }
+.call-saved { font-size: 14px; color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); font-weight: 600; }
   `],
 })
 export class PhoneCallSimulatorComponent implements OnDestroy {

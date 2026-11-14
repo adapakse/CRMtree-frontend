@@ -14,6 +14,12 @@
     "unknownDevice": "Nepoznat uređaj"
   },
   "mySettings": {
+    "appearance": {
+      "dark": "Tamna",
+      "hint": "Svijetla ili tamna tema aplikacije.",
+      "light": "Svijetla",
+      "title": "Izgled"
+    },
     "delete": "Izbriši",
     "manual": {
       "hint": "Interaktivni priručnik za CRMtree sa snimkama zaslona. Otvara se u novoj kartici.",
@@ -22,6 +28,7 @@
     },
     "password": {
       "current": "Trenutna lozinka",
+      "hide": "Sakrij lozinku",
       "hint": "Unesite trenutnu i novu lozinku, najmanje 8 znakova. Promjena odjavljuje vaš račun iz mobilne aplikacije.",
       "mismatch": "Lozinke se ne podudaraju",
       "new": "Nova lozinka",
@@ -29,6 +36,7 @@
       "saveFailed": "Lozinku nije moguće promijeniti",
       "saved": "Lozinka je promijenjena",
       "saving": "Spremanje…",
+      "show": "Prikaži lozinku",
       "submit": "Promijeni lozinku",
       "title": "Promjena lozinke",
       "tooShort": "Lozinka mora imati najmanje 8 znakova"

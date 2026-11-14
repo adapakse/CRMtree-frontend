@@ -43,11 +43,11 @@ type TimelinessFacts = Pick<TaskDeadlineInfo, 'timeliness' | 'days_overdue' | 'i
   `,
   styles: [`
     :host { display:inline-flex; flex-wrap:wrap; align-items:center; gap:4px; }
-    .marker { display:inline-flex; align-items:center; padding:1px 8px; border-radius:10px; font-size:11px; font-weight:600; white-space:nowrap; line-height:1.5; }
-    .overdue { background:#FEE2E2; color:#B91C1C; }
-    .at-risk { background:#FEF3C7; color:#92400E; }
-    .late { background:#F4F4F5; color:#71717A; }
-    .subtasks { background:white; color:#B91C1C; box-shadow:inset 0 0 0 1px #FCA5A5; }
+    .marker { display:inline-flex; align-items:center; padding:1px 8px; border-radius:10px; font-size:12px; font-weight:600; white-space:nowrap; line-height:1.5; }
+    .overdue { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); }
+    .at-risk { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .late { background:var(--gray-100); color:var(--gray-500); }
+    .subtasks { background:var(--surface); color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); box-shadow:inset 0 0 0 1px #FCA5A5; }
     .dot { width:9px; height:9px; padding:0; border-radius:50%; flex-shrink:0; }
     .at-risk.dot { background:#F59E0B; }
     .late.dot { background:#A1A1AA; }

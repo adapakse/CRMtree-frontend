@@ -60,13 +60,13 @@ const transitionKey = (fromStatusId: string, toStatusId: string): string => `${f
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:12px; }
-    .hint { margin:0; font-size:12.5px; color:var(--gray-500); line-height:1.6; }
+    .hint { margin:0; font-size:12px; color:var(--gray-500); line-height:1.6; }
     .roles { display:flex; gap:6px; }
-    .role-btn { border:1.5px solid var(--gray-200); background:white; border-radius:8px; padding:6px 12px; font-size:12.5px; cursor:pointer; color:var(--gray-600); font-family:inherit; }
+    .role-btn { border:1px solid var(--gray-200); background:var(--surface); border-radius:999px; padding:6px 12px; font-size:12px; cursor:pointer; color:var(--gray-600); font-family:inherit; }
     .role-btn.active { border-color:var(--orange); color:var(--orange-dark); background:var(--orange-pale); font-weight:600; }
     .matrix-wrap { overflow-x:auto; }
-    .matrix { border-collapse:collapse; font-size:12.5px; }
-    .matrix th, .matrix td { border:1px solid var(--gray-200); padding:7px 10px; text-align:center; }
+    .matrix { border-collapse:collapse; font-size:12px; }
+    .matrix th, .matrix td { border:1px solid var(--gray-200); padding:8px 10px; text-align:center; }
     .matrix th { background:var(--gray-50); color:var(--gray-600); font-weight:600; white-space:nowrap; }
     .matrix th.from, .matrix th.corner { text-align:left; }
     .same { color:var(--gray-300); }

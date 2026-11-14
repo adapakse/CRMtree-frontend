@@ -115,6 +115,7 @@
     "title": "Activity calendar",
     "views": {
       "day": "Day",
+      "label": "View",
       "month": "Month",
       "tasks": "Tasks",
       "week": "Week"
@@ -529,6 +530,26 @@
     "trainingMode": "Training mode",
     "writeNew": "Write a new email"
   },
+  "fieldErrors": {
+    "closeDate": "Choose the expected close date",
+    "company": "Enter the company name",
+    "contactName": "Enter the contact person's full name",
+    "contactTitle": "Choose the contact person's role",
+    "email": "Enter an email address, e.g. john@company.com",
+    "firstContact": "Choose the first contact date",
+    "industry": "Choose an industry",
+    "lostReason": "Choose the reason for losing",
+    "onlinePct": "Choose the online sales share",
+    "phone": "Enter a phone number, e.g. +48 600 000 000",
+    "probability": "Choose the chance of winning",
+    "salesperson": "Assign a salesperson",
+    "saveFailed": "Couldn't save. Please try again — if it keeps failing, report it to your administrator.",
+    "source": "Choose where the lead came from",
+    "value": "Enter an amount — if you don't know it, enter 0",
+    "valueNegative": "The amount cannot be negative",
+    "valueTooLarge": "Amount too large — the maximum is 999,999,999,999",
+    "website": "Enter the company website, e.g. company.com"
+  },
   "history": {
     "activityAdded": "Activity added: {title}",
     "activityClosed": "Activity closed: {title}",
@@ -741,9 +762,14 @@
       "hot": "Hot"
     },
     "history": {
+      "archived": "Lead moved to archive",
       "converted": "Lead converted to Partner",
       "created": "Lead created",
       "deleted": "Lead deleted",
+      "holdCancelled": "Hold removed",
+      "holdSet": "On hold until {date}",
+      "migrated": "Lead moved",
+      "testAccount": "Trial account",
       "updated": "Lead updated"
     },
     "hold": {
@@ -770,11 +796,11 @@
     },
     "loadError": "Couldn't load the lead.",
     "nip": {
-      "countryCodeRequired": "Enter the country code (2 letters), e.g. PL",
-      "duplicate": "This tax ID is already assigned to another record.",
-      "numberRequired": "Enter the number after the country code",
-      "plTenDigits": "For PL, 10 digits are required after the country code",
-      "required": "Tax ID is required"
+      "countryCodeRequired": "Start with the country code (2 letters), e.g. PL",
+      "duplicate": "This tax ID is already assigned to another company in the CRM",
+      "numberRequired": "Enter the tax ID number after the country code",
+      "plTenDigits": "A Polish tax ID has 10 digits after “PL”, e.g. PL1234567890",
+      "required": "Enter the company tax ID, e.g. PL1234567890"
     },
     "notFound": "Lead not found.",
     "onboarding": {
@@ -922,9 +948,13 @@
       "holdOnlyTitle": "Show only leads on hold",
       "hot": "Hot",
       "mine": "Mine",
+      "peopleGroup": "People",
       "repChip": "Salesperson: {name}",
       "reportFilter": "Report filter: {label}",
       "repsGroup": "Salespeople",
+      "stagesClosed": "Closed",
+      "stagesOpen": "In progress",
+      "teamsGroup": "Teams",
       "wholeGroup": "Whole group: {group}"
     },
     "importCsv": "Import CSV",
@@ -975,6 +1005,7 @@
       "fillRequired": "Fill in the required fields:",
       "fullName": "Full name",
       "hot": "Hot lead",
+      "hotHint": "The client is close to buying — the lead gets 🔥 in the list and on the kanban",
       "namePlaceholder": "John Smith",
       "noExtraContacts": "No additional contacts",
       "notes": "Notes",
@@ -985,10 +1016,11 @@
       "subtitle": "Add a new sales opportunity",
       "taxId": "Tax ID",
       "taxIdErrors": {
-        "countryCode": "Enter the country code (2 letters), e.g. PL",
-        "numberMissing": "Enter the number after the country code",
-        "polishDigits": "For PL, 10 digits are required after the country code",
-        "required": "Tax ID is required"
+        "countryCode": "Start with the country code (2 letters), e.g. PL",
+        "duplicate": "This tax ID is already assigned to another company in the CRM",
+        "numberMissing": "Enter the tax ID number after the country code",
+        "polishDigits": "A Polish tax ID has 10 digits after “PL”, e.g. PL1234567890",
+        "required": "Enter the company tax ID, e.g. PL1234567890"
       },
       "title": "New lead",
       "unassigned": "— unassigned —",
@@ -1036,6 +1068,7 @@
     "title": "Sales leads",
     "view": {
       "kanban": "Kanban",
+      "label": "View",
       "table": "Table",
       "timeline": "Timeline"
     }
@@ -1321,10 +1354,10 @@
     },
     "loadError": "Couldn't load the data.",
     "nip": {
-      "countryCodeRequired": "Enter the country code (2 letters), e.g. PL",
-      "numberRequired": "Enter the number after the country code",
-      "plTenDigits": "For PL, 10 digits are required after the country code",
-      "required": "Tax ID is required"
+      "countryCodeRequired": "Start with the country code (2 letters), e.g. PL",
+      "numberRequired": "Enter the tax ID number after the country code",
+      "plTenDigits": "A Polish tax ID has 10 digits after “PL”, e.g. PL1234567890",
+      "required": "Enter the company tax ID, e.g. PL1234567890"
     },
     "notFound": "Partner not found.",
     "onboarding": {
@@ -1477,11 +1510,11 @@
       "dwhTurnoverHint": "YTD gross turnover from DWH"
     },
     "taxIdErrors": {
-      "countryCode": "Enter the country code (2 letters), e.g. PL",
-      "duplicate": "This tax ID is already assigned to another record.",
-      "numberMissing": "Enter the number after the country code",
-      "polishDigits": "For PL, 10 digits are required after the country code",
-      "required": "Tax ID is required"
+      "countryCode": "Start with the country code (2 letters), e.g. PL",
+      "duplicate": "This tax ID is already assigned to another company in the CRM",
+      "numberMissing": "Enter the tax ID number after the country code",
+      "polishDigits": "A Polish tax ID has 10 digits after “PL”, e.g. PL1234567890",
+      "required": "Enter the company tax ID, e.g. PL1234567890"
     },
     "title": "Partner Registry",
     "toolbar": {
@@ -1495,6 +1528,7 @@
     },
     "view": {
       "cards": "Cards",
+      "label": "View",
       "table": "Table"
     }
   },
@@ -1913,6 +1947,8 @@
       "showAll": "Show all partners with churn risk →"
     },
     "currency": {
+      "billionsPln": "{value}B PLN",
+      "millionsPln": "{value}M PLN",
       "pln": "{value} PLN",
       "thousandsPln": "{value}k PLN"
     },

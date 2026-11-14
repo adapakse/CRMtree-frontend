@@ -86,8 +86,8 @@ function parseOptions(text: string): string[] {
   `,
   styles: [`
     .tfe { display:flex; flex-direction:column; gap:8px; }
-    .hint { margin:0 0 4px; font-size:12.5px; color:var(--gray-500); line-height:1.6; }
-    .muted { margin:0; font-size:13px; color:var(--gray-400); }
+    .hint { margin:0 0 4px; font-size:12px; color:var(--gray-500); line-height:1.6; }
+    .muted { margin:0; font-size:14px; color:var(--gray-400); }
 
     /* Jedna siatka dla wiersza istniejacego pola i dla wiersza dodawania, zeby
        kolumny trzymaly pion. Wczesniej oba byly osobnymi flexami, a typ mial
@@ -102,11 +102,11 @@ function parseOptions(text: string): string[] {
     .row.inactive .name { opacity:.55; text-decoration:line-through; }
     .row.add { padding-top:10px; margin-top:2px; border-top:1px dashed var(--gray-200); }
     .name { min-width:0; }
-    .type { font-size:12.5px; color:var(--gray-600); white-space:nowrap; }
+    .type { font-size:12px; color:var(--gray-600); white-space:nowrap; }
     .type-select { min-width:0; }
     .options { min-width:0; }
     .active-toggle {
-      display:flex; align-items:center; gap:6px; font-size:12.5px;
+      display:flex; align-items:center; gap:6px; font-size:12px;
       color:var(--gray-600); white-space:nowrap; justify-self:end;
     }
     /* Przycisk dodawania zajmuje dwie ostatnie kolumny, czyli konczy sie tam,
@@ -116,11 +116,11 @@ function parseOptions(text: string): string[] {
        Samo „btn-primary" jest klasą prywatną komponentu ustawień i tutaj nie
        działa — przycisk wyglądałby jak surowy, systemowy. */
     .row .del {
-      border:1px solid var(--gray-300); background:white;
+      border:1px solid var(--gray-300); background:var(--surface);
       color:var(--gray-400); border-radius:6px; width:26px; height:26px;
       cursor:pointer; font-size:12px; line-height:1;
     }
-    .row .del:hover:not(:disabled) { border-color:#fca5a5; color:#dc2626; background:#fef2f2; }
+    .row .del:hover:not(:disabled) { border-color:#fca5a5; color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); }
     .row .del:disabled { opacity:.5; cursor:default; }
   `],
 })

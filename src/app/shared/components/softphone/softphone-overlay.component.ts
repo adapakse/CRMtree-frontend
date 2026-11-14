@@ -30,7 +30,7 @@ function fmtDuration(sec: number): string {
 <div *ngIf="micErrorMsg"
      style="position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:10000;
             background:#dc2626;color:#fff;border-radius:10px;padding:12px 20px;
-            font-size:13px;font-weight:600;max-width:360px;text-align:center;
+            font-size:14px;font-weight:600;max-width:360px;text-align:center;
             box-shadow:0 4px 16px rgba(0,0,0,.3)">
   🎙️ {{micErrorMsg}}
 </div>
@@ -62,7 +62,7 @@ function fmtDuration(sec: number): string {
 
     <!-- Spinner lookup -->
     <div *ngIf="call.contextLoading"
-         style="display:flex;align-items:center;gap:5px;font-size:11px;color:#9ca3af;margin-top:5px">
+         style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--gray-400);margin-top:4px">
       <span class="sp-spinner"></span> {{ t('softphone.lookingUpContact') }}
     </div>
 
@@ -70,15 +70,15 @@ function fmtDuration(sec: number): string {
     <button *ngIf="!call.contextLoading && call.context.entityType"
             (click)="goToEntity()"
             style="display:block;width:100%;text-align:left;background:#374151;
-                   border:1px solid #3BAA5D;border-radius:6px;padding:7px 10px;
-                   margin-top:6px;cursor:pointer;color:#4ade80;font-size:12px;
+                   border:1px solid #3BAA5D;border-radius:6px;padding:8px 10px;
+                   margin-top:6px;cursor:pointer;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);font-size:12px;
                    font-weight:600;font-family:inherit">
       🔗 {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
     </button>
 
     <!-- Nie znaleziono -->
     <div *ngIf="!call.contextLoading && !call.context.entityType"
-         style="font-size:11px;color:#6b7280;margin-top:4px">
+         style="font-size:12px;color:var(--gray-500);margin-top:4px">
       {{ t('softphone.incoming.unknownNumber') }}
     </div>
 
@@ -107,14 +107,14 @@ function fmtDuration(sec: number): string {
     <div class="sp-caller">{{ call.displayName }}</div>
 
     <div *ngIf="call.contextLoading"
-         style="display:flex;align-items:center;gap:5px;font-size:11px;color:#9ca3af;margin-top:4px">
+         style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--gray-400);margin-top:4px">
       <span class="sp-spinner"></span> {{ t('softphone.lookingUpContact') }}
     </div>
     <button *ngIf="!call.contextLoading && call.context.entityType"
             (click)="goToEntity()"
             style="display:block;width:100%;text-align:left;background:#374151;
-                   border:1px solid #3BAA5D;border-radius:6px;padding:7px 10px;
-                   margin-top:6px;cursor:pointer;color:#4ade80;font-size:12px;
+                   border:1px solid #3BAA5D;border-radius:6px;padding:8px 10px;
+                   margin-top:6px;cursor:pointer;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);font-size:12px;
                    font-weight:600;font-family:inherit">
       🔗 {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
     </button>
@@ -140,25 +140,25 @@ function fmtDuration(sec: number): string {
   <!-- Formularz notatki po zakończeniu -->
   <ng-container *ngIf="call.phase === 'post-call'">
     <div class="sp-phase-label">📞 {{ t('softphone.postCall.title') }}</div>
-    <div class="sp-caller" style="font-size:13px">
+    <div class="sp-caller" style="font-size:14px">
       {{ call.displayName }}
-      <span *ngIf="call.durationSec > 0" style="color:#9ca3af;font-weight:400"> · {{ fmtDuration(call.durationSec) }}</span>
+      <span *ngIf="call.durationSec > 0" style="color:var(--gray-400);font-weight:400"> · {{ fmtDuration(call.durationSec) }}</span>
     </div>
-    <div *ngIf="call.context.entityType" style="font-size:11px;color:#6b7280;margin-top:2px">
+    <div *ngIf="call.context.entityType" style="font-size:12px;color:var(--gray-500);margin-top:2px">
       {{ t(call.context.entityType === 'lead' ? 'softphone.postCall.savedOnLead' : 'softphone.postCall.savedOnPartner') }}
     </div>
 
     <!-- Status transkrypcji -->
     <div *ngIf="transcriptionState === 'loading'"
-         style="font-size:11px;color:#9ca3af;margin-top:6px;display:flex;align-items:center;gap:4px">
+         style="font-size:12px;color:var(--gray-400);margin-top:6px;display:flex;align-items:center;gap:4px">
       <span class="sp-spinner"></span> {{ t('softphone.postCall.transcriptLoading') }}
     </div>
     <div *ngIf="transcriptionState === 'loaded'"
-         style="font-size:11px;color:#4ade80;margin-top:6px">
+         style="font-size:12px;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);margin-top:6px">
       ✓ {{ t('softphone.postCall.transcriptLoaded') }}
     </div>
     <div *ngIf="transcriptionState === 'unavailable'"
-         style="font-size:11px;color:#9ca3af;margin-top:6px">
+         style="font-size:12px;color:var(--gray-400);margin-top:6px">
       {{ t('softphone.postCall.transcriptUnavailable') }}
     </div>
 
@@ -170,7 +170,7 @@ function fmtDuration(sec: number): string {
       <button class="sp-btn sp-btn-cancel"
               [disabled]="saving"
               (click)="saveActivity(false)"
-              style="flex:0 0 auto;padding:9px 10px;font-size:12px">
+              style="flex:0 0 auto;padding:8px 10px;font-size:12px">
         {{ t('softphone.postCall.withoutNote') }}
       </button>
       <button class="sp-btn sp-btn-save" [disabled]="saving" (click)="saveActivity(true)">
@@ -188,16 +188,16 @@ function fmtDuration(sec: number): string {
   z-index: 9999;
 }
 .sp-card {
-  background: #fff; border-radius: 14px; padding: 24px 28px;
-  box-shadow: 0 8px 32px rgba(0,0,0,.22); min-width: 280px;
+  background: var(--surface); border-radius: 14px; padding: 24px 28px;
+  box-shadow: 0 7px 29px rgba(0,0,0,0.198); min-width: 280px;
 }
 .sp-confirm .sp-title {
-  font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 14px;
+  font-size: 16px; font-weight: 700; color: var(--gray-800); margin-bottom: 14px;
 }
 .sp-number-input {
   width: 100%; box-sizing: border-box;
-  border: 1.5px solid #d1d5db; border-radius: 8px;
-  padding: 9px 12px; font-size: 15px; outline: none;
+  border: 1.5px solid var(--gray-300); border-radius: 8px;
+  padding: 8px 12px; font-size: 16px; outline: none;
 }
 .sp-number-input:focus { border-color: #3BAA5D; }
 
@@ -205,19 +205,19 @@ function fmtDuration(sec: number): string {
   position: fixed; bottom: 24px; right: 24px; z-index: 9998;
   background: #1f2937; color: #f9fafb;
   border-radius: 14px; padding: 18px 20px; min-width: 240px;
-  box-shadow: 0 8px 32px rgba(0,0,0,.35);
+  box-shadow: 0 7px 29px rgba(0,0,0,0.315);
   transition: min-width .2s ease;
 }
 .sp-widget-wide { min-width: 360px; }
 
 .sp-phase-label {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .6px; color: #9ca3af; margin-bottom: 6px;
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .6px; color: var(--gray-400); margin-bottom: 6px;
 }
-.sp-label-active  { color: #4ade80; }
+.sp-label-active  { color: oklch(from #4ade80 max(l, var(--text-min-l)) c h); }
 .sp-label-incoming { color: #60a5fa; }
 .sp-caller {
-  font-size: 15px; font-weight: 600; color: #f9fafb;
+  font-size: 16px; font-weight: 600; color: #f9fafb;
   margin-bottom: 2px;
 }
 .sp-duration {
@@ -226,8 +226,8 @@ function fmtDuration(sec: number): string {
 }
 .sp-row { display: flex; align-items: center; }
 .sp-btn {
-  flex: 1; padding: 9px 12px; border-radius: 8px;
-  font-size: 13px; font-weight: 600; border: none; cursor: pointer;
+  flex: 1; padding: 8px 12px; border-radius: 8px;
+  font-size: 14px; font-weight: 600; border: none; cursor: pointer;
   transition: opacity .15s;
 }
 .sp-btn:hover:not(:disabled) { opacity: .85; }
@@ -241,14 +241,14 @@ function fmtDuration(sec: number): string {
 .sp-note {
   width: 100%; box-sizing: border-box; margin-top: 10px;
   background: #374151; color: #f9fafb; border: 1.5px solid #4b5563;
-  border-radius: 8px; padding: 10px 12px; font-size: 13px;
+  border-radius: 8px; padding: 10px 12px; font-size: 14px;
   resize: vertical; outline: none; font-family: inherit; line-height: 1.5;
 }
-.sp-note::placeholder { color: #6b7280; }
+.sp-note::placeholder { color: var(--gray-500); }
 .sp-note:focus { border-color: #3BAA5D; }
 .sp-note:disabled { opacity: .6; cursor: wait; }
 .sp-error {
-  font-size: 11px; color: #f87171; margin-top: 6px;
+  font-size: 12px; color: #f87171; margin-top: 6px;
 }
 .sp-spinner {
   display: inline-block; width: 10px; height: 10px;
@@ -258,14 +258,14 @@ function fmtDuration(sec: number): string {
 @keyframes sp-spin { to { transform: rotate(360deg); } }
 .sp-dtmf-display {
   background: #111827; border: 1px solid #374151; border-radius: 6px;
-  padding: 5px 10px; margin: 8px 0 4px;
-  font-size: 15px; font-weight: 700; letter-spacing: 3px;
+  padding: 4px 10px; margin: 8px 0 4px;
+  font-size: 16px; font-weight: 700; letter-spacing: 3px;
   color: #f9fafb; text-align: right; min-height: 28px;
   font-variant-numeric: tabular-nums; font-family: monospace;
 }
 .sp-dtmf-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 5px; margin: 0 0 4px;
+  gap: 4px; margin: 0 0 4px;
 }
 .sp-dtmf-key {
   background: #374151; color: #f9fafb;

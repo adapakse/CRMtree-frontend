@@ -28,18 +28,18 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
           <span class="channel-name">LinkedIn</span>
           @if (isConnected('linkedin')) {
             <span class="channel-connected">{{ t('seo.socialChannels.connected') }}{{ accountName('linkedin') ? ' — ' + accountName('linkedin') : '' }}</span>
-            <button type="button" class="btn-ghost btn-sm" (click)="disconnect('linkedin')">{{ t('seo.socialChannels.disconnect') }}</button>
+            <button type="button" class="btn btn-g btn-sm" (click)="disconnect('linkedin')">{{ t('seo.socialChannels.disconnect') }}</button>
           } @else {
-            <button type="button" class="btn-ghost btn-sm" (click)="connect('linkedin')">{{ t('seo.socialChannels.connect') }}</button>
+            <button type="button" class="btn btn-g btn-sm" (click)="connect('linkedin')">{{ t('seo.socialChannels.connect') }}</button>
           }
         </div>
         <div class="channel-row">
           <span class="channel-name">Facebook</span>
           @if (isConnected('facebook')) {
             <span class="channel-connected">{{ t('seo.socialChannels.connected') }}{{ accountName('facebook') ? ' — ' + accountName('facebook') : '' }}</span>
-            <button type="button" class="btn-ghost btn-sm" (click)="disconnect('facebook')">{{ t('seo.socialChannels.disconnect') }}</button>
+            <button type="button" class="btn btn-g btn-sm" (click)="disconnect('facebook')">{{ t('seo.socialChannels.disconnect') }}</button>
           } @else {
-            <button type="button" class="btn-ghost btn-sm" (click)="connect('facebook')">{{ t('seo.socialChannels.connect') }}</button>
+            <button type="button" class="btn btn-g btn-sm" (click)="connect('facebook')">{{ t('seo.socialChannels.connect') }}</button>
           }
         </div>
         <div class="channel-row">
@@ -54,7 +54,7 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
           <span class="channel-name">WordPress</span>
           @if (isConnected('wordpress')) {
             <span class="channel-connected">{{ t('seo.socialChannels.connected') }}{{ accountName('wordpress') ? ' — ' + accountName('wordpress') : '' }}</span>
-            <button type="button" class="btn-ghost btn-sm" (click)="disconnect('wordpress')">{{ t('seo.socialChannels.disconnect') }}</button>
+            <button type="button" class="btn btn-g btn-sm" (click)="disconnect('wordpress')">{{ t('seo.socialChannels.disconnect') }}</button>
           } @else {
             <span class="channel-hint">{{ t('seo.socialChannels.wordpressHint') }}</span>
           }
@@ -67,7 +67,7 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
             <input class="field-input" [(ngModel)]="wpUsername" [placeholder]="t('seo.socialChannels.wordpress.usernamePlaceholder')">
             <label class="field-label">{{ t('seo.socialChannels.wordpress.appPassword') }}</label>
             <input class="field-input" type="password" [(ngModel)]="wpAppPassword" [placeholder]="t('seo.socialChannels.wordpress.appPasswordPlaceholder')">
-            <button type="button" class="btn-ghost btn-sm" (click)="connectWordpress()" [disabled]="connectingWp() || !wpSiteUrl || !wpUsername || !wpAppPassword">
+            <button type="button" class="btn btn-g btn-sm" (click)="connectWordpress()" [disabled]="connectingWp() || !wpSiteUrl || !wpUsername || !wpAppPassword">
               @if (connectingWp()) { {{ t('seo.socialChannels.wordpress.connecting') }} } @else { {{ t('seo.socialChannels.wordpress.connect') }} }
             </button>
           </div>
@@ -77,7 +77,7 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
     </ng-container>
   `,
   styles: [`
-    .channels-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
+    .channels-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: var(--surface); }
     .hint { font-size: 0.78rem; color: var(--gray-500); margin: 0 0 0.9rem; }
     .channels-list { display: flex; flex-direction: column; gap: 0.5rem; }
     .channel-row {
@@ -87,9 +87,6 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
     .channel-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); min-width: 5.5rem; }
     .channel-connected { font-size: 0.82rem; color: var(--orange-dark); flex: 1; }
     .channel-hint { font-size: 0.78rem; color: var(--gray-500); flex: 1; }
-    .btn-ghost { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--gray-100); color: var(--gray-800); }
-    .btn-ghost:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.8rem; white-space: nowrap; }
     .wp-row { align-items: flex-start; }
     .wp-form {
       display: flex; flex-direction: column; gap: 0.3rem;

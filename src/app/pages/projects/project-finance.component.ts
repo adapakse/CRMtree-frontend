@@ -54,7 +54,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:16px; }
-    .read-only-note { font-size:12.5px; color:var(--gray-500); }
+    .read-only-note { font-size:12px; color:var(--gray-500); }
   `],
 })
 export class ProjectFinanceComponent implements OnInit {

@@ -70,28 +70,28 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
       <header class="seo-header">
         <h1>{{ t('seo.main.title') }}</h1>
         <div class="header-actions">
-          <button type="button" class="btn-ghost section-toggle" [class.active]="showStrategy()" (click)="showStrategy.set(!showStrategy())">
+          <button type="button" class="fchip section-toggle" [class.on]="showStrategy()" (click)="showStrategy.set(!showStrategy())">
             {{ t('seo.main.header.strategyToggle', { count: pillars().length }) }}
           </button>
-          <button type="button" class="btn-ghost section-toggle" [class.active]="showAuthors()" (click)="showAuthors.set(!showAuthors())">
+          <button type="button" class="fchip section-toggle" [class.on]="showAuthors()" (click)="showAuthors.set(!showAuthors())">
             {{ t('seo.main.header.authorsToggle', { count: authors().length }) }}
           </button>
-          <button type="button" class="btn-ghost section-toggle" [class.active]="showScreenshots()" (click)="showScreenshots.set(!showScreenshots())">{{ t('seo.main.header.screenshotsToggle') }}</button>
-          <button type="button" class="btn-ghost section-toggle" [class.active]="showChannels()" (click)="showChannels.set(!showChannels())">{{ t('seo.main.sections.channels') }}</button>
-          <button type="button" class="btn-ghost section-toggle" [class.active]="showCalendar()" (click)="showCalendar.set(!showCalendar())">{{ t('seo.main.sections.calendar') }}</button>
-          <button type="button" class="btn-ghost section-toggle" [class.active]="showSettings()" (click)="showSettings.set(!showSettings())">{{ t('seo.main.sections.settings') }}</button>
-          <button type="button" class="btn-accent" (click)="generate()" [disabled]="generating()">
+          <button type="button" class="fchip section-toggle" [class.on]="showScreenshots()" (click)="showScreenshots.set(!showScreenshots())">{{ t('seo.main.header.screenshotsToggle') }}</button>
+          <button type="button" class="fchip section-toggle" [class.on]="showChannels()" (click)="showChannels.set(!showChannels())">{{ t('seo.main.sections.channels') }}</button>
+          <button type="button" class="fchip section-toggle" [class.on]="showCalendar()" (click)="showCalendar.set(!showCalendar())">{{ t('seo.main.sections.calendar') }}</button>
+          <button type="button" class="fchip section-toggle" [class.on]="showSettings()" (click)="showSettings.set(!showSettings())">{{ t('seo.main.sections.settings') }}</button>
+          <button type="button" class="btn btn-p btn-sm" (click)="generate()" [disabled]="generating()">
             @if (generating()) { {{ t('seo.main.generate.inProgress') }} } @else { {{ t('seo.main.generate.action') }} }
           </button>
           <div class="gsc-status">
             @if (gsc()?.connected) {
               <span class="gsc-badge gsc-connected">{{ t('seo.main.gsc.connected', { siteUrl: gsc()?.site_url }) }}</span>
-              <button type="button" class="btn-ghost btn-sm" (click)="syncGsc()" [disabled]="syncingGsc()">
+              <button type="button" class="btn btn-g btn-sm" (click)="syncGsc()" [disabled]="syncingGsc()">
                 @if (syncingGsc()) { {{ t('seo.main.gsc.syncing') }} } @else { {{ t('seo.main.gsc.syncNow') }} }
               </button>
-              <button type="button" class="btn-ghost btn-sm" (click)="disconnectGsc()">{{ t('seo.main.gsc.disconnect') }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="disconnectGsc()">{{ t('seo.main.gsc.disconnect') }}</button>
             } @else {
-              <button type="button" class="btn-ghost" (click)="connectGsc()">{{ t('seo.main.gsc.connect') }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="connectGsc()">{{ t('seo.main.gsc.connect') }}</button>
             }
           </div>
         </div>
@@ -142,8 +142,8 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
           @for (s of statusFilters; track s.value) {
             <button
               type="button"
-              class="tab"
-              [class.active]="statusFilter() === s.value"
+              class="fchip"
+              [class.on]="statusFilter() === s.value"
               (click)="setStatusFilter(s.value)"
             >{{ t(s.labelKey) }}</button>
           }
@@ -184,8 +184,8 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
             }
             <div class="image-controls">
               <input class="image-url-input" [(ngModel)]="editImageUrl" [placeholder]="t('seo.main.detail.image.urlPlaceholder')">
-              <button type="button" class="btn-ghost btn-sm" (click)="saveImageUrl(d.id)">{{ t('seo.main.detail.image.save') }}</button>
-              <button type="button" class="btn-ghost btn-sm" (click)="rerollImage(d.id)" [disabled]="rerolling()">
+              <button type="button" class="btn btn-g btn-sm" (click)="saveImageUrl(d.id)">{{ t('seo.main.detail.image.save') }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="rerollImage(d.id)" [disabled]="rerolling()">
                 @if (rerolling()) { {{ t('seo.main.detail.image.rerolling') }} } @else { {{ t('seo.main.detail.image.reroll') }} }
               </button>
             </div>
@@ -226,7 +226,7 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
                 <label for="scheduleInput">{{ t('seo.main.schedule.label') }}</label>
                 <input id="scheduleInput" type="datetime-local" [(ngModel)]="editScheduledAt" (change)="saveScheduledAt(d.id)">
                 @if (editScheduledAt) {
-                  <button type="button" class="btn-ghost btn-sm" (click)="clearSchedule(d.id)">{{ t('seo.main.schedule.clear') }}</button>
+                  <button type="button" class="btn btn-g btn-sm" (click)="clearSchedule(d.id)">{{ t('seo.main.schedule.clear') }}</button>
                 }
               </div>
             } @else if (d.status === 'scheduled' && d.scheduled_at) {
@@ -235,24 +235,24 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
 
             <div class="detail-actions">
               @if (isEditable(d.status)) {
-                <button type="button" class="btn-ghost" (click)="saveEdits(d.id)">{{ t('seo.main.actions.saveChanges') }}</button>
+                <button type="button" class="btn btn-g btn-sm" (click)="saveEdits(d.id)">{{ t('seo.main.actions.saveChanges') }}</button>
               }
               @if (d.status === 'in_review' || d.status === 'needs_update') {
-                <button type="button" class="btn-reject" (click)="reject(d.id)">{{ t('seo.main.actions.reject') }}</button>
+                <button type="button" class="btn btn-d btn-sm" (click)="reject(d.id)">{{ t('seo.main.actions.reject') }}</button>
               }
               @if (d.status === 'scheduled') {
-                <button type="button" class="btn-reject" (click)="unpublish(d.id)">{{ t('seo.main.actions.cancelSchedule') }}</button>
+                <button type="button" class="btn btn-d btn-sm" (click)="unpublish(d.id)">{{ t('seo.main.actions.cancelSchedule') }}</button>
               }
               @if (d.status === 'draft' || d.status === 'in_review' || d.status === 'needs_update') {
-                <button type="button" class="btn-accent" (click)="approve(d.id)" [disabled]="pendingSlotCount() > 0"
+                <button type="button" class="btn btn-p btn-sm" (click)="approve(d.id)" [disabled]="pendingSlotCount() > 0"
                         [title]="pendingSlotCount() > 0 ? t('seo.main.actions.pendingSlotsHint') : ''">
                   @if (editScheduledAt) { {{ t('seo.main.actions.approveAndSchedule') }} } @else { {{ t('seo.main.actions.approveAndPublish') }} }
                 </button>
               }
               @if (d.status === 'published') {
-                <button type="button" class="btn-reject" (click)="unpublish(d.id)">{{ t('seo.main.actions.unpublish') }}</button>
+                <button type="button" class="btn btn-d btn-sm" (click)="unpublish(d.id)">{{ t('seo.main.actions.unpublish') }}</button>
                 @if (!d.refresh_reason) {
-                  <button type="button" class="btn-ghost" (click)="requestRefresh(d.id)">{{ t('seo.main.actions.markForRefresh') }}</button>
+                  <button type="button" class="btn btn-g btn-sm" (click)="requestRefresh(d.id)">{{ t('seo.main.actions.markForRefresh') }}</button>
                 }
               }
             </div>
@@ -295,9 +295,9 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
                     {{ t('seo.main.refresh.generatedInfo', { date: (draft.generated_at | date:'d MMM y, HH:mm'), cost: draft.cost_usd, facts: draft.facts_used }) }}
                   </p>
                   <div class="detail-actions">
-                    <button type="button" class="btn-accent" (click)="applyRefresh(d.id)">{{ t('seo.main.refresh.apply') }}</button>
-                    <button type="button" class="btn-ghost" (click)="generateRefresh(d.id)">{{ t('seo.main.refresh.regenerate') }}</button>
-                    <button type="button" class="btn-reject" (click)="dismissRefresh(d.id)">{{ t('seo.main.refresh.dismissDraft') }}</button>
+                    <button type="button" class="btn btn-p btn-sm" (click)="applyRefresh(d.id)">{{ t('seo.main.refresh.apply') }}</button>
+                    <button type="button" class="btn btn-g btn-sm" (click)="generateRefresh(d.id)">{{ t('seo.main.refresh.regenerate') }}</button>
+                    <button type="button" class="btn btn-d btn-sm" (click)="dismissRefresh(d.id)">{{ t('seo.main.refresh.dismissDraft') }}</button>
                   </div>
                   }
                 } @else {
@@ -305,8 +305,8 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
                     <p class="social-error">{{ t('seo.main.refresh.failed', { error: d.refresh_error }) }}</p>
                   }
                   <div class="detail-actions">
-                    <button type="button" class="btn-accent" (click)="generateRefresh(d.id)">{{ t('seo.main.refresh.prepare') }}</button>
-                    <button type="button" class="btn-reject" (click)="dismissRefresh(d.id)">{{ t('seo.main.refresh.notNeeded') }}</button>
+                    <button type="button" class="btn btn-p btn-sm" (click)="generateRefresh(d.id)">{{ t('seo.main.refresh.prepare') }}</button>
+                    <button type="button" class="btn btn-d btn-sm" (click)="dismissRefresh(d.id)">{{ t('seo.main.refresh.notNeeded') }}</button>
                   </div>
                 }
               </div>
@@ -321,7 +321,7 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
                 @if (d.status === 'published' && unpublishedSocialPlatforms().length > 0) {
                   <div class="social-actions">
                     @for (platform of unpublishedSocialPlatforms(); track platform) {
-                      <button type="button" class="btn-ghost btn-sm" (click)="retrySocialPost(d.id, platform)" [disabled]="retryingSocial().has(platform)">
+                      <button type="button" class="btn btn-g btn-sm" (click)="retrySocialPost(d.id, platform)" [disabled]="retryingSocial().has(platform)">
                         @if (retryingSocial().has(platform)) { {{ t('seo.main.social.publishing') }} } @else { {{ t('seo.main.social.publishOn', { platform: platformLabel(platform) }) }} }
                       </button>
                     }
@@ -341,10 +341,10 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
                     }
                     <textarea class="social-textarea" [ngModel]="post.body" (ngModelChange)="setSocialBody(post.platform, $event)" rows="4"></textarea>
                     <div class="social-actions">
-                      <button type="button" class="btn-ghost btn-sm" (click)="saveSocialPost(d.id, post.platform)">{{ 'actions.save' | transloco }}</button>
-                      <button type="button" class="btn-ghost btn-sm" (click)="copySocialBody(post.body)">{{ t('seo.main.social.copy') }}</button>
+                      <button type="button" class="btn btn-g btn-sm" (click)="saveSocialPost(d.id, post.platform)">{{ 'actions.save' | transloco }}</button>
+                      <button type="button" class="btn btn-g btn-sm" (click)="copySocialBody(post.body)">{{ t('seo.main.social.copy') }}</button>
                       @if (post.status === 'failed' || post.status === 'draft') {
-                        <button type="button" class="btn-ghost btn-sm" (click)="retrySocialPost(d.id, post.platform)" [disabled]="retryingSocial().has(post.platform)">
+                        <button type="button" class="btn btn-g btn-sm" (click)="retrySocialPost(d.id, post.platform)" [disabled]="retryingSocial().has(post.platform)">
                           @if (retryingSocial().has(post.platform)) { {{ t('seo.main.social.publishing') }} } @else { {{ t('seo.main.social.publishOrRetry') }} }
                         </button>
                       }
@@ -375,27 +375,25 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
     .gsc-badge { font-size: 0.82rem; padding: 0.4rem 0.8rem; border-radius: var(--radius); }
     .gsc-connected { background: var(--orange-pale); color: var(--orange-dark); }
     .status-tabs { display:flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .tab { border: 1px solid var(--gray-200); background: #fff; border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.82rem; cursor: pointer; }
-    .tab.active { background: var(--orange); color: #fff; border-color: var(--orange); }
     .seo-layout { display: grid; grid-template-columns: 340px 1fr; gap: 1.25rem; align-items: start; }
     .seo-list { display: flex; flex-direction: column; gap: 0.4rem; }
     .content-row {
       display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem;
       text-align: left; padding: 0.7rem 0.9rem; border: 1px solid var(--gray-200); border-radius: var(--radius);
-      background: #fff; cursor: pointer;
+      background: var(--surface); cursor: pointer;
     }
     .content-row.selected { border-color: var(--orange); background: var(--orange-pale); }
     .row-title { font-size: 0.9rem; font-weight: 600; color: var(--gray-900); }
     .row-locale { font-size: 0.72rem; color: var(--gray-500); text-transform: uppercase; }
     .row-metrics { font-size: 0.72rem; color: var(--gray-500); }
     .refresh-pill { font-size: 0.7rem; font-weight: 600; color: var(--orange-dark); background: var(--orange-pale); border-radius: 999px; padding: 0.1rem 0.5rem; }
-    .refresh-box { border: 1px solid var(--orange-muted, #bfe3c9); background: #fbfdfb; border-radius: var(--radius); margin-top: 1.25rem; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .refresh-box { border: 1px solid var(--orange-muted, #bfe3c9); background: var(--gray-50); border-radius: var(--radius); margin-top: 1.25rem; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
     .refresh-box h3 { font-size: 0.9rem; margin: 0; color: var(--gray-800); }
     .refresh-reason { font-size: 0.85rem; margin: 0; color: var(--gray-800); }
     .refresh-note { font-size: 0.78rem; color: var(--gray-500); margin: 0; }
     .refresh-generating { font-size: 0.85rem; color: var(--orange-dark); margin: 0; }
     .refresh-label { font-size: 0.78rem; font-weight: 600; color: var(--gray-700); }
-    .refresh-warnings { font-size: 0.78rem; color: #92400E; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 0.5rem 0.75rem; }
+    .refresh-warnings { font-size: 0.78rem; color: oklch(from #92400e max(l, var(--text-min-l)) c h); background: color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border: 1px solid #FDE68A; border-radius: 8px; padding: 0.5rem 0.75rem; }
     .refresh-warnings ul { margin: 0.3rem 0 0; padding-left: 1.1rem; }
     .refresh-queries { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
     .query-chip { font-size: 0.75rem; background: var(--gray-100); border-radius: 999px; padding: 0.15rem 0.6rem; color: var(--gray-700); }
@@ -405,9 +403,9 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
       padding: 0.15em 0.55em; border-radius: 4px; background: var(--gray-100); color: var(--gray-600);
     }
     .status-pill[data-status="published"] { background: var(--orange-pale); color: var(--orange-dark); }
-    .status-pill[data-status="in_review"], .status-pill[data-status="needs_update"] { background: #FEF3C7; color: #92400E; }
+    .status-pill[data-status="in_review"], .status-pill[data-status="needs_update"] { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .status-pill[data-status="draft"] { background: var(--gray-100); color: var(--gray-600); }
-    .seo-detail { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem; }
+    .seo-detail { background: var(--surface); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem; }
     .header-image { width: 100%; max-height: 240px; object-fit: cover; border-radius: var(--radius); margin-bottom: 0.9rem; }
     .metrics-row {
       display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
@@ -417,11 +415,10 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
     .metrics-note { font-weight: 400; color: var(--gray-500); font-size: 0.72rem; }
     .image-controls { display: flex; gap: 0.5rem; margin-bottom: 0.9rem; }
     .image-url-input { flex: 1; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.5rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
-    .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.82rem; white-space: nowrap; }
     .title-input { width: 100%; font-size: 1.1rem; font-weight: 700; border: none; padding: 0; }
     .author-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem; font-size: 0.85rem; color: var(--gray-700); }
     .author-row select { border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
-    .author-missing-note { font-size: 0.75rem; color: #92400E; background: #FEF3C7; border-radius: 999px; padding: 0.15rem 0.6rem; }
+    .author-missing-note { font-size: 0.75rem; color: oklch(from #92400e max(l, var(--text-min-l)) c h); background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); border-radius: 999px; padding: 0.15rem 0.6rem; }
     .meta-input, .body-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; margin-top: 0.6rem; font-family: inherit; }
     .internal-links-row { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.75rem; }
     .internal-links-label { font-size: 0.78rem; color: var(--gray-500); }
@@ -440,23 +437,13 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
       padding: 0.15em 0.55em; border-radius: 4px; background: var(--gray-100); color: var(--gray-600);
     }
     .social-status[data-status="published"] { background: var(--orange-pale); color: var(--orange-dark); }
-    .social-status[data-status="failed"] { background: #FEE2E2; color: #991B1B; }
-    .social-status[data-status="queued"] { background: #FEF3C7; color: #92400E; }
+    .social-status[data-status="failed"] { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .social-status[data-status="queued"] { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .social-view-link { font-size: 0.78rem; color: var(--orange-dark); margin-left: auto; }
-    .social-error { font-size: 0.78rem; color: #991B1B; margin: 0 0 0.5rem; }
-    .social-textarea { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; font-family: inherit; font-size: 0.85rem; background: #fff; }
+    .social-error { font-size: 0.78rem; color: oklch(from #991b1b max(l, var(--text-min-l)) c h); margin: 0 0 0.5rem; }
+    .social-textarea { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; font-family: inherit; font-size: 0.85rem; background: var(--surface); }
     .social-actions { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
     .detail-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
-    .btn-ghost, .btn-accent, .btn-reject { border: none; border-radius: 8px; padding: 0.55rem 1.1rem; font-weight: 600; cursor: pointer; font-size: 0.88rem; }
-    .btn-ghost { background: var(--gray-100); color: var(--gray-800); }
-    .btn-accent { background: var(--orange); color: #fff; }
-    .btn-reject { background: #FEE2E2; color: #991B1B; }
-    /* Section toggles up top — open/active state is a border + faint tint, never
-       a full green fill (that's reserved for the "Generuj nowy artykuł" CTA).
-       Border is always reserved (transparent when inactive) so toggling doesn't
-       shift the button's size. Several toggles can be active at once. */
-    .section-toggle { border: 1.5px solid transparent; padding: calc(0.55rem - 1.5px) calc(1.1rem - 1.5px); }
-    .section-toggle.active { border-color: var(--orange); background: var(--orange-pale); color: var(--orange-dark); }
     .empty { color: var(--gray-500); padding: 1rem 0; }
   `],
 })

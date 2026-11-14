@@ -41,7 +41,7 @@ interface SignedInDevice {
                   {{ t('myDevices.signedInSince', { date: (d.first_seen_at | date:'d MMM y') }) }}
                 </span>
               </div>
-              <button type="button" class="btn-signout" (click)="signOut(d)" [disabled]="signingOut() === d.device_id">
+              <button type="button" class="btn btn-d btn-sm" (click)="signOut(d)" [disabled]="signingOut() === d.device_id">
                 @if (signingOut() === d.device_id) { {{ t('myDevices.signingOut') }} } @else { {{ t('myDevices.signOut') }} }
               </button>
             </li>
@@ -52,22 +52,17 @@ interface SignedInDevice {
   `,
   styles: [`
     .devices-card { padding: 24px; }
-    h2 { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: #18181b; margin: 0 0 6px; }
-    .hint { font-size: 12px; color: #71717a; margin: 0 0 14px; line-height: 1.5; }
-    .empty { font-size: 13px; color: #71717a; margin: 0; }
+    h2 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-800); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+    .hint { font-size: 12px; color: var(--gray-500); margin: 0 0 20px; line-height: 1.5; }
+    .empty { font-size: 14px; color: var(--gray-500); margin: 0; }
     .device-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
     .device-row {
       display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-      border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px;
+      background: var(--gray-50); border-radius: 12px; padding: 12px 16px;
     }
     .device-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-    .device-name { font-size: 13px; font-weight: 600; color: #18181b; }
-    .device-meta { font-size: 12px; color: #71717a; }
-    .btn-signout {
-      border: none; border-radius: 8px; background: #FEE2E2; color: #991B1B;
-      font-weight: 600; font-size: 12px; padding: 7px 12px; cursor: pointer;
-    }
-    .btn-signout:disabled { opacity: 0.6; cursor: not-allowed; }
+    .device-name { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+    .device-meta { font-size: 12px; color: var(--gray-500); }
   `],
 })
 export class MyDevicesComponent implements OnInit {

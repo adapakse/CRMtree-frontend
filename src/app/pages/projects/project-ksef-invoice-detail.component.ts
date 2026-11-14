@@ -168,7 +168,7 @@ type PaidState = 'paid' | 'partiallyPaid' | 'unpaid' | 'unknown';
     .line-name { overflow-wrap:anywhere; }
     .document { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
     .document .hint { flex:1; min-width:220px; }
-    .totals { display:flex; justify-content:flex-end; gap:22px; flex-wrap:wrap; font-size:13px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
+    .totals { display:flex; justify-content:flex-end; gap:22px; flex-wrap:wrap; font-size:14px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
     .totals strong { color:var(--gray-900); margin-left:4px; }
     @media (max-width: 700px) { .parties { grid-template-columns:1fr; } }
   `],

@@ -128,14 +128,14 @@ const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
     </ng-container>
   `,
   styles: [PROJECTS_SHARED_STYLES, `
-    .back { font-size:12.5px; color:var(--gray-500); text-decoration:none; margin-right:6px; }
-    .back:hover { color:var(--orange); }
+    .back { font-size:12px; color:var(--gray-500); text-decoration:none; margin-right:6px; }
+    .back:hover { color: var(--orange-text); }
     .pill.closed { background:var(--gray-100); color:var(--gray-500); }
     .tab-bar { display:flex; align-items:flex-start; gap:16px; }
     .tabs { width:560px; }
     .tabs.with-finance { width:700px; }
     .chat-card { padding:18px 20px; max-width:900px; }
-    .mine-toggle { display:flex; align-items:center; gap:7px; font-size:13px; color:var(--gray-700); padding-top:9px; cursor:pointer; }
+    .mine-toggle { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--gray-700); padding-top:8px; cursor:pointer; }
   `],
 })
 export class ProjectDetailComponent implements OnInit {

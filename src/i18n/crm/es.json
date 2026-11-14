@@ -115,6 +115,7 @@
     "title": "Calendario de actividades",
     "views": {
       "day": "Día",
+      "label": "Vista",
       "month": "Mes",
       "tasks": "Tareas",
       "week": "Semana"
@@ -529,6 +530,26 @@
     "trainingMode": "Modo de formación",
     "writeNew": "Escribir un correo nuevo"
   },
+  "fieldErrors": {
+    "closeDate": "Elige la fecha de cierre prevista",
+    "company": "Indica el nombre de la empresa",
+    "contactName": "Indica el nombre y apellidos del contacto",
+    "contactTitle": "Elige el cargo del contacto",
+    "email": "Indica un correo electrónico, p. ej., juan@empresa.es",
+    "firstContact": "Elige la fecha del primer contacto",
+    "industry": "Elige un sector",
+    "lostReason": "Elige el motivo de la pérdida",
+    "onlinePct": "Elige la cuota de ventas online",
+    "phone": "Indica un número de teléfono, p. ej., +48 600 000 000",
+    "probability": "Elige la probabilidad de éxito",
+    "salesperson": "Asigna un comercial",
+    "saveFailed": "No se pudo guardar. Inténtalo de nuevo; si el error se repite, avisa al administrador.",
+    "source": "Elige de dónde viene el lead",
+    "value": "Indica un importe; si no lo sabes, escribe 0",
+    "valueNegative": "El importe no puede ser negativo",
+    "valueTooLarge": "Importe demasiado alto: máximo 999.999.999.999",
+    "website": "Indica la web de la empresa, p. ej., empresa.es"
+  },
   "history": {
     "activityAdded": "Actividad añadida: {title}",
     "activityClosed": "Actividad cerrada: {title}",
@@ -741,9 +762,14 @@
       "hot": "Caliente"
     },
     "history": {
+      "archived": "Lead movido al archivo",
       "converted": "Lead convertido en partner",
       "created": "Lead creado",
       "deleted": "Lead eliminado",
+      "holdCancelled": "Espera retirada",
+      "holdSet": "En espera hasta el {date}",
+      "migrated": "Lead movido",
+      "testAccount": "Cuenta de prueba",
       "updated": "Lead actualizado"
     },
     "hold": {
@@ -770,11 +796,11 @@
     },
     "loadError": "Error al cargar el lead.",
     "nip": {
-      "countryCodeRequired": "Indica el código de país (2 letras), p. ej., PL",
-      "duplicate": "Este NIF ya está asignado a otro registro.",
-      "numberRequired": "Indica el número después del código de país",
-      "plTenDigits": "Para PL se requieren 10 dígitos después del código de país",
-      "required": "El NIF es obligatorio"
+      "countryCodeRequired": "Empieza por el código de país (2 letras), p. ej., PL",
+      "duplicate": "Este NIF ya está asignado a otra empresa en el CRM",
+      "numberRequired": "Después del código de país escribe el número",
+      "plTenDigits": "El NIF polaco tiene 10 dígitos después de «PL», p. ej., PL1234567890",
+      "required": "Indica el NIF de la empresa, p. ej., PL1234567890"
     },
     "notFound": "Lead no encontrado.",
     "onboarding": {
@@ -922,9 +948,13 @@
       "holdOnlyTitle": "Mostrar solo los leads en espera",
       "hot": "Calientes",
       "mine": "Míos",
+      "peopleGroup": "Personas",
       "repChip": "Comercial: {name}",
       "reportFilter": "Filtro del informe: {label}",
       "repsGroup": "Comerciales",
+      "stagesClosed": "Cerrados",
+      "stagesOpen": "En curso",
+      "teamsGroup": "Equipos",
       "wholeGroup": "Todo el grupo: {group}"
     },
     "importCsv": "Importar CSV",
@@ -975,6 +1005,7 @@
       "fillRequired": "Completa los campos obligatorios:",
       "fullName": "Nombre y apellidos",
       "hot": "Lead caliente",
+      "hotHint": "El cliente está cerca de comprar: el lead recibe 🔥 en la lista y en el kanban",
       "namePlaceholder": "Juan García",
       "noExtraContacts": "Sin contactos adicionales",
       "notes": "Notas",
@@ -985,10 +1016,11 @@
       "subtitle": "Añade una nueva oportunidad de venta",
       "taxId": "NIF",
       "taxIdErrors": {
-        "countryCode": "Indica el código de país (2 letras), p. ej., PL",
-        "numberMissing": "Indica el número después del código de país",
-        "polishDigits": "Para PL se requieren 10 dígitos después del código de país",
-        "required": "El NIF es obligatorio"
+        "countryCode": "Empieza por el código de país (2 letras), p. ej., PL",
+        "duplicate": "Este NIF ya está asignado a otra empresa en el CRM",
+        "numberMissing": "Después del código de país escribe el número",
+        "polishDigits": "El NIF polaco tiene 10 dígitos después de «PL», p. ej., PL1234567890",
+        "required": "Indica el NIF de la empresa, p. ej., PL1234567890"
       },
       "title": "Nuevo lead",
       "unassigned": "— sin asignar —",
@@ -1036,6 +1068,7 @@
     "title": "Leads de ventas",
     "view": {
       "kanban": "Kanban",
+      "label": "Vista",
       "table": "Tabla",
       "timeline": "Cronología"
     }
@@ -1321,10 +1354,10 @@
     },
     "loadError": "Error de carga.",
     "nip": {
-      "countryCodeRequired": "Indica el código de país (2 letras), p. ej., PL",
-      "numberRequired": "Indica el número después del código de país",
-      "plTenDigits": "Para PL se requieren 10 dígitos después del código de país",
-      "required": "El NIF es obligatorio"
+      "countryCodeRequired": "Empieza por el código de país (2 letras), p. ej., PL",
+      "numberRequired": "Después del código de país escribe el número",
+      "plTenDigits": "El NIF polaco tiene 10 dígitos después de «PL», p. ej., PL1234567890",
+      "required": "Indica el NIF de la empresa, p. ej., PL1234567890"
     },
     "notFound": "Partner no encontrado.",
     "onboarding": {
@@ -1477,11 +1510,11 @@
       "dwhTurnoverHint": "Volumen de negocio bruto YTD del DWH"
     },
     "taxIdErrors": {
-      "countryCode": "Indica el código de país (2 letras), p. ej., PL",
-      "duplicate": "Este NIF ya está asignado a otro registro.",
-      "numberMissing": "Indica el número después del código de país",
-      "polishDigits": "Para PL se requieren 10 dígitos después del código de país",
-      "required": "El NIF es obligatorio"
+      "countryCode": "Empieza por el código de país (2 letras), p. ej., PL",
+      "duplicate": "Este NIF ya está asignado a otra empresa en el CRM",
+      "numberMissing": "Después del código de país escribe el número",
+      "polishDigits": "El NIF polaco tiene 10 dígitos después de «PL», p. ej., PL1234567890",
+      "required": "Indica el NIF de la empresa, p. ej., PL1234567890"
     },
     "title": "Registro de partners",
     "toolbar": {
@@ -1495,6 +1528,7 @@
     },
     "view": {
       "cards": "Tarjetas",
+      "label": "Vista",
       "table": "Tabla"
     }
   },
@@ -1913,6 +1947,8 @@
       "showAll": "Mostrar todos los partners con riesgo de churn →"
     },
     "currency": {
+      "billionsPln": "{value} mil M PLN",
+      "millionsPln": "{value} M PLN",
       "pln": "{value} PLN",
       "thousandsPln": "{value} k PLN"
     },

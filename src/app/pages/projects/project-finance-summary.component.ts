@@ -52,13 +52,13 @@ import { ProjectFinanceFormatService } from '../../core/services/project-finance
   styles: [`
     :host { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; }
     .tile { padding:14px 16px; display:flex; flex-direction:column; gap:4px; }
-    .tile-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-500); }
+    .tile-label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-500); }
     .tile-value { font-family:'Sora',sans-serif; font-size:20px; font-weight:700; color:var(--gray-900); font-variant-numeric:tabular-nums; }
-    .tile-percent { font-size:13px; font-weight:600; margin-left:4px; }
-    .tile-line { font-size:12.5px; color:var(--gray-500); font-variant-numeric:tabular-nums; }
+    .tile-percent { font-size:14px; font-weight:600; margin-left:4px; }
+    .tile-line { font-size:12px; color:var(--gray-500); font-variant-numeric:tabular-nums; }
     .tile-line strong { color:var(--gray-800); font-weight:600; }
-    .tile-line.minor { font-size:11.5px; }
-    .danger, .tile-line strong.danger { color:#DC2626; }
+    .tile-line.minor { font-size:12px; }
+    .danger, .tile-line strong.danger { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
   `],
 })
 export class ProjectFinanceSummaryComponent {

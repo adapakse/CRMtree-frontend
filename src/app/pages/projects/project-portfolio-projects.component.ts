@@ -86,15 +86,15 @@ const FINANCE_COLUMN_COUNT = 2;
     .project-row { cursor:pointer; }
     .project-row:hover td { background:var(--gray-50); }
     .project-name { font-weight:600; }
-    .secondary-cell { color:var(--gray-600); font-size:12.5px; }
-    .date { white-space:nowrap; font-size:12.5px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
+    .secondary-cell { color:var(--gray-600); font-size:12px; }
+    .date { white-space:nowrap; font-size:12px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
     .progress { display:flex; align-items:center; gap:8px; white-space:nowrap; }
     .progress-track { width:70px; height:6px; border-radius:3px; background:var(--gray-100); overflow:hidden; }
     .progress-fill { display:block; height:100%; background:var(--orange); }
     .progress-label { font-size:12px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
     .count { font-variant-numeric:tabular-nums; color:var(--gray-400); }
-    .count.overdue { color:#B91C1C; font-weight:700; }
-    .count.at-risk { color:#92400E; font-weight:700; }
+    .count.overdue { color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); font-weight:700; }
+    .count.at-risk { color:oklch(from #92400e max(l, var(--text-min-l)) c h); font-weight:700; }
     .amount { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
     .state-cell { text-align:center; padding:36px 24px !important; color:var(--gray-400); }
     .empty-title { font-weight:600; color:var(--gray-600); margin-bottom:4px; }

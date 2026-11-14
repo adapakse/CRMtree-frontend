@@ -20,29 +20,29 @@ export interface PeriodChangeEvent extends PeriodDates {
 <ng-container *transloco="let t; prefix: 'crm'">
 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
 
-  <select [ngStyle]="selStyle" [(ngModel)]="preset" (ngModelChange)="onPresetChange($event)">
+  <select [ngStyle]="selStyle" [class.sel]="variant !== 'inverted'" [(ngModel)]="preset" (ngModelChange)="onPresetChange($event)">
     <optgroup [label]="t('periodFilter.groups.current')">
-      <option value="cw"   style="color:#374151">{{ t('periodFilter.presets.currentWeek') }}</option>
-      <option value="cm"   style="color:#374151">{{ t('periodFilter.presets.currentMonth') }}</option>
-      <option value="cq"   style="color:#374151">{{ t('periodFilter.presets.currentQuarter') }}</option>
-      <option value="ytd"  style="color:#374151">{{ t('periodFilter.presets.currentYear', { year: year }) }}</option>
+      <option value="cw"   style="color:var(--gray-700)">{{ t('periodFilter.presets.currentWeek') }}</option>
+      <option value="cm"   style="color:var(--gray-700)">{{ t('periodFilter.presets.currentMonth') }}</option>
+      <option value="cq"   style="color:var(--gray-700)">{{ t('periodFilter.presets.currentQuarter') }}</option>
+      <option value="ytd"  style="color:var(--gray-700)">{{ t('periodFilter.presets.currentYear', { year: year }) }}</option>
     </optgroup>
     <optgroup [label]="t('periodFilter.groups.previous')">
-      <option value="prev_w"    style="color:#374151">{{ t('periodFilter.presets.previousWeek') }}</option>
-      <option value="prev_1m"   style="color:#374151">{{ t('periodFilter.presets.previousMonth') }}</option>
-      <option value="prev_q"    style="color:#374151">{{ t('periodFilter.presets.previousQuarter') }}</option>
-      <option value="prev_year" style="color:#374151">{{ t('periodFilter.presets.previousYear', { year: year - 1 }) }}</option>
+      <option value="prev_w"    style="color:var(--gray-700)">{{ t('periodFilter.presets.previousWeek') }}</option>
+      <option value="prev_1m"   style="color:var(--gray-700)">{{ t('periodFilter.presets.previousMonth') }}</option>
+      <option value="prev_q"    style="color:var(--gray-700)">{{ t('periodFilter.presets.previousQuarter') }}</option>
+      <option value="prev_year" style="color:var(--gray-700)">{{ t('periodFilter.presets.previousYear', { year: year - 1 }) }}</option>
     </optgroup>
     <optgroup [label]="t('periodFilter.groups.custom')">
-      <option value="custom" style="color:#374151">{{ t('periodFilter.presets.customRange') }}</option>
+      <option value="custom" style="color:var(--gray-700)">{{ t('periodFilter.presets.customRange') }}</option>
     </optgroup>
   </select>
 
   <ng-container *ngIf="preset === 'custom'">
     <input type="date" [ngStyle]="inputStyle"
            [(ngModel)]="customFrom" (ngModelChange)="onCustomChange()" />
-    <span [style.color]="variant === 'inverted' ? 'rgba(255,255,255,.6)' : '#71717a'"
-          style="font-size:11px">–</span>
+    <span [style.color]="variant === 'inverted' ? 'rgba(255,255,255,.6)' : 'var(--gray-500)'"
+          style="font-size:12px">–</span>
     <input type="date" [ngStyle]="inputStyle"
            [(ngModel)]="customTo" (ngModelChange)="onCustomChange()" />
   </ng-container>
@@ -74,16 +74,8 @@ export class PeriodFilterComponent {
         'max-width':     '140px',
       };
     }
-    return {
-      border:          '1px solid #d1d5db',
-      'border-radius': '6px',
-      padding:         '5px 8px',
-      'font-size':     '12px',
-      color:           '#374151',
-      background:      'white',
-      cursor:          'pointer',
-      outline:         'none',
-    };
+    // The default look comes from the shared select style in global.scss.
+    return {};
   }
 
   get inputStyle(): Record<string, string> {
@@ -99,16 +91,8 @@ export class PeriodFilterComponent {
         width:           '108px',
       };
     }
-    return {
-      border:          '1px solid #d1d5db',
-      'border-radius': '6px',
-      padding:         '5px 6px',
-      'font-size':     '12px',
-      color:           '#374151',
-      background:      'white',
-      outline:         'none',
-      width:           '120px',
-    };
+    // Same: only the width is specific to this filter.
+    return { width: '150px' };
   }
 
   onPresetChange(preset: string): void {

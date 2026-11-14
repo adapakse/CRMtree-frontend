@@ -14,6 +14,12 @@
     "unknownDevice": "Dispositivo sconosciuto"
   },
   "mySettings": {
+    "appearance": {
+      "dark": "Scuro",
+      "hint": "Tema chiaro o scuro dell'app.",
+      "light": "Chiaro",
+      "title": "Aspetto"
+    },
     "delete": "Elimina",
     "manual": {
       "hint": "Manuale interattivo di CRMtree con schermate. Si apre in una nuova scheda.",
@@ -22,6 +28,7 @@
     },
     "password": {
       "current": "Password attuale",
+      "hide": "Nascondi password",
       "hint": "Inserisci la password attuale e una nuova, almeno 8 caratteri. La modifica disconnette il tuo account dall app mobile.",
       "mismatch": "Le password non coincidono",
       "new": "Nuova password",
@@ -29,6 +36,7 @@
       "saveFailed": "Impossibile cambiare la password",
       "saved": "Password cambiata",
       "saving": "Salvataggio…",
+      "show": "Mostra password",
       "submit": "Cambia password",
       "title": "Cambia password",
       "tooShort": "La password deve avere almeno 8 caratteri"

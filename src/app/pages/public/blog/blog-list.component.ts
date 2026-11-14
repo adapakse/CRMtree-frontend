@@ -97,7 +97,7 @@ import { SeoService } from '../../../core/services/seo.service';
     }
     .post-card {
       position:relative; display:flex; flex-direction:column;
-      background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius);
+      background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius);
       overflow:hidden; box-shadow:var(--shadow-sm);
       transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }

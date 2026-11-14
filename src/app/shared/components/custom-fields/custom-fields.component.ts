@@ -88,13 +88,13 @@ const DEFAULT_CURRENCY = 'PLN';
            w oknie edycji. */
     .cf { display:flex; flex-direction:column; gap:12px; }
     .cf-title {
-      font-size:11px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;
-      color:#9ca3af; margin-bottom:2px;
+      font-size:12px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;
+      color:var(--gray-400); margin-bottom:2px;
     }
 
     /* ── tryb edycji ─────────────────────────────────────────────── */
     .cf-row { display:flex; flex-direction:column; gap:4px; }
-    .cf-label { font-size:12px; font-weight:600; color:#374151; }
+    .cf-label { font-size:12px; font-weight:600; color:var(--gray-700); }
     .cf-row .fi, .cf-row .fsel { width:100%; box-sizing:border-box; }
     .cf-money { display:flex; gap:8px; min-width:0; }
     .cf-money .amount { flex:1; min-width:0; }
@@ -102,14 +102,14 @@ const DEFAULT_CURRENCY = 'PLN';
 
     /* ── tryb podgladu na karcie ─────────────────────────────────── */
     .cf-view {
-      display:grid; grid-template-columns:auto 1fr; gap:5px 10px;
-      font-size:13px; align-items:baseline;
+      display:grid; grid-template-columns:auto 1fr; gap:4px 10px;
+      font-size:14px; align-items:baseline;
     }
     /* Wiersz przestaje byc pudelkiem — etykieta i wartosc wchodza wprost
        w siatke, zeby trzymaly te sama linie co pola wbudowane obok. */
     .cf-view .cf-row { display:contents; }
     .cf-view .cf-label {
-      font-size:11px; font-weight:400; color:#9ca3af;
+      font-size:12px; font-weight:400; color:var(--gray-400);
       white-space:nowrap; padding-top:2px;
     }
     .cf-value { color:var(--gray-800); word-break:break-word; }

@@ -1,7 +1,8 @@
 // src/app/core/services/crm-api.service.ts
 import { Injectable, inject } from '@angular/core';
 import { TenantFieldValue } from './tenant-fields.service';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
+import { SHOWS_OWN_ERROR } from './http-error-message';
 import { Observable, combineLatest, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
@@ -1065,8 +1066,9 @@ export class CrmApiService {
   getLead(id: number): Observable<Lead> {
     return this.http.get<Lead>(`${BASE}/leads/${id}`);
   }
-  createLead(data: Partial<Lead>): Observable<Lead> {
-    return this.http.post<Lead>(`${BASE}/leads`, data);
+  /** `showsOwnError`: the form shows the failure itself, so no toast is added. */
+  createLead(data: Partial<Lead>, options: { showsOwnError?: boolean } = {}): Observable<Lead> {
+    return this.http.post<Lead>(`${BASE}/leads`, data, { context: new HttpContext().set(SHOWS_OWN_ERROR, !!options.showsOwnError) });
   }
   setLeadHold(id: number, data: { reason: string; until: string }): Observable<Lead> {
     return this.http.put<Lead>(`${BASE}/leads/${id}/hold`, data);
@@ -1099,8 +1101,8 @@ export class CrmApiService {
   }> {
     return this.http.post<any>(`${BASE}/leads/enrich`, { domain });
   }
-  updateLead(id: number, data: Partial<Lead>): Observable<Lead> {
-    return this.http.patch<Lead>(`${BASE}/leads/${id}`, data);
+  updateLead(id: number, data: Partial<Lead>, options: { showsOwnError?: boolean } = {}): Observable<Lead> {
+    return this.http.patch<Lead>(`${BASE}/leads/${id}`, data, { context: new HttpContext().set(SHOWS_OWN_ERROR, !!options.showsOwnError) });
   }
   deleteLead(id: number): Observable<void> {
     return this.http.delete<void>(`${BASE}/leads/${id}`);

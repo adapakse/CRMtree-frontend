@@ -19,7 +19,7 @@ const MULTI_VALUE_SEPARATOR = ',';
     <ng-container *transloco="let t; prefix: 'list'">
       @switch (filter().kind) {
         @case ('text') {
-          <input class="fi" type="text" [attr.maxlength]="filter().maxLength ?? null"
+          <input class="fi" type="search" [attr.maxlength]="filter().maxLength ?? null"
                  [placeholder]="showsPlaceholder() ? filter().label : ''" [attr.aria-label]="filter().label"
                  [value]="query().value(lowerParam())" (input)="setAfterPause(lowerParam(), $any($event.target).value)">
         }
@@ -72,11 +72,12 @@ const MULTI_VALUE_SEPARATOR = ',';
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:8px; min-width:0; }
-    .fi, .fsel { padding:6px 9px; font-size:12.5px; }
+    .fi, .fsel { padding:6px 8px; font-size:12px; }
+    input.fi[type=search] { height:30px !important; width:100%; font-size:12px; }
     .options { display:flex; flex-direction:column; gap:6px; max-height:260px; overflow-y:auto; }
-    .option { display:flex; align-items:center; gap:7px; font-size:13px; color:var(--gray-700); cursor:pointer; text-transform:none; letter-spacing:0; font-weight:400; }
+    .option { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--gray-700); cursor:pointer; text-transform:none; letter-spacing:0; font-weight:400; }
     .bound { display:grid; grid-template-columns:34px 1fr; align-items:center; gap:8px; font-size:12px; color:var(--gray-500); text-transform:none; letter-spacing:0; font-weight:400; }
-    .note { font-size:12.5px; color:var(--gray-400); }
+    .note { font-size:12px; color:var(--gray-400); }
   `],
 })
 export class ListFilterControlComponent {

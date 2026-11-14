@@ -42,7 +42,11 @@
   },
   "sidebar": {
     "collapse": "Restrângere meniu",
-    "expand": "Extindere meniu"
+    "doneEditing": "Gata",
+    "editMenu": "Editează meniul",
+    "expand": "Extindere meniu",
+    "hideItem": "Ascunde",
+    "showItem": "Afișează"
   },
   "user": {
     "admin": "Administrator",

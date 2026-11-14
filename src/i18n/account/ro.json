@@ -14,6 +14,12 @@
     "unknownDevice": "Dispozitiv necunoscut"
   },
   "mySettings": {
+    "appearance": {
+      "dark": "Întunecat",
+      "hint": "Temă luminoasă sau întunecată a aplicației.",
+      "light": "Luminos",
+      "title": "Aspect"
+    },
     "delete": "Ștergere",
     "manual": {
       "hint": "Manual interactiv CRMtree cu capturi de ecran. Se deschide într-o filă nouă.",
@@ -22,6 +28,7 @@
     },
     "password": {
       "current": "Parola actuală",
+      "hide": "Ascunde parola",
       "hint": "Introdu parola actuală și una nouă, de cel puțin 8 caractere. Schimbarea deconectează contul din aplicația mobilă.",
       "mismatch": "Parolele nu coincid",
       "new": "Parolă nouă",
@@ -29,6 +36,7 @@
       "saveFailed": "Parola nu a putut fi schimbată",
       "saved": "Parola a fost schimbată",
       "saving": "Se salvează…",
+      "show": "Afișează parola",
       "submit": "Schimbă parola",
       "title": "Schimbă parola",
       "tooShort": "Parola trebuie să aibă cel puțin 8 caractere"

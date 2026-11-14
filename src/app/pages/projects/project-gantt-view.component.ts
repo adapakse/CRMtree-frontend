@@ -42,7 +42,7 @@ import { FilterSet, TaskFilterId } from './project-list-filters.service';
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:12px; }
-    .notice { padding:9px 14px; border-radius:9px; background:#FEF3C7; color:#92400E; font-size:12.5px; }
+    .notice { padding:8px 14px; border-radius:9px; background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); font-size:12px; }
     .is-loading { opacity:.55; }
   `],
 })

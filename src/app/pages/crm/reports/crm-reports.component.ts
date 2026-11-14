@@ -42,7 +42,16 @@ interface KpiData {
 <div id="topbar">
   <span class="page-title">{{ t('reports.common.title') }}</span>
   <span class="tsp"></span>
-  <div style="display:flex;align-items:center;gap:8px">
+  <button class="btn btn-g btn-sm" (click)="exportPDF()">
+    <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    {{ t('reports.common.exportPdf') }}
+  </button>
+</div>
+
+<div id="content">
+
+  <!-- Filtry -->
+  <div class="toolbar">
     <select class="sel" [(ngModel)]="period" (ngModelChange)="onFilterChange()">
       <option value="q1">Q1 2025</option>
       <option value="q2">Q2 2025</option>
@@ -73,14 +82,7 @@ interface KpiData {
         <option value="other">{{ t('labels.productTypes.other') }}</option>
       </select>
     </ng-container>
-    <button class="btn btn-g btn-sm" (click)="exportPDF()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      {{ t('reports.common.exportPdf') }}
-    </button>
   </div>
-</div>
-
-<div id="content">
 
   <!-- Baner: dane ze źródła zewnętrznego -->
   <div class="data-source-banner" *ngIf="salesSummary.length > 0">
@@ -100,30 +102,30 @@ interface KpiData {
 
     <!-- ── KPI row — dane CRM (leady) ── -->
     <div class="stats-row">
-      <div class="stat-card" style="border-top:3px solid var(--orange)">
-        <div class="stat-val" style="color:var(--orange)">{{ formatPLN(kpi.pipeline) }}</div>
+      <div class="stat-card">
+        <div class="stat-val" style="color: var(--orange-text)">{{ formatPLN(kpi.pipeline) }}</div>
         <div class="stat-lbl">{{ t('leadsList.stats.pipeline') }}</div>
         <div class="stat-trend trend-up">{{ t('reports.overview.kpi.activePipeline') }}</div>
       </div>
-      <div class="stat-card" style="border-top:3px solid #22C55E">
-        <div class="stat-val" style="color:#22C55E">{{ formatPLN(kpi.won) }}</div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:oklch(from #22c55e max(l, var(--text-min-l)) c h)">{{ formatPLN(kpi.won) }}</div>
         <div class="stat-lbl">{{ t('reports.common.kpi.wonPln') }}</div>
         <div class="stat-trend trend-up" *ngIf="kpi.won > 0">✓ {{ t('reports.overview.kpi.wonContracts') }}</div>
         <div class="stat-trend" *ngIf="kpi.won === 0" style="color:var(--gray-400)">{{ t('reports.overview.kpi.noneInPeriod') }}</div>
       </div>
-      <div class="stat-card" style="border-top:3px solid #3B82F6">
+      <div class="stat-card">
         <div class="stat-val">{{ kpi.winRate }}%</div>
         <div class="stat-lbl">{{ t('reports.common.kpi.winRate') }}</div>
         <div class="stat-trend" [class.trend-up]="kpi.winRate >= 40" [class.trend-dn]="kpi.winRate < 40">
           {{ kpi.winRate >= 40 ? '↑ ' + t('reports.overview.kpi.aboveTarget') : '↓ ' + t('reports.overview.kpi.belowTarget') }}
         </div>
       </div>
-      <div class="stat-card" style="border-top:3px solid #A855F7">
+      <div class="stat-card">
         <div class="stat-val">{{ t('reports.common.days', { count: kpi.avgCycle }) }}</div>
         <div class="stat-lbl">{{ t('reports.common.kpi.avgSalesCycle') }}</div>
         <div class="stat-trend trend-up">{{ t('reports.overview.kpi.avgClosingTime') }}</div>
       </div>
-      <div class="stat-card" style="border-top:3px solid #F59E0B">
+      <div class="stat-card">
         <div class="stat-val">{{ kpi.active }}</div>
         <div class="stat-lbl">{{ t('reports.common.kpi.activeLeads') }}</div>
         <div class="stat-trend">{{ t('reports.overview.kpi.hotCount', { count: kpi.hot }) }} 🔥</div>
@@ -131,31 +133,31 @@ interface KpiData {
     </div>
 
     <!-- ── KPI row — dane zewnętrzne (obrót) — widoczne gdy są dane ── -->
-    <div class="stats-row" *ngIf="salesSummary.length > 0" style="margin-top:-4px">
-      <div class="stat-card" style="border-top:3px solid #0EA5E9">
-        <div class="stat-val" style="color:#0EA5E9">{{ formatPLN(extKpi.grossTurnover) }}</div>
+    <div class="stats-row" *ngIf="salesSummary.length > 0">
+      <div class="stat-card">
+        <div class="stat-val" style="color:oklch(from #0ea5e9 max(l, var(--text-min-l)) c h)">{{ formatPLN(extKpi.grossTurnover) }}</div>
         <div class="stat-lbl">{{ t('reports.overview.external.grossTurnoverPln') }}</div>
-        <div class="stat-trend" style="color:#64748B">{{ t('reports.overview.external.source') }}</div>
+        <div class="stat-trend" style="color:var(--gray-500)">{{ t('reports.overview.external.source') }}</div>
       </div>
-      <div class="stat-card" style="border-top:3px solid #0284C7">
-        <div class="stat-val" style="color:#0284C7">{{ formatPLN(extKpi.netTurnover) }}</div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:oklch(from #0284c7 max(l, var(--text-min-l)) c h)">{{ formatPLN(extKpi.netTurnover) }}</div>
         <div class="stat-lbl">{{ t('reports.overview.external.netTurnoverPln') }}</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.margin', { value: (extKpi.netTurnover/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
+        <div class="stat-trend" style="color:var(--gray-500)">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.margin', { value: (extKpi.netTurnover/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
       </div>
-      <div class="stat-card" style="border-top:3px solid #7C3AED">
-        <div class="stat-val" style="color:#7C3AED">{{ formatPLN(extKpi.fees) }}</div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:oklch(from #7c3aed max(l, var(--text-min-l)) c h)">{{ formatPLN(extKpi.fees) }}</div>
         <div class="stat-lbl">{{ t('reports.overview.external.feesPln') }}</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.feeRate', { value: (extKpi.fees/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
+        <div class="stat-trend" style="color:var(--gray-500)">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.feeRate', { value: (extKpi.fees/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
       </div>
-      <div class="stat-card" style="border-top:3px solid #059669">
-        <div class="stat-val" style="color:#059669">{{ formatPLN(extKpi.revenue) }}</div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:oklch(from #059669 max(l, var(--text-min-l)) c h)">{{ formatPLN(extKpi.revenue) }}</div>
         <div class="stat-lbl">{{ t('reports.overview.external.revenuePln') }}</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.share', { value: (extKpi.revenue/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
+        <div class="stat-trend" style="color:var(--gray-500)">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.share', { value: (extKpi.revenue/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
       </div>
-      <div class="stat-card" style="border-top:3px solid #64748B">
+      <div class="stat-card">
         <div class="stat-val">{{ extKpi.transactions | number }}</div>
         <div class="stat-lbl">{{ t('reports.overview.external.transactions') }}</div>
-        <div class="stat-trend" style="color:#64748B">{{ t('reports.overview.external.productsCount', { count: extKpi.pax }) }}</div>
+        <div class="stat-trend" style="color:var(--gray-500)">{{ t('reports.overview.external.productsCount', { count: extKpi.pax }) }}</div>
       </div>
     </div>
 
@@ -200,12 +202,12 @@ interface KpiData {
           <div class="card-title">{{ t('reports.overview.chart.title') }}</div>
           <div class="chart-legend">
             <span><span class="leg-dot" style="background:var(--orange)"></span>{{ t('reports.common.columns.won') }}</span>
-            <span><span class="leg-dot" style="background:#BFDBFE"></span>{{ t('reports.common.columns.pipeline') }}</span>
+            <span><span class="leg-dot" style="background:color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface))"></span>{{ t('reports.common.columns.pipeline') }}</span>
           </div>
         </div>
         <div class="bar-chart">
           <div *ngFor="let d of monthly" class="bar-col">
-            <div class="bar-won-lbl" *ngIf="d.won > 0" style="color:var(--orange)">{{ (d.won/1000).toFixed(0) }}k</div>
+            <div class="bar-won-lbl" *ngIf="d.won > 0" style="color: var(--orange-text)">{{ (d.won/1000).toFixed(0) }}k</div>
             <div class="bar-won-lbl" *ngIf="!d.won"></div>
             <div class="bar-bars">
               <div class="bar-pipe" [style.height.px]="barH(d.pipe)" [title]="t('reports.overview.chart.pipelineTooltip', { value: (d.pipe/1000).toFixed(0) })"></div>
@@ -220,7 +222,7 @@ interface KpiData {
         <!-- Projected -->
         <div class="proj-box" *ngIf="projected > 0">
           <span>📈 {{ t('reports.overview.chart.projectedWeighted') }}</span>
-          <strong style="color:var(--orange)">{{ formatPLN(projected) }} PLN</strong>
+          <strong style="color: var(--orange-text)">{{ formatPLN(projected) }} PLN</strong>
         </div>
       </div>
     </div>
@@ -232,7 +234,7 @@ interface KpiData {
       <div class="card" style="padding:20px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
           <div class="card-title">{{ t('reports.common.salespeopleResults') }}</div>
-          <span class="mini-lbl" *ngIf="salesByPerson.length > 0" style="color:#0EA5E9">📥 {{ t('reports.overview.external.source') }}</span>
+          <span class="mini-lbl" *ngIf="salesByPerson.length > 0" style="color:oklch(from #0ea5e9 max(l, var(--text-min-l)) c h);display:inline-flex;align-items:center;gap:4px">📥 {{ t('reports.overview.external.source') }}</span>
         </div>
 
         <!-- Tabela z danych zewnętrznych (gdy dostępne) -->
@@ -257,16 +259,16 @@ interface KpiData {
                   </div>
                 </td>
                 <td class="tr" style="color:var(--gray-600)">{{ s.partners_count }}</td>
-                <td class="tr" style="font-weight:600;color:#0EA5E9;font-family:'Sora',sans-serif">
+                <td class="tr" style="font-weight:600;color:oklch(from #0ea5e9 max(l, var(--text-min-l)) c h);font-family:'Sora',sans-serif">
                   {{ s.gross_turnover_pln ? (s.gross_turnover_pln/1000|number:'1.0-0')+'k' : '—' }}
                 </td>
                 <td class="tr" style="color:var(--gray-600)">
                   {{ s.net_turnover_pln ? (s.net_turnover_pln/1000|number:'1.0-0')+'k' : '—' }}
                 </td>
-                <td class="tr" style="color:#7C3AED">
+                <td class="tr" style="color:oklch(from #7c3aed max(l, var(--text-min-l)) c h)">
                   {{ s.fees_pln ? (s.fees_pln/1000|number:'1.0-0')+'k' : '—' }}
                 </td>
-                <td class="tr" style="color:#059669;font-weight:600">
+                <td class="tr" style="color:oklch(from #059669 max(l, var(--text-min-l)) c h);font-weight:600">
                   {{ s.revenue_pln ? (s.revenue_pln/1000|number:'1.0-0')+'k' : '—' }}
                 </td>
               </tr>
@@ -296,13 +298,13 @@ interface KpiData {
                   </div>
                 </td>
                 <td class="tr" style="color:var(--gray-600)">{{ s.leads }}</td>
-                <td class="tr" style="font-weight:600;color:var(--orange);font-family:'Sora',sans-serif">
+                <td class="tr" style="font-weight:600;color: var(--orange-text);font-family:'Sora',sans-serif">
                   {{ s.pipeline ? (s.pipeline/1000).toFixed(0)+'k' : '—' }}
                 </td>
-                <td class="tr" [style.color]="s.won > 0 ? '#22C55E' : 'var(--gray-300)'" style="font-weight:600">
+                <td class="tr" [style.color]="s.won > 0 ? 'oklch(from #22c55e max(l, var(--text-min-l)) c h)' : 'var(--gray-300)'" style="font-weight:600">
                   {{ s.won > 0 ? (s.won/1000).toFixed(0)+'k' : '—' }}
                 </td>
-                <td class="tr" [style.color]="s.winPct >= 40 ? '#22C55E' : 'var(--gray-500)'">{{ s.winPct }}%</td>
+                <td class="tr" [style.color]="s.winPct >= 40 ? 'oklch(from #22c55e max(l, var(--text-min-l)) c h)' : 'var(--gray-500)'">{{ s.winPct }}%</td>
                 <td>
                   <div class="prog-bar">
                     <div class="prog-fill" [style.width.%]="s.progress"
@@ -342,7 +344,7 @@ interface KpiData {
         </div>
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--gray-200)">
           <div class="mini-lbl" style="margin-bottom:8px">{{ t('reports.overview.sourceQuality.title') }}</div>
-          <div style="display:flex;flex-direction:column;gap:5px;font-size:12px">
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:12px">
             <div *ngFor="let s of sourceQuality" style="display:flex;justify-content:space-between">
               <span>{{ t(s.labelKey) }}</span>
               <span style="font-weight:700" [style.color]="s.color">{{ t('reports.common.leadSources.winRate', { value: s.wr }) }}</span>
@@ -397,90 +399,87 @@ interface KpiData {
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
-    #topbar { height:60px; background:white; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
-    .page-title { font-family:'Sora',sans-serif; font-size:17px; font-weight:700; color:var(--gray-900); }
+    #topbar { height:60px; background:var(--surface); border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
+    .page-title { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); }
     .tsp { flex:1; }
-    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
-    .sel:focus { border-color:var(--orange); }
-    .btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; border:none; font-family:inherit; transition:all .15s; }
-    .btn-g { background:white; color:var(--gray-600); border:1px solid var(--gray-200); } .btn-g:hover { background:var(--gray-50); }
-    .btn-sm { padding:5px 10px; font-size:12px; }
+    /* Filter card under the title bar — same as the leads list (shadow/radius/padding from global .toolbar). */
+    .toolbar { background:var(--surface); display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; flex-shrink:0; }
+    input[type=search], input[type=month] { height:36px; box-sizing:border-box; }
 
-    #content { flex:1; overflow-y:auto; padding:20px 24px 28px; display:flex; flex-direction:column; gap:16px; }
+    #content { flex:1; overflow-y:auto; padding:20px 24px 24px; display:flex; flex-direction:column; gap:16px; }
 
     /* KPI */
-    .stats-row { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; flex-shrink:0; }
-    .stat-card { background:white; border:1px solid var(--gray-200); border-radius:10px; padding:14px 18px; }
+    .stats-row { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; flex-shrink:0; }
     .stat-val { font-family:'Sora',sans-serif; font-size:22px; font-weight:700; color:var(--gray-900); }
     .stat-lbl { font-size:12px; color:var(--gray-400); font-weight:500; margin-top:2px; }
-    .stat-trend { font-size:11px; margin-top:5px; font-weight:600; }
-    .trend-up { color:#16A34A; } .trend-dn { color:#DC2626; }
+    .stat-trend { font-size:12px; margin-top:4px; font-weight:600; }
+    .trend-up { color:oklch(from #16a34a max(l, var(--text-min-l)) c h); } .trend-dn { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
 
     /* Layout */
     .chart-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .card { background:white; border:1px solid var(--gray-200); border-radius:10px; }
+    .card { padding:0; }
     .card-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-    .card-title { font-family:'Sora',sans-serif; font-size:13px; font-weight:700; color:var(--gray-900); }
-    .card-sub { font-size:11px; color:var(--gray-400); }
-    .chart-legend { display:flex; gap:10px; font-size:11px; color:var(--gray-400); }
+    .card-title { font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:var(--gray-900); }
+    .card-sub { font-size:12px; color:var(--gray-400); }
+    .chart-legend { display:flex; gap:10px; font-size:12px; color:var(--gray-400); }
     .chart-legend span { display:flex; align-items:center; gap:4px; }
     .leg-dot { width:10px; height:10px; border-radius:2px; display:inline-block; flex-shrink:0; }
 
     /* Funnel */
-    .funnel { display:flex; flex-direction:column; gap:7px; }
+    .funnel { display:flex; flex-direction:column; gap:8px; }
     .funnel-row { display:flex; align-items:center; gap:8px; }
-    .funnel-label { width:96px; font-size:11.5px; color:var(--gray-500); text-align:right; flex-shrink:0; }
+    .funnel-label { width:96px; font-size:12px; color:var(--gray-500); text-align:right; flex-shrink:0; }
     .funnel-bar-wrap { flex:1; position:relative; height:28px; }
     .funnel-bg { position:absolute; inset:0; background:var(--gray-100); border-radius:4px; }
     .funnel-fill { position:absolute; top:0; left:0; height:100%; border-radius:4px; opacity:.85; transition:width .5s ease; }
     .funnel-txt { position:absolute; inset:0; display:flex; align-items:center; padding:0 8px; }
-    .funnel-n { font-size:10.5px; font-weight:700; color:white; text-shadow:0 1px 2px rgba(0,0,0,.4); }
-    .funnel-v { font-size:10.5px; color:white; text-shadow:0 1px 2px rgba(0,0,0,.4); margin-left:auto; }
+    .funnel-n { font-size:10px; font-weight:700; color:white; text-shadow:0 1px 2px rgba(0,0,0,.4); }
+    .funnel-v { font-size:10px; color:white; text-shadow:0 1px 2px rgba(0,0,0,.4); margin-left:auto; }
     .funnel-conv { width:36px; text-align:center; font-size:10px; color:var(--gray-400); flex-shrink:0; }
 
     /* Mini stats */
     .mini-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
-    .mini-stat { background:var(--gray-50); border-radius:8px; padding:8px 10px; }
-    .mini-lbl { font-size:11px; color:var(--gray-400); font-weight:500; text-transform:uppercase; letter-spacing:.4px; margin-bottom:2px; }
-    .mini-val { font-weight:700; color:var(--gray-900); font-family:'Sora',sans-serif; font-size:13px; }
+    .mini-stat { background:var(--gray-50); border-radius:12px; padding:8px 12px; }
+    .mini-lbl { font-size:12px; color:var(--gray-400); font-weight:500; text-transform:uppercase; letter-spacing:.4px; margin-bottom:2px; }
+    .mini-val { font-weight:700; color:var(--gray-900); font-family:'Sora',sans-serif; font-size:14px; }
 
     /* Bar chart */
     .bar-chart { display:flex; align-items:flex-end; gap:6px; height:150px; padding-bottom:0; border-bottom:1px solid var(--gray-200); }
     .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:2px; }
-    .bar-won-lbl { font-size:9px; font-weight:700; min-height:14px; display:flex; align-items:flex-end; }
+    .bar-won-lbl { font-size:10px; font-weight:700; min-height:14px; display:flex; align-items:flex-end; }
     .bar-bars { display:flex; gap:2px; align-items:flex-end; justify-content:center; width:100%; }
-    .bar-pipe { flex:1; background:#BFDBFE; border-radius:3px 3px 0 0; min-height:4px; }
+    .bar-pipe { flex:1; background:color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius:3px 3px 0 0; min-height:4px; }
     .bar-win  { flex:1; background:var(--orange); border-radius:3px 3px 0 0; min-height:4px; }
     .bar-win.empty { flex:1; }
     .bar-labels { display:flex; gap:6px; margin-top:6px; }
-    .bar-lbl-item { flex:1; text-align:center; font-size:11px; color:var(--gray-400); }
-    .proj-box { margin-top:12px; padding:8px 12px; background:var(--orange-pale); border:1px solid var(--orange-muted); border-radius:8px; font-size:12px; color:var(--orange-dark); display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .bar-lbl-item { flex:1; text-align:center; font-size:12px; color:var(--gray-400); }
+    .proj-box { margin-top:12px; padding:8px 12px; background:var(--orange-pale); border:1px solid var(--orange-muted); border-radius:12px; font-size:12px; color:var(--orange-dark); display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
 
     /* Sales table */
-    .sales-tbl { width:100%; border-collapse:collapse; font-size:12.5px; }
+    .sales-tbl { width:100%; border-collapse:collapse; font-size:12px; }
     .sales-tbl thead tr { border-bottom:1px solid var(--gray-200); }
     .sales-tbl th { text-align:left; padding:6px 8px; font-size:10px; text-transform:uppercase; color:var(--gray-400); font-weight:600; }
     .sales-tbl th.tr { text-align:right; }
     .sales-tbl tbody tr { border-bottom:1px solid var(--gray-100); }
     .sales-tbl td { padding:8px 8px; }
     .sales-tbl td.tr { text-align:right; }
-    .avatar-sm { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:white; flex-shrink:0; }
+    .avatar-sm { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:white; flex-shrink:0; }
 
     /* Progress bars */
     .prog-bar { height:6px; background:var(--gray-100); border-radius:3px; overflow:hidden; width:80px; }
     .prog-fill { height:100%; border-radius:3px; transition:width .4s ease; }
 
     /* Insight */
-    .insight-box { margin-top:14px; padding:12px; background:var(--orange-pale); border:1px solid var(--orange-muted); border-radius:8px; font-size:12px; color:var(--orange-dark); line-height:1.5; }
+    .insight-box { margin-top:16px; padding:12px 16px; background:var(--orange-pale); border:1px solid var(--orange-muted); border-radius:12px; font-size:12px; color:var(--orange-dark); line-height:1.5; }
 
     /* Loading */
-    .loading-state { display:flex; align-items:center; justify-content:center; gap:10px; padding:60px; color:var(--gray-400); font-size:13px; }
+    .loading-state { display:flex; align-items:center; justify-content:center; gap:10px; padding:60px; color:var(--gray-400); font-size:14px; }
     .spinner { width:20px; height:20px; border:2px solid var(--gray-200); border-top-color:var(--orange); border-radius:50%; animation:spin .7s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
     /* Data source banner */
-    .data-source-banner { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:9px 14px; font-size:12px; color:#1E40AF; display:flex; align-items:center; gap:8px; flex-shrink:0; }
-    .btn-link { background:none; border:none; color:#2563EB; font-size:12px; font-weight:600; cursor:pointer; text-decoration:underline; padding:0; font-family:inherit; margin-left:auto; }
+    .data-source-banner { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius:12px; padding:8px 16px; font-size:12px; color:oklch(from #1e40af max(l, var(--text-min-l)) c h); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .btn-link { background:none; border:none; color:oklch(from #2563eb max(l, var(--text-min-l)) c h); font-size:12px; font-weight:600; cursor:pointer; text-decoration:underline; padding:0; font-family:inherit; margin-left:auto; }
   `],
 })
 export class CrmReportsComponent implements OnInit {
