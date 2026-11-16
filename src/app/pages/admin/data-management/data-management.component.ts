@@ -302,6 +302,9 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
     .sel-clear { display:inline-flex; background:none; border:none; cursor:pointer; color:var(--gray-400); padding:0; flex-shrink:0; }
     .sel-clear:hover { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .dm-input { height:36px; border:1px solid var(--gray-200); border-radius:10px; padding:0 12px; font-size:14px; outline:none; font-family:inherit; width:100%; box-sizing:border-box; background:var(--surface); }
+    /* Inside the light cards a big drop shadow made the white fields glow — flat field, hairline only. */
+    .delete-card .dm-input:not([data-n1]):not([data-n2]) { box-shadow:none !important; border-color:var(--gray-200); }
+    .delete-card .dm-input:not([data-n1]):not([data-n2]):focus { box-shadow:var(--ring-field) !important; border-color:var(--orange); }
     .dm-input:focus { border-color:var(--orange); }
     .mt-12 { margin-top:12px; }
     .result-ok, .result-err { display:flex; align-items:center; gap:8px; border-radius:10px; padding:8px 12px; font-size:12px; }
