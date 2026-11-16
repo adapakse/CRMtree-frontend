@@ -1070,7 +1070,7 @@
       "kanban": "Kanban",
       "label": "Widok",
       "table": "Tabela",
-      "timeline": "Time Line"
+      "timeline": "Oś czasu"
     }
   },
   "mailCallback": {
@@ -1169,7 +1169,7 @@
     "views": {
       "calendar": "Kalendarz",
       "partners": "Partnerzy",
-      "timeline": "Timeline"
+      "timeline": "Oś czasu"
     }
   },
   "partnerDetail": {
@@ -1413,7 +1413,7 @@
     "sections": {
       "additionalData": "Dane dodatkowe",
       "agent": "Dane Agenta",
-      "billingAddress": "Billing Address",
+      "billingAddress": "Adres rozliczeniowy",
       "billingContact": "Kontakt do spraw rozliczeń",
       "contractContact": "Kontakt do spraw umowy",
       "customFields": "Pola dodatkowe",
@@ -1572,7 +1572,7 @@
         "pipeline": "Pipeline",
         "progress": "Postęp",
         "winRatePct": "Skut. %",
-        "won": "Won"
+        "won": "Wygrane"
       },
       "days": "{count, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}}",
       "exportPdf": "Eksport PDF",

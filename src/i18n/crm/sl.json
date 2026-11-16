@@ -1572,7 +1572,7 @@
         "pipeline": "Lijak",
         "progress": "Napredek",
         "winRatePct": "Uspeh %",
-        "won": "Won"
+        "won": "Dobljeni"
       },
       "days": "{count, plural, one {# dan} two {# dneva} few {# dni} other {# dni}}",
       "exportPdf": "Izvoz PDF",

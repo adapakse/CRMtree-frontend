@@ -1413,7 +1413,7 @@
     "sections": {
       "additionalData": "Dati aggiuntivi",
       "agent": "Dati dell’agente",
-      "billingAddress": "Billing Address",
+      "billingAddress": "Indirizzo di fatturazione",
       "billingContact": "Contatto per la fatturazione",
       "contractContact": "Contatto per il contratto",
       "customFields": "Campi aggiuntivi",
@@ -1572,7 +1572,7 @@
         "pipeline": "Pipeline",
         "progress": "Avanzamento",
         "winRatePct": "Successo %",
-        "won": "Won"
+        "won": "Vinti"
       },
       "days": "{count, plural, one {# giorno} other {# giorni}}",
       "exportPdf": "Esporta PDF",

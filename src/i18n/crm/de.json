@@ -1572,7 +1572,7 @@
         "pipeline": "Pipeline",
         "progress": "Fortschritt",
         "winRatePct": "Quote %",
-        "won": "Won"
+        "won": "Gewonnen"
       },
       "days": "{count, plural, one {# Tag} other {# Tage}}",
       "exportPdf": "PDF-Export",

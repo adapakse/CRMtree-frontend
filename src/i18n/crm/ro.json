@@ -1572,7 +1572,7 @@
         "pipeline": "Pipeline",
         "progress": "Progres",
         "winRatePct": "Câștig %",
-        "won": "Won"
+        "won": "Câștigate"
       },
       "days": "{count, plural, one {# zi} few {# zile} other {# de zile}}",
       "exportPdf": "Export PDF",
