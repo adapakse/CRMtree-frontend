@@ -2025,7 +2025,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .edit-textarea { width:100%; border:1px solid var(--gray-300); border-radius:6px; padding:8px 10px; font-size:14px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
     .edit-textarea:focus { border-color:#3BAA5D; }
     .info-subsection { margin-top:14px; padding-top:12px; border-top:1px solid var(--gray-100); }
-    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); margin-bottom:8px; margin-top:12px; padding-top:12px; border-top:1px solid var(--gray-100); }
+    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); margin-bottom:8px; }
     .link { color: var(--orange-text); text-decoration:none; }
     .link:hover { text-decoration:underline; }
     .dwh-badge { display:inline-block; background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color:oklch(from #7c3aed max(l, var(--text-min-l)) c h); font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
