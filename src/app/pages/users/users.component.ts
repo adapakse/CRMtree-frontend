@@ -88,7 +88,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 @for (grant of user.visibility_grants ?? []; track grant.id) {
                   <span style="font-size:10px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1e40af max(l, var(--text-min-l)) c h);padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap"
                         [title]="grantTooltip(grant)">
-                    👁 {{ grant.group_display || grant.group_name }}
+                    <i class="ei ei-eye"></i> {{ grant.group_display || grant.group_name }}
                     <span style="opacity:.7">{{ grant.access_level }}</span>
                   </span>
                 }
@@ -390,7 +390,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
             <!-- ── Planowane Budżety Sprzedażowe ──────────────────────────────────── -->
             @if (isSalesManager() && selected()!.crm_role === 'salesperson') {
-              <div class="sec-title" style="margin-top:24px">💼 {{ t('users.budgets.title') }}</div>
+              <div class="sec-title" style="margin-top:24px"><i class="ei ei-briefcase"></i> {{ t('users.budgets.title') }}</div>
 
               <div style="display:flex;gap:12px;margin-bottom:16px;align-items:flex-end">
                 <div class="fg" style="flex:1">
@@ -448,7 +448,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
               @if (budgetDirty) {
                 <div style="display:flex;gap:8px;margin-top:20px">
                   <button class="btn btn-p" style="flex:1" [disabled]="budgetSaving" (click)="saveBudgets()">
-                    {{ budgetSaving ? t('users.saving') : '💾 ' + t('users.budgets.save') }}
+                    @if (budgetSaving) { {{ t('users.saving') }} } @else { <i class="ei ei-save"></i> {{ t('users.budgets.save') }} }
                   </button>
                   <button class="btn btn-g" (click)="loadBudgets()">{{ 'actions.cancel' | transloco }}</button>
                 </div>

@@ -80,7 +80,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
                   @if (task.group_name) { <span>· {{ task.group_name }}</span> }
                   @if (task.due_date) {
                     <span [style.color]="isDue(task.due_date) ? 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)' : 'oklch(from #065f46 max(l, var(--text-min-l)) c h)'">
-                      · ⏰ {{ task.due_date | date:'dd.MM.yy' }}
+                      · <i class="ei ei-clock"></i> {{ task.due_date | date:'dd.MM.yy' }}
                     </span>
                     <wt-add-to-calendar [entry]="calendarEntryOf(task)" (click)="$event.stopPropagation(); $event.preventDefault()" />
                   }
@@ -105,7 +105,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
       @if (view === 'kanban') {
         @if (kanbanDocs().length === 0 && !loading()) {
           <div class="empty-state" style="margin-top:48px">
-            <div class="empty-icon">📋</div>
+            <div class="empty-icon"><i class="ei ei-clipboard"></i></div>
             <div class="empty-title">{{ t('labels.noDocuments') }}</div>
             <div>{{ t('workflow.kanban.emptyHint') }}</div>
           </div>
@@ -155,7 +155,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
                       <div style="font-size:12px;margin-top:4px;display:flex;align-items:center;gap:4px"
                            [style.color]="expirationColor(doc.expiration_date)">
                         @if (isExpired(doc.expiration_date)) {
-                          <span [title]="t(doc.doc_type === 'invoice' ? 'workflow.kanban.paymentOverdue' : 'workflow.kanban.expired')">⚠️</span>
+                          <span [title]="t(doc.doc_type === 'invoice' ? 'workflow.kanban.paymentOverdue' : 'workflow.kanban.expired')"><i class="ei ei-warn"></i></span>
                         }
                         {{ t(doc.doc_type === 'invoice' ? 'workflow.kanban.paymentDue' : 'workflow.kanban.expires', { date: (doc.expiration_date | date:'dd.MM.yy') }) }}
                         @if (isExpiringSoon(doc.expiration_date) && !isExpired(doc.expiration_date)) {

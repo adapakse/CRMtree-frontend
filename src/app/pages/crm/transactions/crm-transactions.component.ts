@@ -28,7 +28,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     <div class="kpi"><div class="kpi-val">{{report.total_commission | number:'1.0-0'}} PLN</div><div class="kpi-lbl">{{ t('transactions.amounts.commission') }}</div></div>
     <div class="product-mix" *ngIf="productMix.length">
       <span class="mix-chip" *ngFor="let m of productMix.slice(0,5)">
-        {{productIcon(m.product_type)}} {{productLabel(m.product_type)}} {{m.total_gross | number:'1.0-0'}} PLN
+        <i class="ei ei-{{ productIcon(m.product_type) }}"></i> {{productLabel(m.product_type)}} {{m.total_gross | number:'1.0-0'}} PLN
       </span>
     </div>
   </div>
@@ -39,7 +39,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     <input type="date" [(ngModel)]="filterTo"   (ngModelChange)="reload()" class="filter-input" [placeholder]="t('transactions.filters.to')">
     <select [(ngModel)]="filterType" (ngModelChange)="reload()" class="filter-input">
       <option value="">{{ t('transactions.filters.allTypes') }}</option>
-      <option *ngFor="let typeOption of typeOptions" [value]="typeOption.key">{{typeOption.icon}} {{productLabel(typeOption.key)}}</option>
+      <option *ngFor="let typeOption of typeOptions" [value]="typeOption.key">{{productLabel(typeOption.key)}}</option>
     </select>
     <select [(ngModel)]="filterStatus" (ngModelChange)="reload()" class="filter-input">
       <option value="">{{ t('transactions.filters.allStatuses') }}</option>
@@ -81,7 +81,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
             <td>
               <div class="product-tags">
                 <span class="ptag" *ngFor="let p of (txn.products || []).slice(0,3)">
-                  {{productIcon(p.product_type)}} {{productLabel(p.product_type)}}
+                  <i class="ei ei-{{ productIcon(p.product_type) }}"></i> {{productLabel(p.product_type)}}
                 </span>
                 <span class="ptag more" *ngIf="(txn.products || []).length > 3">+{{(txn.products || []).length - 3}}</span>
               </div>
@@ -101,7 +101,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
                 </thead>
                 <tbody>
                   <tr *ngFor="let p of (txn.products || [])">
-                    <td>{{productIcon(p.product_type)}} {{productLabel(p.product_type)}}</td>
+                    <td><i class="ei ei-{{ productIcon(p.product_type) }}"></i> {{productLabel(p.product_type)}}</td>
                     <td>
                       <strong>{{p.product_name || p.hotel_name || p.flight_number || p.car_category || '—'}}</strong>
                       <div class="row-sub" *ngIf="p.airline">{{p.airline}} {{p.cabin_class}}</div>
@@ -241,7 +241,7 @@ export class CrmTransactionsComponent implements OnInit {
 
   toggleExpand(id: number) { this.expandedId = this.expandedId === id ? null : id; }
   productLabel(t: string) { return t in PRODUCT_TYPE_ICONS ? this.transloco.translate('crm.labels.productTypes.' + t) : t; }
-  productIcon(t: string)  { return PRODUCT_TYPE_ICONS[t as ProductType] || '📦'; }
+  productIcon(t: string)  { return PRODUCT_TYPE_ICONS[t as ProductType] || 'package'; }
   statusLabel(s: string)  { return ['confirmed', 'cancelled', 'refunded'].includes(s) ? this.transloco.translate('crm.transactions.statuses.' + s) : s; }
   stars(n: number) { return '★'.repeat(n); }
   prevPage() { if (this.page > 1) { this.page--; this.reload(); } }

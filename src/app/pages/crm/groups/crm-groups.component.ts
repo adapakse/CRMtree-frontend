@@ -28,7 +28,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
          [class.highlighted]="g.id === highlightedId"
          (click)="viewGroup(g)">
       <div class="gc-header">
-        <div class="gc-icon">🏢</div>
+        <div class="ico-tile"><i class="ei ei-building"></i></div>
         <div class="gc-title">
           <div class="gc-name">{{g.name}}
             <span *ngIf="g.source==='dwh'" class="dwh-tag">DWH</span>
@@ -36,14 +36,14 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
           <div class="gc-industry" *ngIf="g.industry">{{g.industry}}</div>
         </div>
         <div class="gc-actions" *ngIf="isManager && g.source !== 'dwh'" (click)="$event.stopPropagation()">
-          <button class="icon-btn" (click)="editGroup(g)">✏️</button>
+          <button class="icon-btn" (click)="editGroup(g)"><i class="ei ei-pencil"></i></button>
         </div>
       </div>
       <div class="gc-stats">
         <span class="gc-stat"><strong>{{g.partner_count}}</strong> {{ t('partnerGroups.card.partnersNoun', { count: g.partner_count }) }}</span>
         <span class="gc-stat accent"><strong>{{(g.total_arr || 0) | number:'1.0-0'}} PLN</strong> ARR</span>
       </div>
-      <div class="gc-mgr" *ngIf="g.manager_name">👤 {{g.manager_name}}</div>
+      <div class="gc-mgr" *ngIf="g.manager_name"><i class="ei ei-user"></i> {{g.manager_name}}</div>
       <div class="gc-desc" *ngIf="g.description">{{g.description}}</div>
       <div class="gc-partners">
         <span class="partner-chip" *ngFor="let p of g.partners.slice(0,4)">
@@ -60,12 +60,12 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     <div class="side-panel-inner view-panel" (click)="$event.stopPropagation()">
       <div class="vp-header">
         <div>
-          <div class="vp-title">🏢 {{viewingGroup.name}}</div>
+          <div class="vp-title"><i class="ei ei-building"></i> {{viewingGroup.name}}</div>
           <div class="vp-sub" *ngIf="viewingGroup.industry">{{viewingGroup.industry}}</div>
         </div>
         <div class="vp-header-actions">
           <span *ngIf="viewingGroup.source==='dwh'" class="dwh-tag">DWH</span>
-          <button class="icon-btn" *ngIf="isManager && viewingGroup.source !== 'dwh'" (click)="editGroup(viewingGroup)">✏️</button>
+          <button class="icon-btn" *ngIf="isManager && viewingGroup.source !== 'dwh'" (click)="editGroup(viewingGroup)"><i class="ei ei-pencil"></i></button>
           <button class="close-btn" (click)="closeViewPanel()">✕</button>
         </div>
       </div>
@@ -81,7 +81,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
         </div>
       </div>
 
-      <div *ngIf="viewingGroup.manager_name" class="vp-mgr">👤 {{ t('partnerGroups.details.manager') }} <strong>{{viewingGroup.manager_name}}</strong></div>
+      <div *ngIf="viewingGroup.manager_name" class="vp-mgr"><i class="ei ei-user"></i> {{ t('partnerGroups.details.manager') }} <strong>{{viewingGroup.manager_name}}</strong></div>
       <div *ngIf="viewingGroup.description" class="vp-desc">{{viewingGroup.description}}</div>
 
       <div class="vp-partners-section">

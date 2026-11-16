@@ -63,7 +63,7 @@ type SortDir = 'asc' | 'desc';
 
   <!-- Banner filtru z raportu -->
   <div *ngIf="reportFilterLabel" style="background:var(--orange-pale);border-bottom:1px solid var(--orange-muted);padding:6px 20px;font-size:12px;color:var(--orange-dark);display:flex;align-items:center;gap:8px;flex-shrink:0">
-    <span>📊</span>
+    <span><i class="ei ei-chart"></i></span>
     <span>{{ t('partnersList.reportFilter.label') }} <strong>{{reportFilterLabel}}</strong></span>
     <button (click)="clearFilters()" style="background:none;border:none;cursor:pointer;color:var(--orange-dark);font-size:12px;margin-left:4px">✕ {{ t('partnersList.reportFilter.clear') }}</button>
   </div>
@@ -77,40 +77,40 @@ type SortDir = 'asc' | 'desc';
         <div class="pc-company">
           {{p.dwh_company_name || p.company}}
           <span *ngIf="p.dwh_partner_id" style="background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);font-size:10px;font-weight:700;padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle">DWH</span>
-          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h);font-size:14px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h);font-size:14px;margin-left:4px;vertical-align:middle"><i class="ei ei-file"></i> <i class="ei ei-warn"></i></span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
                 [title]="t('partnersList.documents.linkedCount', { count: p.doc_count })"
                 style="color:var(--gray-500);font-size:14px;margin-left:4px;vertical-align:middle;cursor:pointer"
-                (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
+                (click)="$event.stopPropagation(); openPartnerDocs(p)"><i class="ei ei-file"></i></span>
         </div>
         <span class="pbadge pbadge-{{p.status}}">{{statusLabel(p.status)}}</span>
       </div>
       <div *ngIf="p.churn_risk && p.churn_risk !== 'none' && !p.churn_exempt" class="churn-badge churn-{{p.churn_risk}}">
-        🔥 {{ t('partnersList.churn.riskWithLevel', { level: churnLabel(p.churn_risk) }) }}
+        <i class="ei ei-flame"></i> {{ t('partnersList.churn.riskWithLevel', { level: churnLabel(p.churn_risk) }) }}
         <span *ngIf="p.churn_score != null"> · {{ t('partnersList.churn.points', { score: p.churn_score }) }}</span>
       </div>
       <div class="pc-contact" *ngIf="p.contact_name">{{p.contact_name}}<span *ngIf="p.contact_title"> · {{p.contact_title}}</span></div>
       <div class="pc-meta">
-        <span *ngIf="p.group_name" class="pc-tag">🏢 {{p.group_name}}</span>
-        <span *ngIf="p.industry"   class="pc-tag">🏭 {{p.industry}}</span>
-        <span *ngIf="p.manager_name" class="pc-tag">👤 {{p.manager_name}}</span>
+        <span *ngIf="p.group_name" class="pc-tag"><i class="ei ei-building"></i> {{p.group_name}}</span>
+        <span *ngIf="p.industry"   class="pc-tag"><i class="ei ei-factory"></i> {{p.industry}}</span>
+        <span *ngIf="p.manager_name" class="pc-tag"><i class="ei ei-user"></i> {{p.manager_name}}</span>
       </div>
       <div *ngIf="hasUnreadReply(p)||(hasPbxFeature&&(p.missed_call_count??0)>0)||(hasPbxFeature&&(p.unread_sms_count??0)>0)||(hasWhatsappFeature&&(p.unread_whatsapp_count??0)>0)" style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
         <span *ngIf="hasPbxFeature && (p.missed_call_count??0)>0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{p.missed_call_count}}</span>
-        <span *ngIf="hasPbxFeature && (p.unread_sms_count??0)>0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">💬 {{p.unread_sms_count}}</span>
+        <span *ngIf="hasPbxFeature && (p.unread_sms_count??0)>0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px"><i class="ei ei-message"></i> {{p.unread_sms_count}}</span>
         <span *ngIf="hasWhatsappFeature && (p.unread_whatsapp_count??0)>0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{p.unread_whatsapp_count}}</span>
-        <span *ngIf="hasUnreadReply(p)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
+        <span *ngIf="hasUnreadReply(p)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px"><i class="ei ei-mail"></i> {{unreadReplyCount(p)}}</span>
       </div>
       <div class="pc-financials">
         <span *ngIf="p.contract_value" class="pc-arr">{{p.contract_value | number:'1.0-0'}} {{p.annual_turnover_currency || 'PLN'}}<span *ngIf="p.online_pct != null" class="pc-online"> · {{p.online_pct}}% online</span></span>
         <span *ngIf="p.open_opp_count"
               class="pc-opp" [class.pc-opp-valued]="+(p.open_opp_value||0)>0">
-          💡 {{ t('partnersList.card.openOpportunities', { count: p.open_opp_count }) }}<span *ngIf="+(p.open_opp_value||0)>0"> · {{p.open_opp_value|number:'1.0-0'}} PLN</span>
+          <i class="ei ei-bulb"></i> {{ t('partnersList.card.openOpportunities', { count: p.open_opp_count }) }}<span *ngIf="+(p.open_opp_value||0)>0"> · {{p.open_opp_value|number:'1.0-0'}} PLN</span>
         </span>
       </div>
       <ng-container *ngIf="partnerSales(p) as s">
         <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
-          <span style="font-size:12px;font-weight:700;color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">📈 {{s.gross_turnover_pln|number:'1.0-0'}} PLN</span>
+          <span style="font-size:12px;font-weight:700;color:oklch(from #f97316 max(l, var(--text-min-l)) c h)"><i class="ei ei-trending-up"></i> {{s.gross_turnover_pln|number:'1.0-0'}} PLN</span>
           <span style="font-size:12px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">▲ {{ t('partnersList.card.marginAmount', { amount: (s.revenue_pln|number:'1.0-0') }) }}</span>
           <span style="font-size:10px;color:var(--gray-400)">YTD</span>
         </div>
@@ -146,16 +146,16 @@ type SortDir = 'asc' | 'desc';
           <span *ngIf="hasPbxFeature && (p.missed_call_count??0)>0"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{p.missed_call_count}}</span>
           <span *ngIf="hasPbxFeature && (p.unread_sms_count??0)>0"
-                style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">💬 {{p.unread_sms_count}}</span>
+                style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px"><i class="ei ei-message"></i> {{p.unread_sms_count}}</span>
           <span *ngIf="hasWhatsappFeature && (p.unread_whatsapp_count??0)>0"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{p.unread_whatsapp_count}}</span>
           <span *ngIf="hasUnreadReply(p)"
-                style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
-          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h);font-size:14px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+                style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px"><i class="ei ei-mail"></i> {{unreadReplyCount(p)}}</span>
+          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h);font-size:14px;margin-left:4px;vertical-align:middle"><i class="ei ei-file"></i> <i class="ei ei-warn"></i></span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
                 [title]="t('partnersList.documents.linkedCount', { count: p.doc_count })"
                 style="color:var(--gray-500);font-size:14px;margin-left:4px;vertical-align:middle;cursor:pointer"
-                (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
+                (click)="$event.stopPropagation(); openPartnerDocs(p)"><i class="ei ei-file"></i></span>
         </span>
         <span class="td-sub" *ngIf="p.contact_name">{{p.contact_name}}</span>
       </div>

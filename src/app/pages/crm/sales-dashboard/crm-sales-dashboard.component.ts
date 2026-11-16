@@ -1445,7 +1445,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   }
 
   actIcon(type: string): string {
-    return ({ task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄', training:'🎓', qbr:'📊' } as Record<string,string>)[type] || '💬';
+    return ({ task:'check-circle', call:'phone', email:'mail', meeting:'handshake', note:'note', doc_sent:'file', training:'graduation', qbr:'chart' } as Record<string,string>)[type] || 'message';
   }
 
   actBg(type: string): string {

@@ -62,7 +62,7 @@ export interface SavedProvider {
       </div>
 
       @if (!supportedProviders().length) {
-        <div class="pr-note">🔒 {{ unsupportedReason() }}</div>
+        <div class="pr-note"><i class="ei ei-lock"></i> {{ unsupportedReason() }}</div>
       } @else {
         <!-- Jedna linia z wielokropkiem, całość w tooltipie: ten sam komunikat
              dostawcy potrafi powtórzyć się przy kilku funkcjach naraz i rozlany
@@ -98,7 +98,7 @@ export interface SavedProvider {
           <label class="lbl">{{ t('settings.ai.apiKey') }}</label>
           <div class="cell">
             @if (settledProvider() && !keyEditing()) {
-              <span class="keychip">🔑 ····{{ settledHint() }}</span>
+              <span class="keychip"><i class="ei ei-key"></i> ····{{ settledHint() }}</span>
               <button type="button" class="linkbtn" [disabled]="busy()" (click)="startKeyEdit()">
                 {{ t('settings.ai.changeKey') }}
               </button>

@@ -188,8 +188,8 @@ interface CalendarDay {
             <div class="de-source">{{ m.source_name }}
               <span *ngIf="m.assigned_to_name"> · {{ m.assigned_to_name }}</span>
             </div>
-            <div *ngIf="m.meeting_location" class="de-meta">📍 {{ m.meeting_location }}</div>
-            <div *ngIf="m.participants" class="de-meta">👥 {{ m.participants }}</div>
+            <div *ngIf="m.meeting_location" class="de-meta"><i class="ei ei-map-pin"></i> {{ m.meeting_location }}</div>
+            <div *ngIf="m.participants" class="de-meta"><i class="ei ei-users"></i> {{ m.participants }}</div>
           </div>
           <div class="ds-line"></div>
         </div>
@@ -206,7 +206,7 @@ interface CalendarDay {
       <span style="flex:1"></span>
       <ng-container *ngIf="!bulkSelectMode">
         <button class="btn btn-g btn-sm" (click)="enterBulkSelect()">
-          ☑ {{ t('calendar.tasks.bulk.selectOverdue') }}
+          <i class="ei ei-check"></i> {{ t('calendar.tasks.bulk.selectOverdue') }}
         </button>
       </ng-container>
       <ng-container *ngIf="bulkSelectMode">
@@ -330,10 +330,10 @@ interface CalendarDay {
   <div class="detail-panel" (click)="$event.stopPropagation()">
     <div class="dp-header">
       <span class="dp-badge" [class.lead-badge]="selectedMeeting.source_type==='lead'" [class.partner-badge]="selectedMeeting.source_type==='partner'">
-        {{ selectedMeeting.source_type === 'lead' ? '🎯 ' + t('labels.sourceTypes.lead') : '🤝 ' + t('labels.sourceTypes.partner') }}
+        @if (selectedMeeting.source_type === 'lead') { <i class="ei ei-target"></i> {{ t('labels.sourceTypes.lead') }} } @else { <i class="ei ei-handshake"></i> {{ t('labels.sourceTypes.partner') }} }
       </span>
       <span style="flex:1"></span>
-      <button class="btn btn-g btn-sm" (click)="startEdit()" *ngIf="!editMode && canEdit(selectedMeeting)">✏️{{ t('activity.modal.edit') }}</button>
+      <button class="btn btn-g btn-sm" (click)="startEdit()" *ngIf="!editMode && canEdit(selectedMeeting)"><i class="ei ei-pencil"></i> {{ t('activity.modal.edit') }}</button>
       <button class="dp-close" (click)="closeMeeting()">✕</button>
     </div>
 
@@ -344,13 +344,13 @@ interface CalendarDay {
         <a *ngIf="selectedMeeting.source_type === 'lead'"    [routerLink]="['/crm/leads',    selectedMeeting.source_id]" class="dp-link">{{ selectedMeeting.source_name }}</a>
         <a *ngIf="selectedMeeting.source_type === 'partner'" [routerLink]="['/crm/partners', selectedMeeting.source_id]" class="dp-link">{{ selectedMeeting.source_name }}</a>
       </div>
-      <div class="dp-row"><span class="dp-lbl">📅 {{ t('activity.modal.dateTime') }}</span><span>{{ selectedMeeting.activity_at | date:'dd.MM.yyyy HH:mm' }}</span></div>
+      <div class="dp-row"><span class="dp-lbl"><i class="ei ei-calendar"></i> {{ t('activity.modal.dateTime') }}</span><span>{{ selectedMeeting.activity_at | date:'dd.MM.yyyy HH:mm' }}</span></div>
       <div class="dp-row" *ngIf="selectedMeeting.duration_min"><span class="dp-lbl">⏱ {{ t('calendar.meeting.duration') }}</span><span>{{ t('calendar.durationMinutes', { minutes: selectedMeeting.duration_min }) }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.meeting_location"><span class="dp-lbl">📍 {{ t('meetings.location') }}</span><span>{{ selectedMeeting.meeting_location }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.participants"><span class="dp-lbl">👥 {{ t('meetings.participants') }}</span><span style="word-break:break-all">{{ selectedMeeting.participants }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.body"><span class="dp-lbl">📝 {{ t('calendar.meeting.notes') }}</span><span>{{ selectedMeeting.body }}</span></div>
-      <div class="dp-row"><span class="dp-lbl">👤 {{ t('activity.modal.addedBy') }}</span><span>{{ selectedMeeting.created_by_name }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.assigned_to_name"><span class="dp-lbl">🙋 {{ t('calendar.meeting.salesperson') }}</span><span>{{ selectedMeeting.assigned_to_name }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.meeting_location"><span class="dp-lbl"><i class="ei ei-map-pin"></i> {{ t('meetings.location') }}</span><span>{{ selectedMeeting.meeting_location }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.participants"><span class="dp-lbl"><i class="ei ei-users"></i> {{ t('meetings.participants') }}</span><span style="word-break:break-all">{{ selectedMeeting.participants }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.body"><span class="dp-lbl"><i class="ei ei-note"></i> {{ t('calendar.meeting.notes') }}</span><span>{{ selectedMeeting.body }}</span></div>
+      <div class="dp-row"><span class="dp-lbl"><i class="ei ei-user"></i> {{ t('activity.modal.addedBy') }}</span><span>{{ selectedMeeting.created_by_name }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.assigned_to_name"><span class="dp-lbl"><i class="ei ei-user"></i> {{ t('calendar.meeting.salesperson') }}</span><span>{{ selectedMeeting.assigned_to_name }}</span></div>
     </div>
 
     <!-- Tryb edycji -->

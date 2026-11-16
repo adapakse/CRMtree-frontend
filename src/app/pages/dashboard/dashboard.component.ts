@@ -27,31 +27,31 @@ import { LocaleService } from '../../core/i18n/locale.service';
       <!-- Stats -->
       <div class="stats-bar">
         <div class="stat-card">
-          <div class="stat-ico ico-or">📄</div>
+          <div class="stat-ico ico-or"><i class="ei ei-file"></i></div>
           <div class="stat-lbl">{{ t('dashboard.stats.total') }}</div>
           <div class="stat-val">{{ stats().total }}</div>
           <div class="stat-sub">{{ t('dashboard.stats.totalHint') }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-ico ico-bl">⚡</div>
+          <div class="stat-ico ico-bl"><i class="ei ei-zap"></i></div>
           <div class="stat-lbl">{{ t('dashboard.stats.inWorkflow') }}</div>
           <div class="stat-val">{{ stats().inWorkflow }}</div>
           <div class="stat-sub">{{ t('labels.activeTasks') }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-ico ico-gr">✔</div>
+          <div class="stat-ico ico-gr"><i class="ei ei-check"></i></div>
           <div class="stat-lbl">{{ t('dashboard.stats.signed') }}</div>
           <div class="stat-val">{{ stats().signed }}</div>
           <div class="stat-sub">{{ t('dashboard.stats.signedHint') }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-ico ico-re">⚠</div>
+          <div class="stat-ico ico-re"><i class="ei ei-warn"></i></div>
           <div class="stat-lbl">{{ t('dashboard.stats.expiring') }}</div>
           <div class="stat-val">{{ stats().expiring }}</div>
           <div class="stat-sub">{{ t('dashboard.stats.expiringHint') }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-ico ico-pu">📋</div>
+          <div class="stat-ico ico-pu"><i class="ei ei-clipboard"></i></div>
           <div class="stat-lbl">{{ t('labels.myTasks') }}</div>
           <div class="stat-val">{{ myTasks().length }}</div>
           <div class="stat-sub">{{ t('dashboard.stats.myTasksHint') }}</div>
@@ -90,7 +90,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
                       <div style="display:flex;flex-direction:column;gap:4px;margin-top:6px">
                         @for (task of doc.active_task_details!; track task.id) {
                           <div class="task-strip" (click)="$event.stopPropagation()">
-                            <span class="task-type-ico">{{ taskIcon(task.task_type) }}</span>
+                            <span class="task-type-ico"><i class="ei ei-{{ taskIcon(task.task_type) }}"></i></span>
                             <div class="task-strip-body">
                               <div class="task-strip-line1">
                                 <span class="tbadge" [class]="'tbadge-' + task.task_type">
@@ -103,7 +103,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
                                 {{ t('labels.from', { name: task.assigner_name }) }}
                                 @if (task.due_date) {
                                   <span class="task-due" [class.overdue]="isDue(task.due_date)">
-                                    ⏰ {{ task.due_date | date:'dd.MM.yy' }}
+                                    <i class="ei ei-clock"></i> {{ task.due_date | date:'dd.MM.yy' }}
                                   </span>
                                 }
                               </div>
@@ -122,7 +122,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
                 </div>
               }
               @empty {
-                <div class="empty-state"><div class="empty-icon">📁</div><div class="empty-title">{{ t('labels.noDocuments') }}</div></div>
+                <div class="empty-state"><div class="empty-icon"><i class="ei ei-folder"></i></div><div class="empty-title">{{ t('labels.noDocuments') }}</div></div>
               }
             </div>
           }
@@ -144,7 +144,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
                   @if (task.due_date) {
                     <span style="font-size:10px;font-weight:600;margin-left:auto"
                           [style.color]="isDue(task.due_date) ? 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)' : 'oklch(from #065f46 max(l, var(--text-min-l)) c h)'">
-                      ⏰ {{ task.due_date | date:'dd.MM.yy' }}
+                      <i class="ei ei-clock"></i> {{ task.due_date | date:'dd.MM.yy' }}
                     </span>
                   }
                 </div>
@@ -181,7 +181,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
     .stat-lbl { font-size: 12px; font-weight: 500; color: var(--gray-500); text-transform: uppercase; letter-spacing: .4px; }
     .stat-val { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 700; color: var(--gray-900); line-height: 1; }
     .stat-sub { font-size: 12px; color: var(--gray-400); }
-    .stat-ico { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    .stat-ico { font-size: 16px; width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
     .ico-or { background: var(--orange-pale); } .ico-bl { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); } .ico-gr { background: color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface)); color: oklch(from #16A34A max(l, var(--text-min-l)) c h); } .ico-pu { background: color-mix(in srgb, #F5F3FF var(--tint-mix), var(--surface)); color: oklch(from #7C3AED max(l, var(--text-min-l)) c h); } .ico-re { background: color-mix(in srgb, #FEF2F2 var(--tint-mix), var(--surface)); color: oklch(from #DC2626 max(l, var(--text-min-l)) c h); }
     .thead { display: grid; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 0 16px; }
     .th { padding: 10px 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); display: flex; align-items: center; }
@@ -232,7 +232,7 @@ export class DashboardComponent implements OnInit {
   }
 
   taskIcon(type: string): string {
-    return { sign: '✍️', edit: '✏️', approve: '✅', read: '👁' }[type] ?? '📋';
+    return { sign: 'pencil', edit: 'pencil', approve: 'check-circle', read: 'eye' }[type] ?? 'clipboard';
   }
 
   ngOnInit(): void {

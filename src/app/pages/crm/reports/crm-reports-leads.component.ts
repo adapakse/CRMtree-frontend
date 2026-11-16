@@ -96,7 +96,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
 
   <!-- Brak danych -->
   <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--gray-400)">
-    <div style="font-size:48px;margin-bottom:12px">📊</div>
+    <div class="ico-tile ico-tile--lg" style="margin:0 auto 12px"><i class="ei ei-chart"></i></div>
     <div style="font-size:16px;font-weight:600">{{ t('reports.leads.empty.title') }}</div>
     <div style="font-size:14px;margin-top:4px">{{ t('reports.leads.empty.hint') }}</div>
   </div>
@@ -185,7 +185,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
           <div style="font-weight:700;color:var(--gray-800);font-family:'Sora',sans-serif">{{ kpi.active }}</div>
         </div>
         <div style="background:var(--gray-50);border-radius:8px;padding:8px 10px">
-          <div style="color:var(--gray-400);margin-bottom:2px">{{ t('leadsList.stats.hot') }} 🔥<wt-tooltip key="crm.leads.funnel.hot"></wt-tooltip></div>
+          <div style="color:var(--gray-400);margin-bottom:2px">{{ t('leadsList.stats.hot') }} <i class="ei ei-flame"></i><wt-tooltip key="crm.leads.funnel.hot"></wt-tooltip></div>
           <div style="font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);font-family:'Sora',sans-serif">{{ kpi.hot }}</div>
         </div>
       </div>
@@ -314,7 +314,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
       <div #lostEl style="display:flex;flex-direction:column;gap:10px"></div>
       <div *ngIf="!lostReasons.length" style="color:var(--gray-400);font-size:12px;text-align:center;padding:12px">{{ t('reports.leads.lostReasons.empty') }}</div>
       <div *ngIf="lostReasons.length" style="margin-top:16px;padding:12px 16px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px;font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
-        💡<strong>{{ t('reports.leads.lostReasons.topReason') }}</strong> {{ lostReasons[0].reason }} ({{ t('reports.leads.lostReasons.leadsCount', { count: lostReasons[0].count }) }})
+        <i class="ei ei-bulb"></i><strong>{{ t('reports.leads.lostReasons.topReason') }}</strong> {{ lostReasons[0].reason }} ({{ t('reports.leads.lostReasons.leadsCount', { count: lostReasons[0].count }) }})
       </div>
     </div>
   </div>

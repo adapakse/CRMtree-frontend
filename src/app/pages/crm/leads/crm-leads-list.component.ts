@@ -59,7 +59,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color:oklch(from #f59e0b max(l, var(--text-min-l)) c h)">{{ stats.hot }}</div>
-      <div class="stat-lbl">🔥 {{ t('leadsList.stats.hot') }}</div>
+      <div class="stat-lbl"><i class="ei ei-flame"></i> {{ t('leadsList.stats.hot') }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color: var(--orange-text)">{{ formatPLN(stats.pipeline) }}</div>
@@ -78,21 +78,21 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
   <!-- ── Toolbar ── -->
   <div *ngIf="reportFilterLabel" style="display:flex;align-items:center;gap:8px;padding:6px 0 0 0;margin-bottom:-4px">
     <span style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:6px">
-      📊 {{ t('leadsList.filters.reportFilter', { label: reportFilterLabel }) }}
+      <i class="ei ei-chart"></i> {{ t('leadsList.filters.reportFilter', { label: reportFilterLabel }) }}
       <span style="cursor:pointer;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);line-height:1" (click)="clearReportFilter()">×</span>
     </span>
   </div>
   <!-- Persistent rep filter chip -->
   <div *ngIf="persistRepName" style="display:flex;align-items:center;gap:8px;padding:4px 0 0 0;margin-bottom:-4px">
     <span style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:6px">
-      👤 {{ t('leadsList.filters.repChip', { name: persistRepName }) }}
+      <i class="ei ei-user"></i> {{ t('leadsList.filters.repChip', { name: persistRepName }) }}
       <span style="cursor:pointer;font-size:14px;line-height:1" (click)="clearPersistRepFilter()">×</span>
     </span>
   </div>
   <div class="toolbar">
     <span class="fchip" [class.on]="scopeFilter==='all'"  (click)="setScope('all')">{{ t('leadsList.filters.all') }}</span>
     <span class="fchip" [class.on]="scopeFilter==='mine'" (click)="setScope('mine')">{{ t('leadsList.filters.mine') }}</span>
-    <span class="fchip" [class.on]="filterHot"            (click)="filterHot=!filterHot; load()">🔥 {{ t('leadsList.filters.hot') }}</span>
+    <span class="fchip" [class.on]="filterHot"            (click)="filterHot=!filterHot; load()"><i class="ei ei-flame"></i> {{ t('leadsList.filters.hot') }}</span>
     <span class="fchip" [class.on]="filterHoldOnly"       (click)="filterHoldOnly=!filterHoldOnly; load()" [title]="t('leadsList.filters.holdOnlyTitle')">⏸️ {{ t('leadsList.filters.holdOnly') }}</span>
     <span style="flex:1"></span>
     <select class="sel" [(ngModel)]="filterStageUI" (ngModelChange)="onStageFilterChange()">
@@ -179,7 +179,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                (click)="selectLead(lead)">
             <div class="lead-company" style="display:flex;align-items:center;gap:6px">
               <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
-              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #15803d max(l, var(--text-min-l)) c h);border-radius:6px;padding:1px 4px;margin-left:4px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
+              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot"><i class="ei ei-flame"></i></span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #15803d max(l, var(--text-min-l)) c h);border-radius:6px;padding:1px 4px;margin-left:4px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
             </div>
             <div class="lead-contact" *ngIf="lead.contact_name">
               {{ lead.contact_name }}<span *ngIf="lead.contact_title" style="color:var(--gray-400)"> · {{ lead.contact_title }}</span>
@@ -190,7 +190,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
               <span *ngIf="lead.probability != null" class="lv-pct" [title]="t('leadsList.table.chance')">{{lead.probability}}%</span>
             </div>
             <div class="lead-chips" *ngIf="lead.online_pct != null">
-              <span class="lchip lchip-online">🌐 {{lead.online_pct}}%</span>
+              <span class="lchip lchip-online"><i class="ei ei-globe"></i> {{lead.online_pct}}%</span>
             </div>
             <div class="lead-meta">
               <span *ngIf="lead.source" class="tag tag-src">{{ srcLabel(lead.source) }}</span>
@@ -200,9 +200,9 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
             </div>
             <div style="display:flex;align-items:center;gap:4px;margin-top:2px;flex-wrap:wrap">
               <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
-              <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">💬 {{lead.unread_sms_count}}</span>
+              <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px"><i class="ei ei-message"></i> {{lead.unread_sms_count}}</span>
               <span *ngIf="hasWhatsappFeature && (lead.unread_whatsapp_count ?? 0) > 0" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{lead.unread_whatsapp_count}}</span>
-              <span *ngIf="hasUnreadReply(lead)" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
+              <span *ngIf="hasUnreadReply(lead)" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px"><i class="ei ei-mail"></i> {{unreadReplyCount(lead)}}</span>
               <span *ngIf="lead.created_at" class="lead-added">{{ t('leadsList.fields.addedOn') }} {{ lead.created_at | date:'dd.MM.yy' }}</span>
             </div>
           </div>
@@ -248,13 +248,13 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span *ngIf="selected.hot" class="tag tag-orange" style="font-size:10px">🔥</span>
+            <span *ngIf="selected.hot" class="tag tag-orange" style="font-size:10px"><i class="ei ei-flame"></i></span>
             <button class="dp-close" (click)="selected=null; cdr.markForCheck()">✕</button>
           </div>
         </div>
         <div class="dp-actions">
-          <button class="btn btn-g btn-sm" *ngIf="selected.phone" (click)="callPhone(selected.phone)">📞</button>
-          <button class="btn btn-g btn-sm" *ngIf="selected.email" (click)="mailTo(selected.email)">✉</button>
+          <button class="btn btn-g btn-sm" *ngIf="selected.phone" (click)="callPhone(selected.phone)"><i class="ei ei-phone"></i></button>
+          <button class="btn btn-g btn-sm" *ngIf="selected.email" (click)="mailTo(selected.email)"><i class="ei ei-mail"></i></button>
           <button class="btn btn-p btn-sm" [routerLink]="['/crm/leads',selected.id]" style="flex:1">{{ t('leadsList.detail.openDetails') }} →</button>
         </div>
       </div>
@@ -379,15 +379,15 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <div class="td" style="display:flex;align-items:center;gap:8px">
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
-          <div style="font-weight:650;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span>
+          <div style="font-weight:650;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> <i class="ei ei-flame"></i></span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span>
             <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0"
                   style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
             <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0"
-                  style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">💬 {{lead.unread_sms_count}}</span>
+                  style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px"><i class="ei ei-message"></i> {{lead.unread_sms_count}}</span>
             <span *ngIf="hasWhatsappFeature && (lead.unread_whatsapp_count ?? 0) > 0"
                   style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{lead.unread_whatsapp_count}}</span>
             <span *ngIf="hasUnreadReply(lead)"
-                  style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
+                  style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px"><i class="ei ei-mail"></i> {{unreadReplyCount(lead)}}</span>
           </div>
           <div style="font-size:12px;color:var(--gray-400)">{{ lead.contact_name }}</div>
           <div *ngIf="lead.converted_at" style="font-size:10px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);font-weight:600;margin-top:2px">
@@ -414,7 +414,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       </div>
     </div>
     <div *ngIf="allLeads.length===0" class="empty-state">
-      <div style="font-size:32px">📋</div>{{ t('leadsList.table.empty') }}
+      <div class="ico-tile ico-tile--lg" style="margin:0 auto 0px"><i class="ei ei-clipboard"></i></div>{{ t('leadsList.table.empty') }}
     </div>
     <div *ngIf="totalPages>1" class="pagination">
       <button class="btn btn-g btn-sm" [disabled]="page===1" (click)="setPage(page-1)">← {{ t('leadsList.table.previous') }}</button>
@@ -450,10 +450,10 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                      (ngModelChange)="onWebsiteChange()"
                      [class.fi-err]="newMissing('website')"
                      style="padding-right:36px">
-              <span *ngIf="enriching" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400)">⏳</span>
+              <span *ngIf="enriching" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400)"><i class="ei ei-hourglass"></i></span>
             </div>
             <button type="button" class="fchip hot-chip" [class.on]="newForm.hot" [attr.aria-pressed]="!!newForm.hot"
-                    [title]="t('leadsList.newLead.hotHint')" (click)="newForm.hot = !newForm.hot">🔥 {{ t('leadsList.newLead.hot') }}</button>
+                    [title]="t('leadsList.newLead.hotHint')" (click)="newForm.hot = !newForm.hot"><i class="ei ei-flame"></i> {{ t('leadsList.newLead.hot') }}</button>
           </div>
           @if (newMissing('website')) { <span class="ferr">{{ t('fieldErrors.website') }}</span> }
         </div>
@@ -461,7 +461,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           <div>
           <!-- Enrich prompt banner -->
           <div *ngIf="enrichPrompt&&!enriching" style="margin-top:6px;background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
-            <span>🔍 {{ t('leadsList.newLead.enrichPrompt') }}</span>
+            <span><i class="ei ei-search"></i> {{ t('leadsList.newLead.enrichPrompt') }}</span>
             <button style="background:var(--orange-strong);color:white;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-weight:600" (click)="runEnrich()">{{ t('leadsList.newLead.enrichConfirm') }}</button>
             <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:12px" (click)="enrichPrompt=false">{{ t('leadsList.newLead.enrichDecline') }}</button>
           </div>
@@ -647,7 +647,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
 
       <!-- Empty -->
       <div *ngIf="!timelineLoading && timelineMeetings.length===0" class="tl-empty">
-        <div style="font-size:36px;margin-bottom:10px">📭</div>
+        <div class="ico-tile ico-tile--lg" style="margin:0 auto 10px"><i class="ei ei-inbox"></i></div>
         <div style="font-weight:600;color:var(--gray-700)">{{ t('leadsList.timeline.empty') }}</div>
         <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ t('leadsList.timeline.emptyHint') }}</div>
       </div>
@@ -745,7 +745,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <div style="flex:1;min-width:0">
         <div class="modal-title">{{ meetingEditMode ? t('leadsList.meeting.editTitle') : t('leadsList.meeting.detailTitle') }}</div>
         <div style="font-size:12px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-          {{ selectedMeeting.source_type === 'lead' ? '📋 ' + t('labels.sourceTypes.lead') : '🤝 ' + t('labels.sourceTypes.partner') }} · {{ selectedMeeting.source_name }}
+          @if (selectedMeeting.source_type === 'lead') { <i class="ei ei-clipboard"></i> {{ t('labels.sourceTypes.lead') }} } @else { <i class="ei ei-handshake"></i> {{ t('labels.sourceTypes.partner') }} } · {{ selectedMeeting.source_name }}
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -784,11 +784,11 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           <div class="meet-field-val">{{ t('leadsList.meeting.durationValue', { count: selectedMeeting.duration_min }) }}</div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.meeting_location">
-          <div class="meet-field-label">📍 {{ t('leadsList.meeting.location') }}</div>
+          <div class="meet-field-label"><i class="ei ei-map-pin"></i> {{ t('leadsList.meeting.location') }}</div>
           <div class="meet-field-val">{{ selectedMeeting.meeting_location }}</div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.participants">
-          <div class="meet-field-label">👥 {{ t('leadsList.meeting.participants') }}</div>
+          <div class="meet-field-label"><i class="ei ei-users"></i> {{ t('leadsList.meeting.participants') }}</div>
           <div class="meet-field-val" style="white-space:pre-line">{{ selectedMeeting.participants }}</div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.assigned_to_name">
@@ -1996,7 +1996,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     return ACTIVITY_TYPES_WITH_LABEL.includes(type) ? this.transloco.translate('crm.labels.activityTypes.' + type) : type;
   }
   tlTypeIcon(type: string): string {
-    return { call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';
+    return { call:'phone', email:'mail', meeting:'handshake', note:'note', training:'graduation', qbr:'chart', doc_sent:'file', opportunity:'bulb' }[type] || 'message';
   }
   trackById(_: number, l: Lead){ return l.id; }
   callPhone(p: string)         { window.location.href = `tel:${p}`; }
@@ -2016,6 +2016,6 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
 
 
   actIcon(type: string) {
-    return { call:'📞', email:'✉', meeting:'🤝', note:'📝', doc_sent:'📄' }[type] ?? '💬';
+    return { call:'phone', email:'mail', meeting:'handshake', note:'note', doc_sent:'file' }[type] ?? 'message';
   }
 }

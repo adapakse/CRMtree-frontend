@@ -22,7 +22,7 @@ interface SignedInDevice {
   providers: [provideTranslocoScope('account')],
   template: `
     <div class="card devices-card" *transloco="let t; prefix: 'account'">
-      <h2>📱 {{ t('myDevices.title') }}</h2>
+      <h2><i class="ei ei-smartphone"></i> {{ t('myDevices.title') }}</h2>
       <p class="hint">
         {{ t('myDevices.hint') }}
       </p>

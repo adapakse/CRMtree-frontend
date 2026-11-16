@@ -50,6 +50,8 @@ Obie aplikacje mają ten sam kod stylów; różnią się kolorem marki i tłumac
 - Na przyciskach i w akcjach: **ikony linią (SVG `svg.ic`, kolor `currentColor`)**, nie emoji —
   emoji giną na kolorowym tle i wyglądają inaczej w każdym systemie.
 - Emoji zostają tylko tam, gdzie są celowo (kafelki grup w „Grupy i role”).
+- **Zamiast emoji: `<i class="ei ei-phone"></i>`** (globalna klasa, ikona 1em w kolorze tekstu, zestaw `ei-*` na końcu `global.scss`; nową ikonę dopisz tak samo). W nagłówkach sekcji/kart i w przyciskach — sama ikona przed tekstem. Tytuły stron — bez ikony (jest w menu).
+- **Kafelek ikony (wariant A)**: `<span class="ico-tile"><i class="ei ei-file"></i></span>` — 36×36, radius 10, ikona 18px, kolor marki; `ico-tile--danger` (usuwanie), `ico-tile--warn` (ostrzeżenie), `ico-tile--lg` (48px, puste stany/ekrany wyniku).
 
 ## Gotowe elementy — używaj zamiast pisać od nowa
 

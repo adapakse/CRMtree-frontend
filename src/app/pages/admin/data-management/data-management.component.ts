@@ -25,7 +25,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
 <ng-container *transloco="let t; prefix: 'admin'">
 <div class="dm-page">
   <div class="dm-header">
-    <h1>🗄️ {{ t('dataManagement.title') }}</h1>
+    <h1>{{ t('dataManagement.title') }}</h1>
   </div>
   <div class="dm-body">
     <p class="sub">{{ t('dataManagement.subtitle') }}</p>
@@ -33,7 +33,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
   <!-- ── Sekcja 1: Kasowanie pojedynczych elementów ── -->
   <div class="dm-section">
     <div class="section-head">
-      <div class="section-icon danger">🗑️</div>
+      <div class="ico-tile ico-tile--danger"><i class="ei ei-trash"></i></div>
       <div>
         <div class="section-title">{{ t('dataManagement.delete.title') }}</div>
         <div class="section-sub">{{ t('dataManagement.delete.subtitle') }}</div>
@@ -45,7 +45,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
       <!-- Dokument -->
       <div class="delete-card">
         <div class="dc-head">
-          <span class="dc-icon">📄</span>
+          <span class="ico-tile"><i class="ei ei-file"></i></span>
           <div>
             <div class="dc-title">{{ t('dataManagement.delete.document.title') }}</div>
             <div class="dc-desc">{{ t('dataManagement.delete.document.description') }}</div>
@@ -62,11 +62,11 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           </div>
         </div>
         <div *ngIf="docSelected" class="selected-badge">
-          <span class="sel-name">📄 {{ docSelected.label }}</span>
+          <span class="sel-name"><i class="ei ei-file"></i> {{ docSelected.label }}</span>
           <button class="sel-clear" (click)="clearDocSel()">✕</button>
         </div>
         <button class="btn btn-d" (click)="deleteDocument()" [disabled]="!docSelected || deleting() === 'doc'">
-          {{ deleting() === 'doc' ? '⏳ ' + t('dataManagement.delete.inProgress') : '🗑️ ' + t('dataManagement.delete.document.action') }}
+          @if (deleting() === 'doc') { {{ t('dataManagement.delete.inProgress') }} } @else { <i class="ei ei-trash"></i> {{ t('dataManagement.delete.document.action') }} }
         </button>
         <div *ngIf="deleteDocResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deleteDocResult }) }}</div>
       </div>
@@ -74,7 +74,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
       <!-- Lead -->
       <div class="delete-card">
         <div class="dc-head">
-          <span class="dc-icon">👤</span>
+          <span class="ico-tile"><i class="ei ei-user"></i></span>
           <div>
             <div class="dc-title">{{ t('dataManagement.delete.lead.title') }}</div>
             <div class="dc-desc">{{ t('dataManagement.delete.lead.description') }}</div>
@@ -91,11 +91,11 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           </div>
         </div>
         <div *ngIf="leadSelected" class="selected-badge">
-          <span class="sel-name">👤 {{ leadSelected.label }}</span>
+          <span class="sel-name"><i class="ei ei-user"></i> {{ leadSelected.label }}</span>
           <button class="sel-clear" (click)="clearLeadSel()">✕</button>
         </div>
         <button class="btn btn-d" (click)="deleteLead()" [disabled]="!leadSelected || deleting() === 'lead'">
-          {{ deleting() === 'lead' ? '⏳ ' + t('dataManagement.delete.inProgress') : '🗑️ ' + t('dataManagement.delete.lead.action') }}
+          @if (deleting() === 'lead') { {{ t('dataManagement.delete.inProgress') }} } @else { <i class="ei ei-trash"></i> {{ t('dataManagement.delete.lead.action') }} }
         </button>
         <div *ngIf="deleteLeadResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deleteLeadResult }) }}</div>
       </div>
@@ -103,7 +103,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
       <!-- Partner -->
       <div class="delete-card">
         <div class="dc-head">
-          <span class="dc-icon">🤝</span>
+          <span class="ico-tile"><i class="ei ei-handshake"></i></span>
           <div>
             <div class="dc-title">{{ t('dataManagement.delete.partner.title') }}</div>
             <div class="dc-desc">{{ t('dataManagement.delete.partner.description') }}</div>
@@ -120,11 +120,11 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           </div>
         </div>
         <div *ngIf="partnerSelected" class="selected-badge">
-          <span class="sel-name">🤝 {{ partnerSelected.label }}</span>
+          <span class="sel-name"><i class="ei ei-handshake"></i> {{ partnerSelected.label }}</span>
           <button class="sel-clear" (click)="clearPartnerSel()">✕</button>
         </div>
         <button class="btn btn-d" (click)="deletePartner()" [disabled]="!partnerSelected || deleting() === 'partner'">
-          {{ deleting() === 'partner' ? '⏳ ' + t('dataManagement.delete.inProgress') : '🗑️ ' + t('dataManagement.delete.partner.action') }}
+          @if (deleting() === 'partner') { {{ t('dataManagement.delete.inProgress') }} } @else { <i class="ei ei-trash"></i> {{ t('dataManagement.delete.partner.action') }} }
         </button>
         <div *ngIf="deletePartnerResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deletePartnerResult }) }}</div>
       </div>
@@ -136,7 +136,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
   <!-- ── Sekcja 2: Czyszczenie grup danych ── -->
   <div class="dm-section">
     <div class="section-head">
-      <div class="section-icon danger">⚠️</div>
+      <div class="ico-tile ico-tile--danger"><i class="ei ei-warn"></i></div>
       <div>
         <div class="section-title">{{ t('dataManagement.purge.title') }}</div>
         <div class="section-sub">{{ t('dataManagement.purge.subtitle') }}</div>
@@ -148,14 +148,14 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
       <!-- Purge Documents -->
       <div class="purge-card">
         <div class="purge-card-head">
-          <span class="dc-icon">📄</span>
+          <span class="ico-tile"><i class="ei ei-file"></i></span>
           <div>
             <div class="purge-card-title">{{ t('dataManagement.purge.docs.title') }}</div>
             <div class="purge-card-desc">{{ t('dataManagement.purge.docs.description') }}</div>
           </div>
         </div>
         <div *ngIf="purgeConfirming !== 'docs'" class="purge-act">
-          <button class="btn btn-d" (click)="purgeConfirming='docs'">🗑️ {{ t('dataManagement.purge.docs.action') }}</button>
+          <button class="btn btn-d" (click)="purgeConfirming='docs'"><i class="ei ei-trash"></i> {{ t('dataManagement.purge.docs.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'docs'" class="inline-confirm">
           <input class="dm-input" [(ngModel)]="purgeTexts.docs" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.docs.confirmPhrase') })">
@@ -163,7 +163,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
             <button class="btn btn-g btn-sm" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn btn-d btn-sm" (click)="purgeCategory('docs')"
                     [disabled]="purgeTexts.docs !== t('dataManagement.purge.docs.confirmPhrase') || purging() === 'docs'">
-              {{ purging() === 'docs' ? '⏳…' : t('dataManagement.purge.confirm') }}
+              @if (purging() === 'docs') { … } @else { {{ t('dataManagement.purge.confirm') }} }
             </button>
           </div>
         </div>
@@ -173,14 +173,14 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
       <!-- Purge Leads -->
       <div class="purge-card">
         <div class="purge-card-head">
-          <span class="dc-icon">👤</span>
+          <span class="ico-tile"><i class="ei ei-user"></i></span>
           <div>
             <div class="purge-card-title">{{ t('dataManagement.purge.leads.title') }}</div>
             <div class="purge-card-desc">{{ t('dataManagement.purge.leads.description') }}</div>
           </div>
         </div>
         <div *ngIf="purgeConfirming !== 'leads'" class="purge-act">
-          <button class="btn btn-d" (click)="purgeConfirming='leads'">🗑️ {{ t('dataManagement.purge.leads.action') }}</button>
+          <button class="btn btn-d" (click)="purgeConfirming='leads'"><i class="ei ei-trash"></i> {{ t('dataManagement.purge.leads.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'leads'" class="inline-confirm">
           <input class="dm-input" [(ngModel)]="purgeTexts.leads" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.leads.confirmPhrase') })">
@@ -188,7 +188,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
             <button class="btn btn-g btn-sm" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn btn-d btn-sm" (click)="purgeCategory('leads')"
                     [disabled]="purgeTexts.leads !== t('dataManagement.purge.leads.confirmPhrase') || purging() === 'leads'">
-              {{ purging() === 'leads' ? '⏳…' : t('dataManagement.purge.confirm') }}
+              @if (purging() === 'leads') { … } @else { {{ t('dataManagement.purge.confirm') }} }
             </button>
           </div>
         </div>
@@ -198,14 +198,14 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
       <!-- Purge Partners -->
       <div class="purge-card">
         <div class="purge-card-head">
-          <span class="dc-icon">🤝</span>
+          <span class="ico-tile"><i class="ei ei-handshake"></i></span>
           <div>
             <div class="purge-card-title">{{ t('dataManagement.purge.partners.title') }}</div>
             <div class="purge-card-desc">{{ t('dataManagement.purge.partners.description') }}</div>
           </div>
         </div>
         <div *ngIf="purgeConfirming !== 'partners'" class="purge-act">
-          <button class="btn btn-d" (click)="purgeConfirming='partners'">🗑️ {{ t('dataManagement.purge.partners.action') }}</button>
+          <button class="btn btn-d" (click)="purgeConfirming='partners'"><i class="ei ei-trash"></i> {{ t('dataManagement.purge.partners.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'partners'" class="inline-confirm">
           <input class="dm-input" [(ngModel)]="purgeTexts.partners" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.partners.confirmPhrase') })">
@@ -213,7 +213,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
             <button class="btn btn-g btn-sm" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn btn-d btn-sm" (click)="purgeCategory('partners')"
                     [disabled]="purgeTexts.partners !== t('dataManagement.purge.partners.confirmPhrase') || purging() === 'partners'">
-              {{ purging() === 'partners' ? '⏳…' : t('dataManagement.purge.confirm') }}
+              @if (purging() === 'partners') { … } @else { {{ t('dataManagement.purge.confirm') }} }
             </button>
           </div>
         </div>
@@ -227,7 +227,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
   <!-- ── Sekcja 3: Eksport / Import ustawień ── -->
   <div class="dm-section">
     <div class="section-head">
-      <div class="section-icon">📦</div>
+      <div class="ico-tile"><i class="ei ei-package"></i></div>
       <div>
         <div class="section-title">{{ t('dataManagement.settings.title') }}</div>
         <div class="section-sub">{{ t('dataManagement.settings.subtitle') }}</div>
@@ -236,29 +236,29 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
 
     <div class="export-import-grid">
       <div class="ei-card">
-        <div class="ei-title">📥 {{ t('dataManagement.settings.export.title') }}</div>
+        <div class="ei-title"><i class="ei ei-inbox"></i> {{ t('dataManagement.settings.export.title') }}</div>
         <div class="ei-desc">{{ t('dataManagement.settings.export.description') }}</div>
         <div class="mt-12">
           <button class="btn btn-p" (click)="exportSettings()" [disabled]="exporting()">
-            {{ exporting() ? '⏳ ' + t('dataManagement.settings.export.generating') : '📥 ' + t('dataManagement.settings.export.download') }}
+            @if (exporting()) { {{ t('dataManagement.settings.export.generating') }} } @else { <i class="ei ei-inbox"></i> {{ t('dataManagement.settings.export.download') }} }
           </button>
         </div>
       </div>
 
       <div class="ei-card">
-        <div class="ei-title">📤 {{ t('dataManagement.settings.import.title') }}</div>
+        <div class="ei-title"><i class="ei ei-send"></i> {{ t('dataManagement.settings.import.title') }}</div>
         <div class="ei-desc">{{ t('dataManagement.settings.import.description') }}</div>
         <div class="mt-12 import-col">
           <div class="drop-zone" [class.drag-over]="isDragging"
                (dragover)="$event.preventDefault(); isDragging=true"
                (dragleave)="isDragging=false" (drop)="onDrop($event)" (click)="fileInput.click()">
             <input #fileInput type="file" accept=".json" hidden (change)="onFileChange($event)">
-            <span *ngIf="!selectedFile && !importing()">📂 {{ t('dataManagement.settings.import.dropHint') }}</span>
-            <span *ngIf="selectedFile && !importing()">📄 {{ selectedFile.name }}</span>
-            <span *ngIf="importing()">⏳ {{ t('dataManagement.settings.import.inProgress') }}</span>
+            <span *ngIf="!selectedFile && !importing()"><i class="ei ei-folder-open"></i> {{ t('dataManagement.settings.import.dropHint') }}</span>
+            <span *ngIf="selectedFile && !importing()"><i class="ei ei-file"></i> {{ selectedFile.name }}</span>
+            <span *ngIf="importing()"><i class="ei ei-hourglass"></i> {{ t('dataManagement.settings.import.inProgress') }}</span>
           </div>
           <button class="btn btn-p" (click)="importSettings()" [disabled]="!selectedFile || importing()">
-            {{ importing() ? '⏳ ' + t('dataManagement.settings.import.inProgress') : '📤 ' + t('dataManagement.settings.import.action') }}
+            @if (importing()) { {{ t('dataManagement.settings.import.inProgress') }} } @else { <i class="ei ei-send"></i> {{ t('dataManagement.settings.import.action') }} }
           </button>
         </div>
         <div *ngIf="importResult" class="result-ok mt-2">

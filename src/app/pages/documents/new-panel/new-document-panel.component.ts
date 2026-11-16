@@ -198,11 +198,11 @@ interface SelectOption { value: string; label: string; }
                (drop)="onDrop($event)"
                (click)="fileInput.click()">
             @if (selectedFile) {
-              <div style="font-size:14px;font-weight:600;color:var(--gray-800)">📄 {{ selectedFile.name }}</div>
+              <div style="font-size:14px;font-weight:600;color:var(--gray-800)"><i class="ei ei-file"></i> {{ selectedFile.name }}</div>
               <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ formatSize(selectedFile.size) }}</div>
               <button class="btn btn-g btn-sm" style="margin-top:8px" (click)="$event.stopPropagation();selectedFile=null">{{ t('newDocument.file.remove') }}</button>
             } @else {
-              <div style="margin-bottom:8px;color:var(--gray-400)">📂</div>
+              <div style="margin-bottom:8px;color:var(--gray-400)"><i class="ei ei-folder-open"></i></div>
               <div style="font-size:14px;font-weight:600;color:var(--gray-700)">{{ t('newDocument.file.dropHint') }}</div>
               <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ t('newDocument.file.formats') }}</div>
             }

@@ -323,7 +323,7 @@ interface SelectOption { value: string; label: string; }
                 <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
                   @for (p of linkedPartners(); track p.id) {
                     <div style="display:flex;align-items:center;gap:8px;background:var(--gray-50);border-radius:12px;padding:8px 12px">
-                      <span style="font-size:14px">🤝</span>
+                      <span style="font-size:14px"><i class="ei ei-handshake"></i></span>
                       <span style="font-size:14px;font-weight:600;flex:1">{{ p.company }}</span>
                       @if (doc._access === 'full') {
                         <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;line-height:1;display:inline-flex;padding:4px" (click)="unlinkPartner(p)" [title]="t('detail.partners.unlink')">✕</button>
@@ -362,7 +362,7 @@ interface SelectOption { value: string; label: string; }
 
             @if (doc.document_group_name) {
               <div style="background:var(--orange-pale);border-radius:12px;padding:12px 16px;font-size:12px;color:var(--orange-dark)">
-                📎 {{ t('detail.overview.packagePart') }} <strong>{{ doc.document_group_name }}</strong>
+                <i class="ei ei-paperclip"></i> {{ t('detail.overview.packagePart') }} <strong>{{ doc.document_group_name }}</strong>
               </div>
             }
           }
@@ -377,7 +377,7 @@ interface SelectOption { value: string; label: string; }
             @if (doc.blob_name) {
               @if (!isPdf) {
                 <div class="empty-state">
-                  <div class="empty-icon">📄</div>
+                  <div class="empty-icon"><i class="ei ei-file"></i></div>
                   <div class="empty-title">{{ t('detail.preview.unavailable') }}</div>
                   <div style="font-size:12px;color:var(--gray-400);margin:6px auto 0;text-align:center;max-width:320px">
                     {{ t('detail.preview.unavailableFormat') }}<br>{{ t('detail.preview.unavailableHint') }}
@@ -393,7 +393,7 @@ interface SelectOption { value: string; label: string; }
                   }
                   @if (previewError()) {
                     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--gray-500)">
-                      <span style="font-size:32px">⚠️</span>
+                      <span class="ico-tile ico-tile--warn"><i class="ei ei-warn"></i></span>
                       <span style="font-size:14px">{{ previewError() }}</span>
                     </div>
                   }
@@ -404,7 +404,7 @@ interface SelectOption { value: string; label: string; }
               }
             } @else {
               <div class="empty-state">
-                <div class="empty-icon">📎</div>
+                <div class="empty-icon"><i class="ei ei-paperclip"></i></div>
                 <div class="empty-title">{{ t('detail.preview.noFile') }}</div>
                 @if (doc._access === 'full') {
                   <label class="btn btn-p" style="margin-top:12px;cursor:pointer">
@@ -443,7 +443,7 @@ interface SelectOption { value: string; label: string; }
               </div>
             }
             @empty {
-              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">{{ t('detail.versions.empty') }}</div></div>
+              <div class="empty-state"><div class="empty-icon"><i class="ei ei-clipboard"></i></div><div class="empty-title">{{ t('detail.versions.empty') }}</div></div>
             }
           }
 
@@ -510,12 +510,12 @@ interface SelectOption { value: string; label: string; }
           <!-- HISTORY TIMELINE -->
           @if (activeTab === 'history') {
             @if (history().length === 0) {
-              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">{{ t('detail.history.empty') }}</div></div>
+              <div class="empty-state"><div class="empty-icon"><i class="ei ei-clipboard"></i></div><div class="empty-title">{{ t('detail.history.empty') }}</div></div>
             } @else {
               <ul class="tl">
                 @for (entry of history(); track entry.id) {
                   <li class="tli">
-                    <div class="tdot dot-w">{{ historyIcon(entry.action) }}</div>
+                    <div class="tdot dot-w"><i class="ei ei-{{ historyIcon(entry.action) }}"></i></div>
                     <div>
                       <div class="tlt">{{ historyLabel(entry) }}</div>
                       <div class="tlm">
@@ -578,14 +578,14 @@ interface SelectOption { value: string; label: string; }
                 </div>
               </div>
               <button class="btn btn-p" style="margin-top:20px" [disabled]="!wf.assignTo" (click)="assignTask()">
-                📨 {{ t('detail.workflow.assign') }}
+                <i class="ei ei-mail"></i> {{ t('detail.workflow.assign') }}
               </button>
             }
 
             @if (doc._access === 'full' && doc.blob_name && !isStoredInvoice) {
               <div class="sec-title" style="margin-top:24px">{{ t('detail.signus.sectionTitle') }}</div>
               <button class="btn btn-p" (click)="openSignus()">
-                ✍ {{ t('detail.signus.start') }}
+                <i class="ei ei-pencil"></i> {{ t('detail.signus.start') }}
               </button>
             }
 
@@ -627,7 +627,7 @@ interface SelectOption { value: string; label: string; }
       <div class="mol open" (click)="signusOpen = false">
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
-            <div class="moico" style="background:color-mix(in srgb, #F5F3FF var(--tint-mix), var(--surface));color:oklch(from #7e22ce max(l, var(--text-min-l)) c h)">✍</div>
+            <div class="moico" style="background:color-mix(in srgb, #F5F3FF var(--tint-mix), var(--surface));color:oklch(from #7e22ce max(l, var(--text-min-l)) c h)"><i class="ei ei-pencil"></i></div>
             <div>
               <div class="mot">{{ t('detail.signus.modalTitle') }}</div>
               <div class="mos">{{ doc.doc_number }} · {{ doc.name }}</div>
@@ -639,7 +639,7 @@ interface SelectOption { value: string; label: string; }
               <textarea class="fta" style="min-height:60px" [placeholder]="t('detail.signus.emailsPlaceholder')" [(ngModel)]="signusEmails"></textarea>
             </div>
             <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;font-size:12px;color:var(--gray-500)">
-              ℹ {{ t('detail.signus.info') }}
+              <i class="ei ei-info"></i> {{ t('detail.signus.info') }}
             </div>
           </div>
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:8px;justify-content:flex-end;background:var(--gray-50)">
@@ -1064,7 +1064,7 @@ export class DetailPanelComponent implements OnChanges {
     this.docSvc.uploadAttachment(this.doc.id, file, file.name).subscribe({
       next: att => {
         this.attachments.update(list => [...list, att]);
-        this.attachmentEvents.update(evts => [{icon:'📎', title: this.transloco.translate('documents.detail.history.actions.attachment_uploaded', { name: file.name }), date: new Date().toISOString()}, ...evts]);
+        this.attachmentEvents.update(evts => [{icon:'paperclip', title: this.transloco.translate('documents.detail.history.actions.attachment_uploaded', { name: file.name }), date: new Date().toISOString()}, ...evts]);
         this.toast.success(this.transloco.translate('documents.detail.attachments.uploaded'));
         this.reloadHistory();
       },
@@ -1083,7 +1083,7 @@ export class DetailPanelComponent implements OnChanges {
       next: () => {
         this.toast.success(this.transloco.translate('documents.detail.versions.uploaded'));
         this.reloadHistory();
-        this.attachmentEvents.update(evts => [{icon:'📎', title: this.transloco.translate('documents.detail.attachments.events.newVersion', { name: attName }), date: new Date().toISOString()}, ...evts]);
+        this.attachmentEvents.update(evts => [{icon:'paperclip', title: this.transloco.translate('documents.detail.attachments.events.newVersion', { name: attName }), date: new Date().toISOString()}, ...evts]);
         this.attachmentsLoaded = false;
         this.docSvc.getAttachments(this.doc.id).subscribe(list => { this.attachments.set(list); this.attachmentsLoaded = true; });
       },
@@ -1107,7 +1107,7 @@ export class DetailPanelComponent implements OnChanges {
     const attName = this.attachments().find((a:any) => a.id === attId)?.name ?? attId;
     this.docSvc.deleteAttachment(this.doc.id, attId).subscribe(() => {
       this.attachments.update(list => list.filter((a: any) => a.id !== attId));
-      this.attachmentEvents.update(evts => [{icon:'🗑', title: this.transloco.translate('documents.detail.attachments.events.deleted', { name: attName }), date: new Date().toISOString()}, ...evts]);
+      this.attachmentEvents.update(evts => [{icon:'trash', title: this.transloco.translate('documents.detail.attachments.events.deleted', { name: attName }), date: new Date().toISOString()}, ...evts]);
       this.toast.success(this.transloco.translate('documents.detail.attachments.deleted'));
       this.reloadHistory();
     });
@@ -1115,27 +1115,27 @@ export class DetailPanelComponent implements OnChanges {
 
   historyIcon(action: string): string {
     const map: Record<string,string> = {
-      document_created:            '📄',
-      document_updated:            '✏️',
-      document_deleted:            '🗑',
-      document_downloaded:         '⬇️',
-      metadata_updated:            '✏️',
-      tag_added:                   '🏷️',
-      tag_removed:                 '🏷️',
-      tag_updated:                 '🏷️',
-      status_changed:              '🔄',
-      version_uploaded:            '📤',
-      workflow_task_created:       '📝',
-      workflow_task_completed:     '✅',
-      workflow_task_cancelled:     '❌',
-      signing_initiated:           '✍️',
-      signing_completed:           '✅',
-      signing_failed:              '❌',
-      attachment_uploaded:         '📎',
-      attachment_version_uploaded: '📎',
-      attachment_deleted:          '🗑',
+      document_created:            'file',
+      document_updated:            'pencil',
+      document_deleted:            'trash',
+      document_downloaded:         'download',
+      metadata_updated:            'pencil',
+      tag_added:                   'tag',
+      tag_removed:                 'tag',
+      tag_updated:                 'tag',
+      status_changed:              'refresh',
+      version_uploaded:            'send',
+      workflow_task_created:       'note',
+      workflow_task_completed:     'check-circle',
+      workflow_task_cancelled:     'x-circle',
+      signing_initiated:           'pencil',
+      signing_completed:           'check-circle',
+      signing_failed:              'x-circle',
+      attachment_uploaded:         'paperclip',
+      attachment_version_uploaded: 'paperclip',
+      attachment_deleted:          'trash',
     };
-    return map[action] ?? '📋';
+    return map[action] ?? 'clipboard';
   }
 
   historyLabel(entry: any): string {

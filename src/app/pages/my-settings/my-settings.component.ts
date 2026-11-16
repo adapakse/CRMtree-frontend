@@ -36,7 +36,7 @@ const BASE = environment.apiUrl;
   <div class="card settings-head">
     <wt-language-picker mode="user" />
     <div class="manual-entry">
-      <div class="manual-title">📘 {{ t('mySettings.manual.title') }}</div>
+      <div class="manual-title"><i class="ei ei-book"></i> {{ t('mySettings.manual.title') }}</div>
       <p class="manual-hint">{{ t('mySettings.manual.hint') }}</p>
       <a class="btn btn-p" [href]="manualUrl()" target="_blank" rel="noopener">{{ t('mySettings.manual.open') }}</a>
     </div>
@@ -53,7 +53,7 @@ const BASE = environment.apiUrl;
   <!-- ── Zmiana hasła ───────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px">
     <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin:0 0 4px;display:flex;align-items:center;gap:8px">
-      🔑 {{ t('mySettings.password.title') }}
+      <i class="ei ei-key"></i> {{ t('mySettings.password.title') }}
     </h2>
     <p style="font-size:12px;color:var(--gray-500);margin:0 0 20px;line-height:1.5">
       {{ t('mySettings.password.hint') }}
@@ -110,7 +110,7 @@ const BASE = environment.apiUrl;
   <!-- ── Stopka email ───────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px">
     <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin:0 0 4px;display:flex;align-items:center;gap:8px">
-      ✉️ {{ t('mySettings.signature.title') }}
+      <i class="ei ei-mail"></i> {{ t('mySettings.signature.title') }}
     </h2>
     <p style="font-size:12px;color:var(--gray-500);margin:0 0 20px;line-height:1.5">
       {{ t('mySettings.signature.hint') }}
@@ -132,10 +132,10 @@ const BASE = environment.apiUrl;
         ></textarea>
         <div style="display:flex;gap:8px;margin-top:20px">
           <button class="btn btn-p" (click)="save()" [disabled]="saving">
-            {{ saving ? '⏳ ' + t('mySettings.saving') : '💾 ' + t('mySettings.signature.save') }}
+            @if (saving) { {{ t('mySettings.saving') }} } @else { <i class="ei ei-save"></i> {{ t('mySettings.signature.save') }} }
           </button>
           <button class="btn btn-d" (click)="clear()" *ngIf="signatureHtml" [disabled]="saving">
-            🗑 {{ t('mySettings.delete') }}
+            <i class="ei ei-trash"></i> {{ t('mySettings.delete') }}
           </button>
         </div>
         <div *ngIf="saveSuccess" style="margin-top:8px;font-size:12px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-weight:600">
@@ -166,7 +166,7 @@ const BASE = environment.apiUrl;
   <div class="card" style="padding:24px">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
       <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin:0;flex:1;display:flex;align-items:center;gap:8px">
-        📋 {{ t('mySettings.templates.title') }}
+        <i class="ei ei-clipboard"></i> {{ t('mySettings.templates.title') }}
       </h2>
       <button class="btn btn-p" (click)="openTplForm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('mySettings.templates.new') }}</button>
     </div>
@@ -181,8 +181,8 @@ const BASE = environment.apiUrl;
     <div *ngFor="let tpl of templates" style="background:var(--gray-50);border-radius:12px;padding:12px 16px;margin-bottom:8px">
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:14px;font-weight:700;color:var(--gray-800);flex:1">{{tpl.name}}</span>
-        <button class="btn btn-g btn-sm" (click)="editTpl(tpl)">✏️ {{ t('mySettings.templates.edit') }}</button>
-        <button class="btn btn-d btn-sm" (click)="deleteTpl(tpl)" [disabled]="tplSaving">🗑</button>
+        <button class="btn btn-g btn-sm" (click)="editTpl(tpl)"><i class="ei ei-pencil"></i> {{ t('mySettings.templates.edit') }}</button>
+        <button class="btn btn-d btn-sm" (click)="deleteTpl(tpl)" [disabled]="tplSaving"><i class="ei ei-trash"></i></button>
       </div>
       <div *ngIf="tpl.body" style="font-size:12px;color:var(--gray-500);margin-top:8px;max-height:48px;overflow:hidden;line-height:1.5"
            [innerHTML]="tplPreview(tpl.body)"></div>
@@ -203,7 +203,7 @@ const BASE = environment.apiUrl;
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
         <button class="btn btn-g" (click)="cancelTplForm()">{{ 'actions.cancel' | transloco }}</button>
         <button class="btn btn-p" (click)="saveTpl()" [disabled]="!tplForm.name || tplSaving">
-          {{ tplSaving ? '⏳ ' + t('mySettings.saving') : '💾 ' + ('actions.save' | transloco) }}
+          @if (tplSaving) { {{ t('mySettings.saving') }} } @else { <i class="ei ei-save"></i> {{ ('actions.save' | transloco) }} }
         </button>
       </div>
       <div *ngIf="tplError" style="margin-top:8px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">{{tplError}}</div>
@@ -215,7 +215,7 @@ const BASE = environment.apiUrl;
   <!-- ── Softphone PBX ──────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px" *ngIf="auth.hasFeature('pbx')">
     <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin:0 0 4px;display:flex;align-items:center;gap:8px">
-      📞 {{ t('mySettings.pbx.title') }}
+      <i class="ei ei-phone"></i> {{ t('mySettings.pbx.title') }}
     </h2>
     <p style="font-size:12px;color:var(--gray-500);margin:0 0 20px;line-height:1.5">
       {{ t('mySettings.pbx.hint') }}
@@ -228,7 +228,7 @@ const BASE = environment.apiUrl;
       <!-- Skonfigurowany -->
       <div *ngIf="pbxConfigured"
            style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border-radius:12px;margin-bottom:16px">
-        <span style="font-size:18px;flex-shrink:0">✅</span>
+        <span style="font-size:18px;flex-shrink:0"><i class="ei ei-check-circle"></i></span>
         <div>
           <div style="font-size:14px;font-weight:600;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">{{ t('mySettings.pbx.configured') }}</div>
           <div *ngIf="pbxDirectPhone" style="font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h);margin-top:1px">
@@ -243,7 +243,7 @@ const BASE = environment.apiUrl;
       <!-- Nieskonfigurowany -->
       <div *ngIf="!pbxConfigured"
            style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:color-mix(in srgb, #fefce8 var(--tint-mix), var(--surface));border-radius:12px;margin-bottom:16px">
-        <span style="font-size:18px;flex-shrink:0">⚠️</span>
+        <span style="font-size:18px;flex-shrink:0"><i class="ei ei-warn"></i></span>
         <div style="font-size:14px;color:oklch(from #854d0e max(l, var(--text-min-l)) c h)">{{ t('mySettings.pbx.notConfigured') }}</div>
       </div>
 

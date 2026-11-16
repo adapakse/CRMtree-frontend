@@ -739,7 +739,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     </div>
                                     @if (whatsappConfig()!.token_check?.valid === false) {
                                       <div class="token-warning">
-                                        ⚠️ <strong>Token dostępu nie działa — wysyłka WhatsApp z CRM nie przechodzi.</strong>
+                                        <i class="ei ei-warn"></i> <strong>Token dostępu nie działa — wysyłka WhatsApp z CRM nie przechodzi.</strong>
                                         Meta: {{ whatsappConfig()!.token_check!.error }}<br>
                                         Wygeneruj stały token użytkownika systemowego (Meta Business Suite → Użytkownicy systemowi, ważność „Nigdy”) i wklej go poniżej w „Access Token”.
                                       </div>

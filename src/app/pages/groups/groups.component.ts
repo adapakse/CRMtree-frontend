@@ -114,7 +114,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
               </div>
             }
             @empty {
-              <div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">{{ t('userGroups.noMembers') }}</div></div>
+              <div class="empty-state"><div class="empty-icon"><i class="ei ei-user"></i></div><div class="empty-title">{{ t('userGroups.noMembers') }}</div></div>
             }
           </div>
           @if (auth.isAdmin()) {
@@ -132,7 +132,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
       <div class="mol open" (click)="openNew=false">
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
-            <div class="moico" style="background:var(--orange-pale);color: var(--orange-text)">👥</div>
+            <div class="ico-tile"><i class="ei ei-users"></i></div>
             <div><div class="mot">{{ t('userGroups.create.title') }}</div><div class="mos">{{ t('userGroups.create.subtitle') }}</div></div>
           </div>
           <div style="padding:24px;display:flex;flex-direction:column;gap:16px">

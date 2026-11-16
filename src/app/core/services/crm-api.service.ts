@@ -903,16 +903,16 @@ export const PRODUCT_TYPE_LABELS: Record<ProductType, string> = {
 };
 
 export const PRODUCT_TYPE_ICONS: Record<ProductType, string> = {
-  hotel:             '🏨',
-  transport_flight:  '✈️',
-  transport_train:   '🚂',
-  transport_bus:     '🚌',
-  transport_ferry:   '⛴️',
-  car_rental:        '🚗',
-  transfer:          '🚕',
-  travel_insurance:  '🛡️',
-  visa:              '🪪',
-  other:             '📦',
+  hotel:             'building',
+  transport_flight:  'plane',
+  transport_train:   'truck',
+  transport_bus:     'truck',
+  transport_ferry:   'truck',
+  car_rental:        'truck',
+  transfer:          'truck',
+  travel_insurance:  'shield',
+  visa:              'id-card',
+  other:             'package',
 };
 
 /** Źródła leadów — spójne z importem CSV (pole source/zrodlo) */

@@ -65,10 +65,10 @@ interface CallAnalysisRow {
     </button>
     <button *ngIf="batchProgress.running" disabled
             class="btn btn-p">
-      ⏳ {{ t('callAnalysis.header.analyzing') }}
+      <i class="ei ei-hourglass"></i> {{ t('callAnalysis.header.analyzing') }}
     </button>
     <label class="btn btn-g">
-      ⬆ {{ t('callAnalysis.header.importCsv') }}
+      <i class="ei ei-upload"></i> {{ t('callAnalysis.header.importCsv') }}
       <input type="file" accept=".csv" (change)="onFileChange($event)" style="display:none">
     </label>
   </div>
@@ -88,7 +88,7 @@ interface CallAnalysisRow {
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <span style="font-size:12px;color:var(--gray-700);font-weight:500">
         <ng-container *ngIf="batchProgress.running && batchStartedHere">{{ t('callAnalysis.progress.running') }}</ng-container>
-        <ng-container *ngIf="batchProgress.running && !batchStartedHere">⚠ {{ t('callAnalysis.progress.runningOtherUser') }}</ng-container>
+        <ng-container *ngIf="batchProgress.running && !batchStartedHere"><i class="ei ei-warn"></i> {{ t('callAnalysis.progress.runningOtherUser') }}</ng-container>
         <ng-container *ngIf="!batchProgress.running">{{ t('callAnalysis.progress.finished') }}</ng-container>
         &nbsp;{{ t('callAnalysis.progress.companies', { done: batchProgress.done, total: batchProgress.total }) }}
       </span>
@@ -112,7 +112,7 @@ interface CallAnalysisRow {
     </button>
     <button (click)="bulkAction('set-status', 'archived')"
             class="ca-bulk-btn">
-      📦 {{ t('callAnalysis.actions.archive') }}
+      <i class="ei ei-package"></i> {{ t('callAnalysis.actions.archive') }}
     </button>
     <button (click)="bulkAction('set-status', 'pending')"
             class="ca-bulk-btn">
@@ -120,11 +120,11 @@ interface CallAnalysisRow {
     </button>
     <button (click)="bulkAction('re-analyze')"
             class="ca-bulk-btn">
-      🔄 {{ t('callAnalysis.actions.reanalyze') }}
+      <i class="ei ei-refresh"></i> {{ t('callAnalysis.actions.reanalyze') }}
     </button>
     <button (click)="bulkAction('delete')"
             class="ca-bulk-btn ca-bulk-del">
-      🗑 {{ t('callAnalysis.bulk.deleteSelected') }}
+      <i class="ei ei-trash"></i> {{ t('callAnalysis.bulk.deleteSelected') }}
     </button>
     <button (click)="cancelSelection()"
             class="ca-bulk-btn" style="margin-left:auto">
@@ -205,7 +205,7 @@ interface CallAnalysisRow {
        style="border-bottom:1px solid;padding:10px 24px;font-size:14px;flex-shrink:0"
        [style.border-color]="importResult.error ? '#fca5a5' : '#86efac'"
        [style.color]="importResult.error ? 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)' : 'oklch(from #15803d max(l, var(--text-min-l)) c h)'">
-    <span *ngIf="importResult.error">⚠ {{importResult.error}}</span>
+    <span *ngIf="importResult.error"><i class="ei ei-warn"></i> {{importResult.error}}</span>
     <span *ngIf="!importResult.error">
       ✓ {{ t(importResult.created !== undefined ? 'callAnalysis.import.resultCreated' : 'callAnalysis.import.resultUpserted', {
           created: importResult.created, appended: importResult.appended, upserted: importResult.upserted,
@@ -375,7 +375,7 @@ interface CallAnalysisRow {
               <div style="padding:16px 24px">
                 <div *ngIf="r.analysis_status === 'error' && r.analysis_error"
                      style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-size:12px;margin-bottom:8px">
-                  ⚠ {{r.analysis_error}}
+                  <i class="ei ei-warn"></i> {{r.analysis_error}}
                 </div>
                 <div *ngIf="r.ai_summary" style="color:var(--gray-700);font-size:14px;margin-bottom:12px;line-height:1.5">
                   {{r.ai_summary}}
@@ -408,7 +408,7 @@ interface CallAnalysisRow {
                 <div *ngIf="r.notes_text" style="margin-top:16px">
                   <div (click)="toggleTranscript(r.nip, $event)" class="transcript-toggle">
                     <span style="font-size:10px;margin-right:4px">{{ transcriptExpanded.has(r.nip) ? '▼' : '▶' }}</span>
-                    📋 {{ t('callAnalysis.transcript.title', { count: getTranscripts(r).length }) }}
+                    <i class="ei ei-clipboard"></i> {{ t('callAnalysis.transcript.title', { count: getTranscripts(r).length }) }}
                   </div>
                   <div *ngIf="transcriptExpanded.has(r.nip)">
                     <div *ngFor="let chunk of getTranscripts(r); let i = index"
@@ -427,7 +427,7 @@ interface CallAnalysisRow {
 
         <tr *ngIf="!loading && rows.length === 0">
           <td colspan="12" style="padding:60px 24px;text-align:center;color:var(--gray-400)">
-            <div style="font-size:32px;margin-bottom:8px">{{ hasActiveFilters ? '🔍' : '📞' }}</div>
+            <div style="font-size:32px;margin-bottom:8px">@if (hasActiveFilters) { <i class="ei ei-search"></i> } @else { <i class="ei ei-phone"></i> }</div>
             <div style="font-size:14px;font-weight:500">{{ hasActiveFilters ? t('callAnalysis.empty.noResults') : t('callAnalysis.empty.noNotes') }}</div>
             <div *ngIf="!hasActiveFilters" style="font-size:12px;margin-top:4px">{{ t('callAnalysis.empty.hint') }}</div>
           </td>
@@ -467,26 +467,26 @@ interface CallAnalysisRow {
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:var(--gray-700);cursor:pointer"
                 onmouseenter="this.style.background='var(--gray-50)'"
                 onmouseleave="this.style.background='none'">
-          {{r.analysis_status === 'archived' ? '📤 ' + t('callAnalysis.menu.restoreFromArchive') : '📦 ' + t('callAnalysis.actions.archive')}}
+          @if (r.analysis_status === 'archived') { <i class="ei ei-send"></i> {{ t('callAnalysis.menu.restoreFromArchive') }} } @else { <i class="ei ei-package"></i> {{ t('callAnalysis.actions.archive') }} }
         </button>
         <button (click)="reAnalyze(r.nip, $event)"
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:var(--gray-700);cursor:pointer"
                 onmouseenter="this.style.background='var(--gray-50)'"
                 onmouseleave="this.style.background='none'">
-          🔄 {{ t('callAnalysis.actions.reanalyze') }}
+          <i class="ei ei-refresh"></i> {{ t('callAnalysis.actions.reanalyze') }}
         </button>
         <button (click)="openInspect(r, $event)"
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:var(--gray-700);cursor:pointer"
                 onmouseenter="this.style.background='var(--gray-50)'"
                 onmouseleave="this.style.background='none'">
-          🔍 {{ t('callAnalysis.menu.inspect') }}
+          <i class="ei ei-search"></i> {{ t('callAnalysis.menu.inspect') }}
         </button>
         <div style="height:1px;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));margin:4px 0"></div>
         <button (click)="deleteRow(r, $event)"
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);cursor:pointer"
                 onmouseenter="this.style.background='var(--gray-50)'"
                 onmouseleave="this.style.background='none'">
-          🗑 {{ t('callAnalysis.menu.delete') }}
+          <i class="ei ei-trash"></i> {{ t('callAnalysis.menu.delete') }}
         </button>
       </ng-container>
     </ng-container>
@@ -509,7 +509,7 @@ interface CallAnalysisRow {
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));flex-shrink:0">
       <div style="display:flex;flex-direction:column;gap:4px">
-        <span style="font-size:10px;color:var(--gray-400);font-weight:700;text-transform:uppercase;letter-spacing:.6px">🔍 {{ t('callAnalysis.inspect.title') }}</span>
+        <span style="font-size:10px;color:var(--gray-400);font-weight:700;text-transform:uppercase;letter-spacing:.6px"><i class="ei ei-search"></i> {{ t('callAnalysis.inspect.title') }}</span>
         <span style="font-size:16px;font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">
           {{inspectRow.company_name || '—'}}
           <span style="font-size:12px;font-weight:400;color:var(--gray-400);font-family:monospace"> · {{inspectRow.nip}}</span>
@@ -570,7 +570,7 @@ interface CallAnalysisRow {
                 {{inspectRow.follow_up_required ? '✓ ' + t('callAnalysis.followUp.required') : '— ' + t('callAnalysis.followUp.notRequired')}}
               </span>
               <span *ngIf="inspectRow.follow_up_date" style="color:var(--gray-700)">
-                📅 {{inspectRow.follow_up_date | date:'dd.MM.yyyy'}}
+                <i class="ei ei-calendar"></i> {{inspectRow.follow_up_date | date:'dd.MM.yyyy'}}
               </span>
               <span *ngIf="inspectRow.follow_up_done" style="color:var(--gray-400);text-decoration:line-through;font-size:12px">✓ {{ t('callAnalysis.followUp.done') }}</span>
             </div>

@@ -177,10 +177,10 @@ const DOC_DICT_KEYS = ['doc_types', 'doc_statuses', 'doc_gdpr_types', 'doc_payme
 const CRM_DICT_KEYS = ['onboarding_task_templates', 'crm_lead_sources'];
 
 const CATEGORY_LABELS: Record<string, { labelKey: string; icon: string }> = {
-  documents: { labelKey: 'admin.settings.global.categories.documents', icon: '📄' },
-  workflow:  { labelKey: 'admin.settings.global.categories.workflow',  icon: '🗂' },
-  general:   { labelKey: 'admin.settings.global.categories.general',   icon: '⚙️' },
-  crm:       { labelKey: 'admin.settings.global.categories.crm',       icon: '💼' },
+  documents: { labelKey: 'admin.settings.global.categories.documents', icon: 'file' },
+  workflow:  { labelKey: 'admin.settings.global.categories.workflow',  icon: 'folder' },
+  general:   { labelKey: 'admin.settings.global.categories.general',   icon: 'settings' },
+  crm:       { labelKey: 'admin.settings.global.categories.crm',       icon: 'briefcase' },
 };
 
 // Etykiety dla pól json – mapuje klucz → etykiety elementów tablicy
@@ -257,7 +257,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         </span>
       }
       <button class="btn btn-p" [disabled]="saving() || !dirty()" (click)="saveAll()">
-        @if (saving()) { {{ t('settings.actions.saving') }} } @else { 💾 {{ t('settings.actions.saveChanges') }} }
+        @if (saving()) { {{ t('settings.actions.saving') }} } @else { <i class="ei ei-save"></i> {{ t('settings.actions.saveChanges') }} }
       </button>
       <button class="btn btn-g" [disabled]="!dirty()" (click)="resetDrafts()">
         {{ t('settings.actions.discard') }}
@@ -272,7 +272,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
       <div style="max-width:820px">
 
         <a class="survey-link" routerLink="/admin/onboarding-survey">
-          <span style="font-size:18px;flex-shrink:0">📝</span>
+          <span style="font-size:18px;flex-shrink:0"><i class="ei ei-note"></i></span>
           <span>
             <strong>{{ t('settings.survey.title') }}</strong> {{ t('settings.survey.description') }}
           </span>
@@ -282,22 +282,22 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- Zakładki -->
         <div class="tabs">
           <button class="tab-btn" [class.active]="activeTab() === 'global'" (click)="activeTab.set('global')">
-            ⚙️ {{ t('settings.tabs.global') }}
+            <i class="ei ei-settings"></i> {{ t('settings.tabs.global') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'crm'" (click)="activeTab.set('crm'); loadLeadStages()">
-            💼 {{ t('settings.tabs.crm') }}
+            <i class="ei ei-briefcase"></i> {{ t('settings.tabs.crm') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'documents'" (click)="activeTab.set('documents')">
-            📄 {{ t('settings.tabs.documents') }}
+            <i class="ei ei-file"></i> {{ t('settings.tabs.documents') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'users'" (click)="activeTab.set('users'); loadGroups()">
-            👥 {{ t('settings.tabs.users') }}
+            <i class="ei ei-users"></i> {{ t('settings.tabs.users') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'onboarding'" (click)="activeTab.set('onboarding')">
-            🚀 {{ t('settings.tabs.onboarding') }}
+            <i class="ei ei-play"></i> {{ t('settings.tabs.onboarding') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'tooltips'" (click)="activeTab.set('tooltips')">
-            💬 {{ t('settings.tabs.tooltips') }}
+            <i class="ei ei-message"></i> {{ t('settings.tabs.tooltips') }}
           </button>
           <!-- Endpoint /admin/prospects/icp-config jest za requireFeature('prospects'),
                więc bez modułu Prospekty zakładka mogłaby tylko pokazać błąd —
@@ -307,12 +307,12 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                własnego tenanta nie może mu tego ekranu odbierać. -->
           @if (auth.hasFeature('prospects') || auth.isSuperAdmin()) {
             <button class="tab-btn" [class.active]="activeTab() === 'icp'" (click)="activeTab.set('icp'); loadIcpTenants(); loadIcpConfig()">
-              🎯 {{ t('settings.tabs.icp') }}
+              <i class="ei ei-target"></i> {{ t('settings.tabs.icp') }}
             </button>
           }
           @if (auth.hasFeature('projects')) {
             <button class="tab-btn" [class.active]="activeTab() === 'projects'" (click)="activeTab.set('projects')">
-              📋 {{ t('settings.tabs.projects') }}
+              <i class="ei ei-clipboard"></i> {{ t('settings.tabs.projects') }}
             </button>
           }
         </div>
@@ -329,7 +329,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           </div>
 
           <div style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0">ℹ️</span>
+            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-info"></i></span>
             <div>
               <strong>{{ t('settings.tabs.global') }}</strong> {{ t('settings.global.intro') }}
             </div>
@@ -352,7 +352,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @if (aiFeatureEnabled()) {
           <div class="card" style="margin-bottom:24px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px;flex-shrink:0">🤖</span>
+              <span style="font-size:18px;flex-shrink:0"><i class="ei ei-bot"></i></span>
               <span class="cat-title">{{ t('settings.ai.title') }}</span>
             </div>
 
@@ -378,7 +378,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @for (cat of globalCategories(); track cat.key) {
             <div class="card" style="margin-bottom:24px;overflow:hidden">
               <div class="cat-header">
-                <span style="font-size:18px">{{ cat.icon }}</span>
+                <span style="font-size:18px"><i class="ei ei-{{ cat.icon }}"></i></span>
                 <span class="cat-title">{{ cat.label }}</span>
               </div>
               @for (field of cat.fields; track field.key; let last = $last) {
@@ -419,7 +419,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
           <!-- Preview -->
           <div class="card" style="padding:20px;margin-bottom:24px">
-            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">🔍 {{ t('settings.global.preview.title') }}</div>
+            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px"><i class="ei ei-search"></i> {{ t('settings.global.preview.title') }}</div>
             <div style="display:flex;flex-direction:column;gap:8px;font-size:14px">
               <div style="display:flex;align-items:center;gap:12px">
                 <div style="width:16px;height:16px;background:var(--gray-800);border-radius:3px"></div>
@@ -441,7 +441,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         @if (activeTab() === 'crm') {
 
           <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0">💼</span>
+            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-briefcase"></i></span>
             <div>
               <strong>{{ t('settings.tabs.crm') }}</strong> {{ t('settings.crm.intro') }}
             </div>
@@ -585,7 +585,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @if (churnFields().length > 0) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:14px;display:inline-flex;align-items:center;gap:8px">📉 {{ t('settings.crm.scoring.churnTitle') }}</span>
+                <span class="cat-title" style="font-size:14px;display:inline-flex;align-items:center;gap:8px"><i class="ei ei-trending-down"></i> {{ t('settings.crm.scoring.churnTitle') }}</span>
                 @if (churnFields().some(f => f.dirty)) {
                   <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span>
                 }
@@ -663,7 +663,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @if (healthFields().length > 0) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:14px;display:inline-flex;align-items:center;gap:8px">💚 {{ t('settings.crm.scoring.healthTitle') }}</span>
+                <span class="cat-title" style="font-size:14px;display:inline-flex;align-items:center;gap:8px"><i class="ei ei-heart"></i> {{ t('settings.crm.scoring.healthTitle') }}</span>
                 @if (healthFields().some(f => f.dirty)) {
                   <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span>
                 }
@@ -725,7 +725,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                pola są rozłączne — pole partnera nie pojawia się na leadzie. -->
           <div class="card" style="margin-top:24px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px;flex-shrink:0">🧩</span>
+              <span style="font-size:18px;flex-shrink:0"><i class="ei ei-module"></i></span>
               <span class="cat-title">{{ t('settings.customFields.titleLead') }}</span>
             </div>
             <div style="padding:16px 20px">
@@ -738,7 +738,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
           <div class="card" style="margin-top:16px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px;flex-shrink:0">🧩</span>
+              <span style="font-size:18px;flex-shrink:0"><i class="ei ei-module"></i></span>
               <span class="cat-title">{{ t('settings.customFields.titlePartner') }}</span>
             </div>
             <div style="padding:16px 20px">
@@ -754,7 +754,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         @if (activeTab() === 'documents') {
 
           <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #166534 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0">📄</span>
+            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-file"></i></span>
             <div>
               <strong>{{ t('settings.tabs.documents') }}</strong> {{ t('settings.documents.intro') }}
             </div>
@@ -811,7 +811,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                dokumentów tak samo jak typy i statusy wyżej. -->
           <div class="card" style="margin-top:24px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px;flex-shrink:0">🧩</span>
+              <span style="font-size:18px;flex-shrink:0"><i class="ei ei-module"></i></span>
               <span class="cat-title">{{ t('settings.customFields.titleDocument') }}</span>
             </div>
             <div style="padding:16px 20px">
@@ -827,7 +827,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         @if (activeTab() === 'users') {
 
           <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bae6fd var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #0369a1 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0">👥</span>
+            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-users"></i></span>
             <div>
               <strong>{{ t('settings.tabs.users') }}</strong> {{ t('settings.groups.intro') }}
             </div>
@@ -835,7 +835,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
           <!-- Formularz dodawania grupy -->
           <div class="card" style="margin-bottom:24px;padding:20px">
-            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">➕ {{ t('settings.groups.addTitle') }}</div>
+            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px"><i class="ei ei-plus"></i> {{ t('settings.groups.addTitle') }}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
               <div>
                 <label class="field-label">{{ t('settings.groups.technicalName') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
@@ -866,13 +866,13 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             </div>
             @if (groupError()) {
               <div style="background:color-mix(in srgb, #FEF2F2 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">
-                ⚠️ {{ groupError() }}
+                <i class="ei ei-warn"></i> {{ groupError() }}
               </div>
             }
             <button class="btn btn-p"
                     [disabled]="!newGroup.name.trim() || !newGroup.display_name.trim() || groupSaving()"
                     (click)="addGroup()">
-              @if (groupSaving()) { {{ t('settings.groups.adding') }} } @else { ➕ {{ t('settings.groups.addGroup') }} }
+              @if (groupSaving()) { {{ t('settings.groups.adding') }} } @else { <i class="ei ei-plus"></i> {{ t('settings.groups.addGroup') }} }
             </button>
           </div>
 
@@ -887,7 +887,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             @for (g of groups(); track g.id) {
               <div class="card" style="margin-bottom:12px;overflow:hidden">
                 <div style="padding:16px 20px;display:flex;align-items:center;gap:12px">
-                  <div style="width:36px;height:36px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;flex-shrink:0">👥</span></div>
+                  <div style="width:36px;height:36px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;flex-shrink:0"><i class="ei ei-users"></i></span></div>
                   <div style="flex:1;min-width:0">
                     <div style="font-size:14px;font-weight:700;color:var(--gray-900)">{{ groupDisplayName(g) }}</div>
                     <div style="font-size:12px;color:var(--gray-400);margin-top:1px">
@@ -911,7 +911,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                           [disabled]="g.member_count > 0 || g.document_count > 0"
                           [title]="g.member_count > 0 || g.document_count > 0 ? t('settings.groups.cannotDelete') : t('settings.groups.deleteGroup')"
                           (click)="deleteGroup(g)">
-                    🗑 {{ t('settings.actions.delete') }}
+                    <i class="ei ei-trash"></i> {{ t('settings.actions.delete') }}
                   </button>
                 </div>
               </div>
@@ -923,7 +923,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         @if (activeTab() === 'onboarding') {
 
           <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0">🚀</span>
+            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-play"></i></span>
             <div>
               <strong>{{ t('settings.onboarding.introTitle') }}</strong> {{ t('settings.onboarding.intro') }}
               {{ t('settings.onboarding.jsonFormat') }} <code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:12px">[ {{ '{' }}"id":"...", "title":"...", "type":"task|call|...", "step":0{{ '}' }} ]</code>
@@ -988,7 +988,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                     </table>
                   </div>
                   <div style="margin-top:8px;font-size:12px;color:var(--gray-400)">
-                    🔵 {{ t('settings.onboarding.leadSources.legend') }}
+                    <i class="ei ei-dot" style="color:#3B82F6"></i> {{ t('settings.onboarding.leadSources.legend') }}
                   </div>
                   <button class="btn btn-g" style="margin-top:12px"
                           (click)="addLeadSource(field)">+ {{ t('settings.onboarding.leadSources.add') }}</button>
@@ -1078,7 +1078,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                     </table>
                   </div>
                   <div style="margin-top:8px;font-size:12px;color:var(--gray-400)">
-                    🟢 {{ t('settings.onboarding.templates.legend') }}
+                    <i class="ei ei-dot" style="color:#16A34A"></i> {{ t('settings.onboarding.templates.legend') }}
                   </div>
                   <button class="btn btn-g" style="margin-top:12px"
                           (click)="addTemplate(field)">+ {{ t('settings.onboarding.templates.add') }}</button>
@@ -1100,7 +1100,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         @if (activeTab() === 'tooltips') {
 
           <div style="background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #c4b5fd var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0">💬</span>
+            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-message"></i></span>
             <div>
               <strong>{{ t('settings.tooltips.introTitle') }}</strong> {{ t('settings.tooltips.introBeforeIcon') }}
               <strong style="font-family:sans-serif;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">?</strong>
@@ -1140,7 +1140,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                         [placeholder]="t('settings.tooltips.contentPlaceholder')"></textarea>
             </div>
             @if (tipError()) {
-              <div style="background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">⚠ {{ tipError() }}</div>
+              <div style="background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px"><i class="ei ei-warn"></i> {{ tipError() }}</div>
             }
             <button class="btn btn-p"
                     [disabled]="tipSaving() || !newTipLabelKey || !newTipValue.trim()"
@@ -1171,7 +1171,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                       <span class="field-meta">{{ tip.updated_by_name }} · {{ tip.updated_at | date:'dd.MM.yy HH:mm' }}</span>
                     }
                     <button class="btn btn-d btn-sm" style="flex-shrink:0"
-                            (click)="deleteTooltip(tip.key)">🗑 {{ t('settings.actions.delete') }}</button>
+                            (click)="deleteTooltip(tip.key)"><i class="ei ei-trash"></i> {{ t('settings.actions.delete') }}</button>
                   </div>
                   <div style="padding:16px 20px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end">
                     <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:60px;font-size:14px"
@@ -1180,7 +1180,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                     <button class="btn btn-p"
                             [disabled]="!tipDirty[tip.key] || tipSaving()"
                             (click)="saveTooltip(tip.key, tipDrafts[tip.key])">
-                      💾 {{ 'actions.save' | transloco }}
+                      <i class="ei ei-save"></i> {{ 'actions.save' | transloco }}
                     </button>
                   </div>
                 </div>
@@ -1203,7 +1203,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                     <span class="field-meta">{{ tip.updated_by_name }} · {{ tip.updated_at | date:'dd.MM.yy HH:mm' }}</span>
                   }
                   <button class="btn btn-d btn-sm" style="flex-shrink:0"
-                          (click)="deleteTooltip(tip.key)">🗑 {{ t('settings.actions.delete') }}</button>
+                          (click)="deleteTooltip(tip.key)"><i class="ei ei-trash"></i> {{ t('settings.actions.delete') }}</button>
                 </div>
                 <div style="padding:16px 20px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end">
                   <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:60px;font-size:14px"
@@ -1212,7 +1212,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                   <button class="btn btn-p"
                           [disabled]="!tipDirty[tip.key] || tipSaving()"
                           (click)="saveTooltip(tip.key, tipDrafts[tip.key])">
-                    💾 {{ 'actions.save' | transloco }}
+                    <i class="ei ei-save"></i> {{ 'actions.save' | transloco }}
                   </button>
                 </div>
               </div>
@@ -1227,7 +1227,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
              ekranu — patrz icpApiBase(). -->
         @if (activeTab() === 'icp') {
           <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0">🎯</span>
+            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-target"></i></span>
             <div>
               <strong>{{ t('settings.icp.introTitle') }}</strong> {{ t('settings.icp.intro') }}
             </div>
@@ -1901,7 +1901,7 @@ export class SettingsComponent implements OnInit {
     return Object.entries(byCategory).map(([key, flds]) => ({
       key,
       label: CATEGORY_LABELS[key] ? this.transloco.translate(CATEGORY_LABELS[key].labelKey) : key,
-      icon:  CATEGORY_LABELS[key]?.icon  ?? '⚙️',
+      icon:  CATEGORY_LABELS[key]?.icon  ?? 'settings',
       fields: flds,
     }));
   });

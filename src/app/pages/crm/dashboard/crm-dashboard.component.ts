@@ -67,7 +67,7 @@ const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
       <h3>{{ t('crmDashboard.productMix.title', { period: period }) }}</h3>
       <div class="mix-list">
         <div class="mix-row" *ngFor="let m of perf.product_mix">
-          <span class="mix-icon">{{productIcon(m.product_type)}}</span>
+          <span class="mix-icon"><i class="ei ei-{{ productIcon(m.product_type) }}"></i></span>
           <span class="mix-name">{{productLabel(m.product_type)}}</span>
           <div class="mix-bar-wrap">
             <div class="mix-bar" [style.width.%]="mixBarWidth(m.total_gross)"></div>
@@ -120,7 +120,7 @@ const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
       <h3>{{ t('crmDashboard.activities.title') }}</h3>
       <div class="activity-feed">
         <div class="act-item" *ngFor="let a of recentActivities">
-          <span class="act-icon">{{actIcon(a.type)}}</span>
+          <span class="act-icon"><i class="ei ei-{{ actIcon(a.type) }}"></i></span>
           <div class="act-body">
             <span class="act-title">{{a.title}}</span>
             <div class="act-sub">{{a.source_name}} · {{a.activity_at | date:'dd.MM HH:mm'}}</div>
@@ -268,12 +268,12 @@ export class CrmDashboardComponent implements OnInit {
   }
 
   productLabel(t: string) { return t in PRODUCT_TYPE_ICONS ? this.transloco.translate('crm.labels.productTypes.' + t) : t; }
-  productIcon(t: string)  { return PRODUCT_TYPE_ICONS[t as ProductType] || '📦'; }
+  productIcon(t: string)  { return PRODUCT_TYPE_ICONS[t as ProductType] || 'package'; }
   statusLabel(s: string) {
     return PARTNER_STATUSES.includes(s) ? this.transloco.translate('crm.labels.partnerStatuses.' + s) : s;
   }
   stageName(s: string) { return this.stages.label(s); }
   actIcon(type: string) {
-    return { call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄', training:'🎓', qbr:'📊' }[type] || '💬';
+    return { call:'phone', email:'mail', meeting:'handshake', note:'note', doc_sent:'file', training:'graduation', qbr:'chart' }[type] || 'message';
   }
 }
