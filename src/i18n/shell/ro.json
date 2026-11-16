@@ -41,11 +41,13 @@
     "superAdmin": "Super Admin"
   },
   "sidebar": {
+    "closeMenu": "Închide meniul",
     "collapse": "Restrângere meniu",
     "doneEditing": "Gata",
     "editMenu": "Editează meniul",
     "expand": "Extindere meniu",
     "hideItem": "Ascunde",
+    "openMenu": "Deschide meniul",
     "showItem": "Afișează"
   },
   "user": {

@@ -1023,22 +1023,22 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                               <select style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 6px;font-size:12px"
                                       [ngModel]="tpl.type"
                                       (ngModelChange)="updateTemplate(field, idx, 'type', $event)">
-                                <option value="task">✅ {{ t('settings.onboarding.taskTypes.task') }}</option>
-                                <option value="call">📞 {{ t('settings.onboarding.taskTypes.call') }}</option>
-                                <option value="email">📧 {{ t('settings.onboarding.taskTypes.email') }}</option>
-                                <option value="meeting">🤝 {{ t('settings.onboarding.taskTypes.meeting') }}</option>
-                                <option value="doc_sent">📄 {{ t('settings.onboarding.taskTypes.doc_sent') }}</option>
-                                <option value="training">🎓 {{ t('settings.onboarding.taskTypes.training') }}</option>
+                                <option value="task">{{ t('settings.onboarding.taskTypes.task') }}</option>
+                                <option value="call">{{ t('settings.onboarding.taskTypes.call') }}</option>
+                                <option value="email">{{ t('settings.onboarding.taskTypes.email') }}</option>
+                                <option value="meeting">{{ t('settings.onboarding.taskTypes.meeting') }}</option>
+                                <option value="doc_sent">{{ t('settings.onboarding.taskTypes.doc_sent') }}</option>
+                                <option value="training">{{ t('settings.onboarding.taskTypes.training') }}</option>
                               </select>
                             </td>
                             <td style="padding:6px 10px">
                               <select style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 6px;font-size:12px"
                                       [ngModel]="tpl.step"
                                       (ngModelChange)="updateTemplate(field, idx, 'step', +$event)">
-                                <option [value]="0">📝 {{ t('settings.onboarding.steps.contractSigning') }}</option>
-                                <option [value]="1">⚙️ {{ t('settings.onboarding.steps.configuration') }}</option>
-                                <option [value]="2">🎓 {{ t('settings.onboarding.steps.training') }}</option>
-                                <option [value]="3">🚀 {{ t('settings.onboarding.steps.launch') }}</option>
+                                <option [value]="0">{{ t('settings.onboarding.steps.contractSigning') }}</option>
+                                <option [value]="1">{{ t('settings.onboarding.steps.configuration') }}</option>
+                                <option [value]="2">{{ t('settings.onboarding.steps.training') }}</option>
+                                <option [value]="3">{{ t('settings.onboarding.steps.launch') }}</option>
                               </select>
                             </td>
                             <td style="padding:6px 10px;text-align:center">

@@ -43,9 +43,9 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     </select>
     <select [(ngModel)]="filterStatus" (ngModelChange)="reload()" class="filter-input">
       <option value="">{{ t('transactions.filters.allStatuses') }}</option>
-      <option value="confirmed">✓ {{ t('transactions.statuses.confirmed') }}</option>
-      <option value="cancelled">✗ {{ t('transactions.statuses.cancelled') }}</option>
-      <option value="refunded">↩ {{ t('transactions.statuses.refunded') }}</option>
+      <option value="confirmed">{{ t('transactions.statuses.confirmed') }}</option>
+      <option value="cancelled">{{ t('transactions.statuses.cancelled') }}</option>
+      <option value="refunded">{{ t('transactions.statuses.refunded') }}</option>
     </select>
     <span class="result-count">{{ t('transactions.filters.resultCount', { count: total }) }}</span>
   </div>

@@ -41,11 +41,13 @@
     "superAdmin": "Super Admin"
   },
   "sidebar": {
+    "closeMenu": "Zapri meni",
     "collapse": "Strni meni",
     "doneEditing": "Končano",
     "editMenu": "Uredi meni",
     "expand": "Razširi meni",
     "hideItem": "Skrij",
+    "openMenu": "Odpri meni",
     "showItem": "Prikaži"
   },
   "user": {

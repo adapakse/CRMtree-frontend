@@ -153,8 +153,8 @@ interface CallAnalysisRow {
     </div>
     <select class="sel" [(ngModel)]="filters.follow_up" (ngModelChange)="onFilterChange()">
       <option value="">{{ t('callAnalysis.filters.allFollowUps') }}</option>
-      <option value="required">📞 {{ t('callAnalysis.filters.followUpRequired') }}</option>
-      <option value="done">✓ {{ t('callAnalysis.filters.followUpDone') }}</option>
+      <option value="required">{{ t('callAnalysis.filters.followUpRequired') }}</option>
+      <option value="done">{{ t('callAnalysis.filters.followUpDone') }}</option>
     </select>
     <select class="sel" [(ngModel)]="filters.salesperson" (ngModelChange)="onFilterChange()">
       <option value="">{{ t('callAnalysis.filters.allSalespeople') }}</option>
@@ -162,9 +162,9 @@ interface CallAnalysisRow {
     </select>
     <select class="sel" [(ngModel)]="filters.link" (ngModelChange)="onFilterChange()">
       <option value="">{{ t('callAnalysis.filters.allLinks') }}</option>
-      <option value="lead">🏷 {{ t('labels.sourceTypes.lead') }}</option>
-      <option value="partner">🤝 {{ t('labels.sourceTypes.partner') }}</option>
-      <option value="prospect">👁 {{ t('callAnalysis.links.prospect') }}</option>
+      <option value="lead">{{ t('labels.sourceTypes.lead') }}</option>
+      <option value="partner">{{ t('labels.sourceTypes.partner') }}</option>
+      <option value="prospect">{{ t('callAnalysis.links.prospect') }}</option>
       <option value="none">{{ t('callAnalysis.filters.noLinks') }}</option>
     </select>
     <span class="ca-lbl">{{ t('callAnalysis.filters.firstCall') }}</span>

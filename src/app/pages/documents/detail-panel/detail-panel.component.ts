@@ -379,10 +379,10 @@ interface SelectOption { value: string; label: string; }
                 <div class="empty-state">
                   <div class="empty-icon">📄</div>
                   <div class="empty-title">{{ t('detail.preview.unavailable') }}</div>
-                  <div style="font-size:12px;color:var(--gray-400);margin-top:6px;text-align:center;max-width:320px">
+                  <div style="font-size:12px;color:var(--gray-400);margin:6px auto 0;text-align:center;max-width:320px">
                     {{ t('detail.preview.unavailableFormat') }}<br>{{ t('detail.preview.unavailableHint') }}
                   </div>
-                  <button class="btn btn-g" style="margin-top:16px" (click)="downloadDoc()">⬇ {{ t('detail.preview.downloadFile') }}</button>
+                  <button class="btn btn-g" style="margin-top:16px" (click)="downloadDoc()"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> {{ t('detail.preview.downloadFile') }}</button>
                 </div>
               } @else {
                 <div style="background:var(--gray-100);border-radius:14px;overflow:hidden;height:600px;position:relative">
@@ -439,7 +439,7 @@ interface SelectOption { value: string; label: string; }
                     @if (v.blob_size_bytes) { · {{ formatSize(v.blob_size_bytes) }} }
                   </div>
                 </div>
-                <button class="btn btn-g btn-sm" (click)="downloadVersion(v)">⬇ {{ t('detail.actions.download') }}</button>
+                <button class="btn btn-g btn-sm" (click)="downloadVersion(v)"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> {{ t('detail.actions.download') }}</button>
               </div>
             }
             @empty {
@@ -449,7 +449,7 @@ interface SelectOption { value: string; label: string; }
 
           <!-- ATTACHMENTS -->
           @if (activeTab === 'attachments') {
-            @if (doc._access === 'full') {
+            @if (doc._access === 'full' && attachments().length) {
               <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
                 <label class="btn btn-p" style="cursor:pointer">
                   <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> {{ t('detail.attachments.add') }}
@@ -609,7 +609,7 @@ interface SelectOption { value: string; label: string; }
         <!-- Panel Footer -->
         <div class="pf">
           @if (doc._access === 'full' && doc.blob_name) {
-            <button class="btn btn-g" (click)="downloadDoc()">⬇ {{ t('detail.actions.download') }}</button>
+            <button class="btn btn-g" (click)="downloadDoc()"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> {{ t('detail.actions.download') }}</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
             <button class="btn btn-d" (click)="deleteDoc()">🗑 {{ t('detail.actions.delete') }}</button>

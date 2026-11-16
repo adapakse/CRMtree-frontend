@@ -36,7 +36,7 @@ interface CalendarDay {
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;padding:0 20px;flex-shrink:0">
+<div class="cal-topbar" style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;padding:0 20px;flex-shrink:0">
   <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('calendar.title') }}</span>
   <span style="flex:1"></span>
 
@@ -87,7 +87,7 @@ interface CalendarDay {
   <!-- Nawigacja (tylko dla widoków kalendarza) -->
   <ng-container *ngIf="view !== 'tasks'">
     <button class="nav-btn" (click)="prev()">‹</button>
-    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;min-width:200px;text-align:center">{{ periodLabel }}</span>
+    <span class="cal-period" style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;min-width:200px;text-align:center">{{ periodLabel }}</span>
     <button class="nav-btn" (click)="next()">›</button>
     <button class="btn btn-g btn-sm" (click)="today()">{{ t('calendar.nav.today') }}</button>
   </ng-container>
@@ -571,6 +571,7 @@ export class CrmCalendarComponent implements OnInit {
       this.api.getCrmUsers().subscribe({ next: u => { this.crmUsers = u; this.cdr.markForCheck(); }, error: () => {} });
       this.api.getCrmGroups().subscribe({ next: g => { this.crmGroups = g; this.cdr.markForCheck(); }, error: () => {} });
     }
+    if (typeof window !== 'undefined' && window.innerWidth < 768) this.view = 'day';
     this.loadTaskBadge();
     this.load();
   }

@@ -67,12 +67,12 @@ interface WhatsappConvUiState {
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
-<div style="display:flex;flex-direction:column;height:100%;overflow:hidden;padding:24px;box-sizing:border-box;gap:24px" *ngIf="lead">
+<div class="card-page" style="display:flex;flex-direction:column;height:100%;overflow:hidden;padding:24px;box-sizing:border-box;gap:24px" *ngIf="lead">
 
   <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0">
+  <div class="card-hdr" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0">
     <button type="button" class="back-link" routerLink="/crm/leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>{{ t('leadDetail.header.backToLeads') }}</button>
-    <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+    <div class="card-hdr-name" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
       <div *ngIf="lead.logo_url && logoSasUrl" style="width:36px;height:36px;border-radius:50%;background-size:cover;background-position:center;box-shadow:var(--shadow-sm);flex-shrink:0;background-color:var(--gray-50)"
            [style.background-image]="logoSasUrl"></div>
       <h1 style="font-size:22px;font-weight:800;margin:0;color:var(--gray-800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{lead.company}}</h1>
@@ -82,7 +82,7 @@ interface WhatsappConvUiState {
           [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span>
     <span *ngIf="lead.hot" style="background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🔥{{ t('leadDetail.header.hot') }}</span>
     <span *ngIf="lead.hold_active" style="background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));color:var(--gray-700);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px" title="{{lead.hold_reason}}">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div class="card-hdr-actions" style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-quiet btn-sm hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
               [style.background]="lead.hold_active ? 'color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))' : ''"
               [style.color]="lead.hold_active ? 'var(--gray-700)' : ''"
@@ -109,15 +109,15 @@ interface WhatsappConvUiState {
   </div>
 
   <!-- BODY: 3 kolumny -->
-  <div [style.grid-template-columns]="leftCollapsed ? '32px 1fr 260px' : '260px 1fr 260px'" style="flex:1;display:grid;gap:16px;overflow:hidden;min-height:0">
+  <div class="card-body" [class.left-collapsed]="leftCollapsed" [style.grid-template-columns]="leftCollapsed ? '32px 1fr 260px' : '260px 1fr 260px'" style="flex:1;display:grid;gap:16px;overflow:hidden;min-height:0">
 
     <!-- LEWA: Informacje -->
-    <div class="lead-card" style="display:flex;flex-direction:column;min-height:0" [class.left-panel-collapsed]="leftCollapsed">
+    <div class="lead-card card-col-left" style="display:flex;flex-direction:column;min-height:0" [class.left-panel-collapsed]="leftCollapsed">
       <div class="left-panel-hdr">
         <span *ngIf="!leftCollapsed" class="left-panel-title">{{ t('leadDetail.info.title') }}</span>
         <button type="button" class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed ? t('leadDetail.info.expandPanel') : t('leadDetail.info.collapsePanel')" [attr.aria-label]="leftCollapsed ? t('leadDetail.info.expandPanel') : t('leadDetail.info.collapsePanel')">@if (leftCollapsed) { <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></svg> } @else { <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/></svg> }</button>
       </div>
-      <div *ngIf="!leftCollapsed" style="padding:16px;overflow-y:auto;flex:1">
+      <div *ngIf="!leftCollapsed" class="card-info-scroll" style="padding:16px;overflow-y:auto;flex:1">
 
       <!-- Firma -->
       <div class="info-section">
@@ -268,10 +268,10 @@ interface WhatsappConvUiState {
     </div>
 
     <!-- ŚRODEK: Aktywności (tabs: Aktywności | Historia) -->
-    <div class="lead-card" style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
+    <div class="lead-card card-col-mid" style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
 
       <!-- STAGE STEPPER BAR -->
-      <div style="background:var(--surface);border-bottom:1px solid var(--gray-100);padding:12px 16px;flex-shrink:0;display:flex;align-items:center;gap:8px">
+      <div class="stage-bar" style="background:var(--surface);border-bottom:1px solid var(--gray-100);padding:12px 16px;flex-shrink:0;display:flex;align-items:center;gap:8px">
         <!-- Onboarding in progress: blue banner -->
         <ng-container *ngIf="lead.stage==='onboarding'">
           <span style="font-size:15px">⏳</span>
@@ -300,16 +300,16 @@ interface WhatsappConvUiState {
         <!-- Normal stepper mode -->
         <ng-container *ngIf="!stages.isLost(lead.stage) && lead.stage!=='onboarded' && lead.stage!=='onboarding'">
           <button class="stage-arrow-btn" [disabled]="!prevStage() || !canEdit" (click)="quickChangeStage(prevStage()!)" [title]="t('leadDetail.stage.previous')">‹</button>
-          <div style="flex:1;display:flex;align-items:flex-start;padding-top:2px">
+          <div class="stepper-track" style="flex:1;display:flex;align-items:flex-start;padding-top:2px">
             <ng-container *ngFor="let s of orderedStageOptions; let last=last">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div class="stepper-step" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
                 <div class="stepper-slot"><div class="stepper-dot" [ngStyle]="stepperDotStyle(s.key)"
                      (click)="isStageAllowed(s.key) && canEdit && quickChangeStage(s.key)"
                      [style.cursor]="canEdit && isStageAllowed(s.key) ? 'pointer' : 'default'"
                      [title]="s.label"></div></div>
                 <div class="stepper-label" [ngStyle]="stepperLabelStyle(s.key)">{{s.label}}</div>
               </div>
-              <div *ngIf="!last" style="flex:0 0 8px;height:2px;margin-top:8px;border-radius:1px"
+              <div *ngIf="!last" class="stepper-gap" style="flex:0 0 8px;height:2px;margin-top:8px;border-radius:1px"
                    [style.background]="isStageCompleted(s.key) ? '#22c55e' : 'var(--gray-300)'"></div>
             </ng-container>
           </div>
@@ -884,7 +884,7 @@ interface WhatsappConvUiState {
     </div>
 
     <!-- PRAWA: Mock call/email + Konwertuj info -->
-    <div class="shadow-room" style="overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:0">
+    <div class="shadow-room card-col-right" style="overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:0">
 
       <!-- Komunikacja -->
       <div class="side-box">
@@ -1614,14 +1614,14 @@ interface WhatsappConvUiState {
       <div style="display:flex;flex-direction:column;gap:4px">
         <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.modal.type') }}</label>
         <select [(ngModel)]="actEditForm.type" class="act-sel">
-          <option value="task">✅ {{ t('labels.activityTypes.task') }}</option>
-          <option value="call">📞 {{ t('labels.activityTypes.call') }}</option>
-          <option value="meeting">🤝 {{ t('labels.activityTypes.meeting') }}</option>
-          <option value="note">📝 {{ t('labels.activityTypes.note') }}</option>
-          <option value="doc_sent">📄 {{ t('labels.activityTypes.doc_sent') }}</option>
-          <option value="training">🎓 {{ t('labels.activityTypes.training') }}</option>
-          <option value="qbr">📊 {{ t('labels.activityTypes.qbr') }}</option>
-          <option value="opportunity">💡 {{ t('labels.activityTypes.opportunity') }}</option>
+          <option value="task">{{ t('labels.activityTypes.task') }}</option>
+          <option value="call">{{ t('labels.activityTypes.call') }}</option>
+          <option value="meeting">{{ t('labels.activityTypes.meeting') }}</option>
+          <option value="note">{{ t('labels.activityTypes.note') }}</option>
+          <option value="doc_sent">{{ t('labels.activityTypes.doc_sent') }}</option>
+          <option value="training">{{ t('labels.activityTypes.training') }}</option>
+          <option value="qbr">{{ t('labels.activityTypes.qbr') }}</option>
+          <option value="opportunity">{{ t('labels.activityTypes.opportunity') }}</option>
         </select>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px">
@@ -1675,6 +1675,7 @@ interface WhatsappConvUiState {
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
+    @media (max-width:1279px) { :host { overflow-y:auto; overflow-x:hidden; } }
     .hdr-btn { position:relative; box-sizing:border-box; height:32px; padding:0 12px !important; font-size:12px !important; border-radius:10px !important; }
     .hdr-btn:has(> svg:first-child) { padding-left:10px !important; }
     .hdr-btn.btn-quiet { gap:6px !important; }

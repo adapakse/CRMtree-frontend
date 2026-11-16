@@ -70,8 +70,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
-<div class="detail-page" *ngIf="partner">
-  <div class="detail-header">
+<div class="detail-page card-page" *ngIf="partner">
+  <div class="detail-header card-hdr">
     <button type="button" class="back-link" routerLink="/crm/partners"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>{{ t('partnerDetail.header.backToPartners') }}</button>
     <h1>{{(partner.dwh_partner_id ? (partner.dwh_company_name || partner.company) : partner.company)}}</h1>
     <span *ngIf="partner.switched_to_prod_at" style="font-size:12px;color:var(--gray-500);margin-left:8px;align-self:center">
@@ -93,7 +93,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
   <div class="onboarding-panel" *ngIf="partner.status === 'onboarding'">
 
     <!-- Pasek etapów -->
-    <div class="onboarding-steps">
+    <div class="onboarding-steps stepper-scroll">
       <div *ngFor="let s of onboardingSteps; let i = index"
            class="step" [class.done]="partner.onboarding_step > i"
            [class.current]="activeStep === i"
@@ -130,12 +130,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <div class="task-form" *ngIf="showTaskForm && activeStep === taskFormStep">
         <div class="task-form-row">
           <select [(ngModel)]="taskForm.type" class="tf-sel">
-            <option value="task">✅ {{ t('labels.activityTypes.task') }}</option>
-            <option value="call">📞 {{ t('labels.activityTypes.call') }}</option>
-            <option value="email">📧 {{ t('labels.activityTypes.email') }}</option>
-            <option value="meeting">🤝 {{ t('labels.activityTypes.meeting') }}</option>
-            <option value="doc_sent">📄 {{ t('labels.activityTypes.doc_sent') }}</option>
-            <option value="training">🎓 {{ t('labels.activityTypes.training') }}</option>
+            <option value="task">{{ t('labels.activityTypes.task') }}</option>
+            <option value="call">{{ t('labels.activityTypes.call') }}</option>
+            <option value="email">{{ t('labels.activityTypes.email') }}</option>
+            <option value="meeting">{{ t('labels.activityTypes.meeting') }}</option>
+            <option value="doc_sent">{{ t('labels.activityTypes.doc_sent') }}</option>
+            <option value="training">{{ t('labels.activityTypes.training') }}</option>
           </select>
           <input [(ngModel)]="taskForm.title" [placeholder]="t('partnerDetail.onboarding.taskTitlePlaceholder')" class="tf-input" style="flex:1">
         </div>
@@ -178,12 +178,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div class="task-body task-edit" *ngIf="editingTaskId === task.id">
             <div class="task-form-row">
               <select [(ngModel)]="taskEditForm.type" class="tf-sel">
-                <option value="task">✅ {{ t('labels.activityTypes.task') }}</option>
-                <option value="call">📞 {{ t('labels.activityTypes.call') }}</option>
-                <option value="email">📧 {{ t('labels.activityTypes.email') }}</option>
-                <option value="meeting">🤝 {{ t('labels.activityTypes.meeting') }}</option>
-                <option value="doc_sent">📄 {{ t('labels.activityTypes.doc_sent') }}</option>
-                <option value="training">🎓 {{ t('labels.activityTypes.training') }}</option>
+                <option value="task">{{ t('labels.activityTypes.task') }}</option>
+                <option value="call">{{ t('labels.activityTypes.call') }}</option>
+                <option value="email">{{ t('labels.activityTypes.email') }}</option>
+                <option value="meeting">{{ t('labels.activityTypes.meeting') }}</option>
+                <option value="doc_sent">{{ t('labels.activityTypes.doc_sent') }}</option>
+                <option value="training">{{ t('labels.activityTypes.training') }}</option>
               </select>
               <input [(ngModel)]="taskEditForm.title" class="tf-input" style="flex:1">
             </div>
@@ -212,8 +212,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
   </div>
 
-  <div class="detail-body" [class.left-collapsed]="leftCollapsed">
-    <div class="info-card" [class.is-collapsed]="leftCollapsed">
+  <div class="detail-body card-body" [class.left-collapsed]="leftCollapsed">
+    <div class="info-card card-col-left" [class.is-collapsed]="leftCollapsed">
       <div class="left-panel-hdr">
         <h3 *ngIf="!leftCollapsed" style="margin:0;font-size:14px;font-weight:700;color:var(--gray-700)">{{ t('partnerDetail.info.title') }}</h3>
         <button class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed ? t('partnerDetail.info.expandPanel') : t('partnerDetail.info.collapsePanel')">{{leftCollapsed?'›':'‹'}}</button>
@@ -437,7 +437,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       </ng-container>
     </div>
 
-    <div class="activities-card">
+    <div class="activities-card card-col-mid">
       <!-- Pasek tabów -->
       <div class="mid-tabs one-line">
         <button class="tab-btn" [class.active]="midTab==='all'" (click)="midTab='all'">
@@ -1045,7 +1045,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
 
     <!-- Right panel: DWH sales / email thread / products / docs -->
-    <div class="right-panel shadow-room">
+    <div class="right-panel shadow-room card-col-right">
 
       <!-- DWH: dane sprzedazowe -->
       <div *ngIf="partner.dwh_partner_id" class="dwh-box">
@@ -1874,8 +1874,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     /* Body */
     .detail-body { display:grid; grid-template-columns:260px 1fr 260px; gap:16px; flex:1; overflow:hidden; min-height:0; }
     .detail-body.left-collapsed { grid-template-columns:32px 1fr 260px; }
-    @media(max-width:900px) { .detail-body{grid-template-columns:260px 1fr;} .detail-body.left-collapsed{grid-template-columns:32px 1fr;} .right-panel{display:none} }
-    @media(max-width:700px) { .detail-body{grid-template-columns:1fr;} }
+    @media (max-width:1279px) { :host { overflow-y:auto; overflow-x:hidden; } }
     /* Left panel collapse */
     .left-panel-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink:0; }
     .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); background:var(--surface); cursor:pointer; font-size:16px; line-height:1; color:var(--gray-400); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }

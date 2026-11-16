@@ -454,7 +454,7 @@ const TODAY_CALLS_GOAL = 37;
         <span class="panel-title">{{ t('salesDashboard.opportunities.title') }} <wt-tooltip key="crm.sales.recent_leads"></wt-tooltip></span>
       </div>
 
-      <table class="leads-table" *ngIf="recentLeads.length; else emptyLeads">
+      <div class="leads-scroll" *ngIf="recentLeads.length; else emptyLeads"><table class="leads-table">
         <thead>
           <tr>
             <th>{{ t('salesDashboard.opportunities.name') }}</th>
@@ -499,7 +499,7 @@ const TODAY_CALLS_GOAL = 37;
             </td>
           </tr>
         </tbody>
-      </table>
+      </table></div>
       <ng-template #emptyLeads><div class="empty-msg">{{ t('salesDashboard.opportunities.empty') }}</div></ng-template>
 
       <a routerLink="/crm/leads" class="panel-link">{{ t('salesDashboard.opportunities.showAll') }}</a>
@@ -667,7 +667,7 @@ const TODAY_CALLS_GOAL = 37;
 
     /* Grid layout */
     .mid-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 0.85fr); gap: 16px; }
-    .bot-row { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+    .bot-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; }
 
     /* Panel */
     .panel { background: var(--surface); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; box-shadow: var(--shadow-sm); }
@@ -738,8 +738,10 @@ const TODAY_CALLS_GOAL = 37;
     .task-overdue { color: oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
 
     /* Leads table */
-    .leads-table { width: 100%; border-collapse: collapse; font-size: 12px; flex: 1; }
-    .leads-table th { text-align: left; padding: 6px 10px; color: var(--gray-400); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid var(--gray-100); }
+    .leads-scroll { overflow-x: auto; flex: 1; }
+    .leads-table .lead-link { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .leads-table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 12px; flex: 1; }
+    .leads-table th { text-align: left; padding: 6px 10px; color: var(--gray-400); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid var(--gray-100); white-space: nowrap; }
     .leads-table td { padding: 10px 10px; border-bottom: 1px solid var(--gray-50); vertical-align: middle; }
     .leads-table tr:last-child td { border-bottom: none; }
     .lead-link { color: var(--gray-800); font-weight: 600; text-decoration: none; }

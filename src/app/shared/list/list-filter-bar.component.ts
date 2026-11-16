@@ -43,7 +43,7 @@ import { ListFilter, ListQueryState, ListSortOption, ListSortOrder } from './lis
       <ng-content />
       @if (query().activeFilterCount() > 0) {
         <span class="active-count">{{ t('activeFilters', { count: query().activeFilterCount() }) }}</span>
-        <button type="button" class="clear" (click)="query().clearFilters()">{{ t('clearFilters') }}</button>
+        <button type="button" class="btn-reset" (click)="query().clearFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ t('clearFilters') }}</button>
       }
     </ng-container>
   `,
@@ -56,7 +56,7 @@ import { ListFilter, ListQueryState, ListSortOption, ListSortOrder } from './lis
     .order { height:30px; min-width:30px; border:1px solid var(--gray-200); background:var(--surface); border-radius:8px; padding:0 10px; font-size:10px; color:var(--gray-600); cursor:pointer; box-shadow:var(--shadow-field); }
     .order:disabled { opacity:.4; cursor:default; }
     .active-count { font-size:12px; font-weight:600; color:var(--orange-dark); background:var(--orange-pale); border-radius:12px; padding:4px 10px; white-space:nowrap; }
-    .clear { border:none; background:none; padding:0; font-size:12px; color:var(--accent-blue, oklch(from #3b82f6 max(l, var(--text-min-l)) c h)); cursor:pointer; font-family:inherit; white-space:nowrap; }
+    .btn-reset { height:30px; }
   `],
 })
 export class ListFilterBarComponent {

@@ -80,18 +80,18 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
           <button type="button" class="fchip section-toggle" [class.on]="showChannels()" (click)="showChannels.set(!showChannels())">{{ t('seo.main.sections.channels') }}</button>
           <button type="button" class="fchip section-toggle" [class.on]="showCalendar()" (click)="showCalendar.set(!showCalendar())">{{ t('seo.main.sections.calendar') }}</button>
           <button type="button" class="fchip section-toggle" [class.on]="showSettings()" (click)="showSettings.set(!showSettings())">{{ t('seo.main.sections.settings') }}</button>
-          <button type="button" class="btn btn-p btn-sm" (click)="generate()" [disabled]="generating()">
+          <button type="button" class="btn btn-p" (click)="generate()" [disabled]="generating()">
             @if (generating()) { {{ t('seo.main.generate.inProgress') }} } @else { {{ t('seo.main.generate.action') }} }
           </button>
           <div class="gsc-status">
             @if (gsc()?.connected) {
               <span class="gsc-badge gsc-connected">{{ t('seo.main.gsc.connected', { siteUrl: gsc()?.site_url }) }}</span>
-              <button type="button" class="btn btn-g btn-sm" (click)="syncGsc()" [disabled]="syncingGsc()">
+              <button type="button" class="btn btn-g" (click)="syncGsc()" [disabled]="syncingGsc()">
                 @if (syncingGsc()) { {{ t('seo.main.gsc.syncing') }} } @else { {{ t('seo.main.gsc.syncNow') }} }
               </button>
-              <button type="button" class="btn btn-g btn-sm" (click)="disconnectGsc()">{{ t('seo.main.gsc.disconnect') }}</button>
+              <button type="button" class="btn btn-g" (click)="disconnectGsc()">{{ t('seo.main.gsc.disconnect') }}</button>
             } @else {
-              <button type="button" class="btn btn-g btn-sm" (click)="connectGsc()">{{ t('seo.main.gsc.connect') }}</button>
+              <button type="button" class="btn btn-g" (click)="connectGsc()">{{ t('seo.main.gsc.connect') }}</button>
             }
           </div>
         </div>

@@ -388,9 +388,7 @@ interface DiscoveredCompany {
               (ngModelChange)="onFilterChange()">
           </div>
 
-          <button class="btn btn-g" style="height:36px" (click)="resetFilters()">
-            {{ t('admin.filters.reset') }}
-          </button>
+          <button type="button" class="btn-reset" (click)="resetFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ t('list.clearFilters') }}</button>
 
           <label style="display:flex;align-items:center;gap:8px;height:36px;font-size:14px;color:var(--gray-700);cursor:pointer;user-select:none">
             <input type="checkbox"

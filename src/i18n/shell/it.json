@@ -41,11 +41,13 @@
     "superAdmin": "Super Admin"
   },
   "sidebar": {
+    "closeMenu": "Chiudi il menu",
     "collapse": "Comprimi menu",
     "doneEditing": "Fatto",
     "editMenu": "Modifica menu",
     "expand": "Espandi menu",
     "hideItem": "Nascondi",
+    "openMenu": "Apri il menu",
     "showItem": "Mostra"
   },
   "user": {

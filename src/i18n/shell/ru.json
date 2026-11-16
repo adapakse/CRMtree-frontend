@@ -41,11 +41,13 @@
     "superAdmin": "Суперадмин"
   },
   "sidebar": {
+    "closeMenu": "Закрыть меню",
     "collapse": "Свернуть меню",
     "doneEditing": "Готово",
     "editMenu": "Изменить меню",
     "expand": "Развернуть меню",
     "hideItem": "Скрыть",
+    "openMenu": "Открыть меню",
     "showItem": "Показать"
   },
   "user": {

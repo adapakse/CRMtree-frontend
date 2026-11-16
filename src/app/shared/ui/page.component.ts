@@ -30,6 +30,12 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     .grow { flex: 1; }
     .actions { display: flex; align-items: center; gap: 8px; }
     .body { flex: 1; min-height: 0; overflow-y: auto; padding: 24px; }
+    @media (max-width: 1023.98px) {
+      .head { height: auto; min-height: 60px; flex-wrap: wrap; padding: 8px 16px; row-gap: 8px; }
+      .title { min-width: 0; overflow-wrap: anywhere; }
+      .actions { flex-wrap: wrap; }
+      .body { padding: 16px; }
+    }
   `],
 })
 export class PageComponent {
