@@ -3,7 +3,7 @@
    Fonts: Sora (headings) + DM Sans (body)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300..900;1,9..40,300..900&display=swap');
 
 /* ── Design Tokens ─────────────────────────────────────── */
 :root {
@@ -665,7 +665,7 @@ quill-editor:focus-within .ql-container.ql-snow {
     margin-top: 2px;
     padding: 6px 0 0 6px;
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 900;
     color: var(--gray-900);
   }
   select:not([multiple]):not([data-n1]):not([data-n2]) optgroup option { margin-left: -6px; text-transform: none; letter-spacing: normal; margin-top: 2px; color: var(--gray-800); }
@@ -1267,7 +1267,7 @@ select:not([multiple]):is(:focus, :focus-visible, :open) {
   display: flex;
   flex-direction: column;
 }
-.popover-title { font-size: 12px; font-weight: 600; color: var(--gray-600); padding: 6px 8px 4px; }
+.popover-title { font-size: 12px; font-weight: 900; color: var(--gray-900); padding: 6px 8px 4px; }
 .popover-item {
   display: flex; align-items: center; gap: 8px;
   padding: 8px; border: none; border-radius: 8px;
