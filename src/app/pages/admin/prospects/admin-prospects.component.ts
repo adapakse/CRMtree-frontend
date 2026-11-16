@@ -329,12 +329,12 @@ interface DiscoveredCompany {
 
       <!-- Filtry -->
       <div class="card filter-card">
-        <div class="filter-fields">
+        <div class="filter-fields" style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end">
 
-          <div class="fld fld-search">
+          <div class="fld">
             <label>{{ t('admin.filters.search') }}</label>
             <input class="inp" [(ngModel)]="filters.search" [placeholder]="t('admin.filters.searchPlaceholder')"
-              (ngModelChange)="onFilterChange()">
+              (ngModelChange)="onFilterChange()" style="width:180px">
           </div>
 
           <div class="fld">
@@ -352,49 +352,50 @@ interface DiscoveredCompany {
             </select>
           </div>
 
-          <div class="fld fld-range fld-score">
-            <label>{{ t('admin.table.score') }}</label>
-            <div class="range-pair">
-              <input class="inp" type="number" min="0" max="100" placeholder="0" [attr.aria-label]="t('admin.filters.scoreMin')"
-                [(ngModel)]="filters.score_min" (ngModelChange)="onFilterChange()">
-              <span class="range-dash" aria-hidden="true">–</span>
-              <input class="inp" type="number" min="0" max="100" placeholder="100" [attr.aria-label]="t('admin.filters.scoreMax')"
-                [(ngModel)]="filters.score_max" (ngModelChange)="onFilterChange()">
-            </div>
+          <div class="fld">
+            <label>{{ t('admin.filters.scoreMin') }}</label>
+            <input class="inp" type="number" min="0" max="100" [(ngModel)]="filters.score_min"
+              (ngModelChange)="onFilterChange()" style="width:80px">
           </div>
 
-          <div class="filter-break"></div>
-
-          <div class="fld fld-range">
-            <label>{{ t('admin.table.imported') }}</label>
-            <div class="range-pair">
-              <input class="inp" type="date" [attr.aria-label]="t('admin.filters.importedFrom')"
-                [(ngModel)]="filters.imported_from" (ngModelChange)="onFilterChange()">
-              <span class="range-dash" aria-hidden="true">–</span>
-              <input class="inp" type="date" [attr.aria-label]="t('admin.filters.importedTo')"
-                [(ngModel)]="filters.imported_to" (ngModelChange)="onFilterChange()">
-            </div>
+          <div class="fld">
+            <label>{{ t('admin.filters.scoreMax') }}</label>
+            <input class="inp" type="number" min="0" max="100" [(ngModel)]="filters.score_max"
+              (ngModelChange)="onFilterChange()" style="width:80px">
           </div>
 
-          <div class="fld fld-range">
-            <label>{{ t('admin.table.enrichment') }}</label>
-            <div class="range-pair">
-              <input class="inp" type="date" [attr.aria-label]="t('admin.filters.enrichedFrom')"
-                [(ngModel)]="filters.enriched_from" (ngModelChange)="onFilterChange()">
-              <span class="range-dash" aria-hidden="true">–</span>
-              <input class="inp" type="date" [attr.aria-label]="t('admin.filters.enrichedTo')"
-                [(ngModel)]="filters.enriched_to" (ngModelChange)="onFilterChange()">
-            </div>
+          <div class="fld">
+            <label>{{ t('admin.filters.importedFrom') }}</label>
+            <input class="inp" type="date" [(ngModel)]="filters.imported_from"
+              (ngModelChange)="onFilterChange()">
           </div>
 
-          <label class="filter-archive">
+          <div class="fld">
+            <label>{{ t('admin.filters.importedTo') }}</label>
+            <input class="inp" type="date" [(ngModel)]="filters.imported_to"
+              (ngModelChange)="onFilterChange()">
+          </div>
+
+          <div class="fld">
+            <label>{{ t('admin.filters.enrichedFrom') }}</label>
+            <input class="inp" type="date" [(ngModel)]="filters.enriched_from"
+              (ngModelChange)="onFilterChange()">
+          </div>
+
+          <div class="fld">
+            <label>{{ t('admin.filters.enrichedTo') }}</label>
+            <input class="inp" type="date" [(ngModel)]="filters.enriched_to"
+              (ngModelChange)="onFilterChange()">
+          </div>
+
+          <button type="button" class="btn-reset" (click)="resetFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ 'list.clearFilters' | transloco }}</button>
+
+          <label style="display:flex;align-items:center;gap:8px;height:36px;font-size:14px;color:var(--gray-700);cursor:pointer;user-select:none">
             <input type="checkbox"
               [checked]="showArchived()"
               (change)="showArchived.set(!showArchived()); page.set(1); load()">
             {{ t('admin.filters.showArchived') }}
           </label>
-
-          <button type="button" class="btn-reset filter-clear" (click)="resetFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ 'list.clearFilters' | transloco }}</button>
 
         </div>
       </div>
@@ -1882,26 +1883,6 @@ interface DiscoveredCompany {
            padding:0 14px; font-size:14px; background:var(--surface); box-shadow:0 1px 2px rgba(0,0,0,.05); }
     .inp:focus { outline:none; border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
     .filter-card { margin-bottom:16px; padding:12px 18px; border-radius:14px; }
-    .filter-fields { display:flex; flex-wrap:wrap; gap:12px 16px; align-items:flex-end; }
-    .fld label { color:var(--gray-600); }
-    .filter-fields .inp, .filter-fields .range-dash { font-size:12px; }
-    .fld-search { flex:1 1 240px; max-width:320px; }
-    .fld-search .inp { width:100%; }
-    .range-pair { display:flex; flex-wrap:nowrap; align-items:center; gap:8px; }
-    .range-dash { color:var(--gray-600); }
-    .fld-range .range-pair .inp[type=date] { width:152px; }
-    .fld-score .range-pair .inp { width:72px; }
-    .filter-break { flex-basis:100%; height:0; }
-    .filter-archive { display:flex; align-items:center; gap:8px; height:36px; font-size:14px; color:var(--gray-700); cursor:pointer; user-select:none; }
-    .filter-clear { margin-left:auto; }
-    @media (max-width: 767px) {
-      .filter-break { display:none; }
-      .fld-search { max-width:none; }
-      .filter-fields > .fld { flex:1 1 100%; }
-      .filter-fields > .fld > select { width:100%; }
-      .range-pair .inp { flex:1 1 0; min-width:0; width:auto !important; }
-      .filter-clear { margin-left:0; }
-    }
     .inp-sm { height:28px; font-size:12px; padding:0 8px; border-radius:8px; }
 
     .icon-btn {
