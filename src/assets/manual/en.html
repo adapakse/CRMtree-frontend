@@ -1419,6 +1419,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>Add any optional columns you have: <code>www</code>, <code>krs</code>, name, industry, headcount, city, region, PKD code and decision-maker details (name, position, department, phone, email). A <code>www</code> column makes finding the website faster and cheaper.</li>
 <li>Click <b>“Choose a CSV file”</b>, then <b>“Import”</b>.</li>
 <li>Check the summary: “Added”, “Skipped (duplicates)”, “Errors”, “Rows in total”. Rows with an invalid tax ID (it must have 10 digits) are skipped and listed under “Error details”.</li>
+<li>Companies that are already a Lead or a Partner in CRM (same NIP) are skipped: they appear under <b>“Skipped (already in CRM)”</b> with a link to their card.</li>
 </ol>
 <div class="callout"><b>Duplicates</b>A company with the same tax ID is never created twice. The import updates the existing record instead: filled-in cells overwrite the old values and empty cells leave them as they are. The file can be UTF-8 or Windows-1250, separated by semicolons or commas, up to 10 MB.</div>
 

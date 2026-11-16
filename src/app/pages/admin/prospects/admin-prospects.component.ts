@@ -300,6 +300,7 @@ interface DiscoveredCompany {
               [style.color]="importResult()!.errors! > 0 ? 'oklch(from #92400e max(l, var(--text-min-l)) c h)' : 'oklch(from #166534 max(l, var(--text-min-l)) c h)'">
               ✓ {{ t('admin.import.added') }} <b>{{ importResult()!.added }}</b> &nbsp;|&nbsp;
               {{ t('admin.import.skipped') }} <b>{{ importResult()!.skipped }}</b> &nbsp;|&nbsp;
+              @if (importResult()!.skipped_in_crm) { {{ t('admin.import.skippedInCrm') }} <b>{{ importResult()!.skipped_in_crm }}</b> &nbsp;|&nbsp; }
               {{ t('admin.import.errors') }} <b>{{ importResult()!.errors }}</b> &nbsp;|&nbsp;
               {{ t('admin.import.totalRows') }} <b>{{ importResult()!.total }}</b>
               @if (importResult()!.detected_encoding) {
@@ -319,6 +320,20 @@ interface DiscoveredCompany {
                   <div style="font-weight:600;margin-bottom:4px">{{ t('admin.import.errorDetails') }}</div>
                   @for (e of importResult()!.error_details!; track e) {
                     <div style="font-size:12px;margin-bottom:2px">• {{ e }}</div>
+                  }
+                </div>
+              }
+              @if (importResult()!.in_crm?.length) {
+                <div style="margin-top:8px;border-top:1px solid var(--gray-200);padding-top:8px">
+                  <div style="font-weight:600;margin-bottom:4px">{{ t('admin.import.inCrmTitle') }}</div>
+                  @for (d of importResult()!.in_crm!; track d.row) {
+                    <div style="font-size:12px;margin-bottom:2px">• NIP {{ d.nip }} —
+                      @if (d.existsAs === 'partner') {
+                        <a style="cursor:pointer;text-decoration:underline" (click)="goToPartner(d.existingId, d.nip)">{{ t('admin.import.inCrmPartner') }}: {{ d.existingName }}</a>
+                      } @else {
+                        <a style="cursor:pointer;text-decoration:underline" (click)="goToLead(+d.existingId, d.nip)">{{ t('admin.import.inCrmLead') }}: {{ d.existingName }}</a>
+                      }
+                    </div>
                   }
                 </div>
               }
@@ -2367,6 +2382,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   importFile   = signal<File | null>(null);
   importResult = signal<{
     added?: number; skipped?: number; errors?: number; total?: number;
+    skipped_in_crm?: number;
+    in_crm?: { row: number; nip: string; existsAs: 'lead' | 'partner'; existingId: string; existingName: string }[];
     detected_columns?: string[]; error_details?: string[];
     detected_encoding?: string;
     fatal_error?: string;
