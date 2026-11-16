@@ -1477,3 +1477,8 @@ select:not([multiple]):is(:focus, :focus-visible, :open) {
 @media (pointer: coarse), (max-width: 767px) {
   .btn-reset { min-height: 40px; }
 }
+
+/* ── Document panel tabs: label and its help icon on one line, scroll sideways when narrow ── */
+.doc-tabs { overflow-x: auto; scrollbar-width: none; }
+.doc-tabs::-webkit-scrollbar { display: none; }
+.doc-tabs .tab-btn { flex: 1 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; }

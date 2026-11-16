@@ -72,7 +72,7 @@ interface SelectOption { value: string; label: string; }
 
         <!-- Tabs -->
         <div style="padding:16px 24px 0">
-          <div class="tabs" style="margin-bottom:0">
+          <div class="tabs doc-tabs" style="margin-bottom:0">
             @for (tab of tabs; track tab.id) {
               <button class="tab-btn" [class.active]="activeTab === tab.id" (click)="activeTab = tab.id">
                 {{ t(tab.labelKey) }}<wt-tooltip [key]="tab.tooltip"></wt-tooltip>
@@ -612,10 +612,10 @@ interface SelectOption { value: string; label: string; }
             <button class="btn btn-g" (click)="downloadDoc()"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> {{ t('detail.actions.download') }}</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
-            <button class="btn btn-d" (click)="deleteDoc()">🗑 {{ t('detail.actions.delete') }}</button>
+            <button class="btn btn-d" (click)="deleteDoc()"><svg class="ic" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg> {{ t('detail.actions.delete') }}</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
-            <button class="btn btn-p" (click)="saveDoc()">💾 {{ t('detail.actions.saveChanges') }}</button>
+            <button class="btn btn-p" (click)="saveDoc()"><svg class="ic" viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5zM8 3v5h7V3M8 21v-7h8v7"/></svg> {{ t('detail.actions.saveChanges') }}</button>
           }
           <button class="btn btn-g" (click)="close.emit()">{{ 'actions.close' | transloco }}</button>
         </div>
