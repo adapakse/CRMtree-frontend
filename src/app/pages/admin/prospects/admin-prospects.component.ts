@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, OnInit, OnDestroy, HostListener, C
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -235,7 +235,7 @@ interface DiscoveredCompany {
   selector: 'wt-admin-prospects',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, TranslocoDirective],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
   providers: [provideTranslocoScope('prospects')],
   template: `
     <ng-container *transloco="let t; prefix: 'prospects'">
@@ -329,7 +329,7 @@ interface DiscoveredCompany {
 
       <!-- Filtry -->
       <div class="card filter-card">
-        <div style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end">
+        <div class="filter-fields" style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end">
 
           <div class="fld">
             <label>{{ t('admin.filters.search') }}</label>
@@ -388,7 +388,7 @@ interface DiscoveredCompany {
               (ngModelChange)="onFilterChange()">
           </div>
 
-          <button type="button" class="btn-reset" (click)="resetFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ t('list.clearFilters') }}</button>
+          <button type="button" class="btn-reset" (click)="resetFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ 'list.clearFilters' | transloco }}</button>
 
           <label style="display:flex;align-items:center;gap:8px;height:36px;font-size:14px;color:var(--gray-700);cursor:pointer;user-select:none">
             <input type="checkbox"
@@ -1908,6 +1908,8 @@ interface DiscoveredCompany {
     /* overflow: clip rounds the corners without creating a scroll box, so the
        sticky table header keeps sticking to the page scroll. */
     .tbl-card { background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow:clip; }
+    /* narrower than the table: it scrolls sideways in its card instead of being cut off */
+    @media (max-width: 1279px) { .tbl-card { overflow-x:auto; } }
     .tbl { width:100%; border-collapse:collapse; font-size:12px; }
     .tbl th {
       background:var(--gray-50); text-align:left; padding:8px 10px 14px;

@@ -372,6 +372,15 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
     .seo-header h1 { font-size: 1.4rem; margin: 0; }
     .section-title { font-size: 1.05rem; font-weight: 700; color: var(--gray-900); margin: 0 0 0.75rem; }
     .header-actions { display:flex; align-items:center; gap: 0.75rem; }
+    /* the header has more buttons than fit next to the title even beside the full sidebar: they wrap */
+    .seo-header { flex-wrap: wrap; gap: 12px; }
+    .header-actions { flex-wrap: wrap; gap: 8px; }
+    .gsc-status { display: flex; flex-wrap: wrap; gap: 8px; }
+    @media (max-width: 767px) {
+      .seo-page { padding: 16px; }
+      .seo-header h1 { flex: 1 1 100%; }
+      .seo-layout { grid-template-columns: minmax(0, 1fr) !important; }
+    }
     .gsc-badge { font-size: 0.82rem; padding: 0.4rem 0.8rem; border-radius: var(--radius); }
     .gsc-connected { background: var(--orange-pale); color: var(--orange-dark); }
     .status-tabs { display:flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }

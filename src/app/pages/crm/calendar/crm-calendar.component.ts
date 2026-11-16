@@ -37,7 +37,7 @@ interface CalendarDay {
 
 <!-- TOPBAR -->
 <div class="cal-topbar" style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;padding:0 20px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('calendar.title') }}</span>
+  <span class="cal-title" style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('calendar.title') }}</span>
   <span style="flex:1"></span>
 
   <!-- Filtr handlowca (manager) -->
@@ -396,11 +396,17 @@ interface CalendarDay {
     .opt-team { width:16px; height:16px; flex-shrink:0; fill:none; stroke:var(--gray-500); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     .ctl { background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:4px 10px;font-size:12px;outline:none;cursor:pointer;font-family:inherit }
     .ctl:focus { border-color:#3BAA5D }
+    @media (max-width: 767px) {
+      .cal-title { flex: 1 1 100%; }
+      .cal-title + span { display: none; }
+      .cal-period { font-size: 14px !important; flex: 1 1 0 !important; }
+    }
     
     .tasks-badge { display:inline-flex;min-width:16px;height:16px;background:#dc2626;color:white;border-radius:10px;font-size:10px;font-weight:700;align-items:center;justify-content:center;padding:0 4px;line-height:1;margin-left:4px;vertical-align:middle }
 
     /* Month */
-    .month-grid { display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--gray-200);border-top:1px solid var(--gray-200) }
+    /* minmax(0,1fr): long event titles never widen their day column */
+    .month-grid { display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-left:1px solid var(--gray-200);border-top:1px solid var(--gray-200) }
     .month-dayname { padding:6px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-400);text-align:center;border-right:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);background:var(--gray-50) }
     .month-cell { min-height:100px;padding:6px;border-right:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);background:var(--surface);vertical-align:top }
     .month-cell.weekend { background:var(--gray-50) }
@@ -420,7 +426,7 @@ interface CalendarDay {
     .event-more:hover { color:oklch(from #3baa5d max(l, var(--text-min-l)) c h) }
 
     /* Week */
-    .week-grid { display:grid;grid-template-columns:50px repeat(7,1fr);border-left:1px solid var(--gray-200) }
+    .week-grid { display:grid;grid-template-columns:50px repeat(7,minmax(0,1fr));border-left:1px solid var(--gray-200) }
     .wh-time { background:var(--gray-50);border-right:1px solid var(--gray-200);border-bottom:2px solid var(--gray-200) }
     .wh-day { padding:6px;text-align:center;border-right:1px solid var(--gray-200);border-bottom:2px solid var(--gray-200);background:var(--gray-50) }
     .wh-day.today { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface)) }

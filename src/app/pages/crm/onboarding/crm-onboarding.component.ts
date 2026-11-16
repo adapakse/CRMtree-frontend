@@ -458,7 +458,8 @@ const TYPE_LABELS: Record<string, string> = {
     .pc-mgr { font-size:12px;color:var(--gray-400) }
 
     /* Partners sub-toolbar */
-    .view-pills { display:flex;gap:8px;margin-left:auto }
+    .view-pills { display:flex;gap:8px;margin-left:auto;flex-wrap:wrap }
+    @media (max-width: 767px) { .view-pills { margin-left:0; flex:1 1 100%; } }
     .partners-toolbar { display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px }
 
     /* Partners table */

@@ -56,7 +56,7 @@ const ACTION_ICONS: Record<string, string> = {
           <input class="fi" type="text" [(ngModel)]="filters.user_email" (blur)="load()" [placeholder]="t('logs.filters.userEmailPlaceholder')">
         </div>
         <div style="margin-top:auto">
-          <button type="button" class="btn-reset" (click)="clearFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ t('list.clearFilters') }}</button>
+          <button type="button" class="btn-reset" (click)="clearFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ 'list.clearFilters' | transloco }}</button>
         </div>
         <span style="flex:1"></span>
         <span style="font-size:12px;color:var(--gray-400);margin-top:auto">{{ t('logs.count', { count: total() }) }}</span>

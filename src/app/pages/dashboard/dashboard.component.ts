@@ -61,7 +61,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
       <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start">
 
         <!-- Recent Documents -->
-        <div>
+        <div style="min-width:0">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
             <h3 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ t('dashboard.recentDocuments') }}</h3>
             <a routerLink="/documents" class="btn btn-g btn-sm">{{ t('dashboard.seeAll') }}</a>

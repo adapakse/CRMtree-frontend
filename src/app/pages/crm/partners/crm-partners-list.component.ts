@@ -50,7 +50,7 @@ type SortDir = 'asc' | 'desc';
       <option value="">{{ t('partnersList.toolbar.allIndustries') }}</option>
       <option *ngFor="let i of industries" [value]="i">{{i}}</option>
     </select>
-    <button type="button" class="btn-reset" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel||onlyMine" (click)="clearFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ t('list.clearFilters') }}</button>
+    <button type="button" class="btn-reset" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel||onlyMine" (click)="clearFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ 'list.clearFilters' | transloco }}</button>
     <div class="view-row">
       <div class="seg" role="group" [attr.aria-label]="t('partnersList.view.label')">
         <button type="button" class="seg-opt" [class.on]="viewMode==='cards'" [attr.aria-pressed]="viewMode==='cards'" (click)="viewMode='cards'">

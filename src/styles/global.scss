@@ -1374,7 +1374,7 @@ select:not([multiple]):is(:focus, :focus-visible, :open) {
   /* naglowek: zawija sie, nazwa moze sie lamac */
   .card-hdr { gap: 8px !important; }
   .card-hdr h1 { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; overflow-wrap: anywhere; font-size: 20px !important; }
-  .card-hdr-name { flex: 1 1 200px !important; }
+  .card-hdr-name, .card-hdr > h1 { flex: 1 1 200px !important; min-width: 0; }
   .card-hdr-actions { flex: 1 1 100%; }
   .stage-bar { flex-wrap: wrap; }
 }
@@ -1389,7 +1389,10 @@ select:not([multiple]):is(:focus, :focus-visible, :open) {
 
 @media (max-width: 1279px) {
   /* 1. KPI tiles wrap instead of overlapping */
+  /* Angular writes a static style attribute as "prop: value;" (space after the colon),
+     so the attribute selectors below list that form next to the one in the source. */
   .stats-row, .stats-bar, .kpi-row, .dash-kpis,
+  [style*="grid-template-columns: repeat(3,1fr)"], [style*="grid-template-columns: repeat(4,1fr)"], [style*="grid-template-columns: repeat(5,1fr)"],
   [style*="grid-template-columns:repeat(3,1fr)"], [style*="grid-template-columns:repeat(4,1fr)"], [style*="grid-template-columns:repeat(5,1fr)"] {
     display: grid !important;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
@@ -1406,7 +1409,7 @@ select:not([multiple]):is(:focus, :focus-visible, :open) {
   .card > table, .dash-panel table { min-width: 560px; }
 
   /* 3. Kanban: scrolls in its own box, fixed-width columns */
-  .kanban-wrap { overflow-x: auto !important; max-width: 100%; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .kanban-wrap { overflow-x: auto !important; max-width: 100%; scroll-snap-type: x proximity; scroll-padding-inline: 16px; -webkit-overflow-scrolling: touch; }
   .kanban { display: grid !important; grid-template-columns: none !important; grid-auto-flow: column; grid-auto-columns: 272px; flex: none !important; width: max-content; min-width: 0 !important; }
   .kanban > .kol, .kanban-wrap > .kb-col { scroll-snap-align: start; }
   .kb-col { width: 272px !important; }
@@ -1431,21 +1434,55 @@ select:not([multiple]):is(:focus, :focus-visible, :open) {
   /* Big dashboard blocks one under another */
   .dash-body, .mid-row, .bot-row { grid-template-columns: minmax(0, 1fr) !important; }
   .dash-panel.wide { grid-column: auto; }
-  [style*="grid-template-columns:1fr 340px"], [style*="grid-template-columns:repeat(4,1fr);gap:16px;align-items:start"] { grid-template-columns: minmax(0, 1fr) !important; }
+  [style*="grid-template-columns: 1fr 340px"], [style*="grid-template-columns:1fr 340px"],
+  [style*="grid-template-columns: 1.4fr 1fr"], [style*="grid-template-columns: 1.6fr 1fr"], [style*="grid-template-columns: 2fr 1fr"],
+  [style*="grid-template-columns: 1fr 1fr 1fr"], [style*="grid-template-columns: 1fr 1fr; gap: 20px"] { grid-template-columns: minmax(0, 1fr) !important; }
+  [style*="grid-template-columns: repeat(4,1fr); gap: 16px; align-items: start"] { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important; }
+}
+
+/* Inline-styled grids: a wide child (table, chart) scrolls in its own box instead of widening the column */
+@media (max-width: 1279px) {
+  [style*="display: grid"] > *, [style*="display:grid"] > * { min-width: 0; }
 }
 
 @media (max-width: 767px) {
-  .dash-page, .crm-dash, #content { padding-left: 16px !important; padding-right: 16px !important; }
+  .dash-page, .crm-dash, #content, .page-body { padding-left: 16px !important; padding-right: 16px !important; }
   #topbar, .topbar, .cal-topbar { padding-left: 16px !important; padding-right: 16px !important; }
   .dash-header, .dash-top { flex-wrap: wrap !important; }
   .dash-header h1, .dash-greeting { flex: 1 1 100% !important; min-width: 0; }
   .mc-bar-row { grid-template-columns: 100px minmax(0, 1fr) 36px !important; }
   .cal-period { min-width: 0 !important; flex: 1 1 auto; }
 
-  /* Filters: fields take the full width on a phone */
-  .toolbar > :is(select, input), .filters > :is(select, input), .filter-bar > :is(select, input),
-  #topbar > :is(select, input), .topbar > :is(select, input), .cal-topbar > select,
-  select.period-sel { flex: 1 1 100%; max-width: 100%; min-width: 0; }
+  /* KPI tiles: two per row on a phone */
+  .stats-row, .stats-bar, .kpi-row, .dash-kpis,
+  [style*="grid-template-columns: repeat(4,1fr)"], [style*="grid-template-columns: repeat(5,1fr)"],
+  [style*="grid-template-columns:repeat(4,1fr)"], [style*="grid-template-columns:repeat(5,1fr)"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  /* an odd last tile spans the row instead of leaving a hole next to it */
+  :is(.stats-row, .stats-bar, .kpi-row, .dash-kpis,
+      [style*="grid-template-columns: repeat(4,1fr)"], [style*="grid-template-columns: repeat(5,1fr)"],
+      [style*="grid-template-columns:repeat(4,1fr)"], [style*="grid-template-columns:repeat(5,1fr)"]) > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+  [style*="grid-template-columns: repeat(4,1fr); gap: 16px; align-items: start"] { grid-template-columns: minmax(0, 1fr) !important; }
+
+  /* Two-field form rows: one under another on a phone */
+  :is([style*="grid-template-columns: 1fr 1fr"], [style*="grid-template-columns:1fr 1fr"], .fgrid):not(.keep-2col) { grid-template-columns: minmax(0, 1fr) !important; }
+
+  /* Filters: every field in a filter bar takes the full width on a phone (also labelled field
+     groups and fields with an inline width), so one bar never mixes wide and narrow fields. */
+  :is(.toolbar, .filters, .filter-bar, .filter-fields, #topbar, .topbar) > :is(select, input:not([type=checkbox], [type=radio]), .fg, .fld),
+  .cal-topbar > select, select.period-sel {
+    flex: 1 1 100% !important; width: auto !important; max-width: 100% !important; min-width: 0 !important;
+  }
+  :is(.toolbar, .filters, .filter-bar, .filter-fields) > :is(.fg, .fld) > :is(select, input:not([type=checkbox], [type=radio])) {
+    width: 100% !important; max-width: 100% !important; min-width: 0 !important; box-sizing: border-box;
+  }
+  /* shared period picker: the preset select a full row, a custom date range two halves below it */
+  :is(.toolbar, .filters, .filter-bar, .filter-fields) > period-filter { flex: 1 1 100%; min-width: 0; }
+  :is(.toolbar, .filters, .filter-bar, .filter-fields) > period-filter select { flex: 1 1 100%; max-width: 100% !important; }
+  :is(.toolbar, .filters, .filter-bar, .filter-fields) > period-filter input { flex: 1 1 0; min-width: 0; }
+  /* segmented year / mode switches in a filter bar scroll sideways instead of running off the screen */
+  :is(.toolbar, .filters, .filter-bar, .filter-fields) > .seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
   .tabs.seg, .view-switch.seg { max-width: 100%; overflow-x: auto; }
 
   .modal { width: calc(100vw - 32px) !important; max-height: calc(100dvh - 32px); overflow-y: auto; }

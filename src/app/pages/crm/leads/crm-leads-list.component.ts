@@ -888,6 +888,8 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     /* Kanban */
     /* Side padding (cancelled by the negative margin) keeps the card shadows from being clipped by the scroll box. */
     .kanban-wrap { display:flex; flex:1; overflow-y:auto; min-height:0; gap:0; padding:0 16px; margin:0 -16px; }
+    /* the box bleeds 16px past both page edges, so it must not be capped at the page width */
+    @media (max-width: 1279px) { .kanban-wrap { max-width:none; } }
     .kanban { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; flex:1; align-items:start; padding-bottom:16px; min-width:900px; }
     .kol { min-width:0; }
     .kol-head { display:flex; align-items:center; gap:6px; margin-bottom:10px; }

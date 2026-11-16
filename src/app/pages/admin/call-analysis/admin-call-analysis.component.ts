@@ -52,8 +52,8 @@ interface CallAnalysisRow {
 <div style="display:flex;flex-direction:column;height:100%;background:var(--gray-50)" (click)="closeMenu()">
 
   <!-- HEADER -->
-  <div style="background:var(--surface);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:14px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0">
-    <div style="flex:1">
+  <div class="ca-head" style="background:var(--surface);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:14px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+    <div class="ca-head-title" style="flex:1">
       <div style="font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('callAnalysis.title') }}</div>
       <div style="font-size:12px;color:var(--gray-500);margin-top:1px">{{ t('callAnalysis.subtitle') }}</div>
     </div>
@@ -167,14 +167,18 @@ interface CallAnalysisRow {
       <option value="prospect">{{ t('callAnalysis.links.prospect') }}</option>
       <option value="none">{{ t('callAnalysis.filters.noLinks') }}</option>
     </select>
-    <span class="ca-lbl">{{ t('callAnalysis.filters.firstCall') }}</span>
-    <input type="date" class="sel" [(ngModel)]="filters.first_call_from" (ngModelChange)="onFilterChange()">
-    <span class="ca-sep">–</span>
-    <input type="date" class="sel" [(ngModel)]="filters.first_call_to" (ngModelChange)="onFilterChange()">
-    <span class="ca-lbl">{{ t('callAnalysis.filters.lastCall') }}</span>
-    <input type="date" class="sel" [(ngModel)]="filters.last_call_from" (ngModelChange)="onFilterChange()">
-    <span class="ca-sep">–</span>
-    <input type="date" class="sel" [(ngModel)]="filters.last_call_to" (ngModelChange)="onFilterChange()">
+    <div class="ca-grp ca-range">
+      <span class="ca-lbl">{{ t('callAnalysis.filters.firstCall') }}</span>
+      <input type="date" class="sel" [(ngModel)]="filters.first_call_from" (ngModelChange)="onFilterChange()">
+      <span class="ca-sep">–</span>
+      <input type="date" class="sel" [(ngModel)]="filters.first_call_to" (ngModelChange)="onFilterChange()">
+    </div>
+    <div class="ca-grp ca-range">
+      <span class="ca-lbl">{{ t('callAnalysis.filters.lastCall') }}</span>
+      <input type="date" class="sel" [(ngModel)]="filters.last_call_from" (ngModelChange)="onFilterChange()">
+      <span class="ca-sep">–</span>
+      <input type="date" class="sel" [(ngModel)]="filters.last_call_to" (ngModelChange)="onFilterChange()">
+    </div>
 
     <!-- Follow-up date preset filter -->
     <div class="ca-grp">
@@ -665,6 +669,17 @@ interface CallAnalysisRow {
     .ca-sep { font-size:12px; color:var(--gray-400); }
     .ca-total { margin-left:auto; }
     .ca-grp .fchip { font-family:inherit; }
+    @media (max-width: 767px) {
+      .ca-head { flex-wrap:wrap; padding:12px 16px !important; }
+      .ca-head-title { flex:1 1 100% !important; }
+      .toolbar { margin:16px 16px 0; }
+      .ca-table-card { margin:16px; }
+      /* Labelled groups (score, date ranges, follow-up date) take a full row like every other field */
+      .ca-grp { flex:1 1 100%; flex-wrap:wrap; white-space:normal; row-gap:8px; }
+      .ca-grp > .ca-lbl { flex:1 1 100%; }
+      .ca-grp > input { flex:1 1 0; min-width:0; width:auto; }
+      .ca-total { margin-left:0; }
+    }
     .ca-num { width:64px; height:36px; box-sizing:border-box; padding:0 12px; font-family:inherit; font-size:12px; border:1px solid var(--gray-200); border-radius:12px; background:var(--surface); box-shadow:0 1px 2px rgba(0,0,0,.05); color:var(--gray-800); }
     .ca-num:focus { outline:none; border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
     .ca-bulk-btn { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 14px; background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:10px; font-size:12px; font-weight:500; font-family:inherit; cursor:pointer; }

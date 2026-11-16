@@ -71,7 +71,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
 </div>
 
 <!-- CONTENT -->
-<div style="flex:1;overflow-y:auto;padding:20px 24px 24px">
+<div class="page-body" style="flex:1;overflow-y:auto;padding:20px 24px 24px">
 
   <!-- Filtry -->
   <div class="toolbar">
@@ -171,7 +171,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
         <span style="font-size:12px;color:var(--gray-400)">{{ t('reports.common.funnel.subtitle') }}<wt-tooltip key="crm.leads.funnel.pct"></wt-tooltip></span>
       </div>
       <div #funnelEl></div>
-      <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+      <div class="keep-2col" style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
         <div style="background:var(--gray-50);border-radius:8px;padding:8px 10px">
           <div style="color:var(--gray-400);margin-bottom:2px">{{ t('reports.leads.funnel.conversionToWon') }}<wt-tooltip key="crm.leads.funnel.conversion"></wt-tooltip></div>
           <div style="font-weight:700;color:var(--gray-800);font-family:'Sora',sans-serif">{{ kpi.win_rate || 0 }}%</div>
@@ -256,9 +256,9 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
 
     <!-- Aktywność handlowców -->
     <div class="card" style="padding:20px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800)">{{ t('reports.leads.activity.title') }}</div>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
           <button class="fchip" [class.on]="activitySource==='all'"     (click)="setActivitySource('all')">{{ t('reports.leads.activity.sourceAll') }}</button>
           <button class="fchip" [class.on]="activitySource==='lead'"    (click)="setActivitySource('lead')">{{ t('reports.leads.activity.sourceLeads') }}</button>
           <button class="fchip" [class.on]="activitySource==='partner'" (click)="setActivitySource('partner')">{{ t('reports.leads.activity.sourcePartners') }}</button>

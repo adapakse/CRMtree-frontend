@@ -665,6 +665,7 @@ interface SelectOption { value: string; label: string; }
     .pc:hover { background: var(--gray-100); color: var(--gray-700); }
     .pb { padding: 24px; flex: 1; }
     .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
+    @media (max-width: 767px) { .pf { flex-wrap: wrap; padding: 12px 16px; } }
     .mol { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); animation: fadeIn .15s ease; }
     .mo { background: var(--surface); border-radius: 12px; width: 460px; max-width: 95vw; box-shadow: var(--shadow-lg); overflow: hidden; animation: scaleIn .2s ease; }
     .moh { padding: 20px 24px 16px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; }

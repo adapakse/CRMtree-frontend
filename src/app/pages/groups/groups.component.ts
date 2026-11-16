@@ -44,7 +44,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
                 }
               </span>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="keep-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <div style="background:var(--gray-50);border-radius:12px;padding:12px">
                 <div style="font-size:18px;font-weight:700;font-family:'Sora',sans-serif;color:var(--gray-900)">{{ g.member_count ?? 0 }}</div>
                 <div style="font-size:12px;color:var(--gray-400)">{{ t('userGroups.members') }}</div>

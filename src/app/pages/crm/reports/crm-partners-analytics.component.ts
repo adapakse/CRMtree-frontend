@@ -38,7 +38,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 </div>
 
 <!-- CONTENT -->
-<div style="flex:1;overflow-y:auto;padding:20px 24px 24px">
+<div class="page-body" style="flex:1;overflow-y:auto;padding:20px 24px 24px">
 
   <!-- Filtry -->
   <div class="toolbar">
@@ -274,7 +274,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
   <!-- ROW 4: Partnerzy — filtry + tabela + paginacja -->
   <div class="card" style="padding:18px 20px">
 
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <div class="filter-fields" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
       <div class="card-title" style="margin-bottom:0;flex:1;min-width:200px">
         {{ t('reports.partnerAnalytics.partners.title') }}
         <span class="card-subtitle">{{labelA}}{{data.b ? ' vs ' + labelB : ''}}</span>

@@ -231,6 +231,7 @@ interface SelectOption { value: string; label: string; }
     .pc:hover { background: var(--gray-100); color: var(--gray-700); }
     .pb { padding: 24px; flex: 1; }
     .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
+    @media (max-width: 767px) { .pf { flex-wrap: wrap; padding: 12px 16px; } }
   `],
 })
 export class NewDocumentPanelComponent implements OnInit {

@@ -69,7 +69,7 @@ function healthColor(engagement: number): string {
 </div>
 
 <!-- CONTENT -->
-<div style="flex:1;overflow-y:auto;padding:20px 24px 24px;display:flex;flex-direction:column;gap:20px">
+<div class="page-body" style="flex:1;overflow-y:auto;padding:20px 24px 24px;display:flex;flex-direction:column;gap:20px">
 
   <!-- Filtry -->
   <div class="toolbar">

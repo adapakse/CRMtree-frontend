@@ -57,6 +57,10 @@ import { ListFilter, ListQueryState, ListSortOption, ListSortOrder } from './lis
     .order:disabled { opacity:.4; cursor:default; }
     .active-count { font-size:12px; font-weight:600; color:var(--orange-dark); background:var(--orange-pale); border-radius:12px; padding:4px 10px; white-space:nowrap; }
     .btn-reset { height:30px; }
+    /* On a phone the typed filters take a full row each, like the fields of every other filter bar. */
+    @media (max-width: 767px) {
+      .text-filter { flex:1 1 100%; width:auto; min-width:0; }
+    }
   `],
 })
 export class ListFilterBarComponent {

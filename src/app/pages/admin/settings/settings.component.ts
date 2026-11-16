@@ -1631,6 +1631,12 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     }
     .survey-link:hover { background: var(--surface); }
     .survey-link-cta { margin-left: auto; font-weight: 600; color: var(--orange-dark); white-space: nowrap; }
+    @media (max-width: 767px) {
+      #topbar .page-title { flex: 1 1 100%; }
+      .survey-link { flex-wrap: wrap; align-items: flex-start; }
+      .survey-link > span:nth-child(2) { flex: 1 1 0; min-width: 0; }
+      .survey-link-cta { flex: 1 1 100%; margin-left: 30px; }
+    }
   `],
 })
 export class SettingsComponent implements OnInit {
