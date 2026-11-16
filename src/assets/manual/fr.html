@@ -1419,6 +1419,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>Ajoutez toutes les colonnes facultatives dont vous disposez : <code>www</code>, <code>krs</code>, nom, secteur, effectif, ville, région, code PKD et coordonnées du décideur (nom, poste, service, téléphone, e-mail). Une colonne <code>www</code> accélère et réduit le coût de la recherche du site web.</li>
 <li>Cliquez sur <b>« Choisir un fichier CSV »</b>, puis sur <b>« Importer »</b>.</li>
 <li>Vérifiez le récapitulatif : « Ajoutés », « Ignorés (doublons) », « Erreurs », « Lignes au total ». Les lignes avec un numéro fiscal invalide (il doit comporter 10 chiffres) sont ignorées et listées sous « Détail des erreurs ».</li>
+<li>Les entreprises déjà présentes dans le CRM comme Lead ou Partenaire (même NIP) sont ignorées : elles apparaissent sous <b>« Ignorés (déjà dans le CRM) »</b> avec un lien vers leur fiche.</li>
 </ol>
 <div class="callout"><b>Doublons</b>Une entreprise avec le même numéro fiscal n’est jamais créée deux fois. L’import met à jour l’enregistrement existant : les cellules renseignées écrasent les anciennes valeurs et les cellules vides les laissent telles quelles. Le fichier peut être en UTF-8 ou Windows-1250, séparé par des points-virgules ou des virgules, jusqu’à 10 Mo.</div>
 

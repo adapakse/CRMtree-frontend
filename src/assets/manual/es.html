@@ -1418,6 +1418,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>Añade las columnas opcionales que tengas: <code>www</code>, <code>krs</code>, nombre, sector, plantilla, ciudad, región, código PKD y datos de la persona decisora (nombre, cargo, departamento, teléfono, correo). Una columna <code>www</code> hace que encontrar el sitio web sea más rápido y barato.</li>
 <li>Haz clic en <b>“Elegir un archivo CSV”</b> y después en <b>“Importar”</b>.</li>
 <li>Revisa el resumen: “Añadidos”, “Omitidos (duplicados)”, “Errores”, “Total de filas”. Las filas con un NIF no válido (debe tener 10 dígitos) se omiten y se enumeran en “Detalles de los errores”.</li>
+<li>Las empresas que ya están en el CRM como Lead o Socio (mismo NIP) se omiten: aparecen en <b>“Omitidos (ya en el CRM)”</b> con un enlace a su ficha.</li>
 </ol>
 <div class="callout"><b>Duplicados</b>Una empresa con el mismo NIF nunca se crea dos veces. La importación actualiza el registro existente: las celdas rellenadas sobrescriben los valores antiguos y las celdas vacías los dejan como están. El archivo puede ser UTF-8 o Windows-1250, separado por punto y coma o por comas, de hasta 10 MB.</div>
 
