@@ -59,7 +59,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color:oklch(from #f59e0b max(l, var(--text-min-l)) c h)">{{ stats.hot }}</div>
-      <div class="stat-lbl"><i class="ei ei-flame"></i> {{ t('leadsList.stats.hot') }}</div>
+      <div class="stat-lbl">🔥 {{ t('leadsList.stats.hot') }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color: var(--orange-text)">{{ formatPLN(stats.pipeline) }}</div>
@@ -92,7 +92,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
   <div class="toolbar">
     <span class="fchip" [class.on]="scopeFilter==='all'"  (click)="setScope('all')">{{ t('leadsList.filters.all') }}</span>
     <span class="fchip" [class.on]="scopeFilter==='mine'" (click)="setScope('mine')">{{ t('leadsList.filters.mine') }}</span>
-    <span class="fchip" [class.on]="filterHot"            (click)="filterHot=!filterHot; load()"><i class="ei ei-flame"></i> {{ t('leadsList.filters.hot') }}</span>
+    <span class="fchip" [class.on]="filterHot"            (click)="filterHot=!filterHot; load()">🔥 {{ t('leadsList.filters.hot') }}</span>
     <span class="fchip" [class.on]="filterHoldOnly"       (click)="filterHoldOnly=!filterHoldOnly; load()" [title]="t('leadsList.filters.holdOnlyTitle')">⏸️ {{ t('leadsList.filters.holdOnly') }}</span>
     <span style="flex:1"></span>
     <select class="sel" [(ngModel)]="filterStageUI" (ngModelChange)="onStageFilterChange()">
@@ -179,7 +179,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                (click)="selectLead(lead)">
             <div class="lead-company" style="display:flex;align-items:center;gap:6px">
               <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
-              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot"><i class="ei ei-flame"></i></span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #15803d max(l, var(--text-min-l)) c h);border-radius:6px;padding:1px 4px;margin-left:4px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
+              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #15803d max(l, var(--text-min-l)) c h);border-radius:6px;padding:1px 4px;margin-left:4px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
             </div>
             <div class="lead-contact" *ngIf="lead.contact_name">
               {{ lead.contact_name }}<span *ngIf="lead.contact_title" style="color:var(--gray-400)"> · {{ lead.contact_title }}</span>
@@ -190,7 +190,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
               <span *ngIf="lead.probability != null" class="lv-pct" [title]="t('leadsList.table.chance')">{{lead.probability}}%</span>
             </div>
             <div class="lead-chips" *ngIf="lead.online_pct != null">
-              <span class="lchip lchip-online"><i class="ei ei-globe"></i> {{lead.online_pct}}%</span>
+              <span class="lchip lchip-online">🌐 {{lead.online_pct}}%</span>
             </div>
             <div class="lead-meta">
               <span *ngIf="lead.source" class="tag tag-src">{{ srcLabel(lead.source) }}</span>
@@ -248,7 +248,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span *ngIf="selected.hot" class="tag tag-orange" style="font-size:10px"><i class="ei ei-flame"></i></span>
+            <span *ngIf="selected.hot" class="tag tag-orange" style="font-size:10px">🔥</span>
             <button class="dp-close" (click)="selected=null; cdr.markForCheck()">✕</button>
           </div>
         </div>
@@ -379,7 +379,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <div class="td" style="display:flex;align-items:center;gap:8px">
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
-          <div style="font-weight:650;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> <i class="ei ei-flame"></i></span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span>
+          <div style="font-weight:650;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span>
             <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0"
                   style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
             <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0"
@@ -453,7 +453,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
               <span *ngIf="enriching" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400)"><i class="ei ei-hourglass"></i></span>
             </div>
             <button type="button" class="fchip hot-chip" [class.on]="newForm.hot" [attr.aria-pressed]="!!newForm.hot"
-                    [title]="t('leadsList.newLead.hotHint')" (click)="newForm.hot = !newForm.hot"><i class="ei ei-flame"></i> {{ t('leadsList.newLead.hot') }}</button>
+                    [title]="t('leadsList.newLead.hotHint')" (click)="newForm.hot = !newForm.hot">🔥 {{ t('leadsList.newLead.hot') }}</button>
           </div>
           @if (newMissing('website')) { <span class="ferr">{{ t('fieldErrors.website') }}</span> }
         </div>
