@@ -286,7 +286,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
     .section-sub { font-size:12px; color:var(--gray-500); margin-top:4px; line-height:1.5; }
     .delete-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
     @media(max-width:800px) { .delete-grid { grid-template-columns:1fr; } }
-    .delete-card { background:var(--gray-50); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+    .delete-card { background:var(--gray-50); border:1px solid var(--gray-200); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px; }
     .dc-head { display:flex; gap:12px; align-items:flex-start; }
     .dc-icon { width:40px; height:40px; border-radius:10px; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:20px; line-height:1; flex-shrink:0; }
     .dc-title { font-size:14px; font-weight:700; color:var(--gray-800); }
