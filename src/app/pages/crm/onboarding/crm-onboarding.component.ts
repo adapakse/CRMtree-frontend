@@ -25,10 +25,10 @@ const STEP_LABELS = [
   'onboardingBoard.steps.training',
   'onboardingBoard.steps.launch',
 ];
-const STEP_ICONS  = ['note', 'settings', 'graduation', 'play'];
+const STEP_ICONS  = ['📝', '⚙️', '🎓', '🚀'];
 const TYPE_ICONS: Record<string, string> = {
-  task:'check-circle', call:'phone', email:'mail', meeting:'handshake', note:'note',
-  doc_sent:'file', training:'graduation',
+  task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝',
+  doc_sent:'📄', training:'🎓',
 };
 // Translation keys relative to the `crm` scope.
 const TYPE_LABELS: Record<string, string> = {
@@ -46,7 +46,7 @@ const TYPE_LABELS: Record<string, string> = {
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
 <div id="topbar">
-  <span class="page-title">{{ t('onboardingBoard.title') }}</span>
+  <span class="page-title">🚀 {{ t('onboardingBoard.title') }}</span>
   <span class="tsp"></span>
   <!-- Filtry globalne -->
   <input class="srch" type="search" [placeholder]="t('onboardingBoard.filters.searchPlaceholder')"
@@ -64,10 +64,10 @@ const TYPE_LABELS: Record<string, string> = {
     }
   </select>
   <div class="view-pills">
-    <button class="fchip" [class.on]="view==='partners'" (click)="view='partners'"><i class="ei ei-building"></i> {{ t('onboardingBoard.views.partners') }}</button>
-    <button class="fchip" [class.on]="view==='kanban'" (click)="view='kanban'"><i class="ei ei-clipboard"></i> {{ t('leadsList.view.kanban') }}</button>
-    <button class="fchip" [class.on]="view==='timeline'" (click)="view='timeline'"><i class="ei ei-calendar"></i> {{ t('onboardingBoard.views.timeline') }}</button>
-    <button class="fchip" [class.on]="view==='calendar'" (click)="view='calendar'"><i class="ei ei-calendar"></i> {{ t('onboardingBoard.views.calendar') }}</button>
+    <button class="fchip" [class.on]="view==='partners'" (click)="view='partners'">🏢 {{ t('onboardingBoard.views.partners') }}</button>
+    <button class="fchip" [class.on]="view==='kanban'" (click)="view='kanban'">📋 {{ t('leadsList.view.kanban') }}</button>
+    <button class="fchip" [class.on]="view==='timeline'" (click)="view='timeline'">📅 {{ t('onboardingBoard.views.timeline') }}</button>
+    <button class="fchip" [class.on]="view==='calendar'" (click)="view='calendar'">🗓 {{ t('onboardingBoard.views.calendar') }}</button>
   </div>
 </div>
 
@@ -76,7 +76,7 @@ const TYPE_LABELS: Record<string, string> = {
   <!-- Launch success banner -->
   @if (launchResult()) {
     <div style="background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));border:1px solid #86efac;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
-      <span class="ico-tile"><i class="ei ei-sparkles"></i></span>
+      <span style="font-size:22px">🎉</span>
       <div style="flex:1">
         <div style="font-weight:700;color:oklch(from #166534 max(l, var(--text-min-l)) c h);font-size:14px">{{ t('onboardingBoard.launch.successTitle', { company: launchResult()!.company }) }}</div>
         <div style="font-size:12px;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);margin-top:2px">{{ t('onboardingBoard.launch.successHint') }}</div>
@@ -100,7 +100,7 @@ const TYPE_LABELS: Record<string, string> = {
       <div class="loading-state"><div class="spinner"></div></div>
     } @else if (filteredPartners().length === 0) {
       <div class="empty-state">
-        <div class="ico-tile ico-tile--lg" style="margin:0 auto 0px"><i class="ei ei-sparkles"></i></div>
+        <div style="font-size:48px">🎉</div>
         <div style="font-weight:600;margin-top:8px">{{ t('onboardingBoard.partners.empty') }}</div>
         <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ t('onboardingBoard.partners.emptyHint') }}</div>
       </div>
@@ -110,7 +110,7 @@ const TYPE_LABELS: Record<string, string> = {
         @for (p of filteredPartners(); track p.id) {
           <div class="partner-card" (click)="selectPartner(p)">
             <div class="pc-header">
-              <div class="ico-tile"><i class="ei ei-handshake"></i></div>
+              <div class="pc-icon">🤝</div>
               <div style="flex:1;min-width:0">
                 <div class="pc-name">{{ p.company }}</div>
                 @if (p.nip) { <div class="pc-nip">{{ t('partnersList.fields.taxId') }}: {{ p.nip }}</div> }
@@ -120,7 +120,7 @@ const TYPE_LABELS: Record<string, string> = {
             <div class="pc-progress">
               @for (s of [0,1,2,3]; track s) {
                 <div class="pc-step" [class.done]="s < p.onboarding_step" [class.active]="s === p.onboarding_step">
-                  <span><i class="ei ei-{{ STEP_ICONS[s] }}"></i></span>
+                  <span>{{ STEP_ICONS[s] }}</span>
                   <span class="pc-step-lbl">{{ t(STEP_LABELS[s]) }}</span>
                 </div>
               }
@@ -131,12 +131,12 @@ const TYPE_LABELS: Record<string, string> = {
               </div>
               <span class="pc-task-text">{{ p.task_count === 0 ? t('onboardingBoard.tasks.empty') : t('onboardingBoard.partners.taskProgress', { done: p.done_count, total: p.task_count }) }}</span>
             </div>
-            @if (p.manager_name) { <div class="pc-mgr"><i class="ei ei-user"></i> {{ p.manager_name }}</div> }
+            @if (p.manager_name) { <div class="pc-mgr">👤 {{ p.manager_name }}</div> }
             <div style="margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:flex-end">
               @if (p.lead_id) {
                 <a [routerLink]="['/crm/leads', p.lead_id]" (click)="$event.stopPropagation()"
                    style="font-size:12px;color:oklch(from #3b82f6 max(l, var(--text-min-l)) c h);font-weight:600;text-decoration:none;border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:6px;padding:4px 8px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))">
-                  <i class="ei ei-target"></i> {{ t('onboardingBoard.partners.leadData') }}
+                  🎯 {{ t('onboardingBoard.partners.leadData') }}
                 </a>
               }
               <button class="btn btn-sm"
@@ -144,9 +144,9 @@ const TYPE_LABELS: Record<string, string> = {
                       [disabled]="p.done_count < p.task_count || launching() === p.id"
                       (click)="$event.stopPropagation(); launchPartner(p)"
                       [title]="p.done_count < p.task_count ? t('onboardingBoard.launch.remainingTasks', { count: p.task_count - p.done_count }) : t('onboardingBoard.launch.moveToRegistry')">
-                @if (launching() === p.id) { <i class="ei ei-hourglass"></i> {{ t('onboardingBoard.launch.inProgress') }}
-                } @else if (p.done_count >= p.task_count) { <i class="ei ei-play"></i> {{ t('onboardingBoard.launch.action') }}
-                } @else { <i class="ei ei-lock"></i> {{ t('onboardingBoard.launch.action') }} ({{ p.done_count }}/{{ p.task_count }}) }
+                @if (launching() === p.id) { ⏳ {{ t('onboardingBoard.launch.inProgress') }}
+                } @else if (p.done_count >= p.task_count) { 🚀 {{ t('onboardingBoard.launch.action') }}
+                } @else { 🔒 {{ t('onboardingBoard.launch.action') }} ({{ p.done_count }}/{{ p.task_count }}) }
               </button>
             </div>
           </div>
@@ -176,7 +176,7 @@ const TYPE_LABELS: Record<string, string> = {
             <div class="pt-td pt-mono">{{ p.nip || '—' }}</div>
             <!-- Krok -->
             <div class="pt-td">
-              <span class="step-badge"><i class="ei ei-{{ STEP_ICONS[p.onboarding_step] }}"></i> {{ t('onboardingBoard.partners.stepBadge', { step: p.onboarding_step + 1, total: 4 }) }}</span>
+              <span class="step-badge">{{ STEP_ICONS[p.onboarding_step] }} {{ t('onboardingBoard.partners.stepBadge', { step: p.onboarding_step + 1, total: 4 }) }}</span>
               <span class="pt-step-name">{{ t(STEP_LABELS[p.onboarding_step]) }}</span>
             </div>
             <!-- Postęp -->
@@ -195,9 +195,9 @@ const TYPE_LABELS: Record<string, string> = {
                       [disabled]="p.done_count < p.task_count || launching() === p.id"
                       (click)="launchPartner(p)"
                       [title]="p.done_count < p.task_count ? t('onboardingBoard.launch.remainingTasks', { count: p.task_count - p.done_count }) : t('onboardingBoard.launch.moveToRegistry')">
-                @if (launching() === p.id) { <i class="ei ei-hourglass"></i> 
-                } @else if (p.done_count >= p.task_count) { <i class="ei ei-play"></i> {{ t('onboardingBoard.launch.actionShort') }}
-                } @else { <i class="ei ei-lock"></i> ({{ p.done_count }}/{{ p.task_count }}) }
+                @if (launching() === p.id) { ⏳
+                } @else if (p.done_count >= p.task_count) { 🚀 {{ t('onboardingBoard.launch.actionShort') }}
+                } @else { 🔒 ({{ p.done_count }}/{{ p.task_count }}) }
               </button>
             </div>
           </div>
@@ -215,7 +215,7 @@ const TYPE_LABELS: Record<string, string> = {
         @for (step of [0,1,2,3]; track step) {
           <div class="kb-col">
             <div class="kb-head">
-              <span class="kb-icon"><i class="ei ei-{{ STEP_ICONS[step] }}"></i></span>
+              <span class="kb-icon">{{ STEP_ICONS[step] }}</span>
               <span class="kb-title">{{ t(STEP_LABELS[step]) }}</span>
               <span class="kb-cnt">{{ tasksForStep(step).length }}</span>
             </div>
@@ -223,25 +223,25 @@ const TYPE_LABELS: Record<string, string> = {
               @for (task of tasksForStep(step); track task.id) {
                 <div class="kb-card" [class.done]="task.done" (click)="openTask(task)">
                   <div class="kb-card-top">
-                    <span class="type-icon"><i class="ei ei-{{ TYPE_ICONS[task.type] }}"></i></span>
+                    <span class="type-icon">{{ TYPE_ICONS[task.type] }}</span>
                     <span class="kb-partner">{{ task.partner_name }}</span>
                     @if (task.done) { <span class="done-badge">✓</span> }
                   </div>
                   <div class="kb-card-title">{{ task.title }}</div>
                   @if (task.due_date) {
                     <div class="kb-due" [class.overdue]="isOverdue(task)">
-                      <i class="ei ei-calendar"></i> {{ task.due_date | date:'dd.MM' }}
+                      📅 {{ task.due_date | date:'dd.MM' }}
                       @if (task.due_time) { {{ task.due_time.slice(0,5) }} }
                       @else { 09:00 }
                       <wt-add-to-calendar [entry]="calendarEntryOf(task)" (click)="$event.stopPropagation()" />
                     </div>
                   }
                   @if (task.assigned_to_name) {
-                    <div class="kb-assignee"><i class="ei ei-user"></i> {{ task.assigned_to_name }}</div>
+                    <div class="kb-assignee">👤 {{ task.assigned_to_name }}</div>
                   }
                   <div class="kb-card-actions">
                     <button class="kb-del-btn" (click)="$event.stopPropagation(); quickDeleteTask(task)"
-                            [title]="t('onboardingBoard.tasks.delete')"><i class="ei ei-trash"></i></button>
+                            [title]="t('onboardingBoard.tasks.delete')">🗑</button>
                   </div>
                 </div>
               }
@@ -267,7 +267,7 @@ const TYPE_LABELS: Record<string, string> = {
       <div class="timeline-wrap">
         @if (timelineGroups().length === 0) {
           <div class="empty-state">
-            <div class="ico-tile ico-tile--lg" style="margin:0 auto 0px"><i class="ei ei-calendar"></i></div>
+            <div style="font-size:36px">📅</div>
             <div style="margin-top:8px;font-weight:600">{{ t('onboardingBoard.timeline.empty') }}</div>
           </div>
         }
@@ -285,12 +285,12 @@ const TYPE_LABELS: Record<string, string> = {
                 </div>
                 <div class="tl-content">
                   <div class="tl-top">
-                    <span><i class="ei ei-{{ TYPE_ICONS[task.type] }}"></i> {{ task.title }}</span>
+                    <span>{{ TYPE_ICONS[task.type] }} {{ task.title }}</span>
                     @if (task.done) { <span class="done-badge">✓</span> }
                   </div>
                   <div class="tl-meta">
-                    <span class="tl-partner"><i class="ei ei-handshake"></i> {{ task.partner_name }}</span>
-                    @if (task.assigned_to_name) { <span>· <i class="ei ei-user"></i> {{ task.assigned_to_name }}</span> }
+                    <span class="tl-partner">🤝 {{ task.partner_name }}</span>
+                    @if (task.assigned_to_name) { <span>· 👤 {{ task.assigned_to_name }}</span> }
                     <span>· {{ t(STEP_LABELS[task.step]) }}</span>
                   </div>
                 </div>
@@ -326,7 +326,7 @@ const TYPE_LABELS: Record<string, string> = {
                      [class]="'cal-step-'+task.step"
                      (click)="openTask(task)"
                      [title]="task.partner_name + ': ' + task.title">
-                  <i class="ei ei-{{ TYPE_ICONS[task.type] }}"></i> {{ task.title | slice:0:18 }}
+                  {{ TYPE_ICONS[task.type] }} {{ task.title | slice:0:18 }}
                 </div>
               }
             </div>
@@ -345,10 +345,10 @@ const TYPE_LABELS: Record<string, string> = {
       <div class="modal-head">
         <div>
           <div class="modal-title">
-            @if (editingTask) { <i class="ei ei-{{ TYPE_ICONS[editingTask.type] }}"></i> {{ editingTask.title }} } @else { {{ t('onboardingBoard.taskForm.newTask') }} }
+            {{ editingTask ? TYPE_ICONS[editingTask.type] + ' ' + editingTask.title : t('onboardingBoard.taskForm.newTask') }}
           </div>
           @if (editingTask?.partner_name) {
-            <div style="font-size:12px;color:var(--gray-400)"><i class="ei ei-handshake"></i> {{ editingTask!.partner_name }} · {{ t(STEP_LABELS[editingTask!.step]) }}</div>
+            <div style="font-size:12px;color:var(--gray-400)">🤝 {{ editingTask!.partner_name }} · {{ t(STEP_LABELS[editingTask!.step]) }}</div>
           }
         </div>
         <button class="dp-close" (click)="closeTaskModal()">✕</button>
@@ -365,7 +365,7 @@ const TYPE_LABELS: Record<string, string> = {
             <label class="fl">{{ t('activity.modal.type') }}</label>
             <select class="fsel" [(ngModel)]="taskForm.type">
               @for (taskType of taskTypes; track taskType.value) {
-                <option [value]="taskType.value">{{ t(taskType.label) }}</option>
+                <option [value]="taskType.value">{{ taskType.icon }} {{ t(taskType.label) }}</option>
               }
             </select>
           </div>
@@ -374,7 +374,7 @@ const TYPE_LABELS: Record<string, string> = {
             <label class="fl">{{ t('onboardingBoard.taskForm.step') }}</label>
             <select class="fsel" [(ngModel)]="taskForm.step">
               @for (s of [0,1,2,3]; track s) {
-                <option [value]="s">{{ t(STEP_LABELS[s]) }}</option>
+                <option [value]="s">{{ STEP_ICONS[s] }} {{ t(STEP_LABELS[s]) }}</option>
               }
             </select>
           </div>
@@ -407,7 +407,7 @@ const TYPE_LABELS: Record<string, string> = {
             <div class="fg full">
               <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">
                 <input type="checkbox" [(ngModel)]="taskForm.done" style="width:auto">
-                <i class="ei ei-check-circle"></i> {{ t('onboardingBoard.taskForm.done') }}
+                ✅ {{ t('onboardingBoard.taskForm.done') }}
               </label>
             </div>
           }
@@ -416,7 +416,7 @@ const TYPE_LABELS: Record<string, string> = {
       <div class="modal-foot">
         <button class="btn btn-g" (click)="closeTaskModal()">{{ 'actions.cancel' | transloco }}</button>
         @if (editingTask) {
-          <button class="btn btn-d btn-sm" (click)="deleteTask()"><i class="ei ei-trash"></i> {{ t('activity.card.delete') }}</button>
+          <button class="btn btn-d btn-sm" (click)="deleteTask()">🗑 {{ t('activity.card.delete') }}</button>
         }
         <button class="btn btn-p" [disabled]="!taskForm.title || saving()"
                 (click)="saveTask()">
