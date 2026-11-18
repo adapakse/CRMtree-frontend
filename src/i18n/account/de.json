@@ -21,6 +21,10 @@
       "title": "Darstellung"
     },
     "delete": "Löschen",
+    "errors": {
+      "pbxToken": "Fügen Sie Ihr Personal Access Token (PAT) aus der Telefonanlage ein",
+      "templateName": "Geben Sie den Vorlagennamen ein, z. B. Standardangebot"
+    },
     "manual": {
       "hint": "Interaktives CRMtree-Handbuch mit Screenshots. Öffnet sich in einem neuen Tab.",
       "open": "Handbuch öffnen",

@@ -50,6 +50,14 @@
     "uploadFailed": "Nie udało się przesłać pliku: {name}.",
     "uploading": "Przesyłanie…"
   },
+  "form": {
+    "errors": {
+      "closeComment": "Wpisz komentarz — co zostało zrobione, np. „Wysłano ofertę”",
+      "title": "Podaj tytuł"
+    },
+    "fixErrors": "Popraw pola zaznaczone na czerwono ({count})",
+    "noChanges": "Brak zmian do zapisania"
+  },
   "httpErrors": {
     "badRequest": "Niektóre dane są niepoprawne. Sprawdź pola i spróbuj ponownie.",
     "badRequestDetails": "Niepoprawne dane: {details}",

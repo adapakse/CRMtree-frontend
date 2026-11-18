@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} entreprises…",
     "errors": {
       "aiNoCredit": "Plus de crédit sur le compte IA",
+      "nip": "Le NIP doit comporter 10 chiffres, par ex. 1234567890",
       "searchFailedWithReason": "Échec de la recherche : {reason}",
+      "seedName": "Saisissez le nom de l'entreprise modèle, par ex. ABC SARL",
+      "selectCompanies": "Cochez au moins une entreprise dans la liste",
       "taxIdConflict": "Conflit de numéro fiscal — un autre enregistrement utilise déjà ce numéro."
     },
     "exportCsv": "Export CSV",

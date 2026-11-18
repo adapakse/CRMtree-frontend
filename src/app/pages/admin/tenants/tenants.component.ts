@@ -29,11 +29,12 @@ const FEATURE_LABELS: Record<CrmFeature, string> = {
   pbx:              'Telefonia (softphone)',
   call_analysis:    'Analiza rozmów',
   projects:         'Projekty',
+  email_campaigns:  'Kampanie e-mail (SendGrid)',
 };
 
 const ALL_FEATURES: CrmFeature[] = [
   'documents', 'leads', 'sales_reports', 'onboarding',
-  'partner_registry', 'dwh_integration', 'performance', 'seo_bot', 'whatsapp', 'prospects', 'pbx', 'call_analysis', 'projects',
+  'partner_registry', 'dwh_integration', 'performance', 'seo_bot', 'whatsapp', 'prospects', 'pbx', 'call_analysis', 'projects', 'email_campaigns',
 ];
 
 interface TenantUser {
@@ -121,10 +122,11 @@ const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięcz
 // Display order on the pricing page — not alphabetical (API returns plans ordered by code).
 const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, professional: 2 };
 
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 @Component({
   selector: 'app-tenants',
   standalone: true,
-  imports: [CommonModule, FormsModule, OnboardingSurveyAnswersComponent],
+  imports: [CommonModule, FormsModule, OnboardingSurveyAnswersComponent, FormErrorSummaryComponent],
   template: `
     <div class="page">
 
@@ -320,11 +322,12 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                               <div class="edit-grid">
                                 <div class="field">
                                   <label>Plan</label>
-                                  <select [(ngModel)]="subscriptionDraft.planId">
+                                  <select [(ngModel)]="subscriptionDraft.planId" [class.fi-err]="!!fieldError('plan', 'planId')">
                                     @for (p of billingPlans(); track p.id) {
                                       <option [value]="p.id">{{ p.name }}</option>
                                     }
                                   </select>
+                                  @if (fieldError('plan', 'planId'); as message) { <span class="ferr">{{ message }}</span> }
                                 </div>
                                 <div class="field">
                                   <label>Cykl rozliczeniowy</label>
@@ -337,7 +340,8 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                   <label>{{ selectedPlanIsCustomPricing() ? 'Kwota za okres rozliczeniowy (EUR)' : 'Cena za użytkownika (EUR)' }}</label>
                                   <input type="number" min="0.01" step="0.01"
                                     [placeholder]="selectedPlanIsCustomPricing() ? 'np. 5000.00' : 'np. 26.00'"
-                                    [(ngModel)]="subscriptionDraft.customPriceEur">
+                                    [(ngModel)]="subscriptionDraft.customPriceEur" [class.fi-err]="!!fieldError('plan', 'customPriceEur')">
+                                    @if (fieldError('plan', 'customPriceEur'); as message) { <span class="ferr">{{ message }}</span> }
                                 </div>
                               </div>
                               @if (selectedPlanIsCustomPricing()) {
@@ -386,10 +390,11 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                 }
                               }
                               <div class="panel-footer">
+                                <wt-form-error-summary [count]="formErrorCount('plan')" />
                                 <button class="btn-secondary" [disabled]="isPlanDraftUnchanged(t)" (click)="cancelPlanEdit(t)">Anuluj</button>
                                 <button class="btn-primary"
-                                  [disabled]="saving() || !subscriptionDraft.planId || (selectedPlanIsCustomPricing() && !subscriptionDraft.customPriceEur)"
-                                  (click)="openPlanChangeConfirm(t)">
+                                  [disabled]="saving()"
+                                  (click)="isFormInvalid('plan') || openPlanChangeConfirm(t)">
                                   {{ saving() ? 'Zapisuję...' : 'Zapisz plan' }}
                                 </button>
                               </div>
@@ -496,19 +501,23 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                   <div class="edit-grid">
                                     <div class="field">
                                       <label>Client ID <span class="req">*</span></label>
-                                      <input [(ngModel)]="gmailForm.client_id" placeholder="123456789.apps.googleusercontent.com">
+                                      <input [(ngModel)]="gmailForm.client_id" placeholder="123456789.apps.googleusercontent.com" [class.fi-err]="!!fieldError('gmail', 'client_id')">
+                                      @if (fieldError('gmail', 'client_id'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Client Secret {{ gmailProvider() ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
-                                      <input [(ngModel)]="gmailForm.client_secret" type="password" placeholder="{{ gmailProvider() ? '••••••••' : 'GOCSPX-...' }}">
+                                      <input [(ngModel)]="gmailForm.client_secret" type="password" placeholder="{{ gmailProvider() ? '••••••••' : 'GOCSPX-...' }}" [class.fi-err]="!!fieldError('gmail', 'client_secret')">
+                                      @if (fieldError('gmail', 'client_secret'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Redirect URI <span class="req">*</span></label>
-                                      <input [(ngModel)]="gmailForm.redirect_uri" placeholder="https://app.example.com/api/crm/gmail/oauth/callback">
+                                      <input [(ngModel)]="gmailForm.redirect_uri" placeholder="https://app.example.com/api/crm/gmail/oauth/callback" [class.fi-err]="!!fieldError('gmail', 'redirect_uri')">
+                                      @if (fieldError('gmail', 'redirect_uri'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Pub/Sub Topic <span class="req">*</span></label>
-                                      <input [(ngModel)]="gmailForm.pubsub_topic" placeholder="projects/my-project/topics/gmail-push">
+                                      <input [(ngModel)]="gmailForm.pubsub_topic" placeholder="projects/my-project/topics/gmail-push" [class.fi-err]="!!fieldError('gmail', 'pubsub_topic')">
+                                      @if (fieldError('gmail', 'pubsub_topic'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Pub/Sub Subscription <span class="hint-inline">(opcjonalne — obecnie nieużywane)</span></label>
@@ -519,8 +528,9 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     @if (gmailProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'gmail')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !gmailForm.client_id || (!gmailForm.client_secret && !gmailProvider()) || !gmailForm.redirect_uri || !gmailForm.pubsub_topic"
-                                            (click)="saveEmailProvider(t.id, 'gmail')">
+                                    <wt-form-error-summary [count]="formErrorCount('gmail')" />
+                                    <button class="btn-primary" [disabled]="saving()"
+                                            (click)="isFormInvalid('gmail') || saveEmailProvider(t.id, 'gmail')">
                                       {{ saving() ? 'Zapisuję...' : (gmailProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
@@ -557,11 +567,13 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                   <div class="edit-grid">
                                     <div class="field">
                                       <label>Client ID <span class="req">*</span></label>
-                                      <input [(ngModel)]="outlookForm.client_id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                                      <input [(ngModel)]="outlookForm.client_id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" [class.fi-err]="!!fieldError('outlook', 'client_id')">
+                                      @if (fieldError('outlook', 'client_id'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Client Secret {{ outlookProvider() ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
-                                      <input [(ngModel)]="outlookForm.client_secret" type="password" placeholder="{{ outlookProvider() ? '••••••••' : 'secret~...' }}">
+                                      <input [(ngModel)]="outlookForm.client_secret" type="password" placeholder="{{ outlookProvider() ? '••••••••' : 'secret~...' }}" [class.fi-err]="!!fieldError('outlook', 'client_secret')">
+                                      @if (fieldError('outlook', 'client_secret'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Azure Tenant ID <span class="hint-inline">(opcjonalne — appka jest multitenant, logowanie działa bez tego)</span></label>
@@ -569,15 +581,17 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     </div>
                                     <div class="field">
                                       <label>Redirect URI <span class="req">*</span></label>
-                                      <input [(ngModel)]="outlookForm.redirect_uri" placeholder="https://app.example.com/api/crm/outlook/oauth/callback">
+                                      <input [(ngModel)]="outlookForm.redirect_uri" placeholder="https://app.example.com/api/crm/outlook/oauth/callback" [class.fi-err]="!!fieldError('outlook', 'redirect_uri')">
+                                      @if (fieldError('outlook', 'redirect_uri'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                   </div>
                                   <div class="provider-actions">
                                     @if (outlookProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'outlook')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !outlookForm.client_id || (!outlookForm.client_secret && !outlookProvider()) || !outlookForm.redirect_uri"
-                                            (click)="saveEmailProvider(t.id, 'outlook')">
+                                    <wt-form-error-summary [count]="formErrorCount('outlook')" />
+                                    <button class="btn-primary" [disabled]="saving()"
+                                            (click)="isFormInvalid('outlook') || saveEmailProvider(t.id, 'outlook')">
                                       {{ saving() ? 'Zapisuję...' : (outlookProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
@@ -614,11 +628,13 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                   <div class="edit-grid">
                                     <div class="field">
                                       <label>Client ID <span class="req">*</span></label>
-                                      <input [(ngModel)]="zohoForm.client_id" placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX">
+                                      <input [(ngModel)]="zohoForm.client_id" placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" [class.fi-err]="!!fieldError('zoho', 'client_id')">
+                                      @if (fieldError('zoho', 'client_id'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Client Secret {{ zohoProvider() ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
-                                      <input [(ngModel)]="zohoForm.client_secret" type="password" placeholder="{{ zohoProvider() ? '••••••••' : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' }}">
+                                      <input [(ngModel)]="zohoForm.client_secret" type="password" placeholder="{{ zohoProvider() ? '••••••••' : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' }}" [class.fi-err]="!!fieldError('zoho', 'client_secret')">
+                                      @if (fieldError('zoho', 'client_secret'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Redirect URI <span class="hint-inline">(opcjonalne — nadpisuje domyślne)</span></label>
@@ -629,8 +645,9 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     @if (zohoProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'zoho')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !zohoForm.client_id || (!zohoForm.client_secret && !zohoProvider())"
-                                            (click)="saveEmailProvider(t.id, 'zoho')">
+                                    <wt-form-error-summary [count]="formErrorCount('zoho')" />
+                                    <button class="btn-primary" [disabled]="saving()"
+                                            (click)="isFormInvalid('zoho') || saveEmailProvider(t.id, 'zoho')">
                                       {{ saving() ? 'Zapisuję...' : (zohoProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
@@ -672,11 +689,13 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                   <div class="edit-grid">
                                     <div class="field">
                                       <label>Client ID <span class="req">*</span></label>
-                                      <input [(ngModel)]="yandexForm.client_id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                                      <input [(ngModel)]="yandexForm.client_id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" [class.fi-err]="!!fieldError('yandex', 'client_id')">
+                                      @if (fieldError('yandex', 'client_id'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Client Secret {{ yandexProvider() ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
-                                      <input [(ngModel)]="yandexForm.client_secret" type="password" placeholder="{{ yandexProvider() ? '••••••••' : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' }}">
+                                      <input [(ngModel)]="yandexForm.client_secret" type="password" placeholder="{{ yandexProvider() ? '••••••••' : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' }}" [class.fi-err]="!!fieldError('yandex', 'client_secret')">
+                                      @if (fieldError('yandex', 'client_secret'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Redirect URI <span class="hint-inline">(opcjonalne — nadpisuje domyślne)</span></label>
@@ -687,8 +706,9 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     @if (yandexProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'yandex')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !yandexForm.client_id || (!yandexForm.client_secret && !yandexProvider())"
-                                            (click)="saveEmailProvider(t.id, 'yandex')">
+                                    <wt-form-error-summary [count]="formErrorCount('yandex')" />
+                                    <button class="btn-primary" [disabled]="saving()"
+                                            (click)="isFormInvalid('yandex') || saveEmailProvider(t.id, 'yandex')">
                                       {{ saving() ? 'Zapisuję...' : (yandexProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
@@ -750,16 +770,19 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                   <div class="edit-grid">
                                     <div class="field">
                                       <label>WABA ID <span class="req">*</span></label>
-                                      <input [(ngModel)]="whatsappForm.waba_id" placeholder="123456789012345">
+                                      <input [(ngModel)]="whatsappForm.waba_id" placeholder="123456789012345" [class.fi-err]="!!fieldError('whatsapp', 'waba_id')">
+                                      @if (fieldError('whatsapp', 'waba_id'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Phone Number ID <span class="req">*</span></label>
-                                      <input [(ngModel)]="whatsappForm.phone_number_id" placeholder="987654321098765">
+                                      <input [(ngModel)]="whatsappForm.phone_number_id" placeholder="987654321098765" [class.fi-err]="!!fieldError('whatsapp', 'phone_number_id')">
+                                      @if (fieldError('whatsapp', 'phone_number_id'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>Access Token {{ whatsappConfig()?.access_token_configured ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
                                       <input [(ngModel)]="whatsappForm.access_token" type="password"
-                                             placeholder="{{ whatsappConfig()?.access_token_configured ? '••••••••' : 'EAAG...' }}">
+                                             placeholder="{{ whatsappConfig()?.access_token_configured ? '••••••••' : 'EAAG...' }}" [class.fi-err]="!!fieldError('whatsapp', 'access_token')">
+                                             @if (fieldError('whatsapp', 'access_token'); as message) { <span class="ferr">{{ message }}</span> }
                                     </div>
                                     <div class="field">
                                       <label>App Secret <span class="hint-inline">{{ whatsappConfig()?.app_secret_configured ? '(zostaw puste = bez zmian)' : '(opcjonalne, wymagane do weryfikacji webhooka)' }}</span></label>
@@ -794,8 +817,9 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     @if (whatsappConfig()?.configured) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteWhatsappConfig(t.id)">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !whatsappForm.waba_id || !whatsappForm.phone_number_id || (!whatsappForm.access_token && !whatsappConfig()?.access_token_configured)"
-                                            (click)="saveWhatsappConfig(t.id)">
+                                    <wt-form-error-summary [count]="formErrorCount('whatsapp')" />
+                                    <button class="btn-primary" [disabled]="saving()"
+                                            (click)="isFormInvalid('whatsapp') || saveWhatsappConfig(t.id)">
                                       {{ saving() ? 'Zapisuję...' : (whatsappConfig()?.configured ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
@@ -897,11 +921,13 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
           <div class="modal-body">
             <div class="field">
               <label>Nazwa <span class="req">*</span></label>
-              <input [(ngModel)]="createForm.name" placeholder="CRMtree Silver" (input)="autoSlug()">
+              <input [(ngModel)]="createForm.name" placeholder="CRMtree Silver" (input)="autoSlug()" [class.fi-err]="!!fieldError('create', 'name')">
+              @if (fieldError('create', 'name'); as message) { <span class="ferr">{{ message }}</span> }
             </div>
             <div class="field">
               <label>Slug <span class="req">*</span></label>
-              <input [(ngModel)]="createForm.slug" placeholder="crmtree-silver">
+              <input [(ngModel)]="createForm.slug" placeholder="crmtree-silver" [class.fi-err]="!!fieldError('create', 'slug')">
+              @if (fieldError('create', 'slug'); as message) { <span class="ferr">{{ message }}</span> }
               <div class="hint">Tylko [a-z0-9-], min 2 znaki. Niezmienialny po utworzeniu.</div>
             </div>
             <div class="field">
@@ -915,8 +941,9 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
             </div>
           </div>
           <div class="modal-footer">
+            <wt-form-error-summary [count]="formErrorCount('create')" />
             <button class="btn-secondary" (click)="closeCreate()">Anuluj</button>
-            <button class="btn-primary" [disabled]="saving() || !createForm.name || !createForm.slug" (click)="submitCreate()">
+            <button class="btn-primary" [disabled]="saving()" (click)="isFormInvalid('create') || submitCreate()">
               {{ saving() ? 'Tworzę...' : 'Utwórz tenant' }}
             </button>
           </div>
@@ -937,15 +964,18 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
           <div class="modal-body">
             <div class="field">
               <label>Email <span class="req">*</span></label>
-              <input type="email" [(ngModel)]="addUserForm.email" placeholder="jan.kowalski@firma.com">
+              <input type="email" [(ngModel)]="addUserForm.email" placeholder="jan.kowalski@firma.com" [class.fi-err]="!!fieldError('addUser', 'email')">
+              @if (fieldError('addUser', 'email'); as message) { <span class="ferr">{{ message }}</span> }
             </div>
             <div class="field">
               <label>Imię <span class="req">*</span></label>
-              <input [(ngModel)]="addUserForm.first_name" placeholder="Jan">
+              <input [(ngModel)]="addUserForm.first_name" placeholder="Jan" [class.fi-err]="!!fieldError('addUser', 'first_name')">
+              @if (fieldError('addUser', 'first_name'); as message) { <span class="ferr">{{ message }}</span> }
             </div>
             <div class="field">
               <label>Nazwisko <span class="req">*</span></label>
-              <input [(ngModel)]="addUserForm.last_name" placeholder="Kowalski">
+              <input [(ngModel)]="addUserForm.last_name" placeholder="Kowalski" [class.fi-err]="!!fieldError('addUser', 'last_name')">
+              @if (fieldError('addUser', 'last_name'); as message) { <span class="ferr">{{ message }}</span> }
             </div>
             <div class="field field-check">
               <label class="check-label">
@@ -958,10 +988,11 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
             </div>
           </div>
           <div class="modal-footer">
+            <wt-form-error-summary [count]="formErrorCount('addUser')" />
             <button class="btn-secondary" (click)="closeAddUser()">Anuluj</button>
             <button class="btn-primary"
-                    [disabled]="saving() || !addUserForm.email || !addUserForm.first_name || !addUserForm.last_name"
-                    (click)="submitAddUser()">
+                    [disabled]="saving()"
+                    (click)="isFormInvalid('addUser') || submitAddUser()">
               {{ saving() ? 'Tworzę...' : 'Utwórz użytkownika' }}
             </button>
           </div>
@@ -1587,6 +1618,70 @@ export class TenantsComponent implements OnInit {
   // billing (already-issued invoices are frozen from tenant_subscription_history),
   // but that's exactly the kind of thing that's easy to click by accident —
   // show the before/after and require a second click before saving.
+  /** Form whose save was clicked with missing fields; its errors stay visible until the next successful click. */
+  submittedForm: string | null = null;
+
+  /** Superadmin panel stays Polish (docs/i18n.md), so the messages are written here. */
+  private requiredFieldErrors(form: string): Record<string, string> {
+    const errors: Record<string, string> = {};
+    const need = (isMissing: unknown, field: string, message: string) => { if (isMissing) errors[field] = message; };
+    switch (form) {
+      case 'plan':
+        need(!this.subscriptionDraft.planId, 'planId', 'Wybierz plan');
+        need(this.selectedPlanIsCustomPricing() && !this.subscriptionDraft.customPriceEur, 'customPriceEur', 'Podaj kwotę w EUR, np. 5000.00');
+        break;
+      case 'gmail':
+        need(!this.gmailForm.client_id, 'client_id', 'Podaj Client ID, np. 123456789.apps.googleusercontent.com');
+        need(!this.gmailForm.client_secret && !this.gmailProvider(), 'client_secret', 'Podaj Client Secret (zaczyna się od GOCSPX-)');
+        need(!this.gmailForm.redirect_uri, 'redirect_uri', 'Podaj Redirect URI, np. https://app.example.com/api/crm/gmail/oauth/callback');
+        need(!this.gmailForm.pubsub_topic, 'pubsub_topic', 'Podaj temat Pub/Sub, np. projects/my-project/topics/gmail-push');
+        break;
+      case 'outlook':
+        need(!this.outlookForm.client_id, 'client_id', 'Podaj Client ID (Application ID z Azure)');
+        need(!this.outlookForm.client_secret && !this.outlookProvider(), 'client_secret', 'Podaj Client Secret z Azure');
+        need(!this.outlookForm.redirect_uri, 'redirect_uri', 'Podaj Redirect URI, np. https://app.example.com/api/crm/outlook/oauth/callback');
+        break;
+      case 'zoho':
+        need(!this.zohoForm.client_id, 'client_id', 'Podaj Client ID, np. 1000.XXXXXXXX');
+        need(!this.zohoForm.client_secret && !this.zohoProvider(), 'client_secret', 'Podaj Client Secret z Zoho API Console');
+        break;
+      case 'yandex':
+        need(!this.yandexForm.client_id, 'client_id', 'Podaj Client ID z Yandex OAuth');
+        need(!this.yandexForm.client_secret && !this.yandexProvider(), 'client_secret', 'Podaj Client Secret z Yandex OAuth');
+        break;
+      case 'whatsapp':
+        need(!this.whatsappForm.waba_id, 'waba_id', 'Podaj WABA ID (same cyfry), np. 123456789012345');
+        need(!this.whatsappForm.phone_number_id, 'phone_number_id', 'Podaj Phone Number ID (same cyfry), np. 987654321098765');
+        need(!this.whatsappForm.access_token && !this.whatsappConfig()?.access_token_configured, 'access_token', 'Wklej Access Token z Meta (zaczyna się od EAAG)');
+        break;
+      case 'create':
+        need(!this.createForm.name, 'name', 'Podaj nazwę tenanta, np. CRMtree Silver');
+        need(!this.createForm.slug, 'slug', 'Podaj slug, np. crmtree-silver');
+        break;
+      case 'addUser':
+        need(!this.addUserForm.email, 'email', 'Podaj e-mail, np. jan.kowalski@firma.com');
+        need(!this.addUserForm.first_name, 'first_name', 'Podaj imię');
+        need(!this.addUserForm.last_name, 'last_name', 'Podaj nazwisko');
+        break;
+    }
+    return errors;
+  }
+
+  fieldError(form: string, field: string): string | null {
+    return this.submittedForm === form ? this.requiredFieldErrors(form)[field] ?? null : null;
+  }
+
+  formErrorCount(form: string): number {
+    return this.submittedForm === form ? Object.keys(this.requiredFieldErrors(form)).length : 0;
+  }
+
+  /** True (and errors shown) when the form still has missing fields; used as `isFormInvalid(x) || save()`. */
+  isFormInvalid(form: string): boolean {
+    const isInvalid = Object.keys(this.requiredFieldErrors(form)).length > 0;
+    this.submittedForm = isInvalid ? form : null;
+    return isInvalid;
+  }
+
   openPlanChangeConfirm(t: Tenant): void {
     const draftPlan = this.billingPlans().find(p => p.id === this.subscriptionDraft.planId);
     const sub = t.subscription;

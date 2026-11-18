@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { AppSettingsService, AppSettingsMeta, LeadStageConfig } from '../../../core/services/app-settings.service';
 import { LeadStagesService } from '../../../core/services/lead-stages.service';
@@ -177,10 +178,10 @@ const DOC_DICT_KEYS = ['doc_types', 'doc_statuses', 'doc_gdpr_types', 'doc_payme
 const CRM_DICT_KEYS = ['onboarding_task_templates', 'crm_lead_sources'];
 
 const CATEGORY_LABELS: Record<string, { labelKey: string; icon: string }> = {
-  documents: { labelKey: 'admin.settings.global.categories.documents', icon: 'file' },
-  workflow:  { labelKey: 'admin.settings.global.categories.workflow',  icon: 'folder' },
-  general:   { labelKey: 'admin.settings.global.categories.general',   icon: 'settings' },
-  crm:       { labelKey: 'admin.settings.global.categories.crm',       icon: 'briefcase' },
+  documents: { labelKey: 'admin.settings.global.categories.documents', icon: '📄' },
+  workflow:  { labelKey: 'admin.settings.global.categories.workflow',  icon: '🗂' },
+  general:   { labelKey: 'admin.settings.global.categories.general',   icon: '⚙️' },
+  crm:       { labelKey: 'admin.settings.global.categories.crm',       icon: '💼' },
 };
 
 // Etykiety dla pól json – mapuje klucz → etykiety elementów tablicy
@@ -241,7 +242,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 @Component({
   selector: 'wt-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, TenantFieldsEditorComponent, AiPurposeRowComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, TenantFieldsEditorComponent, AiPurposeRowComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   // Zakres `crm` obok `admin`: zakładka „Etapy leada" pokazuje wbudowane nazwy
   // etapów (crm.labels.stages.*) jako podpowiedź w polu nazwy — bez tego
   // placeholder pokazywałby surowy kod etapu.
@@ -256,10 +257,10 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           ● {{ t('settings.topbar.unsavedChanges') }}
         </span>
       }
-      <button class="btn btn-p" [disabled]="saving() || !dirty()" (click)="saveAll()">
-        @if (saving()) { {{ t('settings.actions.saving') }} } @else { <i class="ei ei-save"></i> {{ t('settings.actions.saveChanges') }} }
+      <button class="btn btn-p" [disabled]="saving() || !dirty()" [title]="dirty() ? '' : ('form.noChanges' | transloco)" (click)="saveAll()">
+        @if (saving()) { {{ t('settings.actions.saving') }} } @else { 💾 {{ t('settings.actions.saveChanges') }} }
       </button>
-      <button class="btn btn-g" [disabled]="!dirty()" (click)="resetDrafts()">
+      <button class="btn btn-g" [disabled]="!dirty()" [title]="dirty() ? '' : ('form.noChanges' | transloco)" (click)="resetDrafts()">
         {{ t('settings.actions.discard') }}
       </button>
     </div>
@@ -272,7 +273,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
       <div style="max-width:820px">
 
         <a class="survey-link" routerLink="/admin/onboarding-survey">
-          <span style="font-size:18px;flex-shrink:0"><i class="ei ei-note"></i></span>
+          <span style="font-size:18px;flex-shrink:0">📝</span>
           <span>
             <strong>{{ t('settings.survey.title') }}</strong> {{ t('settings.survey.description') }}
           </span>
@@ -282,22 +283,22 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- Zakładki -->
         <div class="tabs">
           <button class="tab-btn" [class.active]="activeTab() === 'global'" (click)="activeTab.set('global')">
-            <i class="ei ei-settings"></i> {{ t('settings.tabs.global') }}
+            ⚙️ {{ t('settings.tabs.global') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'crm'" (click)="activeTab.set('crm'); loadLeadStages()">
-            <i class="ei ei-briefcase"></i> {{ t('settings.tabs.crm') }}
+            💼 {{ t('settings.tabs.crm') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'documents'" (click)="activeTab.set('documents')">
-            <i class="ei ei-file"></i> {{ t('settings.tabs.documents') }}
+            📄 {{ t('settings.tabs.documents') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'users'" (click)="activeTab.set('users'); loadGroups()">
-            <i class="ei ei-users"></i> {{ t('settings.tabs.users') }}
+            👥 {{ t('settings.tabs.users') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'onboarding'" (click)="activeTab.set('onboarding')">
-            <i class="ei ei-play"></i> {{ t('settings.tabs.onboarding') }}
+            🚀 {{ t('settings.tabs.onboarding') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'tooltips'" (click)="activeTab.set('tooltips')">
-            <i class="ei ei-message"></i> {{ t('settings.tabs.tooltips') }}
+            💬 {{ t('settings.tabs.tooltips') }}
           </button>
           <!-- Endpoint /admin/prospects/icp-config jest za requireFeature('prospects'),
                więc bez modułu Prospekty zakładka mogłaby tylko pokazać błąd —
@@ -307,12 +308,12 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                własnego tenanta nie może mu tego ekranu odbierać. -->
           @if (auth.hasFeature('prospects') || auth.isSuperAdmin()) {
             <button class="tab-btn" [class.active]="activeTab() === 'icp'" (click)="activeTab.set('icp'); loadIcpTenants(); loadIcpConfig()">
-              <i class="ei ei-target"></i> {{ t('settings.tabs.icp') }}
+              🎯 {{ t('settings.tabs.icp') }}
             </button>
           }
           @if (auth.hasFeature('projects')) {
             <button class="tab-btn" [class.active]="activeTab() === 'projects'" (click)="activeTab.set('projects')">
-              <i class="ei ei-clipboard"></i> {{ t('settings.tabs.projects') }}
+              📋 {{ t('settings.tabs.projects') }}
             </button>
           }
         </div>
@@ -329,7 +330,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           </div>
 
           <div style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-info"></i></span>
+            <span style="font-size:18px;flex-shrink:0">ℹ️</span>
             <div>
               <strong>{{ t('settings.tabs.global') }}</strong> {{ t('settings.global.intro') }}
             </div>
@@ -352,7 +353,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @if (aiFeatureEnabled()) {
           <div class="card" style="margin-bottom:24px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px;flex-shrink:0"><i class="ei ei-bot"></i></span>
+              <span style="font-size:18px;flex-shrink:0">🤖</span>
               <span class="cat-title">{{ t('settings.ai.title') }}</span>
             </div>
 
@@ -378,7 +379,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @for (cat of globalCategories(); track cat.key) {
             <div class="card" style="margin-bottom:24px;overflow:hidden">
               <div class="cat-header">
-                <span style="font-size:18px"><i class="ei ei-{{ cat.icon }}"></i></span>
+                <span style="font-size:18px">{{ cat.icon }}</span>
                 <span class="cat-title">{{ cat.label }}</span>
               </div>
               @for (field of cat.fields; track field.key; let last = $last) {
@@ -419,7 +420,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
           <!-- Preview -->
           <div class="card" style="padding:20px;margin-bottom:24px">
-            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px"><i class="ei ei-search"></i> {{ t('settings.global.preview.title') }}</div>
+            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">🔍 {{ t('settings.global.preview.title') }}</div>
             <div style="display:flex;flex-direction:column;gap:8px;font-size:14px">
               <div style="display:flex;align-items:center;gap:12px">
                 <div style="width:16px;height:16px;background:var(--gray-800);border-radius:3px"></div>
@@ -441,7 +442,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         @if (activeTab() === 'crm') {
 
           <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-briefcase"></i></span>
+            <span style="font-size:18px;flex-shrink:0">💼</span>
             <div>
               <strong>{{ t('settings.tabs.crm') }}</strong> {{ t('settings.crm.intro') }}
             </div>
@@ -564,11 +565,13 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                           <input class="stage-name-input" [(ngModel)]="newStageLabel"
                                  [placeholder]="t('settings.leadStages.newStagePlaceholder')"
                                  [disabled]="stagesSaving() || !canAddStage()"
+                                 [class.fi-err]="isStageSubmitted && canAddStage() && !newStageLabel.trim()"
                                  (keyup.enter)="addStage()">
                           <span class="stage-row-spacer"></span>
-                          <button class="stage-add" [disabled]="stagesSaving() || !newStageLabel.trim() || !canAddStage()"
+                          <button class="stage-add" [disabled]="stagesSaving()"
                                   (click)="addStage()">+ {{ t('settings.leadStages.addStage') }}</button>
                         </div>
+                        @if (isStageSubmitted && canAddStage() && !newStageLabel.trim()) { <span class="ferr" role="alert">{{ t('settings.leadStages.errors.name') }}</span> }
                       }
                     }
                   </div>
@@ -585,7 +588,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @if (churnFields().length > 0) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:14px;display:inline-flex;align-items:center;gap:8px"><i class="ei ei-trending-down"></i> {{ t('settings.crm.scoring.churnTitle') }}</span>
+                <span class="cat-title" style="font-size:14px;display:inline-flex;align-items:center;gap:8px">📉 {{ t('settings.crm.scoring.churnTitle') }}</span>
                 @if (churnFields().some(f => f.dirty)) {
                   <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span>
                 }
@@ -663,7 +666,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @if (healthFields().length > 0) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:14px;display:inline-flex;align-items:center;gap:8px"><i class="ei ei-heart"></i> {{ t('settings.crm.scoring.healthTitle') }}</span>
+                <span class="cat-title" style="font-size:14px;display:inline-flex;align-items:center;gap:8px">💚 {{ t('settings.crm.scoring.healthTitle') }}</span>
                 @if (healthFields().some(f => f.dirty)) {
                   <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span>
                 }
@@ -725,7 +728,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                pola są rozłączne — pole partnera nie pojawia się na leadzie. -->
           <div class="card" style="margin-top:24px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px;flex-shrink:0"><i class="ei ei-module"></i></span>
+              <span style="font-size:18px;flex-shrink:0">🧩</span>
               <span class="cat-title">{{ t('settings.customFields.titleLead') }}</span>
             </div>
             <div style="padding:16px 20px">
@@ -738,7 +741,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
           <div class="card" style="margin-top:16px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px;flex-shrink:0"><i class="ei ei-module"></i></span>
+              <span style="font-size:18px;flex-shrink:0">🧩</span>
               <span class="cat-title">{{ t('settings.customFields.titlePartner') }}</span>
             </div>
             <div style="padding:16px 20px">
@@ -754,7 +757,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         @if (activeTab() === 'documents') {
 
           <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #166534 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-file"></i></span>
+            <span style="font-size:18px;flex-shrink:0">📄</span>
             <div>
               <strong>{{ t('settings.tabs.documents') }}</strong> {{ t('settings.documents.intro') }}
             </div>
@@ -811,7 +814,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                dokumentów tak samo jak typy i statusy wyżej. -->
           <div class="card" style="margin-top:24px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px;flex-shrink:0"><i class="ei ei-module"></i></span>
+              <span style="font-size:18px;flex-shrink:0">🧩</span>
               <span class="cat-title">{{ t('settings.customFields.titleDocument') }}</span>
             </div>
             <div style="padding:16px 20px">
@@ -827,7 +830,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         @if (activeTab() === 'users') {
 
           <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bae6fd var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #0369a1 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-users"></i></span>
+            <span style="font-size:18px;flex-shrink:0">👥</span>
             <div>
               <strong>{{ t('settings.tabs.users') }}</strong> {{ t('settings.groups.intro') }}
             </div>
@@ -835,21 +838,23 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
           <!-- Formularz dodawania grupy -->
           <div class="card" style="margin-bottom:24px;padding:20px">
-            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px"><i class="ei ei-plus"></i> {{ t('settings.groups.addTitle') }}</div>
+            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">➕ {{ t('settings.groups.addTitle') }}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
               <div>
-                <label class="field-label">{{ t('settings.groups.technicalName') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
+                <label class="field-label">{{ t('settings.groups.technicalName') }} <span class="req">*</span></label>
                 <div class="field-desc">{{ t('settings.groups.technicalNameHint') }}</div>
                 <input class="fi" style="width:100%;box-sizing:border-box;margin-top:8px"
                        [placeholder]="t('settings.groups.technicalNamePlaceholder')"
-                       [(ngModel)]="newGroup.name">
+                       [(ngModel)]="newGroup.name" [class.fi-err]="isGroupSubmitted && !newGroup.name.trim()">
+                @if (isGroupSubmitted && !newGroup.name.trim()) { <span class="ferr">{{ t('settings.groups.errors.technicalName') }}</span> }
               </div>
               <div>
-                <label class="field-label">{{ t('settings.groups.displayName') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
+                <label class="field-label">{{ t('settings.groups.displayName') }} <span class="req">*</span></label>
                 <div class="field-desc">{{ t('settings.groups.displayNameHint') }}</div>
                 <input class="fi" style="width:100%;box-sizing:border-box;margin-top:8px"
                        [placeholder]="t('settings.groups.displayNamePlaceholder')"
-                       [(ngModel)]="newGroup.display_name">
+                       [(ngModel)]="newGroup.display_name" [class.fi-err]="isGroupSubmitted && !newGroup.display_name.trim()">
+                @if (isGroupSubmitted && !newGroup.display_name.trim()) { <span class="ferr">{{ t('settings.groups.errors.displayName') }}</span> }
               </div>
               <div>
                 <label class="field-label">{{ t('settings.groups.description') }}</label>
@@ -866,14 +871,17 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             </div>
             @if (groupError()) {
               <div style="background:color-mix(in srgb, #FEF2F2 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">
-                <i class="ei ei-warn"></i> {{ groupError() }}
+                ⚠️ {{ groupError() }}
               </div>
             }
-            <button class="btn btn-p"
-                    [disabled]="!newGroup.name.trim() || !newGroup.display_name.trim() || groupSaving()"
-                    (click)="addGroup()">
-              @if (groupSaving()) { {{ t('settings.groups.adding') }} } @else { <i class="ei ei-plus"></i> {{ t('settings.groups.addGroup') }} }
-            </button>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <button class="btn btn-p"
+                      [disabled]="groupSaving()"
+                      (click)="addGroup()">
+                @if (groupSaving()) { {{ t('settings.groups.adding') }} } @else { ➕ {{ t('settings.groups.addGroup') }} }
+              </button>
+              @if (isGroupSubmitted) { <wt-form-error-summary [count]="(newGroup.name.trim() ? 0 : 1) + (newGroup.display_name.trim() ? 0 : 1)" /> }
+            </div>
           </div>
 
           <!-- Lista istniejących grup -->
@@ -887,7 +895,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             @for (g of groups(); track g.id) {
               <div class="card" style="margin-bottom:12px;overflow:hidden">
                 <div style="padding:16px 20px;display:flex;align-items:center;gap:12px">
-                  <div style="width:36px;height:36px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;flex-shrink:0"><i class="ei ei-users"></i></span></div>
+                  <div style="width:36px;height:36px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;flex-shrink:0">👥</span></div>
                   <div style="flex:1;min-width:0">
                     <div style="font-size:14px;font-weight:700;color:var(--gray-900)">{{ groupDisplayName(g) }}</div>
                     <div style="font-size:12px;color:var(--gray-400);margin-top:1px">
@@ -908,10 +916,9 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                     }
                   </div>
                   <button class="btn btn-d btn-sm"
-                          [disabled]="g.member_count > 0 || g.document_count > 0"
                           [title]="g.member_count > 0 || g.document_count > 0 ? t('settings.groups.cannotDelete') : t('settings.groups.deleteGroup')"
                           (click)="deleteGroup(g)">
-                    <i class="ei ei-trash"></i> {{ t('settings.actions.delete') }}
+                    🗑 {{ t('settings.actions.delete') }}
                   </button>
                 </div>
               </div>
@@ -923,7 +930,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         @if (activeTab() === 'onboarding') {
 
           <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-play"></i></span>
+            <span style="font-size:18px;flex-shrink:0">🚀</span>
             <div>
               <strong>{{ t('settings.onboarding.introTitle') }}</strong> {{ t('settings.onboarding.intro') }}
               {{ t('settings.onboarding.jsonFormat') }} <code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:12px">[ {{ '{' }}"id":"...", "title":"...", "type":"task|call|...", "step":0{{ '}' }} ]</code>
@@ -988,7 +995,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                     </table>
                   </div>
                   <div style="margin-top:8px;font-size:12px;color:var(--gray-400)">
-                    <i class="ei ei-dot" style="color:#3B82F6"></i> {{ t('settings.onboarding.leadSources.legend') }}
+                    🔵 {{ t('settings.onboarding.leadSources.legend') }}
                   </div>
                   <button class="btn btn-g" style="margin-top:12px"
                           (click)="addLeadSource(field)">+ {{ t('settings.onboarding.leadSources.add') }}</button>
@@ -1078,7 +1085,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                     </table>
                   </div>
                   <div style="margin-top:8px;font-size:12px;color:var(--gray-400)">
-                    <i class="ei ei-dot" style="color:#16A34A"></i> {{ t('settings.onboarding.templates.legend') }}
+                    🟢 {{ t('settings.onboarding.templates.legend') }}
                   </div>
                   <button class="btn btn-g" style="margin-top:12px"
                           (click)="addTemplate(field)">+ {{ t('settings.onboarding.templates.add') }}</button>
@@ -1100,7 +1107,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         @if (activeTab() === 'tooltips') {
 
           <div style="background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #c4b5fd var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-message"></i></span>
+            <span style="font-size:18px;flex-shrink:0">💬</span>
             <div>
               <strong>{{ t('settings.tooltips.introTitle') }}</strong> {{ t('settings.tooltips.introBeforeIcon') }}
               <strong style="font-family:sans-serif;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">?</strong>
@@ -1113,7 +1120,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">+ {{ t('settings.tooltips.add') }}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
               <div>
-                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.screen') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
+                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.screen') }} <span class="req">*</span></label>
                 <select class="fsel" [(ngModel)]="newTipScreen" (ngModelChange)="onNewTipScreenChange()">
                   <option value="">{{ t('settings.tooltips.chooseScreen') }}</option>
                   @for (s of catalogScreens; track s) {
@@ -1122,7 +1129,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                 </select>
               </div>
               <div>
-                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.label') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
+                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.label') }} <span class="req">*</span></label>
                 <select class="fsel" [(ngModel)]="newTipLabelKey" [disabled]="!newTipScreen">
                   <option value="">{{ t('settings.tooltips.chooseLabel') }}</option>
                   @for (e of catalogForScreen; track e.key) {
@@ -1134,16 +1141,16 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
               </div>
             </div>
             <div style="margin-bottom:20px">
-              <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.content') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
+              <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.content') }} <span class="req">*</span></label>
               <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:72px"
                         [(ngModel)]="newTipValue"
                         [placeholder]="t('settings.tooltips.contentPlaceholder')"></textarea>
             </div>
             @if (tipError()) {
-              <div style="background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px"><i class="ei ei-warn"></i> {{ tipError() }}</div>
+              <div style="background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">⚠ {{ tipError() }}</div>
             }
             <button class="btn btn-p"
-                    [disabled]="tipSaving() || !newTipLabelKey || !newTipValue.trim()"
+                    [disabled]="tipSaving()"
                     (click)="addTooltip()">
               {{ tipSaving() ? t('settings.actions.saving') : '+ ' + t('settings.tooltips.add') }}
             </button>
@@ -1171,7 +1178,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                       <span class="field-meta">{{ tip.updated_by_name }} · {{ tip.updated_at | date:'dd.MM.yy HH:mm' }}</span>
                     }
                     <button class="btn btn-d btn-sm" style="flex-shrink:0"
-                            (click)="deleteTooltip(tip.key)"><i class="ei ei-trash"></i> {{ t('settings.actions.delete') }}</button>
+                            (click)="deleteTooltip(tip.key)">🗑 {{ t('settings.actions.delete') }}</button>
                   </div>
                   <div style="padding:16px 20px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end">
                     <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:60px;font-size:14px"
@@ -1179,8 +1186,9 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                               (ngModelChange)="tipDirty[tip.key] = true"></textarea>
                     <button class="btn btn-p"
                             [disabled]="!tipDirty[tip.key] || tipSaving()"
+                            [title]="tipDirty[tip.key] ? '' : ('form.noChanges' | transloco)"
                             (click)="saveTooltip(tip.key, tipDrafts[tip.key])">
-                      <i class="ei ei-save"></i> {{ 'actions.save' | transloco }}
+                      💾 {{ 'actions.save' | transloco }}
                     </button>
                   </div>
                 </div>
@@ -1203,7 +1211,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                     <span class="field-meta">{{ tip.updated_by_name }} · {{ tip.updated_at | date:'dd.MM.yy HH:mm' }}</span>
                   }
                   <button class="btn btn-d btn-sm" style="flex-shrink:0"
-                          (click)="deleteTooltip(tip.key)"><i class="ei ei-trash"></i> {{ t('settings.actions.delete') }}</button>
+                          (click)="deleteTooltip(tip.key)">🗑 {{ t('settings.actions.delete') }}</button>
                 </div>
                 <div style="padding:16px 20px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end">
                   <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:60px;font-size:14px"
@@ -1211,8 +1219,9 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                             (ngModelChange)="tipDirty[tip.key] = true"></textarea>
                   <button class="btn btn-p"
                           [disabled]="!tipDirty[tip.key] || tipSaving()"
+                          [title]="tipDirty[tip.key] ? '' : ('form.noChanges' | transloco)"
                           (click)="saveTooltip(tip.key, tipDrafts[tip.key])">
-                    <i class="ei ei-save"></i> {{ 'actions.save' | transloco }}
+                    💾 {{ 'actions.save' | transloco }}
                   </button>
                 </div>
               </div>
@@ -1227,7 +1236,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
              ekranu — patrz icpApiBase(). -->
         @if (activeTab() === 'icp') {
           <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
-            <span style="font-size:18px;flex-shrink:0"><i class="ei ei-target"></i></span>
+            <span style="font-size:18px;flex-shrink:0">🎯</span>
             <div>
               <strong>{{ t('settings.icp.introTitle') }}</strong> {{ t('settings.icp.intro') }}
             </div>
@@ -1343,12 +1352,14 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           <div class="modal-body">
             <div class="field">
               <label>{{ t('settings.icp.modal.name') }} <span class="req">*</span></label>
-              <input [(ngModel)]="icpModalDraft.label" [placeholder]="t('settings.icp.modal.namePlaceholder')">
+              <input [(ngModel)]="icpModalDraft.label" [placeholder]="t('settings.icp.modal.namePlaceholder')" [class.fi-err]="isIcpSubmitted && !icpModalDraft.label.trim()">
+              @if (isIcpSubmitted && !icpModalDraft.label.trim()) { <span class="ferr">{{ t('settings.icp.modal.errors.name') }}</span> }
             </div>
             <div class="field">
               <label>{{ t('settings.icp.modal.definition') }} <span class="req">*</span></label>
               <textarea [(ngModel)]="icpModalDraft.ai_definition" rows="8"
-                [placeholder]="t('settings.icp.modal.definitionPlaceholder')"></textarea>
+                [placeholder]="t('settings.icp.modal.definitionPlaceholder')" [class.fi-err]="isIcpSubmitted && !icpModalDraft.ai_definition.trim()"></textarea>
+              @if (isIcpSubmitted && !icpModalDraft.ai_definition.trim()) { <span class="ferr">{{ t('settings.icp.modal.errors.definition') }}</span> }
               <div class="hint">{{ t('settings.icp.modal.definitionHint') }}</div>
             </div>
             <div class="field">
@@ -1370,8 +1381,9 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             </div>
           </div>
           <div class="modal-footer">
+            @if (isIcpSubmitted) { <wt-form-error-summary [count]="(icpModalDraft.label.trim() ? 0 : 1) + (icpModalDraft.ai_definition.trim() ? 0 : 1)" /> }
             <button class="btn-secondary" [disabled]="icpSaving()" (click)="closeIcpEditModal()">{{ 'actions.cancel' | transloco }}</button>
-            <button class="btn-primary" [disabled]="icpSaving() || !icpModalDraft.label.trim() || !icpModalDraft.ai_definition.trim()"
+            <button class="btn-primary" [disabled]="icpSaving()"
                     (click)="saveIcpModalDraft()">
               {{ icpSaving() ? t('settings.icp.modal.saving') : ('actions.save' | transloco) }}
             </button>
@@ -1795,7 +1807,8 @@ export class SettingsComponent implements OnInit {
 
   addGroup(): void {
     const { name, display_name, description, has_owner_restriction } = this.newGroup;
-    if (!name.trim() || !display_name.trim()) return;
+    this.isGroupSubmitted = !name.trim() || !display_name.trim();
+    if (this.isGroupSubmitted) return;
     this.groupSaving.set(true);
     this.groupError.set('');
     this.http.post<any>(`${environment.apiUrl}/admin/settings/groups`, {
@@ -1874,7 +1887,10 @@ export class SettingsComponent implements OnInit {
   }
 
   deleteGroup(g: any): void {
-    if (g.member_count > 0 || g.document_count > 0) return;
+    if (g.member_count > 0 || g.document_count > 0) {
+      this.toast.info(this.transloco.translate('admin.settings.groups.cannotDelete'));
+      return;
+    }
     if (!confirm(this.transloco.translate('admin.settings.groups.deleteConfirm', { name: g.display_name }))) return;
     this.http.delete(`${environment.apiUrl}/admin/settings/groups/${g.id}`).subscribe({
       next: () => {
@@ -1901,7 +1917,7 @@ export class SettingsComponent implements OnInit {
     return Object.entries(byCategory).map(([key, flds]) => ({
       key,
       label: CATEGORY_LABELS[key] ? this.transloco.translate(CATEGORY_LABELS[key].labelKey) : key,
-      icon:  CATEGORY_LABELS[key]?.icon  ?? 'settings',
+      icon:  CATEGORY_LABELS[key]?.icon  ?? '⚙️',
       fields: flds,
     }));
   });
@@ -2325,7 +2341,12 @@ export class SettingsComponent implements OnInit {
   }
 
   addStage(): void {
+    if (!this.canAddStage()) {
+      this.toast.info(this.transloco.translate('admin.settings.leadStages.limitReached', { max: this.maxOpenStages() }));
+      return;
+    }
     const label = this.newStageLabel.trim();
+    this.isStageSubmitted = !label;
     if (!label) return;
     this.stagesSaving.set(true);
     this.leadStages.create({ label }).subscribe({
@@ -2527,7 +2548,12 @@ export class SettingsComponent implements OnInit {
     });
   }
 
+  isGroupSubmitted = false;
+  isStageSubmitted = false;
+  isIcpSubmitted = false;
+
   openIcpEditModal(signal: IcpSignal | null): void {
+    this.isIcpSubmitted = false;
     this.icpModalTarget.set(signal ?? 'new');
     this.icpModalDraft = signal
       ? { label: signal.label, ai_definition: signal.ai_definition, short_description: signal.short_description ?? '', points: signal.points, active: signal.active }
@@ -2564,6 +2590,8 @@ export class SettingsComponent implements OnInit {
     const cfg = this.icpConfig();
     const target = this.icpModalTarget();
     if (!tenantId || !cfg || target === null) return;
+    this.isIcpSubmitted = !this.icpModalDraft.label.trim() || !this.icpModalDraft.ai_definition.trim();
+    if (this.isIcpSubmitted) return;
 
     this.icpSaving.set(true);
     const body = {

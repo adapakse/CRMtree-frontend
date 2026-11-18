@@ -27,6 +27,13 @@
       "subtitle": "Ștergerea definitivă a unui document, lead sau partener împreună cu toate datele și jurnalele asociate.",
       "title": "Ștergerea înregistrărilor"
     },
+    "errors": {
+      "confirmPhrase": "Tastați exact „{phrase}” pentru a confirma",
+      "selectDoc": "Căutați un document și faceți clic pe el în listă",
+      "selectFile": "Alegeți fișierul JSON cu setările exportate",
+      "selectLead": "Căutați un lead și faceți clic pe el în listă",
+      "selectPartner": "Căutați un partener și faceți clic pe el în listă"
+    },
     "purge": {
       "confirm": "Confirmare",
       "docs": {
@@ -705,6 +712,9 @@
       "body": "Sigur ștergi tokenul PBX pentru {name}? Utilizatorul nu va mai putea folosi softphone-ul.",
       "title": "Șterge tokenul PBX"
     },
+    "errors": {
+      "token": "Lipiți Personal Access Token (PAT) din centrală"
+    },
     "loadError": "Eroare la încărcarea datelor.",
     "loading": "Se încarcă…",
     "modal": {
@@ -758,6 +768,9 @@
       "detected": "Recunoscut: {provider}",
       "detectedShort": "recunoscut după cheie",
       "detecting": "Se recunoaște furnizorul…",
+      "errors": {
+        "key": "Lipiți cheia API a furnizorului (de ex. sk-…) sau alegeți o cheie salvată"
+      },
       "intro": "Fiecare funcție are propriul furnizor, cheie și model — enrichment poate rula la un furnizor, iar analiza apelurilor la altul. Lipește o cheie și recunoaștem singuri furnizorul. Salvarea verifică configurația la furnizor; cheia este criptată și nu mai este afișată niciodată.",
       "loading": "Se încarcă configurația AI…",
       "model": "Model",
@@ -1193,6 +1206,9 @@
       "deleteConfirm": "Se șterge câmpul „{name}”?",
       "deleteTooltip": "Șterge câmpul — posibil doar dacă nicio înregistrare nu are valoare",
       "empty": "Niciun câmp suplimentar în acest formular.",
+      "errors": {
+        "name": "Introduceți numele câmpului, de ex. Număr client"
+      },
       "hint": "Câmpuri pe care le definești singur pentru acest formular. Tipul câmpului nu mai poate fi schimbat ulterior — pentru a-l schimba, dezactivează câmpul și adaugă unul nou. Un câmp dezactivat dispare din formular, dar valorile deja introduse rămân.",
       "newNamePlaceholder": "Numele câmpului nou",
       "optionsPlaceholder": "Valori separate prin virgulă",
@@ -1291,6 +1307,10 @@
       "displayNamePlaceholder": "de ex. Relații cu clienții",
       "documentCount": "{count, plural, one {# document} few {# documente} other {# de documente}}",
       "empty": "Nu există grupuri. Adăugați primul grup mai sus sau rulați migrarea 0127.",
+      "errors": {
+        "displayName": "Introduceți numele afișat, de ex. Echipa de vânzări",
+        "technicalName": "Introduceți numele tehnic, de ex. sales_team"
+      },
       "inactive": "Inactiv",
       "intro": "— gestionați grupurile în care pot fi incluși utilizatorii. Grupurile controlează accesul la documente. Un grup cu utilizatori sau documente atribuite nu poate fi șters.",
       "memberCount": "{count, plural, one {# utilizator} few {# utilizatori} other {# de utilizatori}}",
@@ -1332,6 +1352,10 @@
         "definitionHint": "Pe baza acestei descrieri, sistemul evaluează dacă o companie îndeplinește semnalul.",
         "definitionPlaceholder": "Descrieți după ce se recunoaște că firma îndeplinește această condiție — cuvinte/expresii concrete de pe site, secțiuni, funcții.",
         "editTitle": "Editare semnal",
+        "errors": {
+          "definition": "Descrieți după ce trebuie AI să recunoască acest semnal",
+          "name": "Introduceți numele semnalului, de ex. Firma are peste 50 de angajați"
+        },
         "name": "Denumirea semnalului",
         "namePlaceholder": "de ex. Flotă proprie de transport",
         "newTitle": "Semnal nou",
@@ -1456,6 +1480,9 @@
       "codeWrittenHint": "Nu este un pas al pâlniei, ci o stare pe care aplicația o setează singură (arhivarea lead-ului, conversia în partener), deci nu poate fi ștearsă. Numele poate fi schimbat.",
       "confirmDelete": "Ștergeți etapa „{name}”?",
       "confirmDeleteWithLeads": "Ștergeți etapa „{name}”?\n\nCele {count} lead-uri de pe ea vor trece la „{target}”.",
+      "errors": {
+        "name": "Introduceți numele noii etape, de ex. Negociere"
+      },
       "intro": "Nume proprii pentru etapele pâlniei — redenumiți-le pe cele existente, adăugați un pas sau ștergeți unul de care nu aveți nevoie. Codul etapei rămâne același, așa că noul nume apare în toată aplicația, iar rapoartele și datele lead-urilor rămân neatinse. Un nume gol revine la cel implicit.",
       "kinds": {
         "archived": "arhivă",
@@ -1633,6 +1660,9 @@
       "saved": "Grupul a fost actualizat",
       "title": "Editare grup"
     },
+    "errors": {
+      "internalName": "Introduceți numele intern, de ex. echipa-vanzari"
+    },
     "fields": {
       "description": "Descriere",
       "displayName": "Denumire afișată",
@@ -1724,11 +1754,18 @@
       "updated": "Utilizator actualizat"
     },
     "empty": "Nu s-au găsit utilizatori",
+    "errors": {
+      "chooseGroup": "Alegeți un grup din listă"
+    },
     "featureAccess": {
       "callAnalysis": "Analizor de apeluri",
       "callAnalysisDisabled": "Acces la Analizorul de apeluri dezactivat",
       "callAnalysisEnabled": "Acces la Analizorul de apeluri activat",
       "callAnalysisHint": "Analiză AI a notelor de apel, scor și follow-up",
+      "emailCampaigns": "Campanii e-mail",
+      "emailCampaignsDisabled": "Accesul la Campanii e-mail a fost dezactivat",
+      "emailCampaignsEnabled": "Accesul la Campanii e-mail a fost activat",
+      "emailCampaignsHint": "Campanii e-mail către parteneri și leaduri prin SendGrid",
       "prospects": "Prospecți",
       "prospectsDisabled": "Accesul la Prospecți a fost dezactivat",
       "prospectsEnabled": "Accesul la Prospecți a fost activat",

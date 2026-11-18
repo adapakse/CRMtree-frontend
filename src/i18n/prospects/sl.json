@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} podjetij…",
     "errors": {
       "aiNoCredit": "Na računu UI ni več sredstev",
+      "nip": "NIP mora imeti 10 števk, npr. 1234567890",
       "searchFailedWithReason": "Iskanje je spodletelo: {reason}",
+      "seedName": "Vnesite ime vzorčnega podjetja, npr. ABC d.o.o.",
+      "selectCompanies": "Označite vsaj eno podjetje na seznamu",
       "taxIdConflict": "Navzkrižje davčne številke — to številko že uporablja drug zapis."
     },
     "exportCsv": "Izvoz CSV",

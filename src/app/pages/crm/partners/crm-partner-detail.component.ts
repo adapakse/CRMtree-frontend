@@ -30,9 +30,13 @@ import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-pr
 import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
 import { PbxService } from '../../../core/services/pbx.service';
 import { QuillModule } from 'ngx-quill';
+import { PersonConsentsComponent } from '../../../shared/components/person-consents/person-consents.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
+import { withdrawOnboardingErrorMessage } from '../onboarding/withdraw-onboarding-error.util';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
 // number. Numbers are never merged into each other's history.
@@ -66,7 +70,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
   selector: 'wt-crm-partner-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, PhoneInputComponent, ActivityCountBadgeComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe],
+            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent, PersonConsentsComponent],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -86,7 +90,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </span>
     <button class="btn btn-quiet btn-sm" *ngIf="partner.phone || partner.billing_phone || partner.agent_phone"
             (click)="makePartnerCall()" [title]="t('calls.call')" [attr.aria-label]="t('calls.call')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></button>
-    <button class="btn btn-quiet btn-sm" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? t('partnerDetail.edit.title') : t('partnerDetail.header.noEditPermission')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>{{ t('partnerDetail.header.edit') }}</button>
+    <button class="btn btn-quiet btn-sm" (click)="canEdit ? openEdit() : explainNoPermission()" [title]="canEdit ? t('partnerDetail.edit.title') : t('partnerDetail.header.noEditPermission')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>{{ t('partnerDetail.header.edit') }}</button>
   </div>
 
   <!-- Onboarding stepper + zadania -->
@@ -106,6 +110,26 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div class="step-tasks-count" *ngIf="tasksByStep[i]?.length">
           <span [class.all-done]="allTasksDone(i)">{{doneCount(i)}}/{{tasksByStep[i].length}}</span>
         </div>
+      </div>
+    </div>
+
+    <!-- Withdraw from onboarding back to a funnel stage (managers only) -->
+    <div *ngIf="isManager && partner.lead_id" style="margin:10px 16px">
+      <button class="btn btn-sm btn-d" *ngIf="!showWithdrawForm" (click)="showWithdrawForm = true">
+        🔄 {{ t('onboardingBoard.withdraw.detailButton') }}
+      </button>
+      <div *ngIf="showWithdrawForm" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--gray-400)">{{ t('onboardingBoard.withdraw.detailStagePrompt') }}</span>
+        <select [(ngModel)]="withdrawTargetStage" class="tf-sel" [class.fi-err]="withdrawSubmitted && !withdrawTargetStage">
+          <option value="">{{ t('onboardingBoard.withdraw.stagePlaceholder') }}</option>
+          <option *ngFor="let s of leadStages.selectable()" [value]="s.key">{{ leadStages.label(s.key) }}</option>
+        </select>
+        <button class="btn btn-sm btn-d" [disabled]="withdrawingOnboarding" (click)="withdrawOnboarding()">
+          {{ withdrawingOnboarding ? t('onboardingBoard.withdraw.inProgress') : t('onboardingBoard.withdraw.confirm') }}
+        </button>
+        <button class="btn btn-sm btn-g" (click)="cancelWithdrawForm()">{{ 'actions.cancel' | transloco }}</button>
+        <span *ngIf="withdrawSubmitted && !withdrawTargetStage" class="ferr" style="flex-basis:100%">{{ t('onboardingBoard.withdraw.stageRequired') }}</span>
+        <div style="flex-basis:100%;font-size:11px;color:var(--gray-400)">{{ t('onboardingBoard.withdraw.detailHint') }}</div>
       </div>
     </div>
 
@@ -137,8 +161,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <option value="doc_sent">{{ t('labels.activityTypes.doc_sent') }}</option>
             <option value="training">{{ t('labels.activityTypes.training') }}</option>
           </select>
-          <input [(ngModel)]="taskForm.title" [placeholder]="t('partnerDetail.onboarding.taskTitlePlaceholder')" class="tf-input" style="flex:1">
+          <input [(ngModel)]="taskForm.title" [placeholder]="t('partnerDetail.onboarding.taskTitlePlaceholder')" class="tf-input" style="flex:1"
+                 [class.fi-err]="taskSubmitted && !taskForm.title?.trim()">
         </div>
+        @if (taskSubmitted && !taskForm.title?.trim()) { <span class="ferr">{{ t('fieldErrors.title') }}</span> }
         <div class="task-form-row">
           <select [(ngModel)]="taskForm.assigned_to" class="tf-sel" style="flex:1">
             <option value="">{{ t('partnerDetail.onboarding.responsiblePerson') }}</option>
@@ -150,8 +176,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
         <textarea [(ngModel)]="taskForm.body" [placeholder]="t('partnerDetail.onboarding.descriptionOptionalPlaceholder')" rows="2" class="tf-input tf-textarea"></textarea>
         <div class="task-form-actions">
+          @if (taskSubmitted) { <wt-form-error-summary [count]="taskForm.title?.trim() ? 0 : 1" /> }
           <button class="btn-sm" (click)="cancelTaskForm()">{{ 'actions.cancel' | transloco }}</button>
-          <button class="btn-sm primary" (click)="saveTask()" [disabled]="!taskForm.title || savingTask">
+          <button class="btn-sm primary" (click)="saveTask()" [disabled]="savingTask">
             {{savingTask ? '…' : ('actions.save' | transloco)}}
           </button>
         </div>
@@ -474,7 +501,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <i class="ei ei-{{ actIcon(actForm.type) }}"></i> {{actTypeName(actForm.type)}}
           </div>
           <!-- Edytowalny tytuł tylko dla Spotkania i Maila (Mail ma osobny formularz w zakładce „Maile") -->
-          <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" [placeholder]="t('partnerDetail.activity.meetingSubjectPlaceholder')" class="act-input">
+          <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" [placeholder]="t('partnerDetail.activity.meetingSubjectPlaceholder')" class="act-input"
+                 [class.fi-err]="actSubmitted && !actForm.title?.trim()">
+          @if (actSubmitted && !actForm.title?.trim()) { <span class="ferr">{{ t('fieldErrors.title') }}</span> }
           <!-- Termin + przypomnienie + przypisz + priorytet — layout matches crm-lead-detail.component.ts 1:1 -->
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px;align-items:start">
             <label style="font-size:12px;color:var(--gray-400);font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.dueDate') }}
@@ -571,8 +600,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
                         style="background:var(--surface)" [placeholder]="t('partnerDetail.activity.bodyPlaceholder')"></quill-editor>
           <wt-pending-attachments *ngIf="actForm.type==='task' || actForm.type==='note'" [(files)]="pendingActivityFiles"></wt-pending-attachments>
           <div class="act-actions">
+            @if (actSubmitted) { <wt-form-error-summary [count]="actForm.title?.trim() ? 0 : 1" /> }
             <button class="btn-sm" (click)="showNewActivity = false; pendingActivityFiles = []">{{ 'actions.cancel' | transloco }}</button>
-            <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title || savingActivity">
+            <button class="btn-sm primary" (click)="addActivity()" [disabled]="savingActivity">
               {{savingActivity ? '…' : ('actions.save' | transloco)}}
             </button>
           </div>
@@ -592,7 +622,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:var(--gray-400);margin-left:auto;white-space:nowrap">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
               <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:var(--gray-400);margin-left:auto;white-space:nowrap">{{ t('activity.card.createdAt', { date: (a.created_at|date:'dd.MM.yyyy HH:mm') }) }}</span>
-              <wt-add-to-calendar *ngIf="a.activity_at && a.type !== 'email' && a.type !== 'note'"
+              <wt-add-to-calendar *ngIf="a.activity_at && a.type !== 'email' && a.type !== 'marketing_email' && a.type !== 'note'"
                                   [entry]="calendarEntryOf(a)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
             </div>
             <div class="act-card-title">{{a.title}}</div>
@@ -617,7 +647,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </ng-container>
           <!-- Inline edit — layout matches crm-lead-detail.component.ts's inline edit 1:1 -->
           <div *ngIf="inlineEditActId===a.id" style="margin-top:10px;display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
-            <input *ngIf="a.type==='meeting'" [(ngModel)]="inlineEditForm.title" class="act-input" [placeholder]="t('partnerDetail.activity.meetingSubjectPlaceholder')">
+            <input *ngIf="a.type==='meeting' || a.type==='email'" [(ngModel)]="inlineEditForm.title" class="act-input"
+                   [placeholder]="a.type==='email' ? t('email.placeholders.subject') : t('partnerDetail.activity.meetingSubjectPlaceholder')"
+                   [class.fi-err]="inlineEditSubmitted && !inlineEditForm.title?.trim()">
+            @if (inlineEditSubmitted && !inlineEditForm.title?.trim()) { <span class="ferr">{{ t(a.type==='email' ? 'fieldErrors.subject' : 'fieldErrors.title') }}</span> }
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px">
               <label style="font-size:12px;color:var(--gray-500);display:flex;flex-direction:column;gap:2px;font-weight:600">
                 {{ t('activity.form.dateTime') }}
@@ -670,8 +703,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <quill-editor [(ngModel)]="inlineEditForm.body" [modules]="quillModules" style="background:var(--surface)" [placeholder]="t('activity.form.bodyShortPlaceholder')"></quill-editor>
             <wt-entity-attachments *ngIf="a.type==='task' || a.type==='note'" sourceType="partner-activity" [sourceId]="a.id" [compact]="true" [attachmentCount]="a.attachment_count ?? null" [canUpload]="canEdit" (fileCountChange)="a.attachment_count = $event"></wt-entity-attachments>
             <div style="display:flex;gap:6px;justify-content:flex-end">
+              @if (inlineEditSubmitted) { <wt-form-error-summary [count]="inlineEditForm.title?.trim() ? 0 : 1" /> }
               <button class="btn-sm" (click)="cancelInlineEdit()">{{ 'actions.cancel' | transloco }}</button>
-              <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="!inlineEditForm.title||savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
+              <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
             </div>
           </div>
         </div>
@@ -718,13 +752,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </select>
             </div>
             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.to') }}
-              <div class="participant-chips">
+              <div class="participant-chips" [class.fi-err]="emailSubmitted && !emailForm.recipientList?.length">
                 <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button></span>
                 <input class="participant-input" [(ngModel)]="recipientQuery" (input)="onRecipientInput()" (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()" (blur)="showRecipientSug=false" [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
                 <div *ngIf="showRecipientSug" class="suggest-dropdown">
                   <div *ngFor="let s of recipientSuggestions" class="suggest-item" (mousedown)="pickRecipientSug(s)"><span style="font-weight:600">{{s.name||s.email}}</span><span style="color:var(--gray-400);font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span></div>
                 </div>
               </div>
+              @if (emailSubmitted && !emailForm.recipientList?.length) { <span class="ferr">{{ t('fieldErrors.recipients') }}</span> }
             </label>
             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.cc') }}
               <div class="participant-chips">
@@ -736,7 +771,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </div>
             </label>
             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.subject') }}
-              <input class="act-input" [(ngModel)]="emailForm.subject" [placeholder]="t('email.placeholders.subject')">
+              <input class="act-input" [(ngModel)]="emailForm.subject" [placeholder]="t('email.placeholders.subject')" [class.fi-err]="emailSubmitted && !emailForm.subject?.trim()">
+              @if (emailSubmitted && !emailForm.subject?.trim()) { <span class="ferr">{{ t('fieldErrors.subject') }}</span> }
             </label>
             <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.body')" style="display:block" theme="snow"></quill-editor>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -751,8 +787,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
             <div *ngIf="emailError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px"><i class="ei ei-warn"></i> {{emailError}}</div>
             <div style="display:flex;gap:6px;justify-content:flex-end">
+              @if (emailSubmitted) { <wt-form-error-summary [count]="emailErrorCount()" /> }
               <button class="btn-sm" (click)="showEmailCompose=false">{{ 'actions.cancel' | transloco }}</button>
-              <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">@if (sendingEmail) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.sendAction') }} }</button>
+              <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail">@if (sendingEmail) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.sendAction') }} }</button>
             </div>
           </ng-container>
         </div>
@@ -837,7 +874,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
                   <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
                 </label>
               </ng-container>
-              <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.replyBody')" style="display:block" theme="snow"></quill-editor>
+              <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.replyBody')" style="display:block" theme="snow"
+                            [class.fi-err]="inlineReplySubmitted && !inlineReplyForm.body?.trim()"></quill-editor>
+              @if (inlineReplySubmitted && !inlineReplyForm.body?.trim()) { <span class="ferr">{{ t('fieldErrors.message') }}</span> }
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:12px;color:var(--gray-500);flex:1;min-width:0">
               </div>
@@ -846,8 +885,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </div>
               <div *ngIf="inlineReplyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px"><i class="ei ei-warn"></i> {{inlineReplyError}}</div>
               <div style="display:flex;gap:6px;justify-content:flex-end">
+                @if (inlineReplySubmitted) { <wt-form-error-summary [count]="inlineReplyForm.body?.trim() ? 0 : 1" /> }
                 <button class="btn-sm" (click)="cancelInlineReply()">{{ 'actions.cancel' | transloco }}</button>
-                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">@if (inlineReplySending) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.reply.send') }} }</button>
+                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending">@if (inlineReplySending) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.reply.send') }} }</button>
               </div>
             </div>
             <div *ngIf="!showReplyInline" style="display:flex;gap:6px">
@@ -883,7 +923,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
           <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('whatsapp.toField') }}
             <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
-                   placeholder="+48 123 123 123">
+                   placeholder="+48 123 123 123" [class.fi-err]="whatsappSubmitted && (!whatsappToPhone.trim() || whatsappToPhoneMissingCountryCode)">
+            @if (whatsappSubmitted && !whatsappToPhone.trim()) { <span class="ferr">{{ t('fieldErrors.phone') }}</span> }
           </label>
           <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:12px;color:oklch(from #b45309 max(l, var(--text-min-l)) c h)">{{ t('whatsapp.missingCountryCode') }}</div>
 
@@ -897,16 +938,18 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
           <label *ngIf="whatsappMode==='text'" style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('whatsapp.messageBody') }}
             <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
-                      [placeholder]="t('whatsapp.messagePlaceholder')"></textarea>
+                      [placeholder]="t('whatsapp.messagePlaceholder')" [class.fi-err]="whatsappSubmitted && !canSendWhatsappContent"></textarea>
           </label>
           <wt-whatsapp-template-picker *ngIf="whatsappMode==='template'" [disabled]="!canEdit || whatsappSending"
                                        (selectionChange)="whatsappTemplateSelection=$event" />
+          @if (whatsappSubmitted && !canSendWhatsappContent) { <span class="ferr">{{ t(whatsappMode === 'text' ? 'fieldErrors.message' : 'fieldErrors.whatsappTemplate') }}</span> }
 
           <div *ngIf="whatsappError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px"><i class="ei ei-warn"></i> {{whatsappError}}</div>
           <div *ngIf="whatsappSuccess" style="color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px"><i class="ei ei-check-circle"></i> {{ t('whatsapp.sent') }}</div>
 
           <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !canSendWhatsappContent || whatsappToPhoneMissingCountryCode || whatsappSending"
+            @if (whatsappSubmitted) { <wt-form-error-summary [count]="whatsappErrorCount()" /> }
+            <button class="btn-sm primary" [disabled]="whatsappSending"
                     (click)="sendWhatsapp()">
               {{ whatsappSending ? t('whatsapp.sending') : t('whatsapp.send') }}
             </button>
@@ -973,11 +1016,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 <textarea class="act-input" [ngModel]="getWhatsappConvState(conv.phone).replyMessage"
                           (ngModelChange)="setWhatsappConvReplyMessage(conv.phone, $event)"
                           [disabled]="getWhatsappConvState(conv.phone).replySending" rows="3"
-                          [placeholder]="t('whatsapp.reply.placeholder')"></textarea>
+                          [placeholder]="t('whatsapp.reply.placeholder')"
+                          [class.fi-err]="!!getWhatsappConvState(conv.phone).replyError && !getWhatsappConvState(conv.phone).replyMessage.trim()"></textarea>
                 <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px"><i class="ei ei-warn"></i> {{getWhatsappConvState(conv.phone).replyError}}</div>
                 <div style="display:flex;gap:6px;justify-content:flex-end">
                   <button class="btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">{{ 'actions.cancel' | transloco }}</button>
-                  <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
+                  <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending" (click)="sendWhatsappConvReply(conv.phone)">
                     @if (getWhatsappConvState(conv.phone).replySending) { {{ t('whatsapp.reply.sending') }} } @else { <i class="ei ei-send"></i> {{ t('whatsapp.reply.send') }} }
                   </button>
                 </div>
@@ -1031,8 +1075,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <textarea [ngModel]="getSmsConvState(conv.number).replyMessage"
                         (ngModelChange)="setSmsConvReplyMessage(conv.number, $event)"
                         rows="1" style="flex:1;resize:none;border:1px solid var(--gray-300);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit"
-                        [placeholder]="t('sms.messagePlaceholder')" [disabled]="!canEdit || getSmsConvState(conv.number).sending"></textarea>
-              <button class="btn-sm primary" [disabled]="!canEdit || getSmsConvState(conv.number).sending || !getSmsConvState(conv.number).replyMessage.trim()"
+                        [placeholder]="t('sms.messagePlaceholder')" [disabled]="!canEdit || getSmsConvState(conv.number).sending"
+                        [class.fi-err]="!!getSmsConvState(conv.number).error && !getSmsConvState(conv.number).replyMessage.trim()"></textarea>
+              <button class="btn-sm primary" [disabled]="getSmsConvState(conv.number).sending"
                       (click)="sendSmsToConv(conv)">
                 @if (getSmsConvState(conv.number).sending) { … } @else { {{ t('sms.send') }} }
               </button>
@@ -1164,6 +1209,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400)"><i class="ei ei-check-circle"></i> {{ t('consents.title') }}</div>
         </div>
+        <!-- Per-person consents: e-mail campaigns use only these -->
+        <wt-person-consents kind="partners" [entityId]="partner.crm_uuid || partner.id" [canEdit]="canEdit"
+                            [reloadKey]="(partner.email || '') + (partner.extra_contacts | json)"></wt-person-consents>
+        <div style="font-size:12px;font-weight:600;color:var(--gray-500);margin:14px 0 8px;padding-top:10px;border-top:1px solid var(--gray-100)">{{ t('personConsents.companyTitle') }}</div>
+        <div style="font-size:12px;color:var(--gray-400);line-height:1.5;margin:-4px 0 8px">{{ t('personConsents.companyHint') }}</div>
         <div *ngIf="consentLoading" style="text-align:center;color:var(--gray-400);font-size:12px;padding:8px 0">{{ 'states.loading' | transloco }}</div>
         <div *ngFor="let ct of consents" style="margin-bottom:12px">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:4px">
@@ -1195,6 +1245,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
         <button *ngIf="canEdit && consents.length" (click)="saveConsents()"
                 [disabled]="savingConsents || !consentsDirty"
+                [title]="consentsDirty ? '' : ('form.noChanges' | transloco)"
                 style="width:100%;margin-top:2px;font-size:12px;padding:8px;border-radius:8px;font-weight:600;border:none;transition:background .15s"
                 [style.background]="consentsDirty ? '#3BAA5D' : 'var(--gray-100)'"
                 [style.color]="consentsDirty ? 'white' : 'var(--gray-400)'"
@@ -1290,7 +1341,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div class="edit-section">
           <div class="edit-section-title">{{ t('partnerDetail.edit.sections.basic') }}</div>
           <div class="edit-row">
-            <label>{{ t('partnerDetail.fields.companyName') }} *<input [(ngModel)]="editForm.company" [placeholder]="t('partnerDetail.fields.companyName')" required></label>
+            <label>{{ t('partnerDetail.fields.companyName') }} <span class="req">*</span><input [(ngModel)]="editForm.company" [placeholder]="t('partnerDetail.fields.companyName')" required></label>
             <label>{{ t('partnerDetail.fields.status') }}
               <select [(ngModel)]="editForm.status">
                 <option *ngFor="let s of dictStatuses" [value]="s"
@@ -1314,7 +1365,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </label>
             <!-- NIP: edytowalny tylko dla partnerów bez DWH -->
             <label *ngIf="!partner?.dwh_partner_id">
-              {{ t('partnerDetail.fields.nip') }} <span style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span>
+              {{ t('partnerDetail.fields.nip') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
                      (ngModelChange)="validatePartnerNip()"
                      [style.border-color]="partnerNipEditError ? '#ef4444' : ''">
@@ -1373,23 +1424,23 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
 
         <div class="edit-section">
-          <div class="edit-section-title">{{ t('partnerDetail.sections.contractContact') }} *</div>
+          <div class="edit-section-title">{{ t('partnerDetail.sections.contractContact') }} <span class="req">*</span></div>
           <div class="edit-row">
-            <label>{{ t('partnerDetail.fields.fullName') }} *
+            <label>{{ t('partnerDetail.fields.fullName') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.contact_name" [placeholder]="t('partnerDetail.edit.placeholders.fullName')"
                      [class.input-warn]="submitAttempted && !editForm.contact_name">
             </label>
-            <label>{{ t('partnerDetail.fields.contactTitle') }} *
+            <label>{{ t('partnerDetail.fields.contactTitle') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.contact_title" placeholder="CEO"
                      [class.input-warn]="submitAttempted && !editForm.contact_title">
             </label>
           </div>
           <div class="edit-row">
-            <label>{{ t('partnerDetail.fields.email') }} *
+            <label>{{ t('partnerDetail.fields.email') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.email" type="email" [placeholder]="t('partnerDetail.edit.placeholders.email')"
                      [class.input-warn]="submitAttempted && !editForm.email">
             </label>
-            <label>{{ t('partnerDetail.fields.phone') }} *
+            <label>{{ t('partnerDetail.fields.phone') }} <span class="req">*</span>
               <wt-phone-input [(ngModel)]="editForm.phone" [invalid]="submitAttempted && !editForm.phone" />
             </label>
           </div>
@@ -1418,23 +1469,23 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
 
         <div class="edit-section">
-          <div class="edit-section-title">{{ t('partnerDetail.sections.billingContact') }} *</div>
+          <div class="edit-section-title">{{ t('partnerDetail.sections.billingContact') }} <span class="req">*</span></div>
           <div class="edit-row">
-            <label>{{ t('partnerDetail.fields.fullName') }} *
+            <label>{{ t('partnerDetail.fields.fullName') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.billing_contact_name" [placeholder]="t('partnerDetail.edit.placeholders.billingFullName')"
                      [class.input-warn]="submitAttempted && !editForm.billing_contact_name">
             </label>
-            <label>{{ t('partnerDetail.fields.contactTitle') }} *
+            <label>{{ t('partnerDetail.fields.contactTitle') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.billing_contact_title" [placeholder]="t('partnerDetail.edit.placeholders.billingContactTitle')"
                      [class.input-warn]="submitAttempted && !editForm.billing_contact_title">
             </label>
           </div>
           <div class="edit-row">
-            <label>{{ t('partnerDetail.fields.email') }} *
+            <label>{{ t('partnerDetail.fields.email') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.billing_email" type="email" [placeholder]="t('partnerDetail.edit.placeholders.billingContactEmail')"
                      [class.input-warn]="submitAttempted && !editForm.billing_email">
             </label>
-            <label>{{ t('partnerDetail.fields.phone') }} *
+            <label>{{ t('partnerDetail.fields.phone') }} <span class="req">*</span>
               <wt-phone-input [(ngModel)]="editForm.billing_phone" [invalid]="submitAttempted && !editForm.billing_phone" />
             </label>
           </div>
@@ -1756,7 +1807,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     <!-- Reply form -->
     <div class="modal-body" style="gap:10px" *ngIf="msgModalReply">
       <div style="font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:4px">{{ t('email.replyHeading') }}</div>
-      <div class="participant-chips" style="position:relative">
+      <div class="participant-chips" style="position:relative" [class.fi-err]="msgReplySubmitted && !msgModalForm.recipientList?.length">
         <span *ngFor="let r of msgModalForm.recipientList; let i=index" class="participant-chip">
           {{r}}<button (click)="msgModalForm.recipientList.splice(i,1)" type="button">✕</button>
         </span>
@@ -1764,6 +1815,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                (keydown.enter)="pushMsgRecipient()"
                [placeholder]="t('email.placeholders.toShort')" autocomplete="off">
       </div>
+      @if (msgReplySubmitted && !msgModalForm.recipientList?.length) { <span class="ferr">{{ t('fieldErrors.recipients') }}</span> }
       <div class="participant-chips" style="position:relative">
         <span *ngFor="let r of msgModalForm.ccList; let i=index" class="participant-chip">
           {{r}}<button (click)="msgModalForm.ccList.splice(i,1)" type="button">✕</button>
@@ -1772,7 +1824,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
                (keydown.enter)="pushMsgCc()"
                [placeholder]="t('email.placeholders.ccShort')" autocomplete="off">
       </div>
-      <input class="act-input" [(ngModel)]="msgModalForm.subject" [placeholder]="t('email.fields.subject')">
+      <input class="act-input" [(ngModel)]="msgModalForm.subject" [placeholder]="t('email.fields.subject')" [class.fi-err]="msgReplySubmitted && !msgModalForm.subject?.trim()">
+      @if (msgReplySubmitted && !msgModalForm.subject?.trim()) { <span class="ferr">{{ t('fieldErrors.subject') }}</span> }
       <textarea class="act-input" id="partner-msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="7" [placeholder]="t('activity.form.bodyShortPlaceholder')"></textarea>
       <!-- Załączniki w odpowiedzi -->
       <div style="display:flex;flex-direction:column;gap:4px">
@@ -1799,8 +1852,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
     <div class="modal-footer">
       <button class="btn-outline" (click)="closeMsgModal()">{{ 'actions.close' | transloco }}</button>
       <button *ngIf="!msgModalReply" class="btn-primary" (click)="startMsgReply()">@if (threadCanReply) { ↩ {{ t('email.reply.action') }} } @else { <i class="ei ei-mail"></i> {{ t('email.writeNew') }} }</button>
+      @if (msgModalReply && msgReplySubmitted) { <wt-form-error-summary [count]="msgReplyErrorCount()" /> }
       <button *ngIf="msgModalReply" class="btn-primary" (click)="sendMsgReply()"
-              [disabled]="msgModalSending||!msgModalForm.recipientList?.length||!msgModalForm.subject">
+              [disabled]="msgModalSending">
         @if (msgModalSending) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.reply.send') }} }
       </button>
     </div>
@@ -2086,6 +2140,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   private transloco = inject(TranslocoService);
   private attachmentsApi = inject(EntityAttachmentsApiService);
   private toast = inject(ToastService);
+  readonly leadStages = inject(LeadStagesService);
   pendingActivityFiles: File[] = [];
   private locale = inject(LocaleService);
 
@@ -2258,9 +2313,19 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.whatsappToPhone = formatPhoneDisplay(this.whatsappToPhone);
   }
 
+  whatsappErrorCount(): number {
+    return (this.whatsappToPhone.trim() && !this.whatsappToPhoneMissingCountryCode ? 0 : 1) + (this.canSendWhatsappContent ? 0 : 1);
+  }
+
   sendWhatsapp(): void {
-    if (!this.partner || !this.whatsappToPhone.trim() || !this.canSendWhatsappContent) return;
-    if (this.whatsappToPhoneMissingCountryCode) return;
+    if (!this.partner) return;
+    if (!this.canEdit) { this.explainNoPermission(); return; }
+    if (this.whatsappErrorCount() > 0) {
+      this.whatsappSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.whatsappSubmitted = false;
     this.whatsappSending = true;
     this.whatsappError   = null;
     this.whatsappSuccess = false;
@@ -2387,7 +2452,12 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   sendSmsToConv(conv: SmsConversation): void {
     const state = this.getSmsConvState(conv.number);
-    if (!this.partner || !state.replyMessage.trim() || state.sending) return;
+    if (!this.partner || state.sending) return;
+    if (!this.canEdit || !state.replyMessage.trim()) {
+      state.error = this.transloco.translate(this.canEdit ? 'crm.fieldErrors.message' : 'crm.partnerDetail.header.noEditPermission');
+      this.cdr.markForCheck();
+      return;
+    }
     const partnerId = this.partner.id ?? this.partner.crm_id ?? undefined;
     if (partnerId == null) return;
     state.sending = true;
@@ -2514,7 +2584,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   sendWhatsappConvReply(phone: string): void {
     if (!this.partner) return;
     const s = this.getWhatsappConvState(phone);
-    if (!s.replyMessage.trim()) return;
+    if (!s.replyMessage.trim()) {
+      s.replyError = this.transloco.translate('crm.fieldErrors.message');
+      this.cdr.markForCheck();
+      return;
+    }
     s.replySending = true;
     s.replyError   = null;
     this.cdr.markForCheck();
@@ -2800,6 +2874,17 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   showTaskForm = false;
   taskFormStep = 0;
   savingTask   = false;
+  taskSubmitted = false;
+  actSubmitted = false;
+  inlineEditSubmitted = false;
+  emailSubmitted = false;
+  inlineReplySubmitted = false;
+  msgReplySubmitted = false;
+  whatsappSubmitted = false;
+
+  explainNoPermission(): void {
+    this.toast.info(this.transloco.translate('crm.partnerDetail.header.noEditPermission'));
+  }
   editingTaskId: number | null = null;
   taskForm: any = { type: 'task', title: '', body: '', assigned_to: '', due_date: '' };
   taskEditForm: any = { type: 'task', title: '', body: '', assigned_to: '', due_date: '' };
@@ -2959,6 +3044,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   startInlineEdit(a: any): void {
+    this.inlineEditSubmitted = false;
     this.inlineEditActId = a.id;
     this.inlineEditForm  = {
       title:         a.title         || '',
@@ -2984,7 +3070,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   cancelInlineEdit(): void { this.inlineEditActId = null; this.cdr.markForCheck(); }
 
   saveInlineEdit(a: any): void {
-    if (!this.inlineEditForm.title || !this.partner) return;
+    if (!this.partner) return;
+    if (!this.inlineEditForm.title?.trim()) {
+      this.inlineEditSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.inlineEditSubmitted = false;
     this.savingActivity = true;
     const payload: any = {
       title:         this.inlineEditForm.title,
@@ -3511,6 +3603,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.taskFormStep  = this.activeStep;
     this.taskForm      = { type: 'task', title: '', body: '', assigned_to: '', due_date: '' };
     this.showTaskForm  = true;
+    this.taskSubmitted = false;
     this.editingTaskId = null;
     if (!this.crmUsers.length && this.partner) {
       this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
@@ -3521,7 +3614,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   cancelTaskForm(): void { this.showTaskForm = false; this.cdr.markForCheck(); }
 
   saveTask(): void {
-    if (!this.taskForm.title || !this.partner) return;
+    if (!this.partner) return;
+    if (!this.taskForm.title?.trim()) {
+      this.taskSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.taskSubmitted = false;
     this.savingTask = true;
     const payload = {
       step:        this.activeStep,
@@ -3682,8 +3781,48 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ── Withdraw from onboarding back to a funnel stage ──────────────────────
+  showWithdrawForm      = false;
+  withdrawTargetStage   = '';
+  withdrawSubmitted     = false;
+  withdrawingOnboarding = false;
+
+  cancelWithdrawForm(): void {
+    this.showWithdrawForm = false;
+    this.withdrawTargetStage = '';
+    this.withdrawSubmitted = false;
+  }
+
+  withdrawOnboarding(): void {
+    if (!this.partner) return;
+    if (!this.withdrawTargetStage) {
+      this.withdrawSubmitted = true;
+      return;
+    }
+    const stage = this.leadStages.label(this.withdrawTargetStage);
+    if (!confirm(this.transloco.translate('crm.onboardingBoard.withdraw.confirmPrompt', { company: this.partner.company, stage }))) return;
+    this.withdrawingOnboarding = true;
+    this.api.withdrawPartnerOnboarding(this.pid, this.withdrawTargetStage).subscribe({
+      next: r => this.zone.run(() => {
+        this.toast.success(this.transloco.translate('crm.onboardingBoard.withdraw.success', { company: this.partner?.company }));
+        this.router.navigate(['/crm/leads', r.lead_id]);
+      }),
+      error: (err: unknown) => this.zone.run(() => {
+        this.withdrawingOnboarding = false;
+        this.toast.error(withdrawOnboardingErrorMessage(err, this.transloco));
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
   addActivity() {
-    if (!this.actForm.title || !this.partner) return;
+    if (!this.partner) return;
+    if (!this.actForm.title?.trim()) {
+      this.actSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.actSubmitted = false;
     this.savingActivity = true;
     const payload: any = {
       type:  this.actForm.type,
@@ -3778,6 +3917,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       });
     }
     this.showNewActivity = true;
+    this.actSubmitted = false;
   }
 
   debugProcessEmail(): void {
@@ -3799,6 +3939,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   openEmailCompose(prefillThreadId?: string): void {
+    this.emailSubmitted = false;
     const training_mode = this.settings.settings().crm_training_mode;
     if (!this.emailConnected && !training_mode) {
       if (!this.emailProviderKey) {
@@ -4083,10 +4224,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  emailErrorCount(): number {
+    return (this.emailForm.recipientList?.length ? 0 : 1) + (this.emailForm.subject?.trim() ? 0 : 1);
+  }
+
   sendEmail(): void {
     this.addRecipient();
     this.addCc();
-    if (!this.partner || !this.emailForm.recipientList?.length || !this.emailForm.subject) return;
+    if (!this.partner) return;
+    if (this.emailErrorCount() > 0) {
+      this.emailSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.emailSubmitted = false;
     this.sendingEmail = true;
     this.emailError   = '';
 
@@ -4284,6 +4435,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   startInlineReply(a: any): void {
+    this.inlineReplySubmitted = false;
     if (!this.partner) return;
     const activeEmail = this.emailAddress;
     const lastMsg     = this.threadMessages.length > 0 ? this.threadMessages[this.threadMessages.length - 1] : null;
@@ -4371,7 +4523,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   sendInlineReply(): void {
     this.addInlineReplyRecipient();
     this.addInlineReplyCc();
-    if (!this.partner || !this.inlineReplyForm.body?.trim()) return;
+    if (!this.partner) return;
+    if (!this.inlineReplyForm.body?.trim()) {
+      this.inlineReplySubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.inlineReplySubmitted = false;
     this.inlineReplySending = true;
     this.inlineReplyError   = '';
     this.cdr.markForCheck();
@@ -4594,6 +4752,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   startMsgReply(): void {
+    this.msgReplySubmitted = false;
     const m = this.msgModalMsg;
     if (!m) return;
     const activeEmail = this.emailAddress;
@@ -4634,10 +4793,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  msgReplyErrorCount(): number {
+    return (this.msgModalForm.recipientList?.length ? 0 : 1) + (this.msgModalForm.subject?.trim() ? 0 : 1);
+  }
+
   sendMsgReply(): void {
     this.pushMsgRecipient();
     this.pushMsgCc();
-    if (!this.partner || !this.msgModalForm.recipientList?.length || !this.msgModalForm.subject) return;
+    if (!this.partner) return;
+    if (this.msgReplyErrorCount() > 0) {
+      this.msgReplySubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.msgReplySubmitted = false;
     this.msgModalSending = true;
     this.msgModalError   = '';
 
@@ -4758,7 +4927,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return parts.join(' · ');
   }
   actIcon(type: string) {
-    return { task:'check-circle', call:'phone', email:'mail', meeting:'handshake', note:'note', training:'graduation', qbr:'chart', doc_sent:'file', opportunity:'bulb' }[type] || 'message';
+    return { task:'check-circle', call:'phone', email:'mail', meeting:'handshake', note:'note', training:'graduation', qbr:'chart', doc_sent:'file', opportunity:'bulb', marketing_email:'mail' }[type] || 'message';
   }
   commissionBasisLabel(basis: string | null): string {
     const keys: Record<string, string> = {
@@ -4777,7 +4946,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   actTypeName(type: string): string {
-    const known = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity'];
+    const known = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity', 'marketing_email'];
     return known.includes(type) ? this.transloco.translate('crm.labels.activityTypes.' + type) : type;
   }
 

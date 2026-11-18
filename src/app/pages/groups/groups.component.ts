@@ -6,11 +6,13 @@ import { AuthService } from '../../core/auth/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { GroupProfile } from '../../core/models/models';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
+import { scrollToFirstError } from '../../shared/forms/form-errors';
 
 @Component({
   selector: 'wt-groups',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('admin')],
   template: `
 <ng-container *transloco="let t; prefix: 'admin'">
@@ -138,7 +140,9 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
           <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
             <div class="fg">
               <label class="fl">{{ t('userGroups.fields.internalName') }} <span class="req">*</span></label>
-              <input class="fi" [placeholder]="t('userGroups.create.internalNamePlaceholder')" [(ngModel)]="newGroup.name">
+              <input class="fi" [placeholder]="t('userGroups.create.internalNamePlaceholder')" [(ngModel)]="newGroup.name"
+                     [class.fi-err]="newGroupSubmitted && !newGroup.name.trim()">
+              @if (newGroupSubmitted && !newGroup.name.trim()) { <span class="ferr">{{ t('userGroups.errors.internalName') }}</span> }
             </div>
             <div class="fg">
               <label class="fl">{{ t('userGroups.fields.displayName') }} <span class="req">*</span></label>
@@ -154,8 +158,9 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
             </label>
           </div>
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:8px;justify-content:flex-end;background:var(--gray-50)">
+            @if (newGroupSubmitted) { <wt-form-error-summary [count]="newGroup.name.trim() ? 0 : 1" /> }
             <button class="btn btn-g" (click)="openNew=false">{{ 'actions.cancel' | transloco }}</button>
-            <button class="btn btn-p" [disabled]="!newGroup.name.trim()" (click)="createGroup()">{{ t('userGroups.create.title') }}</button>
+            <button class="btn btn-p" (click)="createGroup()">{{ t('userGroups.create.title') }}</button>
           </div>
         </div>
       </div>
@@ -202,6 +207,7 @@ export class GroupsComponent implements OnInit {
   editOwnerRestriction = false;
 
   newGroup = { name: '', display_name: '', description: '', has_owner_restriction: false };
+  newGroupSubmitted = false;
 
   ngOnInit(): void {
     this.loadGroups();
@@ -241,9 +247,15 @@ export class GroupsComponent implements OnInit {
   }
 
   createGroup(): void {
+    if (!this.newGroup.name.trim()) {
+      this.newGroupSubmitted = true;
+      scrollToFirstError();
+      return;
+    }
     this.groupSvc.create(this.newGroup).subscribe(g => {
       this.groups.update(gs => [...gs, g]);
       this.openNew = false;
+      this.newGroupSubmitted = false;
       this.newGroup = { name: '', display_name: '', description: '', has_owner_restriction: false };
       this.toast.success(this.transloco.translate('admin.userGroups.create.done', { name: g.display_name }));
     });

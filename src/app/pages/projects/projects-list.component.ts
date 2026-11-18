@@ -17,6 +17,7 @@ import { ProjectListFiltersService } from './project-list-filters.service';
 import { ProjectMyTasksComponent } from './project-my-tasks.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { ProjectsView, ProjectsViewSwitchComponent } from './projects-view-switch.component';
+import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
 
 const DEFAULT_STATUS_FILTER: ProjectStatusFilter = 'open';
 
@@ -34,7 +35,7 @@ const SCREEN_PARAMS = ['view', 'status'];
   standalone: true,
   imports: [
     FormsModule, TranslocoDirective, TranslocoPipe, ListFilterBarComponent, ListPagerComponent, ProjectListCardComponent,
-    ProjectMyTasksComponent, ProjectsViewSwitchComponent,
+    ProjectMyTasksComponent, ProjectsViewSwitchComponent, FormErrorSummaryComponent,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -91,7 +92,8 @@ const SCREEN_PARAMS = ['view', 'status'];
             <div class="mob">
               <div class="fg">
                 <label class="fl">{{ t('list.createForm.name') }} <span class="req">*</span></label>
-                <input class="fi" [(ngModel)]="newName" maxlength="200" [placeholder]="t('list.createForm.namePlaceholder')">
+                <input class="fi" [(ngModel)]="newName" maxlength="200" [placeholder]="t('list.createForm.namePlaceholder')" [class.fi-err]="isCreateSubmitted && !newName.trim()">
+                @if (isCreateSubmitted && !newName.trim()) { <span class="ferr">{{ t('card.errors.name') }}</span> }
                 <span class="hint">{{ t('list.createForm.keyHint') }}</span>
               </div>
               <div class="fg">
@@ -105,14 +107,15 @@ const SCREEN_PARAMS = ['view', 'status'];
                 </div>
                 <div class="fg">
                   <label class="fl">{{ t('card.endDate') }}</label>
-                  <input class="fi" type="date" [(ngModel)]="newEndDate" [min]="newStartDate">
+                  <input class="fi" type="date" [(ngModel)]="newEndDate" [min]="newStartDate" [class.fi-err]="hasInvalidNewDates()">
                 </div>
               </div>
               @if (hasInvalidNewDates()) { <span class="hint danger">{{ t('card.errors.endBeforeStart') }}</span> }
             </div>
             <div class="mof">
+              @if (isCreateSubmitted) { <wt-form-error-summary [count]="(newName.trim() ? 0 : 1) + (hasInvalidNewDates() ? 1 : 0)" /> }
               <button class="btn btn-g" (click)="isCreateFormOpen.set(false)">{{ 'actions.cancel' | transloco }}</button>
-              <button class="btn btn-p" [disabled]="!newName.trim() || hasInvalidNewDates() || isSaving()" (click)="createProject()">
+              <button class="btn btn-p" [disabled]="isSaving()" (click)="createProject()">
                 {{ t(isSaving() ? 'list.createForm.saving' : 'list.createForm.submit') }}
               </button>
             </div>
@@ -184,6 +187,7 @@ export class ProjectsListComponent implements OnInit {
   readonly hasNarrowedList = computed(() => this.query.activeFilterCount() > 0 || this.statusFilter() !== DEFAULT_STATUS_FILTER);
 
   newName = '';
+  isCreateSubmitted = false;
   newDescription = '';
   newStartDate = '';
   newEndDate = '';
@@ -232,6 +236,7 @@ export class ProjectsListComponent implements OnInit {
   }
 
   openCreateForm(): void {
+    this.isCreateSubmitted = false;
     this.newName = '';
     this.newDescription = '';
     this.newStartDate = '';
@@ -240,6 +245,10 @@ export class ProjectsListComponent implements OnInit {
   }
 
   createProject(): void {
+    if (!this.newName.trim() || this.hasInvalidNewDates()) {
+      this.isCreateSubmitted = true;
+      return;
+    }
     this.isSaving.set(true);
     this.api.createProject({
       name: this.newName.trim(),

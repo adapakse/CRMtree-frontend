@@ -16,6 +16,10 @@
   "login": {
     "email": "Email",
     "emailPlaceholder": "john@company.com",
+    "errors": {
+      "email": "Enter your e-mail address, e.g. john.smith@company.com",
+      "password": "Enter your password"
+    },
     "failed": "Sign-in failed",
     "hidePassword": "Hide",
     "or": "or",

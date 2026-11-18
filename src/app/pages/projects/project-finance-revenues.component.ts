@@ -9,6 +9,7 @@ import { ProjectFinanceFormatService } from '../../core/services/project-finance
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
+import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
 
 const REVENUE_STATUSES: ProjectRevenueStatus[] = ['planned', 'invoiced', 'paid'];
 
@@ -23,7 +24,7 @@ interface RevenueForm {
 @Component({
   selector: 'wt-project-finance-revenues',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -80,11 +81,13 @@ interface RevenueForm {
               <div class="fgrid">
                 <div class="fg">
                   <label class="fl">{{ t('finance.revenues.columns.date') }} <span class="req">*</span></label>
-                  <input class="fi" type="date" [(ngModel)]="form.date">
+                  <input class="fi" type="date" [(ngModel)]="form.date" [class.fi-err]="submitted && !form.date">
+                  @if (submitted && !form.date) { <span class="ferr">{{ t('finance.errors.date') }}</span> }
                 </div>
                 <div class="fg">
                   <label class="fl">{{ t('finance.revenues.amountIn', { currency: currency() }) }} <span class="req">*</span></label>
-                  <input class="fi" type="number" min="0.01" step="0.01" [(ngModel)]="form.amount">
+                  <input class="fi" type="number" min="0.01" step="0.01" [(ngModel)]="form.amount" [class.fi-err]="submitted && !isAmountValid()">
+                  @if (submitted && !isAmountValid()) { <span class="ferr">{{ t('finance.errors.amount') }}</span> }
                 </div>
               </div>
               <div class="fg">
@@ -102,8 +105,9 @@ interface RevenueForm {
               </div>
             </div>
             <div class="mof">
+              @if (submitted) { <wt-form-error-summary [count]="errorCount()" /> }
               <button class="btn btn-g" (click)="isFormOpen.set(false)">{{ 'actions.cancel' | transloco }}</button>
-              <button class="btn btn-p" [disabled]="!isValid() || isSaving()" (click)="save()">
+              <button class="btn btn-p" [disabled]="isSaving()" (click)="save()">
                 {{ isSaving() ? t('finance.saving') : ('actions.save' | transloco) }}
               </button>
             </div>
@@ -141,14 +145,20 @@ export class ProjectFinanceRevenuesComponent {
     this.form = item
       ? { date: item.date.slice(0, 10), amount: item.amount, status: item.status, description: item.description ?? '' }
       : this.emptyForm();
+    this.submitted = false;
     this.isFormOpen.set(true);
   }
 
-  isValid(): boolean {
-    return Boolean(this.form.date) && Number(this.form.amount) > 0;
-  }
+  submitted = false;
+
+  isAmountValid(): boolean { return Number(this.form.amount) > 0; }
+  errorCount(): number { return (this.form.date ? 0 : 1) + (this.isAmountValid() ? 0 : 1); }
 
   save(): void {
+    if (this.errorCount() > 0) {
+      this.submitted = true;
+      return;
+    }
     const item = this.editedItem();
     const payload: ProjectRevenueItemPayload = {
       date: this.form.date,

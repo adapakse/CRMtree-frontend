@@ -4,12 +4,13 @@ import { LucideTrash2 } from '@lucide/angular';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmSeoService, SeoScreenshot } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 
 @Component({
   selector: 'wt-seo-screenshots-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, LucideTrash2, TranslocoDirective, TranslocoPipe],
+  imports: [FormsModule, LucideTrash2, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('crm')],
   template: `
     <ng-container *transloco="let t; prefix: 'crm'">
@@ -22,11 +23,14 @@ import { ToastService } from '../../../core/services/toast.service';
           <img class="shot-img" [src]="seoService.screenshotSrc(s.id)" [alt]="s.caption" loading="lazy">
           @if (editingId() === s.id) {
             <label class="field-label" [for]="'tag-' + s.id">{{ t('seo.screenshots.fields.feature') }}</label>
-            <input class="field-input" [id]="'tag-' + s.id" [(ngModel)]="editTag">
+            <input class="field-input" [id]="'tag-' + s.id" [(ngModel)]="editTag" [class.fi-err]="editSubmitted && !editTag.trim()">
+            @if (editSubmitted && !editTag.trim()) { <span class="ferr">{{ t('fieldErrors.featureTag') }}</span> }
             <label class="field-label" [for]="'caption-' + s.id">{{ t('seo.screenshots.fields.caption') }}</label>
-            <input class="field-input" [id]="'caption-' + s.id" [(ngModel)]="editCaption">
+            <input class="field-input" [id]="'caption-' + s.id" [(ngModel)]="editCaption" [class.fi-err]="editSubmitted && !editCaption.trim()">
+            @if (editSubmitted && !editCaption.trim()) { <span class="ferr">{{ t('fieldErrors.caption') }}</span> }
+            @if (editSubmitted) { <wt-form-error-summary [count]="(editTag.trim() ? 0 : 1) + (editCaption.trim() ? 0 : 1)" /> }
             <div class="card-actions">
-              <button type="button" class="btn btn-g btn-sm" (click)="saveEdit(s.id)" [disabled]="!editTag.trim() || !editCaption.trim()">{{ 'actions.save' | transloco }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="saveEdit(s.id)">{{ 'actions.save' | transloco }}</button>
               <button type="button" class="btn btn-g btn-sm" (click)="editingId.set(null)">{{ 'actions.cancel' | transloco }}</button>
             </div>
           } @else {
@@ -43,12 +47,16 @@ import { ToastService } from '../../../core/services/toast.service';
       }
       <div class="shot-card shot-card-new">
         <label class="field-label" for="newShotFile">{{ t('seo.screenshots.fields.file') }}</label>
-        <input #fileInput id="newShotFile" type="file" accept="image/png,image/jpeg,image/webp" (change)="onFileSelected(fileInput)">
+        <input #fileInput id="newShotFile" type="file" accept="image/png,image/jpeg,image/webp" (change)="onFileSelected(fileInput)" [class.fi-err]="newSubmitted && !newFile">
+        @if (newSubmitted && !newFile) { <span class="ferr">{{ t('fieldErrors.imageFile') }}</span> }
         <label class="field-label" for="newShotTag">{{ t('seo.screenshots.fields.feature') }}</label>
-        <input id="newShotTag" class="field-input" [(ngModel)]="newTag" [placeholder]="t('seo.screenshots.placeholders.feature')">
+        <input id="newShotTag" class="field-input" [(ngModel)]="newTag" [placeholder]="t('seo.screenshots.placeholders.feature')" [class.fi-err]="newSubmitted && !newTag.trim()">
+        @if (newSubmitted && !newTag.trim()) { <span class="ferr">{{ t('fieldErrors.featureTag') }}</span> }
         <label class="field-label" for="newShotCaption">{{ t('seo.screenshots.fields.captionUnderImage') }}</label>
-        <input id="newShotCaption" class="field-input" [(ngModel)]="newCaption" [placeholder]="t('seo.screenshots.placeholders.caption')">
-        <button type="button" class="btn btn-g btn-sm" (click)="upload(fileInput)" [disabled]="!newFile || !newTag.trim() || !newCaption.trim() || uploading()">
+        <input id="newShotCaption" class="field-input" [(ngModel)]="newCaption" [placeholder]="t('seo.screenshots.placeholders.caption')" [class.fi-err]="newSubmitted && !newCaption.trim()">
+        @if (newSubmitted && !newCaption.trim()) { <span class="ferr">{{ t('fieldErrors.caption') }}</span> }
+        @if (newSubmitted) { <wt-form-error-summary [count]="newErrorCount()" /> }
+        <button type="button" class="btn btn-g btn-sm" (click)="upload(fileInput)" [disabled]="uploading()">
           @if (uploading()) { {{ t('seo.screenshots.actions.uploading') }} } @else { {{ t('seo.screenshots.actions.add') }} }
         </button>
       </div>
@@ -87,6 +95,8 @@ export class SeoScreenshotsPanelComponent implements OnInit {
   readonly uploading = signal(false);
 
   editTag = '';
+  editSubmitted = false;
+  newSubmitted = false;
   editCaption = '';
   newTag = '';
   newCaption = '';
@@ -104,8 +114,16 @@ export class SeoScreenshotsPanelComponent implements OnInit {
     this.newFile = input.files?.[0] ?? null;
   }
 
+  newErrorCount(): number {
+    return (this.newFile ? 0 : 1) + (this.newTag.trim() ? 0 : 1) + (this.newCaption.trim() ? 0 : 1);
+  }
+
   upload(input: HTMLInputElement): void {
-    if (!this.newFile) return;
+    if (!this.newFile || this.newErrorCount() > 0) {
+      this.newSubmitted = true;
+      return;
+    }
+    this.newSubmitted = false;
     this.uploading.set(true);
     this.seoService.uploadScreenshot(this.newFile, this.newTag.trim(), this.newCaption.trim()).subscribe({
       next: () => {
@@ -125,12 +143,17 @@ export class SeoScreenshotsPanelComponent implements OnInit {
   }
 
   startEdit(s: SeoScreenshot): void {
+    this.editSubmitted = false;
     this.editTag = s.feature_tag;
     this.editCaption = s.caption;
     this.editingId.set(s.id);
   }
 
   saveEdit(id: number): void {
+    if (!this.editTag.trim() || !this.editCaption.trim()) {
+      this.editSubmitted = true;
+      return;
+    }
     this.seoService.updateScreenshot(id, { feature_tag: this.editTag.trim(), caption: this.editCaption.trim() }).subscribe({
       next: () => { this.toast.success(this.transloco.translate('crm.seo.screenshots.toasts.saved')); this.editingId.set(null); this.load(); },
       error: () => this.toast.error(this.transloco.translate('crm.seo.screenshots.toasts.saveFailed')),

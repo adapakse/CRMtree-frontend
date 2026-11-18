@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
-import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { ToastService } from '../../../core/services/toast.service';
 import { ProjectConfig, ProjectRole, ProjectsApiService } from '../../../core/services/projects-api.service';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
@@ -13,7 +13,7 @@ const transitionKey = (fromStatusId: string, toStatusId: string): string => `${f
 @Component({
   selector: 'wt-project-transitions-editor',
   standalone: true,
-  imports: [TranslocoDirective],
+  imports: [TranslocoDirective, TranslocoPipe],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -52,7 +52,8 @@ const transitionKey = (fromStatusId: string, toStatusId: string): string => `${f
       </div>
 
       <div class="actions">
-        <button class="btn btn-p btn-sm" [disabled]="!isDirty() || isSaving()" (click)="save()">
+        <button class="btn btn-p btn-sm" [disabled]="!isDirty() || isSaving()" (click)="save()"
+                [title]="isDirty() ? '' : ('form.noChanges' | transloco)">
           {{ t(isSaving() ? 'settings.transitions.saving' : 'settings.transitions.saveButton') }}
         </button>
       </div>

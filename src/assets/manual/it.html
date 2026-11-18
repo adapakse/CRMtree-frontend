@@ -232,6 +232,10 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a class="sub" href="#p1-calls-followup">Follow-up e attività CRM</a>
 <a class="sub" href="#p1-calls-example">Esempi</a>
 <a class="sub" href="#p1-calls-faq">Domande e risposte</a>
+<a href="#p1-campaigns">Campagne e-mail</a>
+<a class="sub" href="#p1-campaigns-new">Nuova campagna</a>
+<a class="sub" href="#p1-campaigns-results">Risultati delle campagne</a>
+<a class="sub" href="#p1-campaigns-consents">Consensi per persona sulla scheda</a>
 <div class="part">Parte 2 · Amministratore</div>
 <a href="#p2-start">Come funziona</a>
 <a class="sub" href="#p2-access">Dove trovare le impostazioni</a>
@@ -265,6 +269,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a href="#p2-projects">Impostazioni dei progetti</a>
 <a class="sub" href="#p2-ksef">KSeF – fatture di costo</a>
 <a href="#p2-pbx">Telefonia e analizzatore chiamate</a>
+<a href="#p2-sendgrid">Campagne e-mail: account SendGrid</a>
 <a href="#p2-import">Importazione ed esportazione CSV</a>
 <a href="#p2-data">Gestione dati</a>
 <a href="#p2-logs">Log di audit</a>
@@ -736,7 +741,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>«Timeline»</b> e <b>«Calendario»</b>: le stesse attività su una linea temporale e in un calendario.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_w10_onboarding.jpg?v=20261113" width="1440" height="900" alt="Bacheca di onboarding dei partner"><figcaption>Fala Media Demo alla «Firma del contratto» (Passo 1/4), ancora nessuna attività, «Avvio» disponibile.</figcaption></figure>
-<p>Il pulsante <b>«Avvio»</b> diventa disponibile quando tutte le attività del partner sono concluse (o se non ce ne sono). Fino ad allora mostra un lucchetto e il numero di attività completate. Dopo la conferma il partner diventa «Attivo» e passa nel registro dei partner; il link «Profilo del partner» ne apre la scheda.</p>
+<p>Il pulsante <b>«Avvio»</b> diventa disponibile quando tutte le attività del partner sono concluse (o se non ce ne sono). Fino ad allora mostra un lucchetto e, se lo clicchi, indica quante attività mancano. Dopo la conferma il partner diventa «Attivo» e passa nel registro dei partner; il link «Profilo del partner» ne apre la scheda.</p>
+<p><b>Ritiro nella pipeline.</b> Un responsabile vendite o un amministratore può riportare indietro un partner dall'onboarding quando è partito troppo presto o l'azienda si è tirata indietro: pulsante <b>«🔄 Ritira»</b> sulla bacheca (oppure <b>«Ritira dall'onboarding nella pipeline»</b> sulla scheda del partner), scelta della <b>«Fase della pipeline»</b> e <b>«Conferma il ritiro»</b>. Il partner e le sue attività di onboarding vengono eliminati; il lead torna alla fase scelta e può essere di nuovo passato all'onboarding.</p>
 
 <h4 id="p1-onboarding-card">Onboarding nella scheda del partner</h4>
 <p>Un partner in onboarding ha in cima alla scheda un pannello con i quattro passaggi, ciascuno con il numero di attività completate. Fai clic su un passaggio per vederne le attività. Spunta un'attività con il cerchio accanto; CRMtree registra chi l'ha completata e quando. Le attività in ritardo ricevono un'etichetta rossa «Scaduta».</p>
@@ -1622,6 +1628,28 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p><b>L'analizzatore è nell'app mobile?</b> No. Le attività «Follow-up telefoniczny» compaiono invece sul telefono insieme alle altre tue attività.</p>
 </section>
 
+<section class="ch" id="p1-campaigns">
+<h3>Campagne e-mail</h3>
+<p>Il modulo invia e-mail ai referenti di partner e lead che hanno dato il consenso richiesto. L’invio passa dall’account SendGrid della tua azienda e i modelli si progettano in SendGrid (Dynamic Templates). Vedi CRM → <b>«Campagne e-mail»</b> nel menu quando un amministratore ti ha dato l’accesso <b>«Campagne e-mail»</b>.</p>
+<p>La schermata ha le schede <b>«Campagne»</b>, <b>«Modelli»</b> e <b>«Risultati»</b> (l’amministratore vede anche <b>«Impostazioni SendGrid»</b>). L’elenco delle campagne ha filtri, ordinamento, lo stato come pulsanti (<b>«Bozze»</b>, <b>«Inviate»</b>…) e le azioni <b>«Duplica»</b>, <b>«Archivia»</b>, <b>«Ripristina»</b>. Se SendGrid non è configurato, sopra l’elenco appare <b>«SendGrid non è configurato»</b>.</p>
+
+<h4 id="p1-campaigns-new">Nuova campagna</h4>
+<ol class="steps">
+<li>Clicca <b>«Nuova campagna»</b> e inserisci un nome.</li>
+<li><b>«Quale e-mail inviamo?»</b> — scegli un modello SendGrid. <b>«Guarda com’è l’e-mail»</b> mostra l’anteprima.</li>
+<li><b>«Chi deve riceverla?»</b> — scegli i gruppi (es. <b>«Tutti con consenso»</b>) o carica un <b>«Elenco da file CSV»</b>. <b>«Restringi l’elenco»</b> aggiunge filtri: stato del partner, fase del lead, commerciale, settore, tag, ultimo contatto.</li>
+<li>In <b>«Impostazioni di invio»</b> imposta l’intervallo tra le e-mail alla stessa azienda e il committente.</li>
+<li>A destra vedi in tempo reale quante persone ricevono l’e-mail e perché alcune sono escluse (nessun consenso, disiscrizione, indirizzo respinto…).</li>
+<li><b>«Salva bozza»</b>, poi <b>«Invia un test a me»</b>. Solo dopo il test funziona <b>«Invia tramite SendGrid»</b>.</li>
+</ol>
+
+<h4 id="p1-campaigns-results">Risultati delle campagne</h4>
+<p>La scheda <b>«Risultati»</b> mostra consegne, aperture, clic, disiscrizioni e problemi di indirizzo: i numeri arrivano da SendGrid. La tabella <b>«Aziende che hanno cliccato»</b> porta alla scheda del lead o del partner. Sulla scheda l’invio appare come azione <b>«Campagna e-mail»</b>. Scarica il report con <b>«Scarica il report (.xlsx)»</b>.</p>
+
+<h4 id="p1-campaigns-consents">Consensi per persona sulla scheda</h4>
+<p>Nella sezione <b>«Consensi marketing»</b> della scheda del lead e del partner ogni referente con indirizzo e-mail ha il proprio consenso: <b>«Acconsente»</b>, <b>«Non acconsente»</b> o <b>«Non noto»</b>. Con «Acconsente» bisogna scrivere come è stato ottenuto. Le campagne usano solo questi consensi. La disiscrizione o la segnalazione di spam in SendGrid revoca il consenso automaticamente. Sotto resta <b>«Consenso aziendale (vecchio)»</b>: le campagne non lo usano.</p>
+</section>
+
 <h2 class="part-title" id="p2"><span class="num">2</span> Amministratore</h2>
 <p class="part-lead">Utenti, ruoli e visibilità dei dati, impostazioni dell'app, importazione dei dati e log, con esempi di configurazione e una checklist di implementazione.</p>
 
@@ -1986,6 +2014,19 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="example"><span class="lbl">ESEMPIO · NUOVO COMMERCIALE</span>
 <p>Un nuovo commerciale entra in azienda e l'amministratore crea un account con il ruolo «Commerciale».</p>
 <p class="res">La nuova persona non ha la voce di menu «Analisi delle chiamate» finché l'amministratore non spunta «Analizzatore chiamate» nella sua scheda. Nei dati demo hanno accesso Anna, Piotr ed Ewa, Tomasz no.</p></div>
+</section>
+
+<section class="ch" id="p2-sendgrid">
+<h3>Campagne e-mail: account SendGrid</h3>
+<p>Ogni organizzazione invia dal proprio account SendGrid. CRMtree attiva il modulo per la tua organizzazione, l’amministratore dà l’accesso alle persone: scheda utente → <b>«Accesso alle funzioni»</b> → <b>«Campagne e-mail»</b>. L’amministratore ha sempre accesso.</p>
+<ol class="steps">
+<li>Apri <b>«Campagne e-mail»</b> → <b>«Impostazioni SendGrid»</b>.</li>
+<li>Incolla la <b>«Chiave API»</b> di SendGrid (Settings → API Keys). Dopo il salvataggio vedi solo «salvata, termina con ••••1234» e <b>«Cambia»</b> e <b>«Rimuovi»</b>.</li>
+<li>Compila <b>«Indirizzo mittente»</b> (verificato in SendGrid), <b>«Nome mittente»</b>, facoltativamente <b>«Reply-to»</b>, e l’<b>«ID del gruppo di disiscrizione (ASM)»</b>.</li>
+<li>In <b>«Consenso richiesto per le campagne»</b> scegli un tipo di consenso o lascia «Automatico».</li>
+<li>Copia l’<b>«Indirizzo del webhook»</b>, aggiungilo in SendGrid → Settings → Mail Settings → Event Webhook, seleziona gli eventi e attiva Signed Event Webhook. Incolla la <b>«Chiave pubblica del webhook»</b>.</li>
+<li>Clicca <b>«Salva»</b> e poi <b>«Verifica connessione»</b>: vedrai il numero di modelli in SendGrid.</li>
+</ol>
 </section>
 
 <section class="ch" id="p2-import">

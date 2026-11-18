@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} компаний…",
     "errors": {
       "aiNoCredit": "На счету ИИ нет средств",
+      "nip": "NIP должен содержать 10 цифр, например 1234567890",
       "searchFailedWithReason": "Ошибка поиска: {reason}",
+      "seedName": "Введите название эталонной компании, например ООО ABC",
+      "selectCompanies": "Отметьте хотя бы одну компанию в списке",
       "taxIdConflict": "Конфликт ИНН — этот номер уже использует другая запись."
     },
     "exportCsv": "Экспорт CSV",

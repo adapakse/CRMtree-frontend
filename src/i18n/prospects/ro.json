@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} firme…",
     "errors": {
       "aiNoCredit": "Nu mai există credit în contul AI",
+      "nip": "NIP-ul trebuie să aibă 10 cifre, de ex. 1234567890",
       "searchFailedWithReason": "Căutarea a eșuat: {reason}",
+      "seedName": "Introduceți numele firmei model, de ex. ABC SRL",
+      "selectCompanies": "Bifați cel puțin o firmă din listă",
       "taxIdConflict": "Conflict de CUI — o altă înregistrare folosește deja acest număr."
     },
     "exportCsv": "Export CSV",

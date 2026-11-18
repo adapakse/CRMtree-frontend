@@ -129,6 +129,7 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
         @case ('prospects') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg> }
         @case ('prospectsDashboard') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><circle cx="18" cy="8" r="2"/><circle cx="12" cy="2" r="2"/><circle cx="6" cy="12" r="2"/></svg> }
         @case ('callAnalysis') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> }
+        @case ('emailCampaigns') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg> }
         @case ('onboarding') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> }
         @case ('seoBot') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> }
         @case ('partnerRegistry') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> }
@@ -472,6 +473,7 @@ export class ShellComponent implements OnInit {
       { id: 'prospectsDashboard', route: '/crm/prospects-dashboard', labelKey: 'nav.prospectsDashboard',
         isVisible: () => this.auth.hasFeature('prospects') && (this.isSalesManager() || this.auth.isAdmin()) },
       { id: 'callAnalysis', route: '/admin/call-analysis', labelKey: 'nav.callAnalysis', isVisible: () => this.auth.hasFeature('call_analysis') },
+      { id: 'emailCampaigns', route: '/crm/email-campaigns', labelKey: 'nav.emailCampaigns', isVisible: () => this.auth.hasFeature('email_campaigns') },
     ] },
     { id: 'partners', labelKey: 'sections.partners',
       isVisible: () => this.hasCrmAccess() && (this.auth.hasFeature('partner_registry') || this.auth.hasFeature('onboarding') || this.auth.hasFeature('performance')),

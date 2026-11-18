@@ -50,6 +50,14 @@
     "uploadFailed": "Impossible d’envoyer le fichier : {name}.",
     "uploading": "Envoi en cours…"
   },
+  "form": {
+    "errors": {
+      "closeComment": "Saisissez un commentaire sur ce qui a été fait, par ex. « Offre envoyée »",
+      "title": "Saisissez un titre"
+    },
+    "fixErrors": "Corrigez les champs signalés en rouge ({count})",
+    "noChanges": "Aucune modification à enregistrer"
+  },
   "httpErrors": {
     "badRequest": "Certaines données ne sont pas valides. Vérifiez les champs et réessayez.",
     "badRequestDetails": "Données non valides : {details}",

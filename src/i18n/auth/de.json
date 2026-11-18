@@ -16,6 +16,10 @@
   "login": {
     "email": "E-Mail",
     "emailPlaceholder": "max@firma.de",
+    "errors": {
+      "email": "Geben Sie Ihre E-Mail-Adresse ein, z. B. max.muster@firma.de",
+      "password": "Geben Sie Ihr Passwort ein"
+    },
     "failed": "Anmeldung fehlgeschlagen",
     "hidePassword": "Verbergen",
     "or": "oder",

@@ -7,11 +7,12 @@ import { CrmApiService, PartnerGroup } from '../../../core/services/crm-api.serv
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 
 @Component({
   selector: 'wt-crm-groups',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -101,12 +102,15 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
   <div class="side-panel" *ngIf="showCreate || editingGroup" (click)="closePanel()">
     <div class="side-panel-inner" (click)="$event.stopPropagation()">
       <h3>{{editingGroup ? t('partnerGroups.form.editTitle') : t('partnerGroups.newGroup')}}</h3>
-      <label>{{ t('partnerGroups.form.name') }} *<input class="fi" [(ngModel)]="form.name" [placeholder]="t('partnerGroups.form.namePlaceholder')"></label>
+      <label>{{ t('partnerGroups.form.name') }} <span class="req">*</span><input class="fi" [(ngModel)]="form.name" [placeholder]="t('partnerGroups.form.namePlaceholder')" [class.fi-err]="submitted && !form.name.trim()">
+        @if (submitted && !form.name.trim()) { <span class="ferr">{{ t('fieldErrors.groupName') }}</span> }
+      </label>
       <label>{{ t('partnerGroups.form.industry') }}<input class="fi" [(ngModel)]="form.industry"></label>
       <label>{{ t('partnerGroups.form.description') }}<textarea class="fta" [(ngModel)]="form.description" rows="3"></textarea></label>
       <div class="panel-actions">
         <button class="btn btn-g" (click)="closePanel()">{{ 'actions.cancel' | transloco }}</button>
-        <button class="btn btn-p" (click)="saveGroup()" [disabled]="!form.name || saving">
+        @if (submitted) { <wt-form-error-summary [count]="form.name.trim() ? 0 : 1" /> }
+        <button class="btn btn-p" (click)="saveGroup()" [disabled]="saving">
           {{saving ? '…' : (editingGroup ? ('actions.save' | transloco) : t('partnerGroups.form.create'))}}
         </button>
         <button class="btn btn-d" *ngIf="editingGroup" (click)="deleteGroup()" [disabled]="saving">{{ t('partnerGroups.form.delete') }}</button>
@@ -197,6 +201,7 @@ export class CrmGroupsComponent implements OnInit {
   highlightedId: number | null = null;
   saving = false;
   form: { name: string; industry: string; description: string } = { name: '', industry: '', description: '' };
+  submitted = false;
 
   get isManager() {
     const u = this.auth.user();
@@ -259,10 +264,13 @@ export class CrmGroupsComponent implements OnInit {
     this.form = { name: g.name, industry: g.industry || '', description: g.description || '' };
   }
 
-  closePanel() { this.showCreate = false; this.editingGroup = null; this.form = { name: '', industry: '', description: '' }; }
+  closePanel() { this.showCreate = false; this.editingGroup = null; this.submitted = false; this.form = { name: '', industry: '', description: '' }; }
 
   saveGroup() {
-    if (!this.form.name) return;
+    if (!this.form.name.trim()) {
+      this.submitted = true;
+      return;
+    }
     this.saving = true;
     const data = { name: this.form.name, industry: this.form.industry || null, description: this.form.description || null };
     const obs = this.editingGroup

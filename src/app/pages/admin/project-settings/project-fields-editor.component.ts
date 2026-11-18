@@ -51,15 +51,19 @@ function parseOptions(text: string): string[] {
       }
 
       <div class="row add">
-        <input class="fi name" [(ngModel)]="newName" maxlength="120" [placeholder]="t('settings.fields.newNamePlaceholder')">
+        <input class="fi name" [(ngModel)]="newName" maxlength="120" [placeholder]="t('settings.fields.newNamePlaceholder')"
+               [class.fi-err]="isAddSubmitted && !newName.trim()">
         <select class="fsel type-select" [(ngModel)]="newType">
           @for (option of typeOptions; track option.value) { <option [ngValue]="option.value">{{ t(option.labelKey) }}</option> }
         </select>
         @if (newType === 'list') {
-          <input class="fi options" [(ngModel)]="newOptions" [placeholder]="t('settings.fields.optionsPlaceholder')">
+          <input class="fi options" [(ngModel)]="newOptions" [placeholder]="t('settings.fields.optionsPlaceholder')"
+                 [class.fi-err]="isAddSubmitted && isOptionsMissing()">
         } @else { <span class="options"></span> }
-        <button class="btn btn-p btn-sm" [disabled]="!canAdd()" (click)="add()">{{ t('settings.fields.addButton') }}</button>
+        <button class="btn btn-p btn-sm" (click)="add()">{{ t('settings.fields.addButton') }}</button>
       </div>
+      @if (isAddSubmitted && !newName.trim()) { <span class="ferr" role="alert">{{ t('settings.fields.errors.name') }}</span> }
+      @if (isAddSubmitted && isOptionsMissing()) { <span class="ferr" role="alert">{{ t('settings.fields.optionsRequired') }}</span> }
     </ng-container>
   `,
   styles: [`
@@ -89,10 +93,14 @@ export class ProjectFieldsEditorComponent {
   newName = '';
   newType: ProjectFieldType = 'text';
   newOptions = '';
+  isAddSubmitted = false;
+
+  isOptionsMissing(): boolean {
+    return this.newType === 'list' && parseOptions(this.newOptions).length === 0;
+  }
 
   canAdd(): boolean {
-    if (!this.newName.trim()) return false;
-    return this.newType !== 'list' || parseOptions(this.newOptions).length > 0;
+    return !!this.newName.trim() && !this.isOptionsMissing();
   }
 
   rename(definition: ProjectFieldDefinition, event: Event): void {
@@ -121,6 +129,8 @@ export class ProjectFieldsEditorComponent {
   }
 
   add(): void {
+    this.isAddSubmitted = !this.canAdd();
+    if (this.isAddSubmitted) return;
     const payload = {
       name: this.newName.trim(),
       field_type: this.newType,

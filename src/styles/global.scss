@@ -261,8 +261,10 @@ router-outlet + * {
   font-size: 12px;
   font-weight: 600;
   color: var(--gray-600);
-  .req { color: var(--orange-text); }
 }
+
+/* Required-field asterisk: red everywhere (Adam, 2026-11-18). */
+.req, .required-star { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); font-weight: 600; }
 .fg { display: flex; flex-direction: column; gap: 4px; }
 .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .fg.full { grid-column: 1 / -1; }
@@ -1184,6 +1186,18 @@ input[type="file"] {
 :is(input, textarea, select).fi-err:not([data-n1]):not([data-n2]) {
   border-color: #DC2626 !important;
   &:focus { border-color: #DC2626 !important; box-shadow: var(--shadow-field), 0 0 0 3px rgba(220,38,38,.15) !important; }
+}
+/* Composite fields (recipient chips, rich-text editor) get the same red frame. */
+.participant-chips.fi-err, quill-editor.fi-err .ql-toolbar, quill-editor.fi-err .ql-container { border-color: #DC2626 !important; }
+
+/* Summary next to a submit button after a click with errors: "Fix the fields marked in red (N)". */
+.pf-err {
+  margin-right: auto;
+  align-self: center;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: oklch(from #dc2626 max(l, var(--text-min-l)) c h);
 }
 .ferr, .field-err {
   display: block;

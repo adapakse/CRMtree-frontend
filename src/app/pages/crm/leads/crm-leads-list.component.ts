@@ -442,7 +442,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <div class="fgrid2">
         <!-- WWW field + hot checkbox -->
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">{{ t('leadsList.fields.website') }} @if (newFormRequiresFull) { <span style="color: var(--orange-text)">*</span> } @else { <span style="font-size:10px;color:var(--gray-400)">{{ t('leadsList.newLead.optional') }}</span> }</label>
+          <label class="fl">{{ t('leadsList.fields.website') }} @if (newFormRequiresFull) { <span class="req">*</span> } @else { <span style="font-size:10px;color:var(--gray-400)">{{ t('leadsList.newLead.optional') }}</span> }</label>
           <div class="www-row">
             <div style="position:relative;flex:1;min-width:0">
               <input class="fi" [(ngModel)]="newFormWebsite"
@@ -473,19 +473,19 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
         </div>
 
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">{{ t('leadsList.newLead.companyName') }} <span style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.newLead.companyName') }} <span class="req">*</span></label>
           <input class="fi" [(ngModel)]="newForm.company" [placeholder]="t('leadsList.newLead.companyPlaceholder')"
                  [class.fi-err]="submitted&&!newForm.company">
           @if (submitted&&!newForm.company) { <span class="ferr">{{ t('fieldErrors.company') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.newLead.contactName') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.newLead.contactName') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <input class="fi" [(ngModel)]="newForm.contact_name" [placeholder]="t('leadsList.newLead.namePlaceholder')"
                  [class.fi-err]="newMissing('contactName')">
           @if (newMissing('contactName')) { <span class="ferr">{{ t('fieldErrors.contactName') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.fields.companyRole') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.fields.companyRole') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <select class="fi" [(ngModel)]="newForm.contact_title"
                   [class.fi-err]="newMissing('contactTitle')">
             <option value="">{{ t('leadsList.newLead.select') }}</option>
@@ -494,12 +494,12 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           @if (newMissing('contactTitle')) { <span class="ferr">{{ t('fieldErrors.contactTitle') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.email') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.fields.email') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <input class="fi" type="email" [(ngModel)]="newForm.email" [placeholder]="t('leadsList.newLead.emailPlaceholder')" [class.fi-err]="newMissing('email')">
           @if (newMissing('email')) { <span class="ferr">{{ t('fieldErrors.email') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.phone') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.fields.phone') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <wt-phone-input [(ngModel)]="newForm.phone" [invalid]="newMissing('phone')" />
           @if (newMissing('phone')) { <span class="ferr">{{ t('fieldErrors.phone') }}</span> }
         </div>
@@ -531,7 +531,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           }
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.newLead.taxId') }} <span style="color: var(--orange-text)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.newLead.taxId') }} <span class="req">*</span></label>
           <input class="fi" [(ngModel)]="newForm.nip"
                  placeholder="PL1234567890"
                  maxlength="14"
@@ -540,13 +540,13 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           @if (nipError) { <span class="ferr">{{ nipError }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.newLead.value') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.newLead.value') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <input class="fi" type="number" [(ngModel)]="newForm.value_pln" placeholder="0" min="0" [class.fi-err]="newMissing('value') || !!amountError(newForm.value_pln)">
           @if (amountError(newForm.value_pln); as amountKey) { <span class="ferr">{{ t('fieldErrors.' + amountKey) }}</span> }
           @if (newMissing('value')) { <span class="ferr">{{ t('fieldErrors.value') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.source') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.fields.source') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <select class="fsel" [(ngModel)]="newForm.source" [class.fi-err]="newMissing('source')">
             <option value="">{{ t('leadsList.newLead.select') }}</option>
             @for (s of sourcesWithoutGroup(); track s.value) {
@@ -563,7 +563,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           @if (newMissing('source')) { <span class="ferr">{{ t('fieldErrors.source') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.firstContact') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.fields.firstContact') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <input class="fi" type="date" [(ngModel)]="newForm.first_contact_date" [class.fi-err]="newMissing('firstContact')">
           @if (newMissing('firstContact')) { <span class="ferr">{{ t('fieldErrors.firstContact') }}</span> }
         </div>
@@ -576,7 +576,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           </select>
         </div>
         <div class="fg" *ngIf="isManager">
-          <label class="fl">{{ t('leadsList.fields.salesRep') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.fields.salesRep') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <select class="fsel" [(ngModel)]="newForm.assigned_to" [class.fi-err]="newMissing('salesperson')">
             <option value="">{{ t('leadsList.newLead.unassigned') }}</option>
             <option *ngFor="let u of crmUsers" [value]="u.id"><span class="opt-ini">{{ initials(u.display_name) }}</span>{{ u.display_name }}</option>
@@ -811,7 +811,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     <div *ngIf="meetingEditMode" class="modal-body">
       <div class="fgrid2">
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">{{ t('leadsList.meeting.meetingTitle') }} <span style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.meeting.meetingTitle') }} <span class="req">*</span></label>
           <input class="fi" [(ngModel)]="meetingForm.title" [placeholder]="t('leadsList.meeting.titlePlaceholder')">
         </div>
         <div class="fg">

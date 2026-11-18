@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { Observable, map } from 'rxjs';
@@ -17,6 +17,8 @@ import { buildTaskRows } from './project-task-tree.util';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
+import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
+import { scrollToFirstError } from '../../shared/forms/form-errors';
 
 const COST_STATUSES: ProjectCostStatus[] = ['incurred', 'planned'];
 const DOCUMENT_SEARCH_LIMIT = 10;
@@ -38,7 +40,7 @@ interface CostForm {
 @Component({
   selector: 'wt-project-cost-form',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective, TranslocoPipe, TypeaheadComponent, ProjectDocumentLinkComponent],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe, TypeaheadComponent, ProjectDocumentLinkComponent, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -52,7 +54,8 @@ interface CostForm {
           <div class="fgrid">
             <div class="fg">
               <label class="fl">{{ t('finance.costForm.date') }} <span class="req">*</span></label>
-              <input class="fi" type="date" [(ngModel)]="form.date">
+              <input class="fi" type="date" [(ngModel)]="form.date" [class.fi-err]="missing('date')">
+              @if (missing('date')) { <span class="ferr">{{ t('finance.errors.date') }}</span> }
             </div>
             <div class="fg">
               <label class="fl">{{ t('finance.costForm.status') }}</label>
@@ -64,22 +67,24 @@ interface CostForm {
             </div>
             <div class="fg">
               <label class="fl">{{ t('finance.costForm.category') }} <span class="req">*</span></label>
-              <select class="fsel" [(ngModel)]="form.category_id">
+              <select class="fsel" [(ngModel)]="form.category_id" [class.fi-err]="missing('category')">
                 <option [ngValue]="null">{{ t('finance.costForm.selectCategory') }}</option>
                 @for (category of selectableCategories(); track category.id) {
                   <option [ngValue]="category.id">{{ category.name }}</option>
                 }
               </select>
+              @if (missing('category')) { <span class="ferr">{{ t('finance.errors.category') }}</span> }
             </div>
             <div class="fg">
               <label class="fl">{{ t('finance.costForm.amount') }} <span class="req">*</span></label>
               <div class="money">
-                <input class="fi" type="number" min="0.01" step="0.01" [(ngModel)]="form.amount">
+                <input class="fi" type="number" min="0.01" step="0.01" [(ngModel)]="form.amount" [class.fi-err]="missing('amount')">
                 <select class="fsel" [ngModel]="currency()" (ngModelChange)="currency.set($event)"
                         [attr.aria-label]="t('finance.costForm.currency')">
                   @for (code of currencies(); track code) { <option [ngValue]="code">{{ code }}</option> }
                 </select>
               </div>
+              @if (missing('amount')) { <span class="ferr">{{ t('finance.errors.amount') }}</span> }
             </div>
           </div>
           @if (isForeignCurrency()) {
@@ -131,8 +136,9 @@ interface CostForm {
           </div>
         </div>
         <div class="mof">
+          @if (submitted) { <wt-form-error-summary [count]="errorCount()" /> }
           <button class="btn btn-g" (click)="closed.emit()">{{ 'actions.cancel' | transloco }}</button>
-          <button class="btn btn-p" [disabled]="!isValid() || isSaving()" (click)="save()">
+          <button class="btn btn-p" [disabled]="isSaving()" (click)="save()">
             {{ isSaving() ? t('finance.saving') : ('actions.save' | transloco) }}
           </button>
         </div>
@@ -152,6 +158,7 @@ export class ProjectCostFormComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
   private readonly format = inject(ProjectFinanceFormatService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly projectId = input.required<string>();
   readonly projectKey = input.required<string>();
@@ -252,11 +259,27 @@ export class ProjectCostFormComponent implements OnInit {
     }
   }
 
-  isValid(): boolean {
-    return Boolean(this.form.date) && this.form.category_id !== null && Number(this.form.amount) > 0;
+  submitted = false;
+  private readonly REQUIRED_FIELDS = ['date', 'category', 'amount'];
+
+  missing(field: string): boolean { return this.submitted && this.invalid(field); }
+  errorCount(): number { return this.REQUIRED_FIELDS.filter(field => this.invalid(field)).length; }
+
+  private invalid(field: string): boolean {
+    switch (field) {
+      case 'date':     return !this.form.date;
+      case 'category': return this.form.category_id === null;
+      case 'amount':   return !(Number(this.form.amount) > 0);
+    }
+    return false;
   }
 
   save(): void {
+    if (this.errorCount() > 0) {
+      this.submitted = true;
+      scrollToFirstError(this.host.nativeElement);
+      return;
+    }
     const item = this.item();
     const payload = this.buildPayload(item);
     const request = item

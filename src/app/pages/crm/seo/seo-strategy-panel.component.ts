@@ -3,13 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmSeoService, SeoPillar, SeoCompetitor, SeoBacklink } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 
 @Component({
   selector: 'wt-seo-strategy-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideTranslocoScope('crm')],
-  imports: [FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   template: `
     <ng-container *transloco="let t; prefix: 'crm'">
     <div class="strategy-sections">
@@ -18,13 +19,15 @@ import { ToastService } from '../../../core/services/toast.service';
         <div class="pillar-card">
           @if (editingId() === p.id) {
             <label class="field-label">{{ t('seo.strategy.pillars.name') }}</label>
-            <input class="field-input" [(ngModel)]="editName">
+            <input class="field-input" [(ngModel)]="editName" [class.fi-err]="editSubmitted && !editName.trim()">
+            @if (editSubmitted && !editName.trim()) { <span class="ferr">{{ t('fieldErrors.pillarName') }}</span> }
             <label class="field-label">{{ t('seo.strategy.pillars.description') }}</label>
             <textarea class="field-input" rows="3" [(ngModel)]="editDescription"></textarea>
             <label class="field-label">{{ t('seo.strategy.pillars.keywordTheme') }}</label>
             <input class="field-input" [(ngModel)]="editTheme">
             <div class="pillar-edit-actions">
-              <button type="button" class="btn btn-g btn-sm" (click)="saveEdit(p.id)" [disabled]="!editName.trim() || savingEdit()">
+              @if (editSubmitted) { <wt-form-error-summary [count]="editName.trim() ? 0 : 1" /> }
+              <button type="button" class="btn btn-g btn-sm" (click)="saveEdit(p.id)" [disabled]="savingEdit()">
                 @if (savingEdit()) { {{ t('seo.strategy.pillars.saving') }} } @else { {{ 'actions.save' | transloco }} }
               </button>
               <button type="button" class="btn btn-g btn-sm" (click)="cancelEdit()">{{ 'actions.cancel' | transloco }}</button>
@@ -46,19 +49,21 @@ import { ToastService } from '../../../core/services/toast.service';
       <div class="pillar-card pillar-card-new">
         @if (addingPillar()) {
           <label class="field-label">{{ t('seo.strategy.pillars.name') }}</label>
-          <input class="field-input" [(ngModel)]="newPillarName" [placeholder]="t('seo.strategy.pillars.namePlaceholder')">
+          <input class="field-input" [(ngModel)]="newPillarName" [placeholder]="t('seo.strategy.pillars.namePlaceholder')" [class.fi-err]="newPillarSubmitted && !newPillarName.trim()">
+          @if (newPillarSubmitted && !newPillarName.trim()) { <span class="ferr">{{ t('fieldErrors.pillarName') }}</span> }
           <label class="field-label">{{ t('seo.strategy.pillars.description') }}</label>
           <textarea class="field-input" rows="3" [(ngModel)]="newPillarDescription" [placeholder]="t('seo.strategy.pillars.descriptionPlaceholder')"></textarea>
           <label class="field-label">{{ t('seo.strategy.pillars.keywordTheme') }}</label>
           <input class="field-input" [(ngModel)]="newPillarTheme" [placeholder]="t('seo.strategy.pillars.keywordThemePlaceholder')">
           <div class="pillar-edit-actions">
-            <button type="button" class="btn btn-g btn-sm" (click)="addPillar()" [disabled]="!newPillarName.trim() || savingNewPillar()">
+            @if (newPillarSubmitted) { <wt-form-error-summary [count]="newPillarName.trim() ? 0 : 1" /> }
+            <button type="button" class="btn btn-g btn-sm" (click)="addPillar()" [disabled]="savingNewPillar()">
               @if (savingNewPillar()) { {{ t('seo.strategy.pillars.adding') }} } @else { {{ t('seo.strategy.pillars.add') }} }
             </button>
             <button type="button" class="btn btn-g btn-sm" (click)="addingPillar.set(false)">{{ 'actions.cancel' | transloco }}</button>
           </div>
         } @else {
-          <button type="button" class="btn-add-pillar" (click)="addingPillar.set(true)">{{ t('seo.strategy.pillars.addOwn') }}</button>
+          <button type="button" class="btn-add-pillar" (click)="newPillarSubmitted = false; addingPillar.set(true)">{{ t('seo.strategy.pillars.addOwn') }}</button>
         }
       </div>
     </div>
@@ -81,10 +86,11 @@ import { ToastService } from '../../../core/services/toast.service';
         }
       </div>
       <div class="competitor-form">
-        <input class="competitor-input" [(ngModel)]="newUrl" [placeholder]="t('seo.strategy.competitors.urlPlaceholder')">
+        <input class="competitor-input" [(ngModel)]="newUrl" [placeholder]="t('seo.strategy.competitors.urlPlaceholder')" [class.fi-err]="competitorSubmitted && !newUrl.trim()">
         <input class="competitor-input" [(ngModel)]="newNotes" [placeholder]="t('seo.strategy.competitors.notesPlaceholder')">
-        <button type="button" class="btn btn-g btn-sm" (click)="add()" [disabled]="!newUrl.trim()">{{ t('seo.strategy.competitors.add') }}</button>
+        <button type="button" class="btn btn-g btn-sm" (click)="add()">{{ t('seo.strategy.competitors.add') }}</button>
       </div>
+      @if (competitorSubmitted && !newUrl.trim()) { <span class="ferr" role="alert">{{ t('fieldErrors.competitorUrl') }}</span> }
     </div>
 
     <div class="backlinks-box">
@@ -194,6 +200,9 @@ export class SeoStrategyPanelComponent implements OnInit {
   readonly optIn = signal(false);
   readonly findingCandidates = signal(false);
   newUrl = '';
+  competitorSubmitted = false;
+  editSubmitted = false;
+  newPillarSubmitted = false;
   newNotes = '';
 
   readonly editingId = signal<number | null>(null);
@@ -231,7 +240,11 @@ export class SeoStrategyPanelComponent implements OnInit {
 
   add(): void {
     const url = this.newUrl.trim();
-    if (!url) return;
+    if (!url) {
+      this.competitorSubmitted = true;
+      return;
+    }
+    this.competitorSubmitted = false;
     this.seoService.addCompetitor(url, this.newNotes.trim() || undefined).subscribe({
       next: () => {
         this.toast.success(this.transloco.translate('crm.seo.strategy.toasts.competitorAdded'));
@@ -290,6 +303,7 @@ export class SeoStrategyPanelComponent implements OnInit {
   }
 
   startEdit(p: SeoPillar): void {
+    this.editSubmitted = false;
     this.editingId.set(p.id);
     this.editName = p.name;
     this.editDescription = p.description;
@@ -302,7 +316,10 @@ export class SeoStrategyPanelComponent implements OnInit {
 
   saveEdit(id: number): void {
     const name = this.editName.trim();
-    if (!name) return;
+    if (!name) {
+      this.editSubmitted = true;
+      return;
+    }
     this.savingEdit.set(true);
     this.seoService.updatePillar(id, {
       name,
@@ -331,7 +348,10 @@ export class SeoStrategyPanelComponent implements OnInit {
 
   addPillar(): void {
     const name = this.newPillarName.trim();
-    if (!name) return;
+    if (!name) {
+      this.newPillarSubmitted = true;
+      return;
+    }
     this.savingNewPillar.set(true);
     this.seoService.addPillar(name, this.newPillarDescription.trim(), this.newPillarTheme.trim()).subscribe({
       next: () => {

@@ -27,6 +27,13 @@
       "subtitle": "Eliminación permanente de un documento, lead o partner junto con todos los datos y registros asociados.",
       "title": "Eliminación de registros"
     },
+    "errors": {
+      "confirmPhrase": "Escribe exactamente «{phrase}» para confirmar",
+      "selectDoc": "Busca un documento y haz clic en él en la lista",
+      "selectFile": "Elige el archivo JSON con los ajustes exportados",
+      "selectLead": "Busca un lead y haz clic en él en la lista",
+      "selectPartner": "Busca un socio y haz clic en él en la lista"
+    },
     "purge": {
       "confirm": "Confirmar",
       "docs": {
@@ -705,6 +712,9 @@
       "body": "¿Seguro que quieres eliminar el token PBX de {name}? El usuario no podrá usar el softphone.",
       "title": "Eliminar token PBX"
     },
+    "errors": {
+      "token": "Pega el Personal Access Token (PAT) de la centralita"
+    },
     "loadError": "Error al cargar los datos.",
     "loading": "Cargando…",
     "modal": {
@@ -758,6 +768,9 @@
       "detected": "Reconocido: {provider}",
       "detectedShort": "reconocido por la clave",
       "detecting": "Reconociendo el proveedor…",
+      "errors": {
+        "key": "Pega la clave API del proveedor (p. ej. sk-…) o elige una clave guardada"
+      },
       "intro": "Cada función tiene su propio proveedor, clave y modelo: el enriquecimiento puede ir en un proveedor y el análisis de llamadas en otro. Pega una clave y reconoceremos el proveedor por ti. Guardar verifica la configuración con el proveedor; la clave se cifra y no se vuelve a mostrar.",
       "loading": "Cargando la configuración de IA…",
       "model": "Modelo",
@@ -1193,6 +1206,9 @@
       "deleteConfirm": "¿Eliminar el campo «{name}»?",
       "deleteTooltip": "Eliminar el campo — solo es posible si ningún registro tiene valor",
       "empty": "No hay campos adicionales en este formulario.",
+      "errors": {
+        "name": "Escribe el nombre del campo, p. ej. Número de cliente"
+      },
       "hint": "Campos que defines tú para este formulario. El tipo de campo no se puede cambiar después: para cambiarlo, desactiva el campo y crea uno nuevo. Un campo desactivado desaparece del formulario, pero los valores ya introducidos se conservan.",
       "newNamePlaceholder": "Nombre del nuevo campo",
       "optionsPlaceholder": "Valores separados por comas",
@@ -1291,6 +1307,10 @@
       "displayNamePlaceholder": "p. ej. Atención al cliente",
       "documentCount": "{count, plural, one {# documento} other {# documentos}}",
       "empty": "No hay grupos. Añade el primero arriba o ejecuta la migración 0127.",
+      "errors": {
+        "displayName": "Escribe el nombre visible, p. ej. Equipo de ventas",
+        "technicalName": "Escribe el nombre técnico, p. ej. sales_team"
+      },
       "inactive": "Inactivo",
       "intro": "— gestiona los grupos a los que se pueden asignar usuarios. Los grupos controlan el acceso a los documentos. No se puede eliminar un grupo con usuarios o documentos asignados.",
       "memberCount": "{count, plural, one {# usuario} other {# usuarios}}",
@@ -1332,6 +1352,10 @@
         "definitionHint": "A partir de esta descripción el sistema evalúa si la empresa cumple la señal.",
         "definitionPlaceholder": "Describe cómo saber que la empresa cumple esta condición — palabras o frases concretas en la web, secciones, cargos.",
         "editTitle": "Editar señal",
+        "errors": {
+          "definition": "Describe cómo debe reconocer la IA esta señal",
+          "name": "Escribe el nombre de la señal, p. ej. La empresa tiene más de 50 empleados"
+        },
         "name": "Nombre de la señal",
         "namePlaceholder": "p. ej. Flota de transporte propia",
         "newTitle": "Nueva señal",
@@ -1456,6 +1480,9 @@
       "codeWrittenHint": "No es un paso del embudo, sino un estado que la aplicación establece por sí misma (archivar el lead, convertirlo en socio), por lo que no se puede eliminar. Sí se puede renombrar.",
       "confirmDelete": "¿Eliminar la etapa «{name}»?",
       "confirmDeleteWithLeads": "¿Eliminar la etapa «{name}»?\n\nLos {count} lead(s) que hay pasarán a «{target}».",
+      "errors": {
+        "name": "Escribe el nombre de la nueva etapa, p. ej. Negociación"
+      },
       "intro": "Nombres propios para las etapas del embudo: renombra las existentes, añade un paso o elimina el que no necesites. El código de la etapa no cambia, así que el nuevo nombre aparece en toda la aplicación mientras los informes y los datos de los leads quedan intactos. Un nombre vacío vuelve al integrado.",
       "kinds": {
         "archived": "archivo",
@@ -1633,6 +1660,9 @@
       "saved": "Grupo actualizado",
       "title": "Editar grupo"
     },
+    "errors": {
+      "internalName": "Escribe el nombre interno, p. ej. equipo-ventas"
+    },
     "fields": {
       "description": "Descripción",
       "displayName": "Nombre visible",
@@ -1724,11 +1754,18 @@
       "updated": "Usuario actualizado"
     },
     "empty": "No se han encontrado usuarios",
+    "errors": {
+      "chooseGroup": "Elige un grupo de la lista"
+    },
     "featureAccess": {
       "callAnalysis": "Analizador de llamadas",
       "callAnalysisDisabled": "Acceso al Analizador de llamadas desactivado",
       "callAnalysisEnabled": "Acceso al Analizador de llamadas activado",
       "callAnalysisHint": "Análisis con IA de las notas de llamadas, puntuación y seguimiento",
+      "emailCampaigns": "Campañas de correo",
+      "emailCampaignsDisabled": "Acceso a Campañas de correo desactivado",
+      "emailCampaignsEnabled": "Acceso a Campañas de correo activado",
+      "emailCampaignsHint": "Campañas de correo a partners y leads mediante SendGrid",
       "prospects": "Prospectos",
       "prospectsDisabled": "Acceso a Prospectos desactivado",
       "prospectsEnabled": "Acceso a Prospectos activado",

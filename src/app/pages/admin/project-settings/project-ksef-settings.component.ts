@@ -42,9 +42,12 @@ const MAX_SYNC_DAYS = 365;
         <div class="sync-days">
           <label class="fl" for="ksef-initial-sync-days">{{ t('ksef.settings.initialSyncDays') }}</label>
           <input id="ksef-initial-sync-days" class="fi days" type="number" [min]="minSyncDays" [max]="maxSyncDays" step="1"
-                 [(ngModel)]="initialSyncDays">
-          <button class="btn btn-g btn-sm" [disabled]="!canSaveSyncDays(loaded)" (click)="saveSyncDays()">{{ 'actions.save' | transloco }}</button>
+                 [(ngModel)]="initialSyncDays" [class.fi-err]="isSyncDaysSubmitted && !isSyncDaysValid()">
+          <button class="btn btn-g btn-sm" [disabled]="isSyncDaysValid() && !isSyncDaysChanged(loaded)"
+                  [title]="isSyncDaysValid() && !isSyncDaysChanged(loaded) ? ('form.noChanges' | transloco) : ''"
+                  (click)="saveSyncDays()">{{ 'actions.save' | transloco }}</button>
         </div>
+        @if (isSyncDaysSubmitted && !isSyncDaysValid()) { <span class="ferr" role="alert">{{ t('ksef.settings.errors.syncDays', { min: minSyncDays, max: maxSyncDays }) }}</span> }
         <p class="hint">{{ t('ksef.settings.initialSyncDaysHint', { min: minSyncDays, max: maxSyncDays }) }}</p>
 
         <div class="sync-days">
@@ -56,6 +59,7 @@ const MAX_SYNC_DAYS = 365;
             }
           </select>
           <button class="btn btn-g btn-sm" [disabled]="invoiceDocumentsGroupId === (loaded.invoice_documents_group?.id ?? null)"
+                  [title]="invoiceDocumentsGroupId === (loaded.invoice_documents_group?.id ?? null) ? ('form.noChanges' | transloco) : ''"
                   (click)="saveInvoiceDocumentsGroup()">{{ 'actions.save' | transloco }}</button>
         </div>
         <p class="hint">{{ t('ksef.settings.invoiceDocumentsGroupHint') }}</p>
@@ -89,7 +93,7 @@ const MAX_SYNC_DAYS = 365;
                     <td class="nowrap">{{ format.dateTime(company.last_synced_at) }}</td>
                     <td class="nowrap">{{ format.dateTime(company.last_attempt_at) }}</td>
                     <td class="actions">
-                      <button class="link" [disabled]="syncingCompanyId() !== null || !loaded.is_configured" (click)="sync(company)">
+                      <button class="link" [disabled]="syncingCompanyId() !== null" (click)="loaded.is_configured ? sync(company) : explainNotConfigured()">
                         {{ syncingCompanyId() === company.id ? t('ksef.sync.running') : t('ksef.sync.now') }}
                       </button>
                       <button class="link" (click)="openForm(company)">{{ t('ksef.settings.edit') }}</button>
@@ -102,7 +106,7 @@ const MAX_SYNC_DAYS = 365;
           </div>
         }
         <div>
-          <button class="btn btn-p btn-sm" [disabled]="!loaded.is_configured" (click)="openForm(null)">+ {{ t('ksef.settings.addCompany') }}</button>
+          <button class="btn btn-p btn-sm" (click)="loaded.is_configured ? openForm(null) : explainNotConfigured()">+ {{ t('ksef.settings.addCompany') }}</button>
         </div>
       } @else {
         <p class="hint">{{ hasLoadFailed() ? t('ksef.settings.loadFailed') : ('states.loading' | transloco) }}</p>
@@ -169,12 +173,24 @@ export class ProjectKsefSettingsComponent implements OnInit {
     });
   }
 
-  canSaveSyncDays(config: KsefAdminConfig): boolean {
+  isSyncDaysSubmitted = false;
+
+  isSyncDaysValid(): boolean {
     const days = Number(this.initialSyncDays);
-    return Number.isInteger(days) && days >= MIN_SYNC_DAYS && days <= MAX_SYNC_DAYS && days !== config.initial_sync_days;
+    return Number.isInteger(days) && days >= MIN_SYNC_DAYS && days <= MAX_SYNC_DAYS;
+  }
+
+  isSyncDaysChanged(config: KsefAdminConfig): boolean {
+    return Number(this.initialSyncDays) !== config.initial_sync_days;
+  }
+
+  explainNotConfigured(): void {
+    this.toast.info(this.transloco.translate('projects.ksef.settings.notConfigured'));
   }
 
   saveSyncDays(): void {
+    this.isSyncDaysSubmitted = !this.isSyncDaysValid();
+    if (this.isSyncDaysSubmitted) return;
     this.api.setInitialSyncDays(Number(this.initialSyncDays)).subscribe({
       next: config => {
         this.applyConfig(config);

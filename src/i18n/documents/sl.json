@@ -102,6 +102,9 @@
     },
     "signus": {
       "emailsPlaceholder": "ana@podjetje.si, partner@example.com",
+      "errors": {
+        "emails": "Vnesite e-poštne naslove podpisnikov, ločene z vejicami, npr. janez@podjetje.si, ana@podjetje.si"
+      },
       "info": "Dokument bo poslan v API Signus. Vsak podpisnik bo prejel e-pošto. Podpisane različice se samodejno arhivirajo.",
       "modalTitle": "Začni elektronsko podpisovanje",
       "sectionTitle": "Elektronski podpis (Signus)",
@@ -143,6 +146,9 @@
       "assigned": "Naloga dodeljena — obvestilo po e-pošti poslano",
       "cancelled": "Naloga preklicana",
       "dueDate": "Rok",
+      "errors": {
+        "assignTo": "Poiščite osebo in jo kliknite na seznamu"
+      },
       "message": "Sporočilo",
       "messagePlaceholder": "Neobvezno sporočilo za dodeljeno osebo…",
       "selected": "Izbrano: {name}",
@@ -343,6 +349,17 @@
     "chooseType": "— Izberite vrsto —",
     "create": "Ustvari dokument",
     "createFailed": "Dokumenta ni bilo mogoče ustvariti",
+    "errors": {
+      "buyer": "Vnesite kupca z računa",
+      "contractSubject": "Izberite predmet pogodbe",
+      "country": "Izberite državo pogodbene stranke",
+      "docType": "Izberite vrsto dokumenta",
+      "entity1": "Vnesite prvo pogodbeno stranko, npr. CRMtree d.o.o.",
+      "gdprType": "Izberite razvrstitev GDPR",
+      "group": "Izberite skupino, ki bo videla dokument",
+      "name": "Vnesite ime dokumenta, npr. Partnerska pogodba — ABC d.o.o.",
+      "nip": "Vnesite davčno številko pogodbene stranke, npr. 1234567890"
+    },
     "file": {
       "dropHint": "Spustite datoteko sem ali kliknite za izbiro",
       "formats": "PDF, DOCX — največ 50 MB",

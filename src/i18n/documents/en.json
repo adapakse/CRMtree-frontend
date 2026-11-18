@@ -102,6 +102,9 @@
     },
     "signus": {
       "emailsPlaceholder": "anna@company.com, partner@example.com",
+      "errors": {
+        "emails": "Enter the signatories' e-mail addresses separated by commas, e.g. john@company.com, anna@company.com"
+      },
       "info": "The document will be sent to the Signus API. Each signatory will receive an email. Signed versions are archived automatically.",
       "modalTitle": "Start electronic signing",
       "sectionTitle": "Electronic signature (Signus)",
@@ -143,6 +146,9 @@
       "assigned": "Task assigned — email notification sent",
       "cancelled": "Task cancelled",
       "dueDate": "Due date",
+      "errors": {
+        "assignTo": "Search for a person and click them in the list"
+      },
       "message": "Message",
       "messagePlaceholder": "Optional message for the assignee…",
       "selected": "Selected: {name}",
@@ -343,6 +349,17 @@
     "chooseType": "— Select type —",
     "create": "Create document",
     "createFailed": "Couldn’t create the document",
+    "errors": {
+      "buyer": "Enter the buyer shown on the invoice",
+      "contractSubject": "Choose the subject of the contract",
+      "country": "Choose the counterparty's country",
+      "docType": "Choose the document type",
+      "entity1": "Enter the first party to the contract, e.g. CRMtree Ltd.",
+      "gdprType": "Choose the GDPR classification",
+      "group": "Choose the group that will see the document",
+      "name": "Enter the document name, e.g. Partner agreement — ABC Ltd.",
+      "nip": "Enter the counterparty's tax ID, e.g. 1234567890"
+    },
     "file": {
       "dropHint": "Drop a file here or click to select",
       "formats": "PDF, DOCX — max. 50 MB",

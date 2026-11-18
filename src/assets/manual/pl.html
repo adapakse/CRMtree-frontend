@@ -232,6 +232,10 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a class="sub" href="#p1-calls-followup">Follow-up i zadanie w CRM</a>
 <a class="sub" href="#p1-calls-example">Przykłady</a>
 <a class="sub" href="#p1-calls-faq">Pytania i odpowiedzi</a>
+<a href="#p1-campaigns">Kampanie e-mail</a>
+<a class="sub" href="#p1-campaigns-new">Nowa kampania</a>
+<a class="sub" href="#p1-campaigns-results">Wyniki kampanii</a>
+<a class="sub" href="#p1-campaigns-consents">Zgody imienne na karcie</a>
 <div class="part">Część 2 · Administrator</div>
 <a href="#p2-start">Jak to działa</a>
 <a class="sub" href="#p2-access">Gdzie są ustawienia</a>
@@ -265,6 +269,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a href="#p2-projects">Ustawienia projektów</a>
 <a class="sub" href="#p2-ksef">KSeF – faktury kosztowe</a>
 <a href="#p2-pbx">Telefonia i analizator rozmów</a>
+<a href="#p2-sendgrid">Kampanie e-mail: konto SendGrid</a>
 <a href="#p2-import">Import i eksport CSV</a>
 <a href="#p2-data">Zarządzanie danymi</a>
 <a href="#p2-logs">Logi audytowe</a>
@@ -738,7 +743,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„Timeline”</b> i <b>„Kalendarz”</b>: zadania na osi czasu i w kalendarzu.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/pl_w10_onboarding.jpg?v=20261113" width="1440" height="900" alt="Tablica Onboarding partnerów"><figcaption>Fala Media Demo na kroku „Podpisanie umowy” (Krok 1/4), bez zadań, z aktywnym przyciskiem „Uruchomienie”.</figcaption></figure>
-<p>Przycisk <b>„Uruchomienie”</b> jest aktywny, gdy wszystkie zadania partnera są wykonane (albo gdy nie ma zadań). Do tego czasu ma kłódkę i licznik wykonanych zadań. Po potwierdzeniu partner dostaje status „Aktywny” i trafia do rejestru partnerów. Link „Profil partnera” otwiera jego kartę.</p>
+<p>Przycisk <b>„Uruchomienie”</b> jest aktywny, gdy wszystkie zadania partnera są wykonane (albo gdy nie ma zadań). Do tego czasu ma kłódkę, a kliknięcie pokazuje, ile zadań zostało. Po potwierdzeniu partner dostaje status „Aktywny” i trafia do rejestru partnerów. Link „Profil partnera” otwiera jego kartę.</p>
+<p><b>Wycofanie do lejka.</b> Kierownik sprzedaży lub administrator może cofnąć partnera z onboardingu, gdy wdrożenie ruszyło za wcześnie albo firma się wycofała: przycisk <b>„🔄 Wycofaj”</b> na tablicy (albo <b>„Wycofaj z onboardingu do lejka”</b> na karcie partnera), wybór <b>„Etap lejka”</b> i <b>„Potwierdź wycofanie”</b>. Partner i jego zadania onboardingu są usuwane, a lead wraca na wybrany etap i można go ponownie przekazać do onboardingu.</p>
 
 <h4 id="p1-onboarding-card">Wdrożenie na karcie partnera</h4>
 <p>Partner w statusie „Wdrożenie” ma na karcie panel z czterema krokami. Przy każdym kroku widać liczbę wykonanych zadań. Kliknij krok, aby zobaczyć jego zadania. Zadanie odhaczasz kółkiem przy nazwie, a CRMtree zapisuje, kto i kiedy je wykonał. Zadanie po terminie ma czerwony znacznik „Po terminie”.</p>
@@ -1624,6 +1630,28 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p><b>Czy analizator jest w aplikacji mobilnej?</b> Nie. Zadania „Follow-up telefoniczny” zobaczysz jednak w telefonie razem z innymi zadaniami.</p>
 </section>
 
+<section class="ch" id="p1-campaigns">
+<h3>Kampanie e-mail</h3>
+<p>Moduł wysyła maile do osób kontaktowych partnerów i leadów, które mają wymaganą zgodę. Wysyłka idzie przez konto SendGrid Twojej firmy, a szablony maili projektuje się w SendGrid (Dynamic Templates). Menu CRM → <b>„Kampanie e-mail”</b> widzisz, gdy administrator zaznaczył Ci dostęp <b>„Kampanie e-mail”</b>.</p>
+<p>Ekran ma zakładki <b>„Kampanie”</b>, <b>„Szablony”</b> i <b>„Wyniki”</b> (administrator widzi też <b>„Ustawienia SendGrid”</b>). Lista kampanii ma filtry, sortowanie, status jako przyciski (<b>„Szkice”</b>, <b>„Wysłane”</b>…) i akcje <b>„Duplikuj”</b>, <b>„Archiwizuj”</b>, <b>„Przywróć”</b>. Gdy SendGrid nie jest skonfigurowany, nad listą widać komunikat <b>„SendGrid nie jest skonfigurowany”</b>.</p>
+
+<h4 id="p1-campaigns-new">Nowa kampania</h4>
+<ol class="steps">
+<li>Kliknij <b>„Nowa kampania”</b> i wpisz nazwę.</li>
+<li><b>„Który mail wysyłamy?”</b> — wybierz szablon z SendGrid. <b>„Zobacz, jak wygląda mail”</b> pokazuje podgląd.</li>
+<li><b>„Kto ma go dostać?”</b> — zaznacz grupy (np. <b>„Wszyscy ze zgodą”</b>) albo wgraj <b>„Lista z pliku CSV”</b>. <b>„Zawęź listę”</b> dodaje filtry: status partnera, etap leada, handlowca, branżę, tagi, ostatni kontakt.</li>
+<li>W <b>„Ustawienia wysyłki”</b> ustaw odstęp między mailami do tej samej firmy i zleceniodawcę.</li>
+<li>Po prawej widzisz na żywo, ile osób dostanie maila i dlaczego część pomijamy (brak zgody, wypis, odbity adres…).</li>
+<li><b>„Zapisz szkic”</b>, potem <b>„Wyślij test do siebie”</b>. Dopiero po teście działa <b>„Wyślij przez SendGrid”</b>.</li>
+</ol>
+
+<h4 id="p1-campaigns-results">Wyniki kampanii</h4>
+<p>Zakładka <b>„Wyniki”</b> pokazuje dostarczenia, otwarcia, kliknięcia, wypisy i problemy z adresem — liczby przychodzą z SendGrid. Tabela <b>„Firmy, które kliknęły”</b> prowadzi do karty leada lub partnera. Na karcie wysyłka widać jako aktywność <b>„Kampania e-mail”</b>. Raport pobierzesz przyciskiem <b>„Pobierz raport (.xlsx)”</b>.</p>
+
+<h4 id="p1-campaigns-consents">Zgody imienne na karcie</h4>
+<p>W sekcji <b>„Zgody marketingowe”</b> na karcie leada i partnera każda osoba kontaktowa z adresem e-mail ma własną zgodę: <b>„Zgadza się”</b>, <b>„Nie zgadza się”</b> albo <b>„Nie wiadomo”</b>. Przy „Zgadza się” trzeba wpisać, jak zgoda została pozyskana. Kampanie biorą tylko te zgody. Wypis z maila lub zgłoszenie spamu w SendGrid odbiera zgodę automatycznie. Niżej zostaje <b>„Zgoda firmowa (stara)”</b> — kampanie jej nie używają.</p>
+</section>
+
 <h2 class="part-title" id="p2"><span class="num">2</span> Administrator</h2>
 <p class="part-lead">Użytkownicy, role i widoczność danych, ustawienia aplikacji, import danych i logi, z przykładami konfiguracji i listą kontrolną wdrożenia.</p>
 
@@ -1987,6 +2015,19 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="example"><span class="lbl">PRZYKŁAD · NOWY HANDLOWIEC</span>
 <p>Do firmy dołącza nowy handlowiec. Administrator zakłada konto z rolą „Handlowiec”.</p>
 <p class="res">Nowa osoba nie ma pozycji „Analiza rozmów” w menu, dopóki administrator nie zaznaczy „Analizator rozmów” na jej karcie. W danych demo dostęp mają Anna, Piotr i Ewa, a Tomasz nie.</p></div>
+</section>
+
+<section class="ch" id="p2-sendgrid">
+<h3>Kampanie e-mail: konto SendGrid</h3>
+<p>Każda organizacja wysyła z własnego konta SendGrid. Moduł włącza CRMtree dla Twojej firmy, a dostęp osobom daje administrator: karta użytkownika → <b>„Dostęp do funkcji”</b> → <b>„Kampanie e-mail”</b>. Administrator ma dostęp zawsze.</p>
+<ol class="steps">
+<li>Otwórz <b>„Kampanie e-mail”</b> → <b>„Ustawienia SendGrid”</b>.</li>
+<li>Wklej <b>„Klucz API”</b> z SendGrid (Settings → API Keys). Po zapisaniu widać tylko „zapisany, kończy się na ••••1234” oraz <b>„Zmień”</b> i <b>„Usuń”</b>.</li>
+<li>Uzupełnij <b>„Adres nadawcy”</b> (zweryfikowany w SendGrid), <b>„Nazwa nadawcy”</b>, opcjonalnie <b>„Reply-to”</b>, oraz <b>„ID grupy wypisów (ASM)”</b>.</li>
+<li>W <b>„Zgoda wymagana do kampanii”</b> wybierz typ zgody albo zostaw „Automatycznie”.</li>
+<li>Skopiuj <b>„Adres webhooka”</b>, dodaj go w SendGrid → Settings → Mail Settings → Event Webhook, zaznacz zdarzenia i włącz Signed Event Webhook. Wklej <b>„Klucz publiczny webhooka”</b>.</li>
+<li>Kliknij <b>„Zapisz”</b>, a potem <b>„Sprawdź połączenie”</b> — zobaczysz liczbę szablonów w SendGrid.</li>
+</ol>
 </section>
 
 <section class="ch" id="p2-import">

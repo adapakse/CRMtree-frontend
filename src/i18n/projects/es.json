@@ -19,6 +19,9 @@
       "changeRoleFailed": "No se pudo cambiar el rol",
       "closeProjectFailed": "No se pudo cerrar el proyecto",
       "endBeforeStart": "La fecha límite del proyecto no puede ser anterior a su inicio.",
+      "field": "Elige un campo de la lista",
+      "member": "Busca a una persona y haz clic en ella en la lista",
+      "name": "Escribe el nombre del proyecto, p. ej. Implantación CRM — ABC",
       "removeMemberFailed": "No se pudo quitar a la persona",
       "reopenProjectFailed": "No se pudo reabrir el proyecto",
       "saveFieldsFailed": "No se pudieron guardar los campos",
@@ -61,6 +64,9 @@
   "chat": {
     "deletedUser": "Usuario eliminado",
     "empty": "No hay mensajes.",
+    "errors": {
+      "empty": "Escribe el texto del mensaje"
+    },
     "hint": "Enter envía el mensaje, Shift+Enter añade una línea nueva.",
     "placeholder": "Escribe un mensaje…",
     "send": "Enviar",
@@ -276,6 +282,11 @@
       "openTitle": "Documento de la factura — abrir en el módulo Documentos"
     },
     "edit": "Editar",
+    "errors": {
+      "amount": "Escribe un importe mayor que cero, p. ej. 1250.00",
+      "category": "Elige una categoría de coste",
+      "date": "Elige una fecha"
+    },
     "loadFailed": "No se pudieron cargar las finanzas del proyecto",
     "plan": {
       "currency": "Moneda del proyecto",
@@ -540,6 +551,10 @@
         "addTitle": "Nueva empresa en KSeF",
         "added": "Empresa añadida. Las facturas se descargarán en la próxima sincronización.",
         "editTitle": "Empresa en KSeF",
+        "errors": {
+          "nip": "El NIP debe tener 10 dígitos, p. ej. 1234567890",
+          "token": "Pega el token KSeF generado en la aplicación KSeF"
+        },
         "name": "Nombre (opcional)",
         "saveFailed": "No se pudo guardar la empresa",
         "saved": "Empresa guardada",
@@ -558,6 +573,7 @@
         "duplicateNip": "Ya se ha añadido una empresa con este NIF.",
         "invalidNip": "NIF no válido.",
         "notConfigured": "La integración con KSeF no está configurada en el servidor.",
+        "syncDays": "Escribe un número de días de {min} a {max}",
         "tokenRejected": "KSeF ha rechazado el token para este NIF. Comprueba que el token esté vigente y que se haya emitido para esta empresa.",
         "unknownGroup": "Este grupo no existe o está inactivo. Actualiza la página y elige otro.",
         "unreachable": "No se pudo conectar con KSeF para comprobar el token. Inténtalo de nuevo más tarde."
@@ -588,6 +604,7 @@
     "sync": {
       "failedForCompany": "La sincronización ha fallado para al menos una empresa. El administrador verá los detalles en Configuración → Proyectos → KSeF.",
       "finished": "Sincronización finalizada",
+      "notConfigured": "KSeF no está configurado — un administrador añade la empresa en Ajustes → Proyectos → KSeF",
       "now": "Sincronizar ahora",
       "running": "Sincronizando…",
       "startFailed": "No se pudo iniciar la sincronización",
@@ -709,6 +726,9 @@
       "placeholder": "p. ej., entrega retrasada del cliente",
       "reason": "Motivo del cambio de fecha límite"
     },
+    "errors": {
+      "name": "Escribe el nombre de la tarea, p. ej. Preparar la oferta"
+    },
     "fields": {
       "assignees": "Personas asignadas",
       "description": "Descripción adicional",
@@ -794,6 +814,9 @@
     "dictionary": {
       "active": "activo",
       "addButton": "Añadir",
+      "errors": {
+        "name": "Escribe el nombre del nuevo elemento"
+      },
       "moveDown": "Bajar",
       "moveUp": "Subir",
       "newItemPlaceholder": "Nuevo elemento…",
@@ -803,6 +826,9 @@
       "active": "activo",
       "addButton": "Añadir campo",
       "empty": "No hay campos definidos.",
+      "errors": {
+        "name": "Escribe el nombre del campo, p. ej. Número de pedido"
+      },
       "hint": "El PM puede añadir a su proyecto los campos definidos aquí (Ficha del proyecto → Campos adicionales de tareas) y decidir si son obligatorios. El tipo de campo no se puede cambiar una vez creado.",
       "newNamePlaceholder": "Nombre del nuevo campo…",
       "optionsPlaceholder": "Valores separados por comas",

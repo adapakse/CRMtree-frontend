@@ -5,12 +5,13 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 import { CrmSeoService, SeoAuthor } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 
 @Component({
   selector: 'wt-seo-authors-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, LucideTrash2, TranslocoDirective, TranslocoPipe],
+  imports: [FormsModule, LucideTrash2, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('crm')],
   template: `
     <ng-container *transloco="let t; prefix: 'crm'">
@@ -19,7 +20,8 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
         <div class="author-card" [class.inactive]="!a.is_active">
           @if (editingId() === a.id) {
             <label class="field-label">{{ t('seo.authors.fields.fullName') }} <span class="required-star">*</span></label>
-            <input class="field-input" [(ngModel)]="editName">
+            <input class="field-input" [(ngModel)]="editName" [class.fi-err]="editSubmitted && !editName.trim()">
+            @if (editSubmitted && !editName.trim()) { <span class="ferr">{{ t('fieldErrors.fullName') }}</span> }
             <label class="field-label">{{ t('seo.authors.fields.jobTitle') }}</label>
             <input class="field-input" [(ngModel)]="editJobTitle" [placeholder]="t('seo.authors.placeholders.jobTitleEdit')">
             <label class="field-label">{{ t('seo.authors.fields.bio') }}</label>
@@ -32,7 +34,8 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
             <label class="field-label">{{ t('seo.authors.fields.linkedinProfile') }}</label>
             <input class="field-input" [(ngModel)]="editLinkedinUrl" placeholder="https://linkedin.com/in/...">
             <div class="author-edit-actions">
-              <button type="button" class="btn btn-g btn-sm" (click)="saveEdit(a.id)" [disabled]="!editName.trim() || savingEdit()">
+              @if (editSubmitted) { <wt-form-error-summary [count]="editName.trim() ? 0 : 1" /> }
+              <button type="button" class="btn btn-g btn-sm" (click)="saveEdit(a.id)" [disabled]="savingEdit()">
                 @if (savingEdit()) { {{ t('seo.authors.actions.saving') }} } @else { {{ 'actions.save' | transloco }} }
               </button>
               <button type="button" class="btn btn-g btn-sm" (click)="cancelEdit()">{{ 'actions.cancel' | transloco }}</button>
@@ -71,7 +74,8 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
       <div class="author-card author-card-new">
         @if (adding()) {
           <label class="field-label">{{ t('seo.authors.fields.fullName') }} <span class="required-star">*</span></label>
-          <input class="field-input" [(ngModel)]="newName" [placeholder]="t('seo.authors.placeholders.fullName')">
+          <input class="field-input" [(ngModel)]="newName" [placeholder]="t('seo.authors.placeholders.fullName')" [class.fi-err]="newSubmitted && !newName.trim()">
+          @if (newSubmitted && !newName.trim()) { <span class="ferr">{{ t('fieldErrors.fullName') }}</span> }
           <label class="field-label">{{ t('seo.authors.fields.jobTitle') }}</label>
           <input class="field-input" [(ngModel)]="newJobTitle" [placeholder]="t('seo.authors.placeholders.jobTitleNew')">
           <label class="field-label">{{ t('seo.authors.fields.bio') }}</label>
@@ -82,13 +86,14 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
           <label class="field-label">{{ t('seo.authors.fields.linkedinProfile') }}</label>
           <input class="field-input" [(ngModel)]="newLinkedinUrl" placeholder="https://linkedin.com/in/...">
           <div class="author-edit-actions">
-            <button type="button" class="btn btn-g btn-sm" (click)="add()" [disabled]="!newName.trim() || savingNew()">
+            @if (newSubmitted) { <wt-form-error-summary [count]="newName.trim() ? 0 : 1" /> }
+            <button type="button" class="btn btn-g btn-sm" (click)="add()" [disabled]="savingNew()">
               @if (savingNew()) { {{ t('seo.authors.actions.adding') }} } @else { {{ t('seo.authors.actions.add') }} }
             </button>
             <button type="button" class="btn btn-g btn-sm" (click)="adding.set(false)">{{ 'actions.cancel' | transloco }}</button>
           </div>
         } @else {
-          <button type="button" class="btn-add-author" (click)="adding.set(true)">{{ t('seo.authors.actions.addNew') }}</button>
+          <button type="button" class="btn-add-author" (click)="newSubmitted = false; adding.set(true)">{{ t('seo.authors.actions.addNew') }}</button>
         }
       </div>
     </div>
@@ -151,6 +156,8 @@ export class SeoAuthorsPanelComponent implements OnInit {
   readonly savingEdit = signal(false);
   readonly uploadingPhoto = signal(false);
   editName = '';
+  editSubmitted = false;
+  newSubmitted = false;
   editJobTitle = '';
   editBio = '';
   editLinkedinUrl = '';
@@ -172,6 +179,7 @@ export class SeoAuthorsPanelComponent implements OnInit {
   }
 
   startEdit(a: SeoAuthor): void {
+    this.editSubmitted = false;
     this.editingId.set(a.id);
     this.editName = a.full_name;
     this.editJobTitle = a.job_title ?? '';
@@ -208,7 +216,10 @@ export class SeoAuthorsPanelComponent implements OnInit {
 
   saveEdit(id: number): void {
     const full_name = this.editName.trim();
-    if (!full_name) return;
+    if (!full_name) {
+      this.editSubmitted = true;
+      return;
+    }
     this.savingEdit.set(true);
     this.seoService.updateAuthor(id, {
       full_name,
@@ -250,7 +261,10 @@ export class SeoAuthorsPanelComponent implements OnInit {
 
   add(): void {
     const full_name = this.newName.trim();
-    if (!full_name) return;
+    if (!full_name) {
+      this.newSubmitted = true;
+      return;
+    }
     this.savingNew.set(true);
     this.seoService.addAuthor({
       full_name,

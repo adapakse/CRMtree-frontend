@@ -94,6 +94,9 @@
     "tasks": {
       "bulk": {
         "closeSelected": "Zatvori označene zadatke",
+        "errors": {
+          "noneSelected": "Označite barem jedan zadatak na popisu"
+        },
         "selectOverdue": "Označi sve zadatke kojima je istekao rok",
         "selectedCount": "{count, plural, one {# označen} few {# označena} other {# označenih}}"
       },
@@ -531,24 +534,39 @@
     "writeNew": "Napiši novu e-poruku"
   },
   "fieldErrors": {
+    "caption": "Upišite opis snimke, npr. Nadzorna ploča izvješća o prodaji",
     "closeDate": "Odaberite očekivani datum zatvaranja",
     "company": "Unesite naziv tvrtke",
+    "competitorUrl": "Upišite web-stranicu konkurenta, npr. konkurent.hr",
     "contactName": "Unesite ime i prezime kontaktne osobe",
     "contactTitle": "Odaberite radno mjesto kontaktne osobe",
     "email": "Unesite adresu e-pošte, npr. ivan@tvrtka.hr",
+    "featureTag": "Upišite funkciju na snimci, npr. Izvješća",
     "firstContact": "Odaberite datum prvog kontakta",
+    "fullName": "Upišite ime i prezime, npr. Ana Horvat",
+    "groupName": "Upišite naziv grupe, npr. Hotelski lanci",
+    "imageFile": "Odaberite slikovnu datoteku (PNG, JPG ili WEBP)",
     "industry": "Odaberite djelatnost",
     "lostReason": "Odaberite razlog gubitka",
+    "message": "Upišite tekst poruke",
     "onlinePct": "Odaberite udio online prodaje",
     "phone": "Unesite broj telefona, npr. +48 600 000 000",
+    "pillarName": "Upišite naziv stupa, npr. Poslovna putovanja",
     "probability": "Odaberite izglede za uspjeh",
+    "recipients": "Dodajte barem jednog primatelja, npr. ivan.horvat@tvrtka.hr",
     "salesperson": "Dodijelite prodavača",
     "saveFailed": "Spremanje nije uspjelo. Pokušajte ponovno – ako se pogreška ponovi, javite je administratoru.",
     "source": "Odaberite odakle je došao lead",
+    "subject": "Upišite predmet poruke",
+    "title": "Upišite naslov, npr. Sastanak o ponudi",
     "value": "Unesite iznos – ako ga ne znate, upišite 0",
     "valueNegative": "Iznos ne može biti negativan",
     "valueTooLarge": "Iznos je prevelik – najviše 999.999.999.999",
-    "website": "Unesite web-stranicu tvrtke, npr. tvrtka.hr"
+    "website": "Unesite web-stranicu tvrtke, npr. tvrtka.hr",
+    "whatsappTemplate": "Odaberite predložak i ispunite sva njegova polja",
+    "wordpressAppPassword": "Zalijepite lozinku aplikacije iz WordPress profila (npr. abcd efgh ijkl mnop)",
+    "wordpressUrl": "Upišite adresu WordPress stranice, npr. https://blog.tvrtka.hr",
+    "wordpressUser": "Upišite WordPress korisničko ime"
   },
   "history": {
     "activityAdded": "Aktivnost dodana: {title}",
@@ -622,6 +640,7 @@
       "call": "Poziv",
       "doc_sent": "Dokument",
       "email": "E-pošta",
+      "marketing_email": "E-mail kampanja",
       "meeting": "Sastanak",
       "note": "Bilješka",
       "opportunity": "Prilika",
@@ -795,6 +814,10 @@
       "title": "Informacije"
     },
     "loadError": "Pogreška pri učitavanju leada.",
+    "missingContact": {
+      "email": "Lead nema e-mail adresu — dodajte je u „Uredi podatke”",
+      "phone": "Lead nema broj telefona — dodajte ga u „Uredi podatke”"
+    },
     "nip": {
       "countryCodeRequired": "Počnite kodom države (2 slova), npr. PL",
       "duplicate": "Ovaj porezni broj u CRM-u je već dodijeljen drugoj tvrtki",
@@ -1142,11 +1165,13 @@
       "newTask": "Novi zadatak",
       "note": "Bilješka",
       "notePlaceholder": "Dodatne informacije…",
+      "partnerRequired": "Odaberite partnera na vrhu stranice da biste mu dodali zadatak",
       "step": "Korak procesa",
       "time": "Vrijeme",
       "timeHint": "(neobavezno, zadano 09:00)",
       "title": "Naslov zadatka",
-      "titlePlaceholder": "Naziv zadatka"
+      "titlePlaceholder": "Naziv zadatka",
+      "titleRequired": "Unesite naziv zadatka, npr. „Potpisivanje okvirnog ugovora”"
     },
     "taskTypes": {
       "call": "Poziv"
@@ -1170,6 +1195,26 @@
       "calendar": "Kalendar",
       "partners": "Partneri",
       "timeline": "Vremenska crta"
+    },
+    "withdraw": {
+      "action": "Povuci",
+      "confirm": "Potvrdi povlačenje",
+      "confirmPrompt": "Povući „{company}” iz onboardinga u fazu „{stage}”? Partner i njegovi zadaci onboardinga bit će izbrisani, lead se vraća u prodajni pipeline.",
+      "detailButton": "Povuci iz onboardinga u pipeline",
+      "detailHint": "Briše ovog partnera i njegove zadatke onboardinga — lead se vraća u odabranu fazu pipelinea.",
+      "detailStagePrompt": "Vrati lead u fazu:",
+      "failed": "Povlačenje iz onboardinga nije uspjelo",
+      "hint": "Povuci iz onboardinga u fazu pipelinea",
+      "inProgress": "Povlačenje…",
+      "intro": "{company} bit će uklonjena iz onboardinga (zajedno sa zadacima onboardinga) i vraća se u prodajni pipeline u odabranoj fazi.",
+      "invalidStage": "Ova faza više ne postoji u pipelineu — osvježite stranicu i odaberite drugu",
+      "noPermission": "Iz onboardinga može povući samo voditelj prodaje ili administrator",
+      "notFound": "Partner nije pronađen — možda je već povučen ili pokrenut",
+      "stageLabel": "Faza pipelinea",
+      "stagePlaceholder": "— odaberite fazu —",
+      "stageRequired": "Odaberite fazu pipelinea u koju se tvrtka vraća",
+      "success": "„{company}” je ponovno u prodajnom pipelineu",
+      "title": "Povuci iz onboardinga"
     }
   },
   "partnerDetail": {
@@ -1563,6 +1608,32 @@
       "previousQuarter": "Prethodni kvartal",
       "previousWeek": "Prethodni tjedan",
       "previousYear": "Prethodna godina ({year})"
+    }
+  },
+  "personConsents": {
+    "cancel": "Odustani",
+    "companyHint": "E-mail kampanje je ne koriste — vrijedi privola osobe iznad.",
+    "companyTitle": "Privola tvrtke (stara)",
+    "deniedPlaceholder": "npr. odbijeno telefonom",
+    "errors": {
+      "note": "Opišite kako je privola dobivena (najmanje 3 znaka), npr. obrazac na sajmu 12. 10."
+    },
+    "grantedPlaceholder": "npr. usmeno na sastanku 12. 11., obrazac na sajmu",
+    "loadFailed": "Privole nije moguće učitati.",
+    "loading": "Učitavanje…",
+    "mainContact": "glavni kontakt",
+    "noPeople": "Nema osoba s e-mail adresom. Dodajte kontakt osobu s e-mailom da biste zabilježili njezinu privolu.",
+    "noteOptional": "Bilješka (neobavezno)",
+    "noteRequired": "Kako je dobivena? (obavezno)",
+    "save": "Spremi",
+    "sources": {
+      "sendgrid_spam": "e-mail prijavljen kao spam",
+      "sendgrid_unsubscribe": "odjava iz e-maila"
+    },
+    "values": {
+      "denied": "Ne slaže se",
+      "granted": "Slaže se",
+      "no_data": "Nepoznato"
     }
   },
   "reports": {

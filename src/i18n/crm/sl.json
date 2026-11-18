@@ -94,6 +94,9 @@
     "tasks": {
       "bulk": {
         "closeSelected": "Zapri izbrane naloge",
+        "errors": {
+          "noneSelected": "Označite vsaj eno opravilo na seznamu"
+        },
         "selectOverdue": "Izberi vse zapadle naloge",
         "selectedCount": "{count, plural, one {# izbrana} two {# izbrani} few {# izbrane} other {# izbranih}}"
       },
@@ -531,24 +534,39 @@
     "writeNew": "Napiši novo e-sporočilo"
   },
   "fieldErrors": {
+    "caption": "Vnesite napis pod posnetkom, npr. Nadzorna plošča prodajnih poročil",
     "closeDate": "Izberite predviden datum zaključka",
     "company": "Vnesite ime podjetja",
+    "competitorUrl": "Vnesite spletno stran konkurenta, npr. konkurent.si",
     "contactName": "Vnesite ime in priimek kontaktne osebe",
     "contactTitle": "Izberite delovno mesto kontaktne osebe",
     "email": "Vnesite e-poštni naslov, npr. janez@podjetje.si",
+    "featureTag": "Vnesite funkcijo na posnetku, npr. Poročila",
     "firstContact": "Izberite datum prvega stika",
+    "fullName": "Vnesite ime in priimek, npr. Ana Novak",
+    "groupName": "Vnesite ime skupine, npr. Hotelske verige",
+    "imageFile": "Izberite slikovno datoteko (PNG, JPG ali WEBP)",
     "industry": "Izberite panogo",
     "lostReason": "Izberite razlog za izgubo",
+    "message": "Vnesite besedilo sporočila",
     "onlinePct": "Izberite delež spletne prodaje",
     "phone": "Vnesite telefonsko številko, npr. +48 600 000 000",
+    "pillarName": "Vnesite ime stebra, npr. Poslovna potovanja",
     "probability": "Izberite možnost uspeha",
+    "recipients": "Dodajte vsaj enega prejemnika, npr. janez.novak@podjetje.si",
     "salesperson": "Dodelite prodajalca",
     "saveFailed": "Shranjevanje ni uspelo. Poskusite znova – če se napaka ponovi, jo sporočite skrbniku.",
     "source": "Izberite, od kod je prišel lead",
+    "subject": "Vnesite zadevo sporočila",
+    "title": "Vnesite naslov, npr. Sestanek o ponudbi",
     "value": "Vnesite znesek – če ga ne poznate, vpišite 0",
     "valueNegative": "Znesek ne sme biti negativen",
     "valueTooLarge": "Znesek je prevelik – največ 999.999.999.999",
-    "website": "Vnesite spletno stran podjetja, npr. podjetje.si"
+    "website": "Vnesite spletno stran podjetja, npr. podjetje.si",
+    "whatsappTemplate": "Izberite predlogo in izpolnite vsa njena polja",
+    "wordpressAppPassword": "Prilepite geslo za aplikacijo iz profila WordPress (npr. abcd efgh ijkl mnop)",
+    "wordpressUrl": "Vnesite naslov spletnega mesta WordPress, npr. https://blog.podjetje.si",
+    "wordpressUser": "Vnesite uporabniško ime WordPress"
   },
   "history": {
     "activityAdded": "Aktivnost dodana: {title}",
@@ -622,6 +640,7 @@
       "call": "Klic",
       "doc_sent": "Dokument",
       "email": "E-pošta",
+      "marketing_email": "E-poštna kampanja",
       "meeting": "Sestanek",
       "note": "Zapisek",
       "opportunity": "Priložnost",
@@ -795,6 +814,10 @@
       "title": "Informacije"
     },
     "loadError": "Napaka pri nalaganju leada.",
+    "missingContact": {
+      "email": "Lead nima e-poštnega naslova — dodajte ga v »Uredi podatke«",
+      "phone": "Lead nima telefonske številke — dodajte jo v »Uredi podatke«"
+    },
     "nip": {
       "countryCodeRequired": "Začnite s kodo države (2 črki), npr. PL",
       "duplicate": "Ta davčna številka je v CRM že dodeljena drugemu podjetju",
@@ -1142,11 +1165,13 @@
       "newTask": "Nova naloga",
       "note": "Zapisek",
       "notePlaceholder": "Dodatne informacije…",
+      "partnerRequired": "Na vrhu strani izberite partnerja, da mu dodate nalogo",
       "step": "Korak postopka",
       "time": "Ura",
       "timeHint": "(neobvezno, privz. 09:00)",
       "title": "Naslov naloge",
-      "titlePlaceholder": "Naziv naloge"
+      "titlePlaceholder": "Naziv naloge",
+      "titleRequired": "Vnesite naslov naloge, npr. »Podpis okvirne pogodbe«"
     },
     "taskTypes": {
       "call": "Klic"
@@ -1170,6 +1195,26 @@
       "calendar": "Koledar",
       "partners": "Partnerji",
       "timeline": "Časovnica"
+    },
+    "withdraw": {
+      "action": "Umakni",
+      "confirm": "Potrdi umik",
+      "confirmPrompt": "Umakniti »{company}« iz uvajanja v fazo »{stage}«? Partner in njegove naloge uvajanja bodo izbrisani, lead se vrne v prodajni lijak.",
+      "detailButton": "Umakni iz uvajanja v lijak",
+      "detailHint": "Izbriše tega partnerja in njegove naloge uvajanja — lead se vrne v izbrano fazo lijaka.",
+      "detailStagePrompt": "Vrni lead v fazo:",
+      "failed": "Umik iz uvajanja ni uspel",
+      "hint": "Umakni iz uvajanja v fazo lijaka",
+      "inProgress": "Umikanje…",
+      "intro": "{company} bo odstranjena iz uvajanja (skupaj z nalogami uvajanja) in se vrne v prodajni lijak v izbrani fazi.",
+      "invalidStage": "Te faze ni več v lijaku — osvežite stran in izberite drugo",
+      "noPermission": "Iz uvajanja lahko umakne samo vodja prodaje ali skrbnik",
+      "notFound": "Partnerja ni mogoče najti — morda je že umaknjen ali zagnan",
+      "stageLabel": "Faza lijaka",
+      "stagePlaceholder": "— izberite fazo —",
+      "stageRequired": "Izberite fazo lijaka, v katero se vrne podjetje",
+      "success": "»{company}« je spet v prodajnem lijaku",
+      "title": "Umakni iz uvajanja"
     }
   },
   "partnerDetail": {
@@ -1563,6 +1608,32 @@
       "previousQuarter": "Prejšnje četrtletje",
       "previousWeek": "Prejšnji teden",
       "previousYear": "Prejšnje leto ({year})"
+    }
+  },
+  "personConsents": {
+    "cancel": "Prekliči",
+    "companyHint": "E-poštne kampanje ga ne uporabljajo — šteje soglasje osebe zgoraj.",
+    "companyTitle": "Soglasje podjetja (staro)",
+    "deniedPlaceholder": "npr. zavrnitev po telefonu",
+    "errors": {
+      "note": "Opišite, kako ste pridobili soglasje (vsaj 3 znaki), npr. obrazec na sejmu 12. 10."
+    },
+    "grantedPlaceholder": "npr. ustno na sestanku 12. 11., obrazec na sejmu",
+    "loadFailed": "Soglasij ni bilo mogoče naložiti.",
+    "loading": "Nalaganje…",
+    "mainContact": "glavni kontakt",
+    "noPeople": "Ni oseb z e-poštnim naslovom. Dodajte kontaktno osebo z e-pošto, da zabeležite njeno soglasje.",
+    "noteOptional": "Opomba (neobvezno)",
+    "noteRequired": "Kako je bilo pridobljeno? (obvezno)",
+    "save": "Shrani",
+    "sources": {
+      "sendgrid_spam": "e-pošta prijavljena kot neželena",
+      "sendgrid_unsubscribe": "odjava iz e-pošte"
+    },
+    "values": {
+      "denied": "Ne soglaša",
+      "granted": "Soglaša",
+      "no_data": "Ni znano"
     }
   },
   "reports": {

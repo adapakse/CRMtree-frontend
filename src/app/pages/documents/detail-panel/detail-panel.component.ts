@@ -23,6 +23,8 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { DEFAULT_LOCALE } from '../../../core/i18n/locales';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
+import { scrollToFirstError } from '../../../shared/forms/form-errors';
 
 // Built-in values have translated names; any other value comes from App
 // Settings and is its own display name.
@@ -49,7 +51,7 @@ interface SelectOption { value: string; label: string; }
 @Component({
   selector: 'wt-detail-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe, PaymentStatusBadgeComponent, InvoiceFieldsComponent, DocumentProjectLinksComponent, CustomFieldsComponent],
+  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe, PaymentStatusBadgeComponent, InvoiceFieldsComponent, DocumentProjectLinksComponent, CustomFieldsComponent, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -541,7 +543,8 @@ interface SelectOption { value: string; label: string; }
                            [placeholder]="t('detail.workflow.userSearchPlaceholder')"
                            [(ngModel)]="wf.assignSearch"
                            (ngModelChange)="onUserSearch($event)"
-                           (blur)="hideDropdown()">
+                           (blur)="hideDropdown()"
+                           [class.fi-err]="wfSubmitted && !wf.assignTo">
                     @if (userDropdown().length > 0) {
                       <div class="udrop">
                         @for (u of userDropdown(); track u.id) {
@@ -556,6 +559,8 @@ interface SelectOption { value: string; label: string; }
                       <div style="margin-top:4px;font-size:12px;color: var(--orange-text);font-weight:500">
                         {{ t('detail.workflow.selected', { name: wf.assignToName }) }}
                       </div>
+                    } @else if (wfSubmitted) {
+                      <span class="ferr">{{ t('detail.workflow.errors.assignTo') }}</span>
                     }
                   </div>
                 </div>
@@ -577,9 +582,12 @@ interface SelectOption { value: string; label: string; }
                   <textarea class="fta" [placeholder]="t('detail.workflow.messagePlaceholder')" [(ngModel)]="wf.message"></textarea>
                 </div>
               </div>
-              <button class="btn btn-p" style="margin-top:20px" [disabled]="!wf.assignTo" (click)="assignTask()">
-                <i class="ei ei-mail"></i> {{ t('detail.workflow.assign') }}
-              </button>
+              <div style="margin-top:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+                <button class="btn btn-p" (click)="assignTask()">
+                  <i class="ei ei-mail"></i> {{ t('detail.workflow.assign') }}
+                </button>
+                @if (wfSubmitted) { <wt-form-error-summary [count]="wf.assignTo ? 0 : 1" /> }
+              </div>
             }
 
             @if (doc._access === 'full' && doc.blob_name && !isStoredInvoice) {
@@ -636,15 +644,18 @@ interface SelectOption { value: string; label: string; }
           <div style="padding:24px">
             <div class="fg" style="margin-bottom:16px">
               <label class="fl">{{ t('detail.signus.signatories') }} <span class="req">*</span></label>
-              <textarea class="fta" style="min-height:60px" [placeholder]="t('detail.signus.emailsPlaceholder')" [(ngModel)]="signusEmails"></textarea>
+              <textarea class="fta" style="min-height:60px" [placeholder]="t('detail.signus.emailsPlaceholder')" [(ngModel)]="signusEmails"
+                        [class.fi-err]="signusSubmitted && !signusEmails.trim()"></textarea>
+              @if (signusSubmitted && !signusEmails.trim()) { <span class="ferr">{{ t('detail.signus.errors.emails') }}</span> }
             </div>
             <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;font-size:12px;color:var(--gray-500)">
               <i class="ei ei-info"></i> {{ t('detail.signus.info') }}
             </div>
           </div>
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:8px;justify-content:flex-end;background:var(--gray-50)">
+            @if (signusSubmitted) { <wt-form-error-summary [count]="signusEmails.trim() ? 0 : 1" /> }
             <button class="btn btn-g" (click)="signusOpen = false">{{ 'actions.close' | transloco }}</button>
-            <button class="btn btn-p" [disabled]="!signusEmails.trim()" (click)="confirmSignus()">{{ t('detail.signus.send') }} →</button>
+            <button class="btn btn-p" (click)="confirmSignus()">{{ t('detail.signus.send') }} →</button>
           </div>
         </div>
       </div>
@@ -834,6 +845,8 @@ export class DetailPanelComponent implements OnChanges {
   partnerDropdown      = signal<any[]>([]);
   private partnerSearchTimer: ReturnType<typeof setTimeout> | null = null;
   signusEmails = '';
+  signusSubmitted = false;
+  wfSubmitted = false;
 
   wf = { assignTo: '', assignToName: '', assignSearch: '', taskType: 'read', message: '', dueDate: '' };
   userDropdown = signal<User[]>([]);
@@ -1233,6 +1246,12 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   assignTask(): void {
+    if (!this.wf.assignTo) {
+      this.wfSubmitted = true;
+      scrollToFirstError();
+      return;
+    }
+    this.wfSubmitted = false;
     this.wfSvc.assignTask(this.doc.id, {
       assigned_to: this.wf.assignTo,
       task_type:   this.wf.taskType,
@@ -1257,9 +1276,13 @@ export class DetailPanelComponent implements OnChanges {
     });
   }
 
-  openSignus(): void { this.signusOpen = true; this.signusEmails = ''; }
+  openSignus(): void { this.signusOpen = true; this.signusEmails = ''; this.signusSubmitted = false; }
 
   confirmSignus(): void {
+    if (!this.signusEmails.trim()) {
+      this.signusSubmitted = true;
+      return;
+    }
     const signatories = this.signusEmails.split(',').map(e => ({ email: e.trim() })).filter(s => s.email);
     this.docSvc.initiateSigning(this.doc.id, signatories).subscribe({
       next: (res: any) => {

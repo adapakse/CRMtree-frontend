@@ -15,6 +15,7 @@ import { MyProjectNotificationsComponent } from './my-project-notifications.comp
 import { MyDevicesComponent } from './my-devices.component';
 import { ThemePickerComponent } from '../../shared/components/theme-picker/theme-picker.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
@@ -23,7 +24,7 @@ const BASE = environment.apiUrl;
 @Component({
   selector: 'wt-my-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent, MyProjectNotificationsComponent, LanguagePickerComponent, ThemePickerComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent, MyProjectNotificationsComponent, LanguagePickerComponent, ThemePickerComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('account')],
   template: `
 <ng-container *transloco="let t; prefix: 'account'">
@@ -193,16 +194,18 @@ const BASE = environment.apiUrl;
       <h3 style="font-size:14px;font-weight:700;margin:0 0 16px;color:var(--gray-800)">
         {{ tplEditingId ? t('mySettings.templates.editTitle') : t('mySettings.templates.new') }}
       </h3>
-      <label class="fl" style="display:block;margin-bottom:8px">{{ t('mySettings.templates.nameLabel') }} *</label>
+      <label class="fl" style="display:block;margin-bottom:8px">{{ t('mySettings.templates.nameLabel') }} <span class="req">*</span></label>
       <input [(ngModel)]="tplForm.name" [placeholder]="t('mySettings.templates.namePlaceholder')"
-             class="fi" style="margin-bottom:16px">
-      <label class="fl" style="display:block;margin-bottom:8px">{{ t('mySettings.templates.bodyLabel') }} *</label>
+             class="fi" [style.margin-bottom.px]="tplSubmitted && !tplForm.name.trim() ? 0 : 16" [class.fi-err]="tplSubmitted && !tplForm.name.trim()">
+      @if (tplSubmitted && !tplForm.name.trim()) { <span class="ferr" style="margin-bottom:16px">{{ t('mySettings.errors.templateName') }}</span> }
+      <label class="fl" style="display:block;margin-bottom:8px">{{ t('mySettings.templates.bodyLabel') }} <span class="req">*</span></label>
       <quill-editor [(ngModel)]="tplForm.body" [modules]="quillModules"
                     style="background:var(--surface)"
                     [placeholder]="t('mySettings.templates.bodyPlaceholder')"></quill-editor>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+        @if (tplSubmitted) { <wt-form-error-summary [count]="tplForm.name.trim() ? 0 : 1" /> }
         <button class="btn btn-g" (click)="cancelTplForm()">{{ 'actions.cancel' | transloco }}</button>
-        <button class="btn btn-p" (click)="saveTpl()" [disabled]="!tplForm.name || tplSaving">
+        <button class="btn btn-p" (click)="saveTpl()" [disabled]="tplSaving">
           @if (tplSaving) { {{ t('mySettings.saving') }} } @else { <i class="ei ei-save"></i> {{ ('actions.save' | transloco) }} }
         </button>
       </div>
@@ -256,6 +259,7 @@ const BASE = environment.apiUrl;
           <input
             [type]="pbxShowToken ? 'text' : 'password'"
             [(ngModel)]="pbxToken"
+            [class.fi-err]="pbxSubmitted && !pbxToken.trim()"
             [placeholder]="t('mySettings.pbx.tokenPlaceholder')"
             autocomplete="off"
             class="fi"
@@ -268,12 +272,14 @@ const BASE = environment.apiUrl;
         <div style="font-size:12px;color:var(--gray-400);margin-top:4px;line-height:1.5">
           {{ t('mySettings.pbx.tokenHelpStart') }} → <em>API Tokens (PAT)</em> → Create token → {{ t('mySettings.pbx.tokenHelpEnd') }}
         </div>
+        @if (pbxSubmitted && !pbxToken.trim()) { <span class="ferr">{{ t('mySettings.errors.pbxToken') }}</span> }
       </div>
 
       <div style="display:flex;gap:8px;align-items:center;margin-top:20px">
-        <button class="btn btn-p" (click)="savePbxToken()" [disabled]="pbxSaving || !pbxToken.trim()">
+        <button class="btn btn-p" (click)="savePbxToken()" [disabled]="pbxSaving">
           {{ pbxSaving ? t('mySettings.saving') : t('mySettings.pbx.saveToken') }}
         </button>
+        @if (pbxSubmitted) { <wt-form-error-summary [count]="pbxToken.trim() ? 0 : 1" /> }
         <button *ngIf="pbxConfigured" class="btn btn-d" (click)="deletePbxToken()"
                 [disabled]="pbxSaving">
           {{ t('mySettings.delete') }}
@@ -426,6 +432,8 @@ export class MySettingsComponent implements OnInit {
   tplForm = { name: '', body: '' };
   tplSaving = false;
   tplError  = '';
+  tplSubmitted = false;
+  pbxSubmitted = false;
 
   readonly quillModules = {
     toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']],
@@ -476,7 +484,11 @@ export class MySettingsComponent implements OnInit {
 
   savePbxToken() {
     const pat = this.pbxToken.trim();
-    if (!pat) return;
+    if (!pat) {
+      this.pbxSubmitted = true;
+      return;
+    }
+    this.pbxSubmitted = false;
     this.pbxSaving  = true;
     this.pbxSaveOk  = false;
     this.pbxSaveErr = '';
@@ -560,6 +572,7 @@ export class MySettingsComponent implements OnInit {
   }
 
   openTplForm() {
+    this.tplSubmitted   = false;
     this.tplEditingId   = null;
     this.tplForm        = { name: '', body: '' };
     this.tplError       = '';
@@ -567,6 +580,7 @@ export class MySettingsComponent implements OnInit {
   }
 
   editTpl(t: EmailTemplate) {
+    this.tplSubmitted   = false;
     this.tplEditingId   = t.id;
     this.tplForm        = { name: t.name, body: t.body };
     this.tplError       = '';
@@ -579,7 +593,10 @@ export class MySettingsComponent implements OnInit {
   }
 
   saveTpl() {
-    if (!this.tplForm.name.trim()) return;
+    if (!this.tplForm.name.trim()) {
+      this.tplSubmitted = true;
+      return;
+    }
     this.tplSaving = true;
     this.tplError  = '';
     const data = { name: this.tplForm.name.trim(), body: this.tplForm.body };

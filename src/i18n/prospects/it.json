@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} aziende…",
     "errors": {
       "aiNoCredit": "Credito esaurito sull’account IA",
+      "nip": "Il NIP deve avere 10 cifre, ad es. 1234567890",
       "searchFailedWithReason": "Ricerca non riuscita: {reason}",
+      "seedName": "Inserisci il nome dell'azienda modello, ad es. ABC S.r.l.",
+      "selectCompanies": "Seleziona almeno un'azienda nell'elenco",
       "taxIdConflict": "Conflitto di partita IVA — un altro record usa già questo numero."
     },
     "exportCsv": "Esporta CSV",

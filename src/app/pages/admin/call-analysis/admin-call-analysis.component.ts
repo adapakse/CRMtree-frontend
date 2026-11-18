@@ -68,7 +68,7 @@ interface CallAnalysisRow {
       <i class="ei ei-hourglass"></i> {{ t('callAnalysis.header.analyzing') }}
     </button>
     <label class="btn btn-g">
-      <i class="ei ei-upload"></i> {{ t('callAnalysis.header.importCsv') }}
+      <span aria-hidden="true">📄</span> {{ t('callAnalysis.header.importCsv') }}
       <input type="file" accept=".csv" (change)="onFileChange($event)" style="display:none">
     </label>
   </div>

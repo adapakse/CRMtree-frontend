@@ -39,9 +39,10 @@ const MAX_MESSAGE_LENGTH = 4000;
       @if (canPost()) {
         <div class="composer">
           <textarea class="fta" rows="2" [(ngModel)]="draft" [maxlength]="maxLength" [placeholder]="t('chat.placeholder')"
-                    (keydown.enter)="sendOnEnter($event)"></textarea>
-          <button class="btn btn-p btn-sm" [disabled]="!draft.trim() || isSending()" (click)="send()">{{ t('chat.send') }}</button>
+                    (keydown.enter)="sendOnEnter($event)" [class.fi-err]="isEmptySubmitted && !draft.trim()"></textarea>
+          <button class="btn btn-p btn-sm" [disabled]="isSending()" (click)="send()">{{ t('chat.send') }}</button>
         </div>
+        @if (isEmptySubmitted && !draft.trim()) { <span class="ferr" role="alert">{{ t('chat.errors.empty') }}</span> }
         <div class="hint">{{ t('chat.hint') }}</div>
       }
     </ng-container>
@@ -87,6 +88,8 @@ export class ProjectChatComponent implements OnInit {
     this.destroyRef.onDestroy(() => clearInterval(timer));
   }
 
+  isEmptySubmitted = false;
+
   sendOnEnter(event: Event): void {
     if ((event as KeyboardEvent).shiftKey) return;
     event.preventDefault();
@@ -95,7 +98,12 @@ export class ProjectChatComponent implements OnInit {
 
   send(): void {
     const body = this.draft.trim();
-    if (!body || this.isSending()) return;
+    if (this.isSending()) return;
+    if (!body) {
+      this.isEmptySubmitted = true;
+      return;
+    }
+    this.isEmptySubmitted = false;
     this.isSending.set(true);
     this.api.postMessage(this.projectId(), this.taskId(), body).subscribe({
       next: message => {

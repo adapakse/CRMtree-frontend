@@ -102,6 +102,9 @@
     },
     "signus": {
       "emailsPlaceholder": "anna@firma.com, partner@example.com",
+      "errors": {
+        "emails": "Geben Sie die E-Mail-Adressen der Unterzeichner durch Kommas getrennt ein, z. B. jan@firma.de, anna@firma.de"
+      },
       "info": "Das Dokument wird an die Signus-API gesendet. Jeder Unterzeichner erhält eine E-Mail. Unterzeichnete Versionen werden automatisch archiviert.",
       "modalTitle": "Elektronische Unterzeichnung starten",
       "sectionTitle": "Elektronische Signatur (Signus)",
@@ -143,6 +146,9 @@
       "assigned": "Aufgabe zugewiesen — E-Mail-Benachrichtigung gesendet",
       "cancelled": "Aufgabe abgebrochen",
       "dueDate": "Fälligkeitsdatum",
+      "errors": {
+        "assignTo": "Suchen Sie eine Person und klicken Sie sie in der Liste an"
+      },
       "message": "Nachricht",
       "messagePlaceholder": "Optionale Nachricht an die zugewiesene Person…",
       "selected": "Ausgewählt: {name}",
@@ -343,6 +349,17 @@
     "chooseType": "— Typ auswählen —",
     "create": "Dokument erstellen",
     "createFailed": "Das Dokument konnte nicht erstellt werden",
+    "errors": {
+      "buyer": "Geben Sie den Käufer laut Rechnung ein",
+      "contractSubject": "Wählen Sie den Vertragsgegenstand",
+      "country": "Wählen Sie das Land des Vertragspartners",
+      "docType": "Wählen Sie den Dokumenttyp",
+      "entity1": "Geben Sie die erste Vertragspartei ein, z. B. CRMtree GmbH",
+      "gdprType": "Wählen Sie die DSGVO-Klassifizierung",
+      "group": "Wählen Sie die Gruppe, die das Dokument sehen soll",
+      "name": "Geben Sie den Dokumentnamen ein, z. B. Partnervertrag — ABC GmbH",
+      "nip": "Geben Sie die Steuernummer des Vertragspartners ein, z. B. 1234567890"
+    },
     "file": {
       "dropHint": "Datei hier ablegen oder klicken, um sie auszuwählen",
       "formats": "PDF, DOCX — max. 50 MB",

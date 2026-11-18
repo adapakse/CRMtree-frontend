@@ -149,17 +149,17 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
           <div style="padding:24px">
             <div class="fgrid">
               <div class="fg">
-                <label class="fl">{{ t('users.fields.firstName') }} <span style="color: var(--orange-text)">*</span></label>
+                <label class="fl">{{ t('users.fields.firstName') }} <span class="req">*</span></label>
                 <input class="fi" [(ngModel)]="newFirst" [placeholder]="t('users.create.firstNamePlaceholder')" [class.fi-err]="submitted && !newFirst">
                 @if (submitted && !newFirst) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
               <div class="fg">
-                <label class="fl">{{ t('users.fields.lastName') }} <span style="color: var(--orange-text)">*</span></label>
+                <label class="fl">{{ t('users.fields.lastName') }} <span class="req">*</span></label>
                 <input class="fi" [(ngModel)]="newLast" [placeholder]="t('users.create.lastNamePlaceholder')" [class.fi-err]="submitted && !newLast">
                 @if (submitted && !newLast) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
               <div class="fg" style="grid-column:1/-1">
-                <label class="fl">{{ t('users.fields.email') }} <span style="color: var(--orange-text)">*</span></label>
+                <label class="fl">{{ t('users.fields.email') }} <span class="req">*</span></label>
                 <input class="fi" type="email" [(ngModel)]="newEmail" [placeholder]="t('users.create.emailPlaceholder')" [class.fi-err]="submitted && !newEmail">
                 @if (submitted && !newEmail) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
@@ -473,10 +473,11 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
               <div style="display:flex;gap:8px;align-items:flex-end">
                 <div class="fg" style="flex:1">
                   <label class="fl">{{ t('users.roles.group') }}</label>
-                  <select class="fsel" [(ngModel)]="newRoleGroup">
+                  <select class="fsel" [(ngModel)]="newRoleGroup" [class.fi-err]="roleSubmitted && !newRoleGroup">
                     <option value="">{{ t('users.chooseGroup') }}</option>
                     @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
                   </select>
+                  @if (roleSubmitted && !newRoleGroup) { <span class="ferr" role="alert">{{ t('users.errors.chooseGroup') }}</span> }
                 </div>
                 <div class="fg" style="width:120px">
                   <label class="fl">{{ t('users.access') }}</label>
@@ -485,7 +486,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                     <option value="full">{{ t('users.accessLevels.full') }}</option>
                   </select>
                 </div>
-                <button class="btn btn-p" [disabled]="!newRoleGroup" (click)="assignRole()">{{ t('users.roles.assign') }}</button>
+                <button class="btn btn-p" (click)="assignRole()">{{ t('users.roles.assign') }}</button>
               </div>
 
               <!-- Granty widoczności CRM — celowo osobno od „Role w grupach":
@@ -508,10 +509,11 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
               <div style="display:flex;gap:8px;align-items:flex-end">
                 <div class="fg" style="flex:1">
                   <label class="fl">{{ t('users.grants.group') }}</label>
-                  <select class="fsel" [(ngModel)]="newGrantGroup">
+                  <select class="fsel" [(ngModel)]="newGrantGroup" [class.fi-err]="grantSubmitted && !newGrantGroup">
                     <option value="">{{ t('users.chooseGroup') }}</option>
                     @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
                   </select>
+                  @if (grantSubmitted && !newGrantGroup) { <span class="ferr" role="alert">{{ t('users.errors.chooseGroup') }}</span> }
                 </div>
                 <div class="fg" style="width:120px">
                   <label class="fl">{{ t('users.grants.module') }}</label>
@@ -527,13 +529,13 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                     <option value="full">{{ t('users.accessLevels.full') }}</option>
                   </select>
                 </div>
-                <button class="btn btn-p" [disabled]="!newGrantGroup" (click)="addVisibilityGrant()">{{ t('users.grants.add') }}</button>
+                <button class="btn btn-p" (click)="addVisibilityGrant()">{{ t('users.grants.add') }}</button>
               </div>
               <div style="font-size:12px;color:var(--gray-500);margin-top:8px">
                 {{ t('users.grants.hint') }}
               </div>
 
-              @if (tenantHasProspects() || tenantHasCallAnalysis()) {
+              @if (tenantHasProspects() || tenantHasCallAnalysis() || (tenantHasEmailCampaigns() && !selected()!.is_admin)) {
                 <div class="sec-title" style="margin-top:24px">{{ t('users.featureAccess.title') }}</div>
               }
               @if (tenantHasProspects()) {
@@ -560,6 +562,18 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                          [disabled]="featureSaving()"
                          [checked]="callAnalysisAccess()"
                          (change)="toggleCallAnalysisAccess($any($event.target).checked)">
+                </div>
+              }
+              @if (tenantHasEmailCampaigns() && !selected()!.is_admin) {
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--gray-50);border-radius:12px;margin-top:8px">
+                  <div style="flex:1">
+                    <div style="font-weight:600">{{ t('users.featureAccess.emailCampaigns') }}</div>
+                    <div style="font-size:12px;color:var(--gray-500)">{{ t('users.featureAccess.emailCampaignsHint') }}</div>
+                  </div>
+                  <input type="checkbox"
+                         [disabled]="featureSaving()"
+                         [checked]="emailCampaignsAccess()"
+                         (change)="toggleEmailCampaignsAccess($any($event.target).checked)">
                 </div>
               }
             }
@@ -644,6 +658,8 @@ export class UsersComponent implements OnInit {
 
   tenantHasCallAnalysis = computed(() => this.auth.hasFeature('call_analysis'));
   callAnalysisAccess = signal(false);
+  tenantHasEmailCampaigns = computed(() => this.auth.hasFeature('email_campaigns'));
+  emailCampaignsAccess = signal(false);
   featureSaving      = signal(false);
 
   users      = signal<User[]>([]);
@@ -705,6 +721,8 @@ export class UsersComponent implements OnInit {
   passwordSaving     = signal(false);
 
   newRoleGroup  = '';
+  roleSubmitted = false;
+  grantSubmitted = false;
   newRoleAccess: 'read' | 'full' = 'read';
 
   newGrantGroup  = '';
@@ -951,10 +969,14 @@ export class UsersComponent implements OnInit {
 
   openUser(user: User): void {
     this.callAnalysisAccess.set(false);
-    if (this.tenantHasCallAnalysis() && !user.is_admin) {
+    this.emailCampaignsAccess.set(false);
+    if ((this.tenantHasCallAnalysis() || this.tenantHasEmailCampaigns()) && !user.is_admin) {
       this.userSvc.getFeatureAccess(user.id).subscribe({
-        next: map => this.callAnalysisAccess.set(map['call_analysis'] === true),
-        error: () => this.callAnalysisAccess.set(false),
+        next: map => {
+          this.callAnalysisAccess.set(map['call_analysis'] === true);
+          this.emailCampaignsAccess.set(map['email_campaigns'] === true);
+        },
+        error: () => { this.callAnalysisAccess.set(false); this.emailCampaignsAccess.set(false); },
       });
     }
     this.userSvc.get(user.id).subscribe({
@@ -1047,7 +1069,9 @@ export class UsersComponent implements OnInit {
 
   assignRole(): void {
     const u = this.selected();
-    if (!u || !this.newRoleGroup) return;
+    if (!u) return;
+    this.roleSubmitted = !this.newRoleGroup;
+    if (!this.newRoleGroup) return;
     this.userSvc.assignRole(u.id, this.newRoleGroup, this.newRoleAccess).subscribe(role => {
       const group = this.groups().find(g => g.id === this.newRoleGroup);
       const newRole = { ...role, group_name: group?.name ?? '', group_display: group?.display_name ?? '' };
@@ -1083,7 +1107,9 @@ export class UsersComponent implements OnInit {
 
   addVisibilityGrant(): void {
     const u = this.selected();
-    if (!u || !this.newGrantGroup) return;
+    if (!u) return;
+    this.grantSubmitted = !this.newGrantGroup;
+    if (!this.newGrantGroup) return;
     this.userSvc
       .addVisibilityGrant(u.id, this.newGrantGroup, this.newGrantModule, this.newGrantAccess)
       .subscribe({
@@ -1122,6 +1148,27 @@ export class UsersComponent implements OnInit {
   // Analizator rozmów — uprawnienie imienne, osobny mechanizm niż Prospekty
   // (tam dostęp daje członkostwo w grupie „Prospekty"). Przy błędzie wracamy do
   // poprzedniego stanu, żeby przełącznik nie pokazywał czegoś, czego nie zapisano.
+  toggleEmailCampaignsAccess(checked: boolean): void {
+    const u = this.selected();
+    if (!u) return;
+    const previous = this.emailCampaignsAccess();
+    this.emailCampaignsAccess.set(checked);
+    this.featureSaving.set(true);
+    this.userSvc.setFeatureAccess(u.id, 'email_campaigns', checked).subscribe({
+      next: () => {
+        this.featureSaving.set(false);
+        this.toast.success(this.transloco.translate(
+          checked ? 'admin.users.featureAccess.emailCampaignsEnabled'
+                  : 'admin.users.featureAccess.emailCampaignsDisabled'));
+      },
+      error: () => {
+        this.featureSaving.set(false);
+        this.emailCampaignsAccess.set(previous);
+        this.toast.error(this.transloco.translate('admin.users.featureAccess.saveFailed'));
+      },
+    });
+  }
+
   toggleCallAnalysisAccess(checked: boolean): void {
     const u = this.selected();
     if (!u) return;

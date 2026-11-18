@@ -102,6 +102,9 @@
     },
     "signus": {
       "emailsPlaceholder": "anna@azienda.com, partner@example.com",
+      "errors": {
+        "emails": "Inserisci gli indirizzi e-mail dei firmatari separati da virgole, ad es. marco@azienda.it, anna@azienda.it"
+      },
       "info": "Il documento verrà inviato all'API di Signus. Ogni firmatario riceverà un'e-mail. Le versioni firmate vengono archiviate automaticamente.",
       "modalTitle": "Avvia la firma elettronica",
       "sectionTitle": "Firma elettronica (Signus)",
@@ -143,6 +146,9 @@
       "assigned": "Attività assegnata — notifica e-mail inviata",
       "cancelled": "Attività annullata",
       "dueDate": "Scadenza",
+      "errors": {
+        "assignTo": "Cerca una persona e fai clic su di essa nell'elenco"
+      },
       "message": "Messaggio",
       "messagePlaceholder": "Messaggio facoltativo per la persona assegnata…",
       "selected": "Selezionato: {name}",
@@ -343,6 +349,17 @@
     "chooseType": "— Seleziona tipo —",
     "create": "Crea documento",
     "createFailed": "Impossibile creare il documento",
+    "errors": {
+      "buyer": "Inserisci l'acquirente indicato in fattura",
+      "contractSubject": "Scegli l'oggetto del contratto",
+      "country": "Scegli il paese della controparte",
+      "docType": "Scegli il tipo di documento",
+      "entity1": "Inserisci la prima parte del contratto, ad es. CRMtree S.r.l.",
+      "gdprType": "Scegli la classificazione GDPR",
+      "group": "Scegli il gruppo che vedrà il documento",
+      "name": "Inserisci il nome del documento, ad es. Contratto di partnership — ABC S.r.l.",
+      "nip": "Inserisci la partita IVA della controparte, ad es. 1234567890"
+    },
     "file": {
       "dropHint": "Rilascia qui il file o clicca per selezionarlo",
       "formats": "PDF, DOCX — max 50 MB",

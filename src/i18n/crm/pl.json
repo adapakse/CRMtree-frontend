@@ -94,6 +94,9 @@
     "tasks": {
       "bulk": {
         "closeSelected": "Zamknij zaznaczone zadania",
+        "errors": {
+          "noneSelected": "Zaznacz co najmniej jedno zadanie na liście"
+        },
         "selectOverdue": "Zaznacz wszystkie przeterminowane zadania",
         "selectedCount": "{count, plural, one {# zaznaczone} few {# zaznaczone} many {# zaznaczonych} other {# zaznaczonego}}"
       },
@@ -531,24 +534,39 @@
     "writeNew": "Napisz nowego maila"
   },
   "fieldErrors": {
+    "caption": "Podaj podpis pod zrzutem, np. Panel raportów sprzedaży",
     "closeDate": "Wybierz przewidywaną datę zamknięcia",
     "company": "Podaj nazwę firmy",
+    "competitorUrl": "Podaj adres strony konkurenta, np. konkurent.pl",
     "contactName": "Podaj imię i nazwisko osoby kontaktowej",
     "contactTitle": "Wybierz stanowisko osoby kontaktowej",
     "email": "Podaj adres e-mail, np. jan@firma.pl",
+    "featureTag": "Podaj funkcję, której dotyczy zrzut, np. Raporty",
     "firstContact": "Wybierz datę pierwszego kontaktu",
+    "fullName": "Podaj imię i nazwisko, np. Anna Nowak",
+    "groupName": "Podaj nazwę grupy, np. Sieci hotelowe",
+    "imageFile": "Wybierz plik obrazka (PNG, JPG lub WEBP)",
     "industry": "Wybierz branżę",
     "lostReason": "Wybierz powód przegranej",
+    "message": "Wpisz treść wiadomości",
     "onlinePct": "Wybierz udział sprzedaży online",
     "phone": "Podaj numer telefonu, np. +48 600 000 000",
+    "pillarName": "Podaj nazwę filaru, np. Podróże służbowe",
     "probability": "Wybierz szansę na wygraną",
+    "recipients": "Dodaj co najmniej jednego odbiorcę, np. jan.kowalski@firma.pl",
     "salesperson": "Przypisz handlowca",
     "saveFailed": "Nie udało się zapisać. Spróbuj jeszcze raz — jeśli błąd się powtórzy, zgłoś go administratorowi.",
     "source": "Wybierz, skąd przyszedł lead",
+    "subject": "Podaj temat wiadomości",
+    "title": "Podaj tytuł, np. Spotkanie w sprawie oferty",
     "value": "Podaj kwotę — jeśli jej nie znasz, wpisz 0",
     "valueNegative": "Kwota nie może być ujemna",
     "valueTooLarge": "Za duża kwota — maksymalnie 999 999 999 999",
-    "website": "Podaj adres strony firmy, np. firma.pl"
+    "website": "Podaj adres strony firmy, np. firma.pl",
+    "whatsappTemplate": "Wybierz szablon i uzupełnij wszystkie jego pola",
+    "wordpressAppPassword": "Wklej hasło aplikacji z profilu WordPress (np. abcd efgh ijkl mnop)",
+    "wordpressUrl": "Podaj adres strony WordPress, np. https://blog.firma.pl",
+    "wordpressUser": "Podaj nazwę użytkownika WordPress"
   },
   "history": {
     "activityAdded": "Aktywność dodana: {title}",
@@ -622,6 +640,7 @@
       "call": "Połączenie",
       "doc_sent": "Dokument",
       "email": "Email",
+      "marketing_email": "Kampania e-mail",
       "meeting": "Spotkanie",
       "note": "Notatka",
       "opportunity": "Szansa",
@@ -795,6 +814,10 @@
       "title": "Informacje"
     },
     "loadError": "Błąd ładowania leada.",
+    "missingContact": {
+      "email": "Lead nie ma adresu e-mail — dodaj go w „Edytuj dane”",
+      "phone": "Lead nie ma numeru telefonu — dodaj go w „Edytuj dane”"
+    },
     "nip": {
       "countryCodeRequired": "Zacznij od kodu kraju (2 litery), np. PL",
       "duplicate": "Ten NIP jest już przypisany do innej firmy w CRM",
@@ -1142,11 +1165,13 @@
       "newTask": "Nowe zadanie",
       "note": "Notatka",
       "notePlaceholder": "Dodatkowe informacje…",
+      "partnerRequired": "Wybierz partnera na górze strony, żeby dodać mu zadanie",
       "step": "Krok procesu",
       "time": "Godzina",
       "timeHint": "(opcjonalna, def. 09:00)",
       "title": "Tytuł zadania",
-      "titlePlaceholder": "Nazwa zadania"
+      "titlePlaceholder": "Nazwa zadania",
+      "titleRequired": "Podaj tytuł zadania, np. „Podpisanie umowy ramowej”"
     },
     "taskTypes": {
       "call": "Telefon"
@@ -1170,6 +1195,26 @@
       "calendar": "Kalendarz",
       "partners": "Partnerzy",
       "timeline": "Oś czasu"
+    },
+    "withdraw": {
+      "action": "Wycofaj",
+      "confirm": "Potwierdź wycofanie",
+      "confirmPrompt": "Wycofać „{company}” z onboardingu do etapu „{stage}”? Partner i jego zadania onboardingu zostaną usunięte, lead wraca do lejka sprzedażowego.",
+      "detailButton": "Wycofaj z onboardingu do lejka",
+      "detailHint": "Usunie tego partnera i jego zadania onboardingu — lead wraca do wybranego etapu lejka.",
+      "detailStagePrompt": "Wycofaj lead do etapu:",
+      "failed": "Nie udało się wycofać z onboardingu",
+      "hint": "Wycofaj z onboardingu do etapu lejka",
+      "inProgress": "Wycofywanie…",
+      "intro": "{company} zostanie usunięta z onboardingu (razem z zadaniami onboardingu) i wraca do lejka sprzedażowego na wybranym etapie.",
+      "invalidStage": "Tego etapu nie ma już w lejku — odśwież stronę i wybierz inny",
+      "noPermission": "Wycofać z onboardingu może tylko kierownik sprzedaży lub administrator",
+      "notFound": "Nie znaleziono partnera — mógł zostać już wycofany albo uruchomiony",
+      "stageLabel": "Etap lejka",
+      "stagePlaceholder": "— wybierz etap —",
+      "stageRequired": "Wybierz etap lejka, do którego wraca firma",
+      "success": "„{company}” wraca do lejka sprzedażowego",
+      "title": "Wycofaj z onboardingu"
     }
   },
   "partnerDetail": {
@@ -1563,6 +1608,32 @@
       "previousQuarter": "Poprzedni kwartał",
       "previousWeek": "Poprzedni tydzień",
       "previousYear": "Poprzedni rok ({year})"
+    }
+  },
+  "personConsents": {
+    "cancel": "Anuluj",
+    "companyHint": "Kampanie e-mail jej nie używają — liczy się zgoda osoby powyżej.",
+    "companyTitle": "Zgoda firmowa (stara)",
+    "deniedPlaceholder": "np. odmowa przez telefon",
+    "errors": {
+      "note": "Opisz, skąd masz zgodę (co najmniej 3 znaki), np. formularz na targach 12.10"
+    },
+    "grantedPlaceholder": "np. ustnie na spotkaniu 12.11, formularz na targach",
+    "loadFailed": "Nie udało się wczytać zgód.",
+    "loading": "Ładowanie…",
+    "mainContact": "główny kontakt",
+    "noPeople": "Brak osób z adresem e-mail. Dodaj osobę kontaktową z e-mailem, żeby zapisać jej zgodę.",
+    "noteOptional": "Notatka (opcjonalnie)",
+    "noteRequired": "Jak pozyskana? (wymagane)",
+    "save": "Zapisz",
+    "sources": {
+      "sendgrid_spam": "mail zgłoszony jako spam",
+      "sendgrid_unsubscribe": "wypis z maila"
+    },
+    "values": {
+      "denied": "Nie zgadza się",
+      "granted": "Zgadza się",
+      "no_data": "Nie wiadomo"
     }
   },
   "reports": {

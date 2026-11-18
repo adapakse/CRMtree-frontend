@@ -94,6 +94,9 @@
     "tasks": {
       "bulk": {
         "closeSelected": "Clôturer les tâches sélectionnées",
+        "errors": {
+          "noneSelected": "Cochez au moins une tâche dans la liste"
+        },
         "selectOverdue": "Sélectionner toutes les tâches en retard",
         "selectedCount": "{count, plural, one {# sélectionnée} other {# sélectionnées}}"
       },
@@ -531,24 +534,39 @@
     "writeNew": "Rédiger un nouvel e-mail"
   },
   "fieldErrors": {
+    "caption": "Saisissez une légende, par ex. Tableau de bord des ventes",
     "closeDate": "Choisissez la date de clôture prévue",
     "company": "Indiquez le nom de l'entreprise",
+    "competitorUrl": "Saisissez le site du concurrent, par ex. concurrent.fr",
     "contactName": "Indiquez le nom complet du contact",
     "contactTitle": "Choisissez le poste du contact",
     "email": "Indiquez une adresse e-mail, p. ex. jean@entreprise.fr",
+    "featureTag": "Saisissez la fonction montrée, par ex. Rapports",
     "firstContact": "Choisissez la date du premier contact",
+    "fullName": "Saisissez le nom complet, par ex. Anne Martin",
+    "groupName": "Saisissez le nom du groupe, par ex. Chaînes hôtelières",
+    "imageFile": "Choisissez un fichier image (PNG, JPG ou WEBP)",
     "industry": "Choisissez un secteur",
     "lostReason": "Choisissez le motif de la perte",
+    "message": "Saisissez le texte du message",
     "onlinePct": "Choisissez la part des ventes en ligne",
     "phone": "Indiquez un numéro de téléphone, p. ex. +48 600 000 000",
+    "pillarName": "Saisissez le nom du pilier, par ex. Voyages d'affaires",
     "probability": "Choisissez la probabilité de gain",
+    "recipients": "Ajoutez au moins un destinataire, par ex. jean.dupont@societe.fr",
     "salesperson": "Attribuez un commercial",
     "saveFailed": "Échec de l'enregistrement. Réessayez — si l'erreur persiste, signalez-la à votre administrateur.",
     "source": "Choisissez d'où vient le lead",
+    "subject": "Saisissez l'objet du message",
+    "title": "Saisissez un titre, par ex. Réunion sur l'offre",
     "value": "Indiquez un montant — si vous ne le connaissez pas, saisissez 0",
     "valueNegative": "Le montant ne peut pas être négatif",
     "valueTooLarge": "Montant trop élevé — maximum 999 999 999 999",
-    "website": "Indiquez le site web de l'entreprise, p. ex. entreprise.fr"
+    "website": "Indiquez le site web de l'entreprise, p. ex. entreprise.fr",
+    "whatsappTemplate": "Choisissez un modèle et remplissez tous ses champs",
+    "wordpressAppPassword": "Collez le mot de passe d'application de votre profil WordPress (par ex. abcd efgh ijkl mnop)",
+    "wordpressUrl": "Saisissez l'adresse du site WordPress, par ex. https://blog.societe.fr",
+    "wordpressUser": "Saisissez le nom d'utilisateur WordPress"
   },
   "history": {
     "activityAdded": "Activité ajoutée : {title}",
@@ -622,6 +640,7 @@
       "call": "Appel",
       "doc_sent": "Document",
       "email": "E-mail",
+      "marketing_email": "Campagne e-mail",
       "meeting": "Réunion",
       "note": "Note",
       "opportunity": "Opportunité",
@@ -795,6 +814,10 @@
       "title": "Informations"
     },
     "loadError": "Erreur lors du chargement du lead.",
+    "missingContact": {
+      "email": "Ce lead n'a pas d'adresse e-mail — ajoutez-la dans « Modifier les données »",
+      "phone": "Ce lead n'a pas de numéro de téléphone — ajoutez-le dans « Modifier les données »"
+    },
     "nip": {
       "countryCodeRequired": "Commencez par le code pays (2 lettres), p. ex. PL",
       "duplicate": "Ce numéro fiscal est déjà attribué à une autre entreprise dans le CRM",
@@ -1142,11 +1165,13 @@
       "newTask": "Nouvelle tâche",
       "note": "Note",
       "notePlaceholder": "Informations complémentaires…",
+      "partnerRequired": "Choisissez un partenaire en haut de la page pour ajouter une tâche",
       "step": "Étape du processus",
       "time": "Heure",
       "timeHint": "(facultative, par déf. 09:00)",
       "title": "Titre de la tâche",
-      "titlePlaceholder": "Nom de la tâche"
+      "titlePlaceholder": "Nom de la tâche",
+      "titleRequired": "Saisissez un titre de tâche, p. ex. « Signer le contrat-cadre »"
     },
     "taskTypes": {
       "call": "Appel"
@@ -1170,6 +1195,26 @@
       "calendar": "Calendrier",
       "partners": "Partenaires",
       "timeline": "Chronologie"
+    },
+    "withdraw": {
+      "action": "Retirer",
+      "confirm": "Confirmer le retrait",
+      "confirmPrompt": "Retirer « {company} » de l'onboarding vers l'étape « {stage} » ? Le partenaire et ses tâches d'onboarding seront supprimés et le lead revient dans le pipeline commercial.",
+      "detailButton": "Retirer de l'onboarding vers le pipeline",
+      "detailHint": "Supprime ce partenaire et ses tâches d'onboarding — le lead revient à l'étape du pipeline choisie.",
+      "detailStagePrompt": "Ramener le lead à l'étape :",
+      "failed": "Impossible de retirer de l'onboarding",
+      "hint": "Retirer de l'onboarding vers une étape du pipeline",
+      "inProgress": "Retrait en cours…",
+      "intro": "{company} sera retirée de l'onboarding (avec ses tâches d'onboarding) et revient dans le pipeline commercial à l'étape choisie.",
+      "invalidStage": "Cette étape n'existe plus dans le pipeline — actualisez la page et choisissez-en une autre",
+      "noPermission": "Seul un responsable commercial ou un administrateur peut retirer de l'onboarding",
+      "notFound": "Partenaire introuvable — il a peut-être déjà été retiré ou lancé",
+      "stageLabel": "Étape du pipeline",
+      "stagePlaceholder": "— choisir une étape —",
+      "stageRequired": "Choisissez l'étape du pipeline à laquelle revient l'entreprise",
+      "success": "« {company} » est de retour dans le pipeline commercial",
+      "title": "Retirer de l'onboarding"
     }
   },
   "partnerDetail": {
@@ -1563,6 +1608,32 @@
       "previousQuarter": "Trimestre précédent",
       "previousWeek": "Semaine précédente",
       "previousYear": "Année précédente ({year})"
+    }
+  },
+  "personConsents": {
+    "cancel": "Annuler",
+    "companyHint": "Les campagnes e-mail ne l’utilisent pas : seul compte le consentement de la personne ci-dessus.",
+    "companyTitle": "Consentement de l’entreprise (ancien)",
+    "deniedPlaceholder": "p. ex. refus par téléphone",
+    "errors": {
+      "note": "Décrivez comment le consentement a été obtenu (au moins 3 caractères), par ex. formulaire salon 12.10"
+    },
+    "grantedPlaceholder": "p. ex. oralement lors du rendez-vous du 12.11, formulaire au salon",
+    "loadFailed": "Impossible de charger les consentements.",
+    "loading": "Chargement…",
+    "mainContact": "contact principal",
+    "noPeople": "Aucune personne avec une adresse e-mail. Ajoutez un contact avec e-mail pour enregistrer son consentement.",
+    "noteOptional": "Note (facultative)",
+    "noteRequired": "Comment a-t-il été obtenu ? (obligatoire)",
+    "save": "Enregistrer",
+    "sources": {
+      "sendgrid_spam": "e-mail signalé comme spam",
+      "sendgrid_unsubscribe": "désinscription depuis un e-mail"
+    },
+    "values": {
+      "denied": "Refuse",
+      "granted": "Accepte",
+      "no_data": "Inconnu"
     }
   },
   "reports": {

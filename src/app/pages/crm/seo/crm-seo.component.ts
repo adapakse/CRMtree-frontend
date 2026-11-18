@@ -244,7 +244,7 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
                 <button type="button" class="btn btn-d btn-sm" (click)="unpublish(d.id)">{{ t('seo.main.actions.cancelSchedule') }}</button>
               }
               @if (d.status === 'draft' || d.status === 'in_review' || d.status === 'needs_update') {
-                <button type="button" class="btn btn-p btn-sm" (click)="approve(d.id)" [disabled]="pendingSlotCount() > 0"
+                <button type="button" class="btn btn-p btn-sm" (click)="approve(d.id)"
                         [title]="pendingSlotCount() > 0 ? t('seo.main.actions.pendingSlotsHint') : ''">
                   @if (editScheduledAt) { {{ t('seo.main.actions.approveAndSchedule') }} } @else { {{ t('seo.main.actions.approveAndPublish') }} }
                 </button>
@@ -743,6 +743,10 @@ export class CrmSeoComponent implements OnInit {
   }
 
   approve(id: number): void {
+    if (this.pendingSlotCount() > 0) {
+      this.toast.info(this.transloco.translate('crm.seo.main.actions.pendingSlotsHint'));
+      return;
+    }
     this.seoService.approve(id).subscribe({
       next: (d) => {
         this.toast.success(d.status === 'scheduled' ? this.transloco.translate('crm.seo.main.toasts.scheduled') : this.transloco.translate('crm.seo.main.toasts.published'));

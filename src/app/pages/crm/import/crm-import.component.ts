@@ -57,7 +57,7 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
            (drop)="onDrop($event, 'leads')"
            (click)="leadsInput.click()">
         <input #leadsInput type="file" accept=".csv,.txt" hidden (change)="onFileChange($event, 'leads')">
-        <span *ngIf="!uploadingLeads"><i class="ei ei-folder-open"></i> {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="!uploadingLeads"><span aria-hidden="true">📄</span> {{ t('csvImport.dropZone.prompt') }}</span>
         <span *ngIf="uploadingLeads"><i class="ei ei-hourglass"></i> {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="leadsResult" class="result-panel">
@@ -117,7 +117,7 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
            (drop)="onDrop($event, 'partners')"
            (click)="partnersInput.click()">
         <input #partnersInput type="file" accept=".csv,.txt" hidden (change)="onFileChange($event, 'partners')">
-        <span *ngIf="!uploadingPartners"><i class="ei ei-folder-open"></i> {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="!uploadingPartners"><span aria-hidden="true">📄</span> {{ t('csvImport.dropZone.prompt') }}</span>
         <span *ngIf="uploadingPartners"><i class="ei ei-hourglass"></i> {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="partnersResult" class="result-panel">
@@ -168,7 +168,7 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
            (drop)="onDrop($event, 'documents')"
            (click)="docsInput.click()">
         <input #docsInput type="file" accept=".csv,.txt" hidden (change)="onFileChange($event, 'documents')">
-        <span *ngIf="!uploadingDocs"><i class="ei ei-folder-open"></i> {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="!uploadingDocs"><span aria-hidden="true">📄</span> {{ t('csvImport.dropZone.prompt') }}</span>
         <span *ngIf="uploadingDocs"><i class="ei ei-hourglass"></i> {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="docsResult" class="result-panel">
@@ -221,7 +221,7 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
            (drop)="onDropSales($event)"
            (click)="salesInput.click()">
         <input #salesInput type="file" accept=".csv,.txt" hidden (change)="onSalesFileChange($event)">
-        <span *ngIf="!uploadingSales"><i class="ei ei-folder-open"></i> {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="!uploadingSales"><span aria-hidden="true">📄</span> {{ t('csvImport.dropZone.prompt') }}</span>
         <span *ngIf="uploadingSales"><i class="ei ei-hourglass"></i> {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="salesResult" class="result-panel">

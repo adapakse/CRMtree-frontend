@@ -232,6 +232,10 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a class="sub" href="#p1-calls-followup">Seguimientos y tareas del CRM</a>
 <a class="sub" href="#p1-calls-example">Ejemplos</a>
 <a class="sub" href="#p1-calls-faq">Preguntas y respuestas</a>
+<a href="#p1-campaigns">Campañas de correo</a>
+<a class="sub" href="#p1-campaigns-new">Nueva campaña</a>
+<a class="sub" href="#p1-campaigns-results">Resultados de las campañas</a>
+<a class="sub" href="#p1-campaigns-consents">Consentimientos por persona en la ficha</a>
 <div class="part">Parte 2 · Administrador</div>
 <a href="#p2-start">Cómo funciona</a>
 <a class="sub" href="#p2-access">Dónde encontrar la configuración</a>
@@ -265,6 +269,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a href="#p2-projects">Configuración de proyectos</a>
 <a class="sub" href="#p2-ksef">KSeF – facturas de costes</a>
 <a href="#p2-pbx">Telefonía y analizador de llamadas</a>
+<a href="#p2-sendgrid">Campañas de correo: cuenta de SendGrid</a>
 <a href="#p2-import">Importación y exportación CSV</a>
 <a href="#p2-data">Gestión de datos</a>
 <a href="#p2-logs">Registros de auditoría</a>
@@ -735,7 +740,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>“Cronología”</b> y <b>“Calendario”</b>: las mismas tareas en una línea de tiempo y en un calendario.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_w10_onboarding.jpg?v=20261113" width="1440" height="900" alt="Tablero de onboarding de partners"><figcaption>Fala Media Demo en “Firma del contrato” (Paso 1/4), sin tareas todavía, “Lanzamiento” disponible.</figcaption></figure>
-<p>El botón <b>“Lanzamiento”</b> está disponible cuando todas las tareas del partner están hechas (o cuando no hay ninguna). Hasta entonces muestra un candado y el número de tareas completadas. Tras confirmar, el partner pasa a “Activo” y se traslada al registro de partners; el enlace “Perfil del partner” abre su ficha.</p>
+<p>El botón <b>“Lanzamiento”</b> está disponible cuando todas las tareas del partner están hechas (o cuando no hay ninguna). Hasta entonces muestra un candado y, al pulsarlo, indica cuántas tareas faltan. Tras confirmar, el partner pasa a “Activo” y se traslada al registro de partners; el enlace “Perfil del partner” abre su ficha.</p>
+<p><b>Retirada al pipeline.</b> Un jefe de ventas o un administrador puede sacar a un partner del onboarding cuando empezó demasiado pronto o la empresa se echó atrás: botón <b>“🔄 Retirar”</b> en el tablero (o <b>“Retirar del onboarding al pipeline”</b> en la ficha del partner), elige la <b>“Etapa del pipeline”</b> y pulsa <b>“Confirmar retirada”</b>. El partner y sus tareas de onboarding se eliminan; el lead vuelve a la etapa elegida y puede pasar de nuevo al onboarding.</p>
 
 <h4 id="p1-onboarding-card">Onboarding en la ficha del partner</h4>
 <p>Un partner en onboarding tiene un panel con los cuatro pasos en la parte superior de su ficha, y cada uno indica cuántas de sus tareas están hechas. Haz clic en un paso para ver sus tareas. Marca una tarea con el círculo que tiene al lado; CRMtree registra quién la completó y cuándo. Las tareas retrasadas reciben una etiqueta roja “Vencida”.</p>
@@ -1621,6 +1627,28 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p><b>¿Está el analizador en la aplicación móvil?</b> No. Las tareas “Follow-up telefoniczny” sí aparecen en tu móvil junto con tus demás tareas.</p>
 </section>
 
+<section class="ch" id="p1-campaigns">
+<h3>Campañas de correo</h3>
+<p>El módulo envía correos a las personas de contacto de partners y leads que dieron el consentimiento requerido. El envío pasa por la cuenta de SendGrid de tu empresa y las plantillas se diseñan en SendGrid (Dynamic Templates). Ves CRM → <b>«Campañas de correo»</b> en el menú cuando un administrador te ha dado el acceso <b>«Campañas de correo»</b>.</p>
+<p>La pantalla tiene las pestañas <b>«Campañas»</b>, <b>«Plantillas»</b> y <b>«Resultados»</b> (el administrador ve también <b>«Configuración de SendGrid»</b>). La lista de campañas tiene filtros, ordenación, el estado como botones (<b>«Borradores»</b>, <b>«Enviadas»</b>…) y las acciones <b>«Duplicar»</b>, <b>«Archivar»</b>, <b>«Restaurar»</b>. Si SendGrid no está configurado, sobre la lista aparece <b>«SendGrid no está configurado»</b>.</p>
+
+<h4 id="p1-campaigns-new">Nueva campaña</h4>
+<ol class="steps">
+<li>Haz clic en <b>«Nueva campaña»</b> y escribe un nombre.</li>
+<li><b>«¿Qué correo enviamos?»</b>: elige una plantilla de SendGrid. <b>«Ver cómo es el correo»</b> muestra la vista previa.</li>
+<li><b>«¿Quién debe recibirlo?»</b>: elige grupos (p. ej. <b>«Todos con consentimiento»</b>) o sube una <b>«Lista de un archivo CSV»</b>. <b>«Acotar la lista»</b> añade filtros: estado del partner, etapa del lead, comercial, sector, etiquetas, último contacto.</li>
+<li>En <b>«Configuración del envío»</b> define el intervalo entre correos a la misma empresa y el solicitante.</li>
+<li>A la derecha ves en directo cuántas personas recibirán el correo y por qué se omite a algunas (sin consentimiento, baja, dirección rebotada…).</li>
+<li><b>«Guardar borrador»</b> y luego <b>«Enviarme una prueba»</b>. Solo tras la prueba funciona <b>«Enviar con SendGrid»</b>.</li>
+</ol>
+
+<h4 id="p1-campaigns-results">Resultados de las campañas</h4>
+<p>La pestaña <b>«Resultados»</b> muestra entregas, aperturas, clics, bajas y problemas de dirección: los números llegan de SendGrid. La tabla <b>«Empresas que hicieron clic»</b> lleva a la ficha del lead o del partner. En la ficha, el envío aparece como actividad <b>«Campaña de correo»</b>. Descarga el informe con <b>«Descargar informe (.xlsx)»</b>.</p>
+
+<h4 id="p1-campaigns-consents">Consentimientos por persona en la ficha</h4>
+<p>En la sección <b>«Consentimientos de marketing»</b> de la ficha del lead y del partner, cada persona de contacto con dirección de correo tiene su propio consentimiento: <b>«Acepta»</b>, <b>«No acepta»</b> o <b>«Desconocido»</b>. Con «Acepta» hay que anotar cómo se obtuvo. Las campañas usan solo estos consentimientos. Una baja o una denuncia de spam en SendGrid retira el consentimiento automáticamente. Debajo queda <b>«Consentimiento de empresa (antiguo)»</b>: las campañas no lo usan.</p>
+</section>
+
 <h2 class="part-title" id="p2"><span class="num">2</span> Administrador</h2>
 <p class="part-lead">Usuarios, roles y visibilidad de los datos, configuración de la aplicación, importación de datos y registros, con ejemplos de configuración y una lista de comprobación de la implantación.</p>
 
@@ -1985,6 +2013,19 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="example"><span class="lbl">EJEMPLO · COMERCIAL NUEVO</span>
 <p>Se incorpora un comercial nuevo y el administrador crea una cuenta con el rol “Comercial”.</p>
 <p class="res">La persona nueva no tiene el elemento de menú “Análisis de llamadas” hasta que el administrador marca “Analizador de llamadas” en su ficha. En los datos de demostración, Anna, Piotr y Ewa tienen acceso, Tomasz no.</p></div>
+</section>
+
+<section class="ch" id="p2-sendgrid">
+<h3>Campañas de correo: cuenta de SendGrid</h3>
+<p>Cada organización envía desde su propia cuenta de SendGrid. CRMtree activa el módulo para tu organización y el administrador da acceso a las personas: ficha del usuario → <b>«Acceso a funciones»</b> → <b>«Campañas de correo»</b>. El administrador siempre tiene acceso.</p>
+<ol class="steps">
+<li>Abre <b>«Campañas de correo»</b> → <b>«Configuración de SendGrid»</b>.</li>
+<li>Pega la <b>«Clave API»</b> de SendGrid (Settings → API Keys). Tras guardar solo se ve «guardada, termina en ••••1234» y <b>«Cambiar»</b> y <b>«Eliminar»</b>.</li>
+<li>Completa <b>«Dirección del remitente»</b> (verificada en SendGrid), <b>«Nombre del remitente»</b>, opcionalmente <b>«Reply-to»</b>, y el <b>«ID del grupo de bajas (ASM)»</b>.</li>
+<li>En <b>«Consentimiento requerido para las campañas»</b> elige un tipo de consentimiento o deja «Automático».</li>
+<li>Copia la <b>«Dirección del webhook»</b>, añádela en SendGrid → Settings → Mail Settings → Event Webhook, marca los eventos y activa Signed Event Webhook. Pega la <b>«Clave pública del webhook»</b>.</li>
+<li>Haz clic en <b>«Guardar»</b> y luego en <b>«Comprobar conexión»</b>: verás el número de plantillas en SendGrid.</li>
+</ol>
 </section>
 
 <section class="ch" id="p2-import">

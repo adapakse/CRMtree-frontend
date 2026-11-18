@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} Firmen…",
     "errors": {
       "aiNoCredit": "Kein Guthaben auf dem KI-Konto",
+      "nip": "Die NIP muss 10 Ziffern haben, z. B. 1234567890",
       "searchFailedWithReason": "Suche fehlgeschlagen: {reason}",
+      "seedName": "Geben Sie den Namen des Musterunternehmens ein, z. B. ABC GmbH",
+      "selectCompanies": "Markieren Sie mindestens ein Unternehmen in der Liste",
       "taxIdConflict": "Konflikt bei der Steuernummer — ein anderer Datensatz nutzt diese Nummer bereits."
     },
     "exportCsv": "CSV-Export",

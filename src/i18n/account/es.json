@@ -21,6 +21,10 @@
       "title": "Apariencia"
     },
     "delete": "Eliminar",
+    "errors": {
+      "pbxToken": "Pega tu Personal Access Token (PAT) de la centralita",
+      "templateName": "Escribe el nombre de la plantilla, p. ej. Oferta estándar"
+    },
     "manual": {
       "hint": "Manual interactivo de CRMtree con capturas de pantalla. Se abre en una pestaña nueva.",
       "open": "Abrir el manual",

@@ -30,9 +30,8 @@ const GROUP_NOT_CONFIGURED_STATUS = 409;
           </span>
         }
       } @else {
-        <!-- The title sits on a wrapper: browsers show no tooltip for a disabled button. -->
         <span [title]="isGroupConfigured() ? '' : t('ksef.document.groupMissing')">
-          <button type="button" class="btn btn-g btn-sm" [disabled]="!isGroupConfigured() || isRegistering()" (click)="register()">
+          <button type="button" class="btn btn-g btn-sm" [disabled]="isRegistering()" (click)="register()">
             {{ isRegistering() ? t('ksef.document.registering') : t('ksef.document.register') }}
           </button>
         </span>
@@ -65,6 +64,10 @@ export class ProjectKsefInvoiceDocumentComponent {
   readonly canOpen = computed(() => this.registered()?.can_open ?? true);
 
   register(): void {
+    if (!this.isGroupConfigured()) {
+      this.toast.info(this.transloco.translate('projects.ksef.document.groupMissing'));
+      return;
+    }
     this.isRegistering.set(true);
     this.api.registerInvoiceDocument(this.invoiceId()).subscribe({
       next: document => {

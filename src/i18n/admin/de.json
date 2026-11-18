@@ -27,6 +27,13 @@
       "subtitle": "Dauerhaftes Löschen eines Dokuments, Leads oder Partners samt allen zugehörigen Daten und Protokollen.",
       "title": "Datensätze löschen"
     },
+    "errors": {
+      "confirmPhrase": "Geben Sie genau „{phrase}“ ein, um zu bestätigen",
+      "selectDoc": "Suchen Sie ein Dokument und klicken Sie es in der Liste an",
+      "selectFile": "Wählen Sie die JSON-Datei mit den exportierten Einstellungen",
+      "selectLead": "Suchen Sie einen Lead und klicken Sie ihn in der Liste an",
+      "selectPartner": "Suchen Sie einen Partner und klicken Sie ihn in der Liste an"
+    },
     "purge": {
       "confirm": "Bestätigen",
       "docs": {
@@ -705,6 +712,9 @@
       "body": "Soll das PBX-Token für {name} wirklich gelöscht werden? Der Benutzer kann das Softphone dann nicht mehr verwenden.",
       "title": "PBX-Token löschen"
     },
+    "errors": {
+      "token": "Fügen Sie das Personal Access Token (PAT) aus der Telefonanlage ein"
+    },
     "loadError": "Fehler beim Laden der Daten.",
     "loading": "Wird geladen…",
     "modal": {
@@ -758,6 +768,9 @@
       "detected": "Erkannt: {provider}",
       "detectedShort": "am Schlüssel erkannt",
       "detecting": "Anbieter wird erkannt…",
+      "errors": {
+        "key": "Fügen Sie den API-Schlüssel des Anbieters ein (z. B. sk-…) oder wählen Sie einen gespeicherten Schlüssel"
+      },
       "intro": "Jede Funktion hat einen eigenen Anbieter, Schlüssel und Modell — Enrichment kann bei einem Anbieter laufen, die Gesprächsanalyse bei einem anderen. Fügen Sie einen Schlüssel ein, den Anbieter erkennen wir selbst. Das Speichern prüft die Einrichtung beim Anbieter; der Schlüssel wird verschlüsselt und nie wieder angezeigt.",
       "loading": "KI-Konfiguration wird geladen…",
       "model": "Modell",
@@ -1193,6 +1206,9 @@
       "deleteConfirm": "Feld „{name}“ löschen?",
       "deleteTooltip": "Feld löschen — nur möglich, solange kein Datensatz einen Wert darin hat",
       "empty": "Keine Zusatzfelder in diesem Formular.",
+      "errors": {
+        "name": "Geben Sie den Feldnamen ein, z. B. Kundennummer"
+      },
       "hint": "Felder, die Sie selbst für dieses Formular definieren. Der Feldtyp lässt sich später nicht ändern — schalten Sie das Feld dafür ab und legen Sie ein neues an. Ein abgeschaltetes Feld verschwindet aus dem Formular, bereits erfasste Werte bleiben erhalten.",
       "newNamePlaceholder": "Name des neuen Feldes",
       "optionsPlaceholder": "Werte durch Komma getrennt",
@@ -1291,6 +1307,10 @@
       "displayNamePlaceholder": "z. B. Kundenservice",
       "documentCount": "{count, plural, one {# Dokument} other {# Dokumente}}",
       "empty": "Keine Gruppen vorhanden. Fügen Sie oben die erste Gruppe hinzu oder führen Sie die Migration 0127 aus.",
+      "errors": {
+        "displayName": "Geben Sie den Anzeigenamen ein, z. B. Vertriebsteam",
+        "technicalName": "Geben Sie den technischen Namen ein, z. B. sales_team"
+      },
       "inactive": "Inaktiv",
       "intro": "— verwalten Sie die Gruppen, denen Benutzer zugewiesen werden können. Gruppen steuern den Zugriff auf Dokumente. Eine Gruppe mit zugewiesenen Benutzern oder Dokumenten kann nicht gelöscht werden.",
       "memberCount": "{count, plural, one {# Benutzer} other {# Benutzer}}",
@@ -1332,6 +1352,10 @@
         "definitionHint": "Anhand dieser Beschreibung bewertet das System, ob ein Unternehmen das Signal erfüllt.",
         "definitionPlaceholder": "Beschreiben Sie, woran zu erkennen ist, dass ein Unternehmen diese Bedingung erfüllt — konkrete Wörter/Formulierungen auf der Website, Bereiche, Positionen.",
         "editTitle": "Signal bearbeiten",
+        "errors": {
+          "definition": "Beschreiben Sie, woran die KI dieses Signal erkennen soll",
+          "name": "Geben Sie den Namen des Signals ein, z. B. Firma hat über 50 Mitarbeiter"
+        },
         "name": "Name des Signals",
         "namePlaceholder": "z. B. Eigener Fuhrpark",
         "newTitle": "Neues Signal",
@@ -1456,6 +1480,9 @@
       "codeWrittenHint": "Das ist kein Funnel-Schritt, sondern ein Zustand, den die Anwendung selbst setzt (Lead archivieren, in Partner umwandeln), daher nicht löschbar. Umbenennen ist möglich.",
       "confirmDelete": "Phase „{name}“ entfernen?",
       "confirmDeleteWithLeads": "Phase „{name}“ entfernen?\n\nDie {count} Lead(s) darauf wechseln zu „{target}“.",
+      "errors": {
+        "name": "Geben Sie den Namen der neuen Phase ein, z. B. Verhandlung"
+      },
       "intro": "Eigene Namen für die Funnel-Phasen — bestehende umbenennen, einen Schritt hinzufügen oder einen überflüssigen entfernen. Der Phasencode bleibt gleich, daher erscheint der neue Name in der gesamten Anwendung, während Berichte und Lead-Daten unberührt bleiben. Ein leerer Name führt zum eingebauten zurück.",
       "kinds": {
         "archived": "Archiv",
@@ -1633,6 +1660,9 @@
       "saved": "Gruppe aktualisiert",
       "title": "Gruppe bearbeiten"
     },
+    "errors": {
+      "internalName": "Geben Sie den internen Namen ein, z. B. vertrieb"
+    },
     "fields": {
       "description": "Beschreibung",
       "displayName": "Anzeigename",
@@ -1724,11 +1754,18 @@
       "updated": "Benutzer aktualisiert"
     },
     "empty": "Keine Benutzer gefunden",
+    "errors": {
+      "chooseGroup": "Wählen Sie eine Gruppe aus der Liste"
+    },
     "featureAccess": {
       "callAnalysis": "Gesprächsanalyse",
       "callAnalysisDisabled": "Zugriff auf Gesprächsanalyse deaktiviert",
       "callAnalysisEnabled": "Zugriff auf Gesprächsanalyse aktiviert",
       "callAnalysisHint": "KI-Analyse von Telefonnotizen, Bewertung und Follow-up",
+      "emailCampaigns": "E-Mail-Kampagnen",
+      "emailCampaignsDisabled": "Zugriff auf E-Mail-Kampagnen deaktiviert",
+      "emailCampaignsEnabled": "Zugriff auf E-Mail-Kampagnen aktiviert",
+      "emailCampaignsHint": "E-Mail-Kampagnen an Partner und Leads über SendGrid",
       "prospects": "Interessenten",
       "prospectsDisabled": "Zugriff auf Interessenten deaktiviert",
       "prospectsEnabled": "Zugriff auf Interessenten aktiviert",

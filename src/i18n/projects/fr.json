@@ -19,6 +19,9 @@
       "changeRoleFailed": "Impossible de modifier le rôle",
       "closeProjectFailed": "Impossible de clôturer le projet",
       "endBeforeStart": "L’échéance du projet ne peut pas être antérieure à son début.",
+      "field": "Choisissez un champ dans la liste",
+      "member": "Recherchez une personne et cliquez dessus dans la liste",
+      "name": "Saisissez le nom du projet, par ex. Déploiement CRM — ABC",
       "removeMemberFailed": "Impossible de retirer la personne",
       "reopenProjectFailed": "Impossible de rouvrir le projet",
       "saveFieldsFailed": "Impossible d’enregistrer les champs",
@@ -61,6 +64,9 @@
   "chat": {
     "deletedUser": "Utilisateur supprimé",
     "empty": "Aucun message.",
+    "errors": {
+      "empty": "Saisissez le texte du message"
+    },
     "hint": "Entrée envoie le message, Maj+Entrée ajoute une nouvelle ligne.",
     "placeholder": "Écrivez un message…",
     "send": "Envoyer",
@@ -276,6 +282,11 @@
       "openTitle": "Document de facture — ouvrir dans le module Documents"
     },
     "edit": "Modifier",
+    "errors": {
+      "amount": "Saisissez un montant supérieur à zéro, par ex. 1250.00",
+      "category": "Choisissez une catégorie de coût",
+      "date": "Choisissez une date"
+    },
     "loadFailed": "Impossible de charger les finances du projet",
     "plan": {
       "currency": "Devise du projet",
@@ -540,6 +551,10 @@
         "addTitle": "Nouvelle société dans KSeF",
         "added": "Société ajoutée. Les factures seront téléchargées lors de la prochaine synchronisation.",
         "editTitle": "Société dans KSeF",
+        "errors": {
+          "nip": "Le NIP doit comporter 10 chiffres, par ex. 1234567890",
+          "token": "Collez le jeton KSeF généré dans l'application KSeF"
+        },
         "name": "Nom (facultatif)",
         "saveFailed": "Impossible d’enregistrer la société",
         "saved": "Société enregistrée",
@@ -558,6 +573,7 @@
         "duplicateNip": "Une société avec ce numéro fiscal a déjà été ajoutée.",
         "invalidNip": "Numéro fiscal invalide.",
         "notConfigured": "L’intégration avec KSeF n’est pas configurée sur le serveur.",
+        "syncDays": "Saisissez un nombre de jours de {min} à {max}",
         "tokenRejected": "KSeF a rejeté le jeton pour ce numéro fiscal. Vérifiez que le jeton est valide et qu’il a été émis pour cette société.",
         "unknownGroup": "Ce groupe n’existe pas ou est inactif. Actualisez la page et choisissez-en un autre.",
         "unreachable": "Impossible de se connecter à KSeF pour vérifier le jeton. Réessayez plus tard."
@@ -588,6 +604,7 @@
     "sync": {
       "failedForCompany": "La synchronisation a échoué pour au moins une société. L’administrateur verra les détails dans Paramètres → Projets → KSeF.",
       "finished": "Synchronisation terminée",
+      "notConfigured": "KSeF n'est pas configuré — un administrateur ajoute l'entreprise dans Paramètres → Projets → KSeF",
       "now": "Synchroniser maintenant",
       "running": "Synchronisation…",
       "startFailed": "Impossible de lancer la synchronisation",
@@ -709,6 +726,9 @@
       "placeholder": "p. ex. livraison tardive du client",
       "reason": "Motif de la modification de l’échéance"
     },
+    "errors": {
+      "name": "Saisissez le nom de la tâche, par ex. Préparer l'offre"
+    },
     "fields": {
       "assignees": "Personnes assignées",
       "description": "Description complémentaire",
@@ -794,6 +814,9 @@
     "dictionary": {
       "active": "actif",
       "addButton": "Ajouter",
+      "errors": {
+        "name": "Saisissez le nom du nouvel élément"
+      },
       "moveDown": "Descendre",
       "moveUp": "Monter",
       "newItemPlaceholder": "Nouvel élément…",
@@ -803,6 +826,9 @@
       "active": "actif",
       "addButton": "Ajouter un champ",
       "empty": "Aucun champ défini.",
+      "errors": {
+        "name": "Saisissez le nom du champ, par ex. Numéro de commande"
+      },
       "hint": "Le PM peut ajouter à son projet les champs définis ici (Fiche projet → Champs supplémentaires des tâches) et décider s’ils sont obligatoires. Le type d’un champ ne peut plus être modifié après sa création.",
       "newNamePlaceholder": "Nom du nouveau champ…",
       "optionsPlaceholder": "Valeurs séparées par des virgules",

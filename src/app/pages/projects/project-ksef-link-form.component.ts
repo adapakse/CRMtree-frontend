@@ -14,6 +14,7 @@ import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 import { PROJECT_KSEF_STYLES, taskLabel } from './project-ksef.styles';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
+import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
 
 const COST_STATUSES: ProjectCostStatus[] = ['incurred', 'planned'];
 // A <select> option cannot be indented with CSS, so the tree depth is drawn with non-breaking spaces.
@@ -28,7 +29,7 @@ const OPTION_INDENT = '   ';
 @Component({
   selector: 'wt-project-ksef-link-form',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective, ProjectKsefLinksTableComponent],
+  imports: [FormsModule, TranslocoDirective, ProjectKsefLinksTableComponent, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -65,12 +66,13 @@ const OPTION_INDENT = '   ';
           <div class="fgrid">
             <div class="fg">
               <label class="fl">{{ t('finance.costForm.category') }} <span class="req">*</span></label>
-              <select class="fsel" [ngModel]="categoryId()" (ngModelChange)="categoryId.set($event)">
+              <select class="fsel" [ngModel]="categoryId()" (ngModelChange)="categoryId.set($event)" [class.fi-err]="submitted() && isCategoryMissing()">
                 <option [ngValue]="null">{{ t('finance.costForm.selectCategory') }}</option>
                 @for (category of activeCategories(); track category.id) {
                   <option [ngValue]="category.id">{{ category.name }}</option>
                 }
               </select>
+              @if (submitted() && isCategoryMissing()) { <span class="ferr">{{ t('finance.errors.category') }}</span> }
             </div>
             <div class="fg">
               <label class="fl">{{ t('finance.costForm.status') }}</label>
@@ -94,7 +96,8 @@ const OPTION_INDENT = '   ';
                 {{ t('ksef.link.amountIn', { currency: projectCurrency() }) }}
                 @if (isAmountRequired()) { <span class="req">*</span> }
               </label>
-              <input class="fi" type="number" min="0.01" step="0.01" [ngModel]="amount()" (ngModelChange)="amount.set($event)">
+              <input class="fi" type="number" min="0.01" step="0.01" [ngModel]="amount()" (ngModelChange)="amount.set($event)" [class.fi-err]="submitted() && isAmountInvalid()">
+              @if (submitted() && isAmountInvalid()) { <span class="ferr">{{ t('finance.errors.amount') }}</span> }
             </div>
           </div>
           <p class="hint">
@@ -115,8 +118,9 @@ const OPTION_INDENT = '   ';
         }
       </div>
       <div class="mof">
+        @if (submitted()) { <wt-form-error-summary [count]="errorCount()" /> }
         <button class="btn btn-g" [disabled]="isSaving()" (click)="back.emit()">{{ t('ksef.link.back') }}</button>
-        <button class="btn btn-p" [disabled]="!isValid() || isSaving()" (click)="save()">
+        <button class="btn btn-p" [disabled]="isSaving()" (click)="save()">
           {{ isSaving() ? t('finance.saving') : t('ksef.link.confirm') }}
         </button>
       </div>
@@ -168,13 +172,15 @@ export class ProjectKsefLinkFormComponent implements OnInit {
     id: row.task.id,
     label: `${OPTION_INDENT.repeat(row.depth)}${taskLabel(this.projectKey(), row.task.task_number, row.task.name)}`,
   })));
-  readonly isValid = computed(() => {
-    if (this.attachTo()) return true;
+  readonly submitted = signal(false);
+  readonly isCategoryMissing = computed(() => !this.attachTo() && this.categoryId() === null);
+  readonly isAmountInvalid = computed(() => {
+    if (this.attachTo()) return false;
     const amount = this.amount();
     const isAmountEmpty = amount === null || String(amount) === '';
-    const isAmountValid = isAmountEmpty ? !this.isAmountRequired() : Number(amount) > 0;
-    return this.categoryId() !== null && isAmountValid;
+    return isAmountEmpty ? this.isAmountRequired() : !(Number(amount) > 0);
   });
+  readonly errorCount = computed(() => (this.isCategoryMissing() ? 1 : 0) + (this.isAmountInvalid() ? 1 : 0));
 
   ngOnInit(): void {
     this.selectedTaskId = this.taskId();
@@ -188,6 +194,10 @@ export class ProjectKsefLinkFormComponent implements OnInit {
   }
 
   save(): void {
+    if (this.errorCount() > 0) {
+      this.submitted.set(true);
+      return;
+    }
     const cost = this.attachTo();
     const invoiceId = this.invoice().id;
     const request = cost

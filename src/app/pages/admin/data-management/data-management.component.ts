@@ -52,7 +52,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           </div>
         </div>
         <div class="search-wrap">
-          <input class="dm-input" [(ngModel)]="docSearch" (ngModelChange)="onDocSearch($event)"
+          <input class="dm-input" [(ngModel)]="docSearch" [class.fi-err]="deleteSubmitted === 'doc' && !docSelected" (ngModelChange)="onDocSearch($event)"
                  [placeholder]="t('dataManagement.delete.document.searchPlaceholder')" autocomplete="off">
           <div class="suggestions" *ngIf="docSuggestions.length && !docSelected">
             <div *ngFor="let s of docSuggestions" class="suggestion-item" (mousedown)="selectDoc(s)">
@@ -65,7 +65,8 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <span class="sel-name"><i class="ei ei-file"></i> {{ docSelected.label }}</span>
           <button class="sel-clear" (click)="clearDocSel()">✕</button>
         </div>
-        <button class="btn btn-d" (click)="deleteDocument()" [disabled]="!docSelected || deleting() === 'doc'">
+        @if (deleteSubmitted === 'doc' && !docSelected) { <span class="ferr" role="alert">{{ t('dataManagement.errors.selectDoc') }}</span> }
+        <button class="btn btn-d" (click)="deleteDocument()" [disabled]="deleting() === 'doc'">
           @if (deleting() === 'doc') { {{ t('dataManagement.delete.inProgress') }} } @else { <i class="ei ei-trash"></i> {{ t('dataManagement.delete.document.action') }} }
         </button>
         <div *ngIf="deleteDocResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deleteDocResult }) }}</div>
@@ -81,7 +82,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           </div>
         </div>
         <div class="search-wrap">
-          <input class="dm-input" [(ngModel)]="leadSearch" (ngModelChange)="onLeadSearch($event)"
+          <input class="dm-input" [(ngModel)]="leadSearch" [class.fi-err]="deleteSubmitted === 'lead' && !leadSelected" (ngModelChange)="onLeadSearch($event)"
                  [placeholder]="t('dataManagement.delete.lead.searchPlaceholder')" autocomplete="off">
           <div class="suggestions" *ngIf="leadSuggestions.length && !leadSelected">
             <div *ngFor="let s of leadSuggestions" class="suggestion-item" (mousedown)="selectLead(s)">
@@ -94,7 +95,8 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <span class="sel-name"><i class="ei ei-user"></i> {{ leadSelected.label }}</span>
           <button class="sel-clear" (click)="clearLeadSel()">✕</button>
         </div>
-        <button class="btn btn-d" (click)="deleteLead()" [disabled]="!leadSelected || deleting() === 'lead'">
+        @if (deleteSubmitted === 'lead' && !leadSelected) { <span class="ferr" role="alert">{{ t('dataManagement.errors.selectLead') }}</span> }
+        <button class="btn btn-d" (click)="deleteLead()" [disabled]="deleting() === 'lead'">
           @if (deleting() === 'lead') { {{ t('dataManagement.delete.inProgress') }} } @else { <i class="ei ei-trash"></i> {{ t('dataManagement.delete.lead.action') }} }
         </button>
         <div *ngIf="deleteLeadResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deleteLeadResult }) }}</div>
@@ -110,7 +112,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           </div>
         </div>
         <div class="search-wrap">
-          <input class="dm-input" [(ngModel)]="partnerSearch" (ngModelChange)="onPartnerSearch($event)"
+          <input class="dm-input" [(ngModel)]="partnerSearch" [class.fi-err]="deleteSubmitted === 'partner' && !partnerSelected" (ngModelChange)="onPartnerSearch($event)"
                  [placeholder]="t('dataManagement.delete.partner.searchPlaceholder')" autocomplete="off">
           <div class="suggestions" *ngIf="partnerSuggestions.length && !partnerSelected">
             <div *ngFor="let s of partnerSuggestions" class="suggestion-item" (mousedown)="selectPartner(s)">
@@ -123,7 +125,8 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <span class="sel-name"><i class="ei ei-handshake"></i> {{ partnerSelected.label }}</span>
           <button class="sel-clear" (click)="clearPartnerSel()">✕</button>
         </div>
-        <button class="btn btn-d" (click)="deletePartner()" [disabled]="!partnerSelected || deleting() === 'partner'">
+        @if (deleteSubmitted === 'partner' && !partnerSelected) { <span class="ferr" role="alert">{{ t('dataManagement.errors.selectPartner') }}</span> }
+        <button class="btn btn-d" (click)="deletePartner()" [disabled]="deleting() === 'partner'">
           @if (deleting() === 'partner') { {{ t('dataManagement.delete.inProgress') }} } @else { <i class="ei ei-trash"></i> {{ t('dataManagement.delete.partner.action') }} }
         </button>
         <div *ngIf="deletePartnerResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deletePartnerResult }) }}</div>
@@ -158,11 +161,12 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <button class="btn btn-d" (click)="purgeConfirming='docs'"><i class="ei ei-trash"></i> {{ t('dataManagement.purge.docs.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'docs'" class="inline-confirm">
-          <input class="dm-input" [(ngModel)]="purgeTexts.docs" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.docs.confirmPhrase') })">
+          <input class="dm-input" [(ngModel)]="purgeTexts.docs" [class.fi-err]="purgeSubmitted === 'docs' && purgeTexts.docs !== t('dataManagement.purge.docs.confirmPhrase')" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.docs.confirmPhrase') })">
+          @if (purgeSubmitted === 'docs' && purgeTexts.docs !== t('dataManagement.purge.docs.confirmPhrase')) { <span class="ferr" role="alert">{{ t('dataManagement.errors.confirmPhrase', { phrase: t('dataManagement.purge.docs.confirmPhrase') }) }}</span> }
           <div class="confirm-actions">
             <button class="btn btn-g btn-sm" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn btn-d btn-sm" (click)="purgeCategory('docs')"
-                    [disabled]="purgeTexts.docs !== t('dataManagement.purge.docs.confirmPhrase') || purging() === 'docs'">
+                    [disabled]="purging() === 'docs'">
               @if (purging() === 'docs') { … } @else { {{ t('dataManagement.purge.confirm') }} }
             </button>
           </div>
@@ -183,11 +187,12 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <button class="btn btn-d" (click)="purgeConfirming='leads'"><i class="ei ei-trash"></i> {{ t('dataManagement.purge.leads.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'leads'" class="inline-confirm">
-          <input class="dm-input" [(ngModel)]="purgeTexts.leads" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.leads.confirmPhrase') })">
+          <input class="dm-input" [(ngModel)]="purgeTexts.leads" [class.fi-err]="purgeSubmitted === 'leads' && purgeTexts.leads !== t('dataManagement.purge.leads.confirmPhrase')" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.leads.confirmPhrase') })">
+          @if (purgeSubmitted === 'leads' && purgeTexts.leads !== t('dataManagement.purge.leads.confirmPhrase')) { <span class="ferr" role="alert">{{ t('dataManagement.errors.confirmPhrase', { phrase: t('dataManagement.purge.leads.confirmPhrase') }) }}</span> }
           <div class="confirm-actions">
             <button class="btn btn-g btn-sm" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn btn-d btn-sm" (click)="purgeCategory('leads')"
-                    [disabled]="purgeTexts.leads !== t('dataManagement.purge.leads.confirmPhrase') || purging() === 'leads'">
+                    [disabled]="purging() === 'leads'">
               @if (purging() === 'leads') { … } @else { {{ t('dataManagement.purge.confirm') }} }
             </button>
           </div>
@@ -208,11 +213,12 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <button class="btn btn-d" (click)="purgeConfirming='partners'"><i class="ei ei-trash"></i> {{ t('dataManagement.purge.partners.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'partners'" class="inline-confirm">
-          <input class="dm-input" [(ngModel)]="purgeTexts.partners" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.partners.confirmPhrase') })">
+          <input class="dm-input" [(ngModel)]="purgeTexts.partners" [class.fi-err]="purgeSubmitted === 'partners' && purgeTexts.partners !== t('dataManagement.purge.partners.confirmPhrase')" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.partners.confirmPhrase') })">
+          @if (purgeSubmitted === 'partners' && purgeTexts.partners !== t('dataManagement.purge.partners.confirmPhrase')) { <span class="ferr" role="alert">{{ t('dataManagement.errors.confirmPhrase', { phrase: t('dataManagement.purge.partners.confirmPhrase') }) }}</span> }
           <div class="confirm-actions">
             <button class="btn btn-g btn-sm" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn btn-d btn-sm" (click)="purgeCategory('partners')"
-                    [disabled]="purgeTexts.partners !== t('dataManagement.purge.partners.confirmPhrase') || purging() === 'partners'">
+                    [disabled]="purging() === 'partners'">
               @if (purging() === 'partners') { … } @else { {{ t('dataManagement.purge.confirm') }} }
             </button>
           </div>
@@ -257,7 +263,8 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
             <span *ngIf="selectedFile && !importing()"><i class="ei ei-file"></i> {{ selectedFile.name }}</span>
             <span *ngIf="importing()"><i class="ei ei-hourglass"></i> {{ t('dataManagement.settings.import.inProgress') }}</span>
           </div>
-          <button class="btn btn-p" (click)="importSettings()" [disabled]="!selectedFile || importing()">
+          @if (importSubmitted && !selectedFile) { <span class="ferr" role="alert">{{ t('dataManagement.errors.selectFile') }}</span> }
+          <button class="btn btn-p" (click)="importSettings()" [disabled]="importing()">
             @if (importing()) { {{ t('dataManagement.settings.import.inProgress') }} } @else { <i class="ei ei-send"></i> {{ t('dataManagement.settings.import.action') }} }
           </button>
         </div>
@@ -361,6 +368,9 @@ export class DataManagementComponent {
   importing       = signal(false);
   isDragging      = false;
   selectedFile: File | null = null;
+  importSubmitted = false;
+  deleteSubmitted: '' | 'doc' | 'lead' | 'partner' = '';
+  purgeSubmitted = '';
   importResult: any = null;
   importError     = '';
 
@@ -430,6 +440,7 @@ export class DataManagementComponent {
 
   // ── Delete single ─────────────────────────────────────────────
   deleteDocument() {
+    this.deleteSubmitted = this.docSelected ? '' : 'doc';
     if (!this.docSelected) return;
     this.deleting.set('doc'); this.deleteDocResult = ''; this.deleteError = '';
     this.http.delete<any>(`${BASE}/documents/${this.docSelected.id}`, { headers: this.hdrs() }).subscribe({
@@ -439,6 +450,7 @@ export class DataManagementComponent {
   }
 
   deleteLead() {
+    this.deleteSubmitted = this.leadSelected ? '' : 'lead';
     if (!this.leadSelected) return;
     this.deleting.set('lead'); this.deleteLeadResult = ''; this.deleteError = '';
     this.http.delete<any>(`${BASE}/leads/${this.leadSelected.id}`, { headers: this.hdrs() }).subscribe({
@@ -448,6 +460,7 @@ export class DataManagementComponent {
   }
 
   deletePartner() {
+    this.deleteSubmitted = this.partnerSelected ? '' : 'partner';
     if (!this.partnerSelected) return;
     this.deleting.set('partner'); this.deletePartnerResult = ''; this.deleteError = '';
     this.http.delete<any>(`${BASE}/partners/${this.partnerSelected.id}`, { headers: this.hdrs() }).subscribe({
@@ -459,6 +472,7 @@ export class DataManagementComponent {
   // ── Purge category ────────────────────────────────────────────
   purgeCategory(cat: string) {
     const confirmPhrase = this.transloco.translate('admin.dataManagement.purge.' + cat + '.confirmPhrase');
+    this.purgeSubmitted = (this.purgeTexts as any)[cat] === confirmPhrase ? '' : cat;
     if ((this.purgeTexts as any)[cat] !== confirmPhrase) return;
     this.purging.set(cat);
     this.purgeError = '';
@@ -500,6 +514,7 @@ export class DataManagementComponent {
   }
 
   importSettings() {
+    this.importSubmitted = !this.selectedFile;
     if (!this.selectedFile) return;
     this.importing.set(true); this.importResult = null; this.importError = '';
     const reader = new FileReader();

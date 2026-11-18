@@ -19,6 +19,9 @@
       "changeRoleFailed": "Vloge ni bilo mogoče spremeniti",
       "closeProjectFailed": "Projekta ni bilo mogoče zapreti",
       "endBeforeStart": "Rok projekta ne sme biti pred njegovim začetkom.",
+      "field": "Izberite polje s seznama",
+      "member": "Poiščite osebo in jo kliknite na seznamu",
+      "name": "Vnesite ime projekta, npr. Uvedba CRM — ABC",
       "removeMemberFailed": "Osebe ni bilo mogoče odstraniti",
       "reopenProjectFailed": "Projekta ni bilo mogoče odpreti",
       "saveFieldsFailed": "Polj ni bilo mogoče shraniti",
@@ -61,6 +64,9 @@
   "chat": {
     "deletedUser": "Izbrisan uporabnik",
     "empty": "Ni sporočil.",
+    "errors": {
+      "empty": "Vnesite besedilo sporočila"
+    },
     "hint": "Enter pošlje sporočilo, Shift+Enter doda novo vrstico.",
     "placeholder": "Napišite sporočilo…",
     "send": "Pošlji",
@@ -276,6 +282,11 @@
       "openTitle": "Dokument računa — odpri v modulu Dokumenti"
     },
     "edit": "Uredi",
+    "errors": {
+      "amount": "Vnesite znesek, večji od nič, npr. 1250.00",
+      "category": "Izberite kategorijo stroška",
+      "date": "Izberite datum"
+    },
     "loadFailed": "Financ projekta ni bilo mogoče naložiti",
     "plan": {
       "currency": "Valuta projekta",
@@ -540,6 +551,10 @@
         "addTitle": "Novo podjetje v KSeF",
         "added": "Podjetje dodano. Računi bodo preneseni ob naslednji sinhronizaciji.",
         "editTitle": "Podjetje v KSeF",
+        "errors": {
+          "nip": "NIP mora imeti 10 števk, npr. 1234567890",
+          "token": "Prilepite žeton KSeF, ustvarjen v aplikaciji KSeF"
+        },
         "name": "Naziv (neobvezno)",
         "saveFailed": "Podjetja ni bilo mogoče shraniti",
         "saved": "Podjetje shranjeno",
@@ -558,6 +573,7 @@
         "duplicateNip": "Podjetje s to davčno številko je že dodano.",
         "invalidNip": "Neveljavna davčna številka.",
         "notConfigured": "Integracija s KSeF na strežniku ni konfigurirana.",
+        "syncDays": "Vnesite število dni od {min} do {max}",
         "tokenRejected": "KSeF je zavrnil žeton za to davčno številko. Preverite, ali je žeton veljaven in izdan za to podjetje.",
         "unknownGroup": "Ta skupina ne obstaja ali ni aktivna. Osvežite stran in izberite drugo.",
         "unreachable": "Povezave s KSeF za preverjanje žetona ni bilo mogoče vzpostaviti. Poskusite znova pozneje."
@@ -588,6 +604,7 @@
     "sync": {
       "failedForCompany": "Sinhronizacija ni uspela za vsaj eno podjetje. Podrobnosti vidi skrbnik v Nastavitve → Projekti → KSeF.",
       "finished": "Sinhronizacija končana",
+      "notConfigured": "KSeF ni nastavljen — skrbnik doda podjetje v Nastavitve → Projekti → KSeF",
       "now": "Sinhroniziraj zdaj",
       "running": "Sinhronizacija…",
       "startFailed": "Sinhronizacije ni bilo mogoče zagnati",
@@ -709,6 +726,9 @@
       "placeholder": "npr. zamuda pri dobavi s strani stranke",
       "reason": "Razlog za spremembo roka"
     },
+    "errors": {
+      "name": "Vnesite ime opravila, npr. Pripraviti ponudbo"
+    },
     "fields": {
       "assignees": "Dodeljene osebe",
       "description": "Dodatni opis",
@@ -794,6 +814,9 @@
     "dictionary": {
       "active": "aktivno",
       "addButton": "Dodaj",
+      "errors": {
+        "name": "Vnesite ime novega elementa"
+      },
       "moveDown": "Dol",
       "moveUp": "Gor",
       "newItemPlaceholder": "Nova postavka…",
@@ -803,6 +826,9 @@
       "active": "aktivno",
       "addButton": "Dodaj polje",
       "empty": "Ni določenih polj.",
+      "errors": {
+        "name": "Vnesite ime polja, npr. Številka naročila"
+      },
       "hint": "Polja, določena tukaj, lahko PM doda v svoj projekt (Kartica projekta → Dodatna polja nalog) in odloči, ali so obvezna. Vrste polja po ustvarjanju ni mogoče spremeniti.",
       "newNamePlaceholder": "Naziv novega polja…",
       "optionsPlaceholder": "Vrednosti, ločene z vejico",

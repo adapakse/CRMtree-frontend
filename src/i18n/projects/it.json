@@ -19,6 +19,9 @@
       "changeRoleFailed": "Impossibile modificare il ruolo",
       "closeProjectFailed": "Impossibile chiudere il progetto",
       "endBeforeStart": "La scadenza del progetto non può essere anteriore al suo inizio.",
+      "field": "Scegli un campo dall'elenco",
+      "member": "Cerca una persona e fai clic su di essa nell'elenco",
+      "name": "Inserisci il nome del progetto, ad es. Implementazione CRM — ABC",
       "removeMemberFailed": "Impossibile rimuovere la persona",
       "reopenProjectFailed": "Impossibile riaprire il progetto",
       "saveFieldsFailed": "Impossibile salvare i campi",
@@ -61,6 +64,9 @@
   "chat": {
     "deletedUser": "Utente eliminato",
     "empty": "Nessun messaggio.",
+    "errors": {
+      "empty": "Inserisci il testo del messaggio"
+    },
     "hint": "Invio manda il messaggio, Maiusc+Invio aggiunge una nuova riga.",
     "placeholder": "Scrivi un messaggio…",
     "send": "Invia",
@@ -276,6 +282,11 @@
       "openTitle": "Documento della fattura — apri nel modulo Documenti"
     },
     "edit": "Modifica",
+    "errors": {
+      "amount": "Inserisci un importo maggiore di zero, ad es. 1250.00",
+      "category": "Scegli una categoria di costo",
+      "date": "Scegli una data"
+    },
     "loadFailed": "Impossibile caricare le finanze del progetto",
     "plan": {
       "currency": "Valuta del progetto",
@@ -540,6 +551,10 @@
         "addTitle": "Nuova azienda in KSeF",
         "added": "Azienda aggiunta. Le fatture verranno scaricate alla prossima sincronizzazione.",
         "editTitle": "Azienda in KSeF",
+        "errors": {
+          "nip": "Il NIP deve avere 10 cifre, ad es. 1234567890",
+          "token": "Incolla il token KSeF generato nell'applicazione KSeF"
+        },
         "name": "Nome (facoltativo)",
         "saveFailed": "Impossibile salvare l'azienda",
         "saved": "Azienda salvata",
@@ -558,6 +573,7 @@
         "duplicateNip": "Un'azienda con questa partita IVA è già stata aggiunta.",
         "invalidNip": "Partita IVA non valida.",
         "notConfigured": "L'integrazione con KSeF non è configurata sul server.",
+        "syncDays": "Inserisci un numero di giorni da {min} a {max}",
         "tokenRejected": "KSeF ha rifiutato il token per questa partita IVA. Verifica che il token sia valido e rilasciato per questa azienda.",
         "unknownGroup": "Questo gruppo non esiste o non è attivo. Aggiorna la pagina e scegline un altro.",
         "unreachable": "Impossibile connettersi a KSeF per verificare il token. Riprova più tardi."
@@ -588,6 +604,7 @@
     "sync": {
       "failedForCompany": "Sincronizzazione non riuscita per almeno un'azienda. L'amministratore può vedere i dettagli in Impostazioni → Progetti → KSeF.",
       "finished": "Sincronizzazione completata",
+      "notConfigured": "KSeF non è configurato — un amministratore aggiunge l'azienda in Impostazioni → Progetti → KSeF",
       "now": "Sincronizza ora",
       "running": "Sincronizzazione…",
       "startFailed": "Impossibile avviare la sincronizzazione",
@@ -709,6 +726,9 @@
       "placeholder": "es. consegna tardiva da parte del cliente",
       "reason": "Motivo della modifica della scadenza"
     },
+    "errors": {
+      "name": "Inserisci il nome dell'attività, ad es. Preparare l'offerta"
+    },
     "fields": {
       "assignees": "Persone assegnate",
       "description": "Descrizione aggiuntiva",
@@ -794,6 +814,9 @@
     "dictionary": {
       "active": "attivo",
       "addButton": "Aggiungi",
+      "errors": {
+        "name": "Inserisci il nome della nuova voce"
+      },
       "moveDown": "Giù",
       "moveUp": "Su",
       "newItemPlaceholder": "Nuova voce…",
@@ -803,6 +826,9 @@
       "active": "attivo",
       "addButton": "Aggiungi campo",
       "empty": "Nessun campo definito.",
+      "errors": {
+        "name": "Inserisci il nome del campo, ad es. Numero d'ordine"
+      },
       "hint": "Il PM può aggiungere i campi definiti qui al proprio progetto (Scheda progetto → Campi aggiuntivi delle attività) e decidere se sono obbligatori. Il tipo di campo non può essere modificato dopo la creazione.",
       "newNamePlaceholder": "Nome del nuovo campo…",
       "optionsPlaceholder": "Valori separati da virgola",

@@ -21,6 +21,10 @@
       "title": "Aspect"
     },
     "delete": "Ștergere",
+    "errors": {
+      "pbxToken": "Lipiți Personal Access Token (PAT) din centrală",
+      "templateName": "Introduceți numele șablonului, de ex. Ofertă standard"
+    },
     "manual": {
       "hint": "Manual interactiv CRMtree cu capturi de ecran. Se deschide într-o filă nouă.",
       "open": "Deschide manualul",

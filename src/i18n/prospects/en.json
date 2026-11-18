@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} companies…",
     "errors": {
       "aiNoCredit": "No credit left on the AI account",
+      "nip": "The tax ID must have 10 digits, e.g. 1234567890",
       "searchFailedWithReason": "Search failed: {reason}",
+      "seedName": "Enter the name of the model company, e.g. ABC Ltd.",
+      "selectCompanies": "Select at least one company in the list",
       "taxIdConflict": "Tax ID conflict — another record already uses this number."
     },
     "exportCsv": "Export CSV",

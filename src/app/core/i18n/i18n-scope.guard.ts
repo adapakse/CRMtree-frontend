@@ -11,6 +11,9 @@ const SCOPES_BY_PATH_PREFIX: Record<string, string[]> = {
   // screens do not download those texts.
   'admin/prospects': ['admin', 'crm', 'prospects'],
   'crm/prospects-dashboard': ['crm', 'prospects'],
+  // E-mail campaigns have their own texts and reuse the CRM labels (partner statuses, lead stages).
+  'crm/email-campaigns': ['crm', 'campaigns'],
+  'crm/email-campaigns/:id': ['crm', 'campaigns'],
   crm: ['crm'],
   projects: ['projects'],
   // Call analysis lives under /admin but belongs to the CRM texts.

@@ -16,6 +16,10 @@
   "login": {
     "email": "E-pošta",
     "emailPlaceholder": "ivan@tvrtka.hr",
+    "errors": {
+      "email": "Upišite e-mail adresu, npr. ivan.horvat@tvrtka.hr",
+      "password": "Upišite lozinku"
+    },
     "failed": "Prijava nije uspjela",
     "hidePassword": "Sakrij",
     "or": "ili",

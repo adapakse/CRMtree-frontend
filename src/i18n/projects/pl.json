@@ -19,6 +19,9 @@
       "changeRoleFailed": "Nie udało się zmienić roli",
       "closeProjectFailed": "Nie udało się zamknąć projektu",
       "endBeforeStart": "Termin projektu nie może być wcześniejszy niż jego początek.",
+      "field": "Wybierz pole z listy",
+      "member": "Wyszukaj osobę i kliknij ją na liście",
+      "name": "Podaj nazwę projektu, np. Wdrożenie CRM — ABC",
       "removeMemberFailed": "Nie udało się usunąć osoby",
       "reopenProjectFailed": "Nie udało się otworzyć projektu",
       "saveFieldsFailed": "Nie udało się zapisać pól",
@@ -61,6 +64,9 @@
   "chat": {
     "deletedUser": "Usunięty użytkownik",
     "empty": "Brak wiadomości.",
+    "errors": {
+      "empty": "Wpisz treść wiadomości"
+    },
     "hint": "Enter wysyła wiadomość, Shift+Enter dodaje nową linię.",
     "placeholder": "Napisz wiadomość…",
     "send": "Wyślij",
@@ -276,6 +282,11 @@
       "openTitle": "Dokument faktury — otwórz w module Dokumenty"
     },
     "edit": "Edytuj",
+    "errors": {
+      "amount": "Podaj kwotę większą od zera, np. 1250.00",
+      "category": "Wybierz kategorię kosztu",
+      "date": "Wybierz datę"
+    },
     "loadFailed": "Nie udało się pobrać finansów projektu",
     "plan": {
       "currency": "Waluta projektu",
@@ -540,6 +551,10 @@
         "addTitle": "Nowa firma w KSeF",
         "added": "Firma dodana. Faktury zostaną pobrane przy najbliższej synchronizacji.",
         "editTitle": "Firma w KSeF",
+        "errors": {
+          "nip": "NIP musi mieć 10 cyfr, np. 1234567890",
+          "token": "Wklej token KSeF wygenerowany w aplikacji KSeF"
+        },
         "name": "Nazwa (opcjonalnie)",
         "saveFailed": "Nie udało się zapisać firmy",
         "saved": "Firma zapisana",
@@ -558,6 +573,7 @@
         "duplicateNip": "Firma z tym NIP-em jest już dodana.",
         "invalidNip": "Nieprawidłowy NIP.",
         "notConfigured": "Integracja z KSeF nie jest skonfigurowana na serwerze.",
+        "syncDays": "Podaj liczbę dni od {min} do {max}",
         "tokenRejected": "KSeF odrzucił token dla tego NIP-u. Sprawdź, czy token jest aktualny i wystawiony dla tej firmy.",
         "unknownGroup": "Ta grupa nie istnieje albo jest nieaktywna. Odśwież stronę i wybierz inną.",
         "unreachable": "Nie udało się połączyć z KSeF, aby sprawdzić token. Spróbuj ponownie później."
@@ -588,6 +604,7 @@
     "sync": {
       "failedForCompany": "Synchronizacja nie powiodła się dla co najmniej jednej firmy. Szczegóły zobaczy administrator w Ustawienia → Projekty → KSeF.",
       "finished": "Synchronizacja zakończona",
+      "notConfigured": "KSeF nie jest skonfigurowany — administrator dodaje firmę w Ustawienia → Projekty → KSeF",
       "now": "Synchronizuj teraz",
       "running": "Synchronizacja…",
       "startFailed": "Nie udało się uruchomić synchronizacji",
@@ -709,6 +726,9 @@
       "placeholder": "np. opóźniona dostawa od klienta",
       "reason": "Powód zmiany terminu"
     },
+    "errors": {
+      "name": "Podaj nazwę zadania, np. Przygotować ofertę"
+    },
     "fields": {
       "assignees": "Przypisane osoby",
       "description": "Opis dodatkowy",
@@ -794,6 +814,9 @@
     "dictionary": {
       "active": "aktywny",
       "addButton": "Dodaj",
+      "errors": {
+        "name": "Wpisz nazwę nowej pozycji"
+      },
       "moveDown": "W dół",
       "moveUp": "W górę",
       "newItemPlaceholder": "Nowa pozycja…",
@@ -803,6 +826,9 @@
       "active": "aktywne",
       "addButton": "Dodaj pole",
       "empty": "Brak zdefiniowanych pól.",
+      "errors": {
+        "name": "Podaj nazwę pola, np. Numer zamówienia"
+      },
       "hint": "Pola zdefiniowane tutaj PM może dodać do swojego projektu (Karta projektu → Pola dodatkowe zadań) i zdecydować, czy są wymagane. Typu pola nie można zmienić po utworzeniu.",
       "newNamePlaceholder": "Nazwa nowego pola…",
       "optionsPlaceholder": "Wartości po przecinku",

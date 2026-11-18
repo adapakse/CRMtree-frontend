@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { CrmApiService, CalendarMeeting, ActivityTask, CrmUser, CrmGroup } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -16,7 +17,7 @@ import { LocaleService } from '../../../core/i18n/locale.service';
 
 type ViewMode = 'month' | 'week' | 'day' | 'tasks';
 
-const KNOWN_ACTIVITY_TYPES = ['task', 'call', 'email', 'meeting', 'note', 'doc_sent', 'training', 'qbr', 'opportunity'];
+const KNOWN_ACTIVITY_TYPES = ['task', 'call', 'email', 'meeting', 'note', 'doc_sent', 'training', 'qbr', 'opportunity', 'marketing_email'];
 const KNOWN_PRIORITIES = ['asap', 'important', 'medium', 'low'];
 
 interface CalendarDay {
@@ -29,7 +30,7 @@ interface CalendarDay {
 @Component({
   selector: 'wt-crm-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent, EntityAttachmentsComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent, EntityAttachmentsComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -211,8 +212,9 @@ interface CalendarDay {
       </ng-container>
       <ng-container *ngIf="bulkSelectMode">
         <span style="font-size:12px;color:var(--gray-700);font-weight:600">{{ t('calendar.tasks.bulk.selectedCount', { count: selectedTaskKeys.size }) }}</span>
+        @if (bulkCloseSubmitted && !selectedTaskKeys.size) { <span class="pf-err" role="alert" style="margin-right:0">{{ t('calendar.tasks.bulk.errors.noneSelected') }}</span> }
         <button class="btn btn-p btn-sm"
-                (click)="bulkClose()" [disabled]="!selectedTaskKeys.size || saving">
+                (click)="bulkClose()" [disabled]="saving">
           {{saving ? '…' : t('calendar.tasks.bulk.closeSelected')}}
         </button>
         <button class="btn btn-g btn-sm" (click)="exitBulkSelect()">{{ 'actions.cancel' | transloco }}</button>
@@ -295,8 +297,10 @@ interface CalendarDay {
            (click)="$event.stopPropagation()">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div style="display:flex;flex-direction:column;gap:4px">
-            <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.modal.title') }} *</label>
-            <input [(ngModel)]="inlineEditForm.title" class="ef-input" [placeholder]="t('calendar.tasks.form.titlePlaceholder')">
+            <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.modal.title') }} <span class="req">*</span></label>
+            <input [(ngModel)]="inlineEditForm.title" class="ef-input" [placeholder]="t('calendar.tasks.form.titlePlaceholder')"
+                   [class.fi-err]="inlineEditSubmitted && !inlineEditForm.title?.trim()">
+            @if (inlineEditSubmitted && !inlineEditForm.title?.trim()) { <span class="ferr">{{ 'form.errors.title' | transloco }}</span> }
           </div>
           <div style="display:flex;flex-direction:column;gap:4px">
             <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.form.dateTime') }}</label>
@@ -315,8 +319,9 @@ interface CalendarDay {
           </select>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end">
+          @if (inlineEditSubmitted) { <wt-form-error-summary [count]="inlineEditForm.title?.trim() ? 0 : 1" /> }
           <button class="btn btn-g" (click)="cancelInlineEdit()">{{ 'actions.cancel' | transloco }}</button>
-          <button class="btn btn-p" (click)="saveInlineEdit(task)" [disabled]="!inlineEditForm.title?.trim() || saving">
+          <button class="btn btn-p" (click)="saveInlineEdit(task)" [disabled]="saving">
             {{saving ? '…' : ('actions.save' | transloco)}}
           </button>
         </div>
@@ -356,7 +361,7 @@ interface CalendarDay {
     <!-- Tryb edycji -->
     <div *ngIf="editMode" class="dp-body">
       <div class="ef-row">
-        <label class="ef-lbl">{{ t('activity.modal.title') }} *</label>
+        <label class="ef-lbl">{{ t('activity.modal.title') }} <span class="req">*</span></label>
         <input class="ef-input" [(ngModel)]="editForm.title">
       </div>
       <div class="ef-row">
@@ -543,6 +548,8 @@ export class CrmCalendarComponent implements OnInit {
   // Inline edit
   expandedTaskKey: string | null = null;
   inlineEditForm: any = {};
+  inlineEditSubmitted = false;
+  bulkCloseSubmitted = false;
 
   // Masowe zamykanie
   bulkSelectMode = false;
@@ -699,6 +706,7 @@ export class CrmCalendarComponent implements OnInit {
 
     // Otwórz nowe zadanie
     this.expandedTaskKey = key;
+    this.inlineEditSubmitted = false;
     this.inlineEditForm = {
       title:       t.title,
       body:        t.body || '',
@@ -714,7 +722,11 @@ export class CrmCalendarComponent implements OnInit {
   cancelInlineEdit(): void { this.expandedTaskKey = null; this.cdr.markForCheck(); }
 
   saveInlineEdit(t: ActivityTask, silent = false): void {
-    if (!this.inlineEditForm.title?.trim()) return;
+    if (!this.inlineEditForm.title?.trim()) {
+      if (!silent) { this.inlineEditSubmitted = true; this.cdr.markForCheck(); }
+      return;
+    }
+    this.inlineEditSubmitted = false;
     if (!silent) { this.saving = true; this.cdr.markForCheck(); }
     const payload: any = {
       title:       this.inlineEditForm.title.trim(),
@@ -796,6 +808,7 @@ export class CrmCalendarComponent implements OnInit {
 
   exitBulkSelect(): void {
     this.bulkSelectMode = false;
+    this.bulkCloseSubmitted = false;
     this.selectedTaskKeys = new Set();
     this.cdr.markForCheck();
   }
@@ -808,7 +821,12 @@ export class CrmCalendarComponent implements OnInit {
   }
 
   bulkClose(): void {
-    if (!this.selectedTaskKeys.size) return;
+    if (!this.selectedTaskKeys.size) {
+      this.bulkCloseSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.bulkCloseSubmitted = false;
     this.saving = true;
     this.cdr.markForCheck();
     const toClose = this.activities.filter(t => this.selectedTaskKeys.has(this.taskKey(t)));

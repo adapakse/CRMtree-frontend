@@ -16,6 +16,10 @@
   "login": {
     "email": "E-mail",
     "emailPlaceholder": "jean@entreprise.fr",
+    "errors": {
+      "email": "Saisissez votre adresse e-mail, par ex. jean.dupont@societe.fr",
+      "password": "Saisissez votre mot de passe"
+    },
     "failed": "Échec de la connexion",
     "hidePassword": "Masquer",
     "or": "ou",

@@ -50,6 +50,14 @@
     "uploadFailed": "Fișierul nu a putut fi încărcat: {name}.",
     "uploading": "Se încarcă…"
   },
+  "form": {
+    "errors": {
+      "closeComment": "Introduceți un comentariu despre ce s-a făcut, de ex. „Ofertă trimisă”",
+      "title": "Introduceți un titlu"
+    },
+    "fixErrors": "Corectați câmpurile marcate cu roșu ({count})",
+    "noChanges": "Nu există modificări de salvat"
+  },
   "httpErrors": {
     "badRequest": "Unele date nu sunt valide. Verificați câmpurile și încercați din nou.",
     "badRequestDetails": "Date nevalide: {details}",

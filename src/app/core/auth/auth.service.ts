@@ -22,7 +22,7 @@ const isSafeReturnUrl = (url: string): boolean =>
  * USER_MANAGED_FEATURES w backendowym `middleware/crm-rbac.js` — rozjazd
  * oznacza menu pokazujące moduł, do którego backend i tak nie wpuści.
  */
-export const USER_MANAGED_FEATURES: CrmFeature[] = ['call_analysis'];
+export const USER_MANAGED_FEATURES: CrmFeature[] = ['call_analysis', 'email_campaigns'];
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

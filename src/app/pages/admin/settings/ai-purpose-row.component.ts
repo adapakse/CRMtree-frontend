@@ -104,7 +104,7 @@ export interface SavedProvider {
               </button>
             } @else {
               <input class="fi key" type="password" autocomplete="off"
-                     [(ngModel)]="draftKey" (ngModelChange)="onKeyChange()" [disabled]="busy()"
+                     [(ngModel)]="draftKey" (ngModelChange)="onKeyChange()" [disabled]="busy()" [class.fi-err]="submitted() && !canSave()"
                      [placeholder]="t('settings.ai.apiKeyPlaceholder')">
               @if (settledProvider()) {
                 <button type="button" class="linkbtn" [disabled]="busy()" (click)="cancelKeyEdit()">
@@ -113,6 +113,7 @@ export interface SavedProvider {
               }
             }
           </div>
+          @if (submitted() && !canSave()) { <span class="ferr">{{ t('settings.ai.errors.key') }}</span> }
 
           <!-- Dostawcy skonfigurowani już przy innej funkcji: klucz jest zapisany,
                więc wystarczy kliknięcie, zamiast wklejać go drugi raz. -->
@@ -183,7 +184,7 @@ export interface SavedProvider {
         }
 
         <div class="pr-actions">
-          <button class="btn btn-p" [disabled]="busy() || !canSave()" (click)="save()">
+          <button class="btn btn-p" [disabled]="busy()" (click)="save()">
             {{ busy() ? t('settings.ai.verifying') : t('settings.ai.saveAndVerify') }}
           </button>
           @if (config()) {
@@ -191,6 +192,7 @@ export interface SavedProvider {
               {{ t('settings.ai.remove') }}
             </button>
           }
+          @if (submitted() && !canSave()) { <span class="pf-err" role="alert">{{ t('settings.ai.errors.key') }}</span> }
         </div>
       }
     </div>
@@ -471,7 +473,11 @@ export class AiPurposeRowComponent {
     this.draftModel = '';
   }
 
+  readonly submitted = signal(false);
+
   save(): void {
+    this.submitted.set(!this.canSave());
+    if (this.submitted()) return;
     // Zapas na wypadek, gdyby wartość-wartownik trafiła tu inną drogą: lepiej
     // powiedzieć wprost, czego brakuje, niż nie zrobić nic.
     if (this.draftModel === CUSTOM_MODEL) {

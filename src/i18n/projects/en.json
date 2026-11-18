@@ -19,6 +19,9 @@
       "changeRoleFailed": "Couldn't change the role",
       "closeProjectFailed": "Couldn't close the project",
       "endBeforeStart": "The project end date cannot be earlier than its start.",
+      "field": "Choose a field from the list",
+      "member": "Search for a person and click them in the list",
+      "name": "Enter the project name, e.g. CRM rollout — ABC",
       "removeMemberFailed": "Couldn't remove the person",
       "reopenProjectFailed": "Couldn't reopen the project",
       "saveFieldsFailed": "Couldn't save the fields",
@@ -61,6 +64,9 @@
   "chat": {
     "deletedUser": "Deleted user",
     "empty": "No messages.",
+    "errors": {
+      "empty": "Enter the message text"
+    },
     "hint": "Enter sends the message, Shift+Enter adds a new line.",
     "placeholder": "Write a message…",
     "send": "Send",
@@ -276,6 +282,11 @@
       "openTitle": "Invoice document — open in the Documents module"
     },
     "edit": "Edit",
+    "errors": {
+      "amount": "Enter an amount greater than zero, e.g. 1250.00",
+      "category": "Choose a cost category",
+      "date": "Choose a date"
+    },
     "loadFailed": "Couldn't load the project finance",
     "plan": {
       "currency": "Project currency",
@@ -540,6 +551,10 @@
         "addTitle": "New company in KSeF",
         "added": "Company added. Its invoices will be downloaded with the next sync.",
         "editTitle": "Company in KSeF",
+        "errors": {
+          "nip": "The tax ID must have 10 digits, e.g. 1234567890",
+          "token": "Paste the KSeF token generated in the KSeF application"
+        },
         "name": "Name (optional)",
         "saveFailed": "Could not save the company",
         "saved": "Company saved",
@@ -558,6 +573,7 @@
         "duplicateNip": "A company with this tax ID has already been added.",
         "invalidNip": "Invalid tax ID.",
         "notConfigured": "The KSeF integration is not configured on the server.",
+        "syncDays": "Enter a number of days from {min} to {max}",
         "tokenRejected": "KSeF rejected the token for this tax ID. Check that the token is valid and was issued for this company.",
         "unknownGroup": "This group does not exist or is inactive. Refresh the page and choose another one.",
         "unreachable": "KSeF could not be reached to verify the token. Try again later."
@@ -588,6 +604,7 @@
     "sync": {
       "failedForCompany": "The sync failed for at least one company. An administrator can see the details in Settings → Projects → KSeF.",
       "finished": "Sync finished",
+      "notConfigured": "KSeF is not set up — an administrator adds the company in Settings → Projects → KSeF",
       "now": "Sync now",
       "running": "Syncing…",
       "startFailed": "Could not start the sync",
@@ -709,6 +726,9 @@
       "placeholder": "e.g. late delivery from the client",
       "reason": "Reason for the change of the end date"
     },
+    "errors": {
+      "name": "Enter the task name, e.g. Prepare the offer"
+    },
     "fields": {
       "assignees": "Assignees",
       "description": "Additional description",
@@ -794,6 +814,9 @@
     "dictionary": {
       "active": "active",
       "addButton": "Add",
+      "errors": {
+        "name": "Enter the name of the new item"
+      },
       "moveDown": "Move down",
       "moveUp": "Move up",
       "newItemPlaceholder": "New item…",
@@ -803,6 +826,9 @@
       "active": "active",
       "addButton": "Add field",
       "empty": "No fields defined.",
+      "errors": {
+        "name": "Enter the field name, e.g. Order number"
+      },
       "hint": "A PM can add the fields defined here to their project (Project card → Task custom fields) and decide whether they are required. The field type cannot be changed after creation.",
       "newNamePlaceholder": "New field name…",
       "optionsPlaceholder": "Comma-separated values",

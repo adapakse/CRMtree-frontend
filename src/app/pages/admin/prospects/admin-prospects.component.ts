@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -235,7 +236,7 @@ interface DiscoveredCompany {
   selector: 'wt-admin-prospects',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('prospects')],
   template: `
     <ng-container *transloco="let t; prefix: 'prospects'">
@@ -276,7 +277,7 @@ interface DiscoveredCompany {
         </div>
         <div style="display:flex;gap:10px;align-items:center">
           <label class="btn btn-g" style="cursor:pointer;margin:0">
-            <i class="ei ei-folder"></i> {{ t('admin.import.chooseFile') }}
+            <span aria-hidden="true">📄</span> {{ t('admin.import.chooseFile') }}
             <input type="file" accept=".csv" style="display:none"
               (change)="onFileSelected($event)">
           </label>
@@ -649,9 +650,8 @@ interface DiscoveredCompany {
                   </button>
                 } @else {
                   <button class="btn btn-p btn-sm"
-                    [disabled]="toLeadLoading() === p.id || !qualifiesForLead(p)"
-                    [style.opacity]="qualifiesForLead(p) ? '1' : '0.4'"
-                    (click)="toLead(p)"
+                    [disabled]="toLeadLoading() === p.id"
+                    (click)="qualifiesForLead(p) ? toLead(p) : explainLeadBlocked(p)"
                     [title]="leadButtonTooltip(p)">
                     @if (toLeadLoading() === p.id) { … } @else { → {{ t('admin.table.lead') }} }
                   </button>
@@ -1208,13 +1208,15 @@ interface DiscoveredCompany {
           <input class="inp" style="width:100%;box-sizing:border-box"
             [(ngModel)]="toLeadNipValue"
             maxlength="13"
-            placeholder="0000000000">
+            placeholder="0000000000"
+            [class.fi-err]="isToLeadSubmitted && toLeadNipDigits.length !== 10">
           @if (toLeadNipDigits !== toLeadDialog()!.nip) {
             <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);font-weight:600">
               {{ t('admin.toLead.changed') }}
             </span>
           }
         </div>
+        @if (isToLeadSubmitted && toLeadNipDigits.length !== 10) { <span class="ferr">{{ t('admin.errors.nip') }}</span> }
         <div style="font-size:12px;color:var(--gray-500);margin-bottom:16px">
           {{ t('admin.toLead.taxIdHint') }}
           @if (toLeadNipDigits !== toLeadDialog()!.nip && toLeadNipDigits.length === 10) {
@@ -1251,10 +1253,11 @@ interface DiscoveredCompany {
         }
 
         <div style="display:flex;gap:8px;justify-content:flex-end">
+          @if (isToLeadSubmitted) { <wt-form-error-summary [count]="toLeadNipDigits.length === 10 ? 0 : 1" /> }
           <button class="btn btn-g"
             (click)="toLeadDialog.set(null)">{{ t('admin.bulk.cancel') }}</button>
           <button class="btn btn-p"
-            [disabled]="toLeadNipDigits.length !== 10 || !!toLeadLoading()"
+            [disabled]="!!toLeadLoading()"
             (click)="confirmToLead()">
             {{ toLeadLoading() ? t('admin.toLead.creating') : toLeadDuplicateError() ? t('admin.toLead.createAnyway') : t('admin.toLead.create') }}
           </button>
@@ -1667,7 +1670,9 @@ interface DiscoveredCompany {
               [(ngModel)]="discoverySeedName"
               [placeholder]="t('admin.discoveryModal.companyNamePlaceholder')"
               [disabled]="discoveryLoading()"
+              [class.fi-err]="isDiscoverySubmitted && !discoverySeedName.trim()"
               (keydown.enter)="startDiscovery()">
+            @if (isDiscoverySubmitted && !discoverySeedName.trim()) { <span class="ferr">{{ t('admin.errors.seedName') }}</span> }
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--gray-700);display:block;margin-bottom:4px">{{ t('admin.discoveryModal.taxId') }}</label>
@@ -1675,7 +1680,9 @@ interface DiscoveredCompany {
               [(ngModel)]="discoverySeedNip"
               placeholder="1234567890"
               [disabled]="discoveryLoading()"
+              [class.fi-err]="isDiscoverySubmitted && isDiscoveryNipInvalid()"
               (keydown.enter)="startDiscovery()">
+            @if (isDiscoverySubmitted && isDiscoveryNipInvalid()) { <span class="ferr">{{ t('admin.errors.nip') }}</span> }
           </div>
         </div>
 
@@ -1698,11 +1705,12 @@ interface DiscoveredCompany {
 
         <div style="display:flex;gap:8px;margin-bottom:16px">
           <button class="btn btn-p"
-            [disabled]="discoveryLoading() || !discoverySeedName.trim() || discoverySeedNip.replace(/\D/g,'').length !== 10"
+            [disabled]="discoveryLoading()"
             (click)="startDiscovery()">
             ▶ {{ t('admin.discoveryModal.search') }}
           </button>
           <button class="btn btn-g" (click)="cancelDiscovery()">{{ t('admin.bulk.cancel') }}</button>
+          @if (isDiscoverySubmitted) { <wt-form-error-summary [count]="(discoverySeedName.trim() ? 0 : 1) + (isDiscoveryNipInvalid() ? 1 : 0)" /> }
           @if (discoveryResults().length > 0 && !discoveryLoading()) {
             <span style="align-self:center;font-size:12px;color:var(--gray-500)">
               {{ t('admin.detail.industry') }} <b style="color:var(--gray-700)">{{ discoveryIndustry() || '—' }}</b>
@@ -1819,8 +1827,9 @@ interface DiscoveredCompany {
                 @if (discoveryDone()!.batchStarted) { {{ t('admin.discoveryModal.andEnrichmentStarted') }} }
               </div>
             } @else {
+              @if (isDiscoveryAddSubmitted && discoverySelectedCount() === 0) { <span class="pf-err" role="alert">{{ t('admin.errors.selectCompanies') }}</span> }
               <button class="btn btn-p"
-                [disabled]="discoveryAdding() || discoverySelectedCount() === 0"
+                [disabled]="discoveryAdding()"
                 (click)="bulkAddAndEnrich()">
                 @if (discoveryAdding()) { <i class="ei ei-hourglass"></i> {{ t('admin.discoveryModal.adding') }} } @else { ▶ {{ t('admin.discoveryModal.addAndEnrich') }} }
               </button>
@@ -2626,6 +2635,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   // ── "Znajdź konkurencję" ───────────────────────────────────────
 
   openDiscovery() {
+    this.isDiscoverySubmitted = false;
+    this.isDiscoveryAddSubmitted = false;
     this.discoverySeedName = '';
     this.discoverySeedNip  = '';
     this.discoveryResults.set([]);
@@ -2644,7 +2655,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   startDiscovery() {
     const name = this.discoverySeedName.trim();
     const nip  = this.discoverySeedNip.replace(/\D/g, '');
-    if (!name || nip.length !== 10) return;
+    this.isDiscoverySubmitted = !name || nip.length !== 10;
+    if (this.isDiscoverySubmitted) return;
 
     this.discoveryAbort?.abort();
     this.discoveryAbort = new AbortController();
@@ -2752,7 +2764,19 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     this.discoveryResults.update(r => r.map(c => ({ ...c, selected: checked && !!(c.nip || c.nip_edit) })));
   }
 
+  isDiscoverySubmitted = false;
+  isDiscoveryAddSubmitted = false;
+  isToLeadSubmitted = false;
+
+  isDiscoveryNipInvalid(): boolean { return this.discoverySeedNip.replace(/\D/g, '').length !== 10; }
+
+  explainLeadBlocked(p: Prospect): void {
+    this.toast.info(this.leadButtonTooltip(p));
+  }
+
   bulkAddAndEnrich() {
+    this.isDiscoveryAddSubmitted = this.discoverySelectedCount() === 0;
+    if (this.isDiscoveryAddSubmitted) return;
     const toAdd = this.discoveryResults()
       .filter(c => c.selected)
       .map(c => ({
@@ -2935,6 +2959,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   // ── → Lead ──────────────────────────────────────────────────────
 
   toLead(p: Prospect) {
+    this.isToLeadSubmitted = false;
     this.toLeadAssignedTo.set('');
     this.toLeadDuplicateError.set(null);
     this.toLeadNipValue = p.nip || '';
@@ -2951,7 +2976,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     const p = this.toLeadDialog();
     if (!p) return;
     const nip = this.toLeadNipValue.replace(/\D/g, '');
-    if (nip.length !== 10) return;
+    this.isToLeadSubmitted = nip.length !== 10;
+    if (this.isToLeadSubmitted) return;
     this.toLeadLoading.set(p.id);
     this.toLeadDuplicateError.set(null);
     const body: Record<string, string> = {};

@@ -21,6 +21,10 @@
       "title": "Wygląd"
     },
     "delete": "Usuń",
+    "errors": {
+      "pbxToken": "Wklej swój Personal Access Token (PAT) z centrali",
+      "templateName": "Podaj nazwę szablonu, np. Oferta standardowa"
+    },
     "manual": {
       "hint": "Interaktywna instrukcja CRMtree ze zrzutami ekranu. Otworzy się w nowej karcie.",
       "open": "Otwórz instrukcję",

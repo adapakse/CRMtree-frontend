@@ -27,6 +27,13 @@
       "subtitle": "Permanently deletes a document, lead or partner together with all related data and logs.",
       "title": "Deleting records"
     },
+    "errors": {
+      "confirmPhrase": "Type exactly “{phrase}” to confirm",
+      "selectDoc": "Search for a document and click it in the list",
+      "selectFile": "Choose the JSON file with the exported settings",
+      "selectLead": "Search for a lead and click it in the list",
+      "selectPartner": "Search for a partner and click them in the list"
+    },
     "purge": {
       "confirm": "Confirm",
       "docs": {
@@ -705,6 +712,9 @@
       "body": "Are you sure you want to delete the PBX token for {name}? The user will not be able to use the softphone.",
       "title": "Delete PBX token"
     },
+    "errors": {
+      "token": "Paste the Personal Access Token (PAT) from the PBX"
+    },
     "loadError": "Failed to load data.",
     "loading": "Loading…",
     "modal": {
@@ -758,6 +768,9 @@
       "detected": "Recognised: {provider}",
       "detectedShort": "recognised from the key",
       "detecting": "Recognising the provider…",
+      "errors": {
+        "key": "Paste the provider's API key (e.g. sk-…) or choose a saved key"
+      },
       "intro": "Every feature has its own provider, key and model — enrichment can run at one provider and call analysis at another. Paste a key and we recognise the provider ourselves. Saving verifies the setup with the provider; the key is encrypted and never shown again.",
       "loading": "Loading AI configuration...",
       "model": "Model",
@@ -1193,6 +1206,9 @@
       "deleteConfirm": "Delete the field “{name}”?",
       "deleteTooltip": "Delete the field — only possible while no record has a value in it",
       "empty": "No custom fields on this form.",
+      "errors": {
+        "name": "Enter the field name, e.g. Customer number"
+      },
       "hint": "Fields you define yourself for this form. A field's type cannot be changed later — to change it, switch the field off and add a new one. A disabled field disappears from the form, but values already entered are kept.",
       "newNamePlaceholder": "New field name",
       "optionsPlaceholder": "Comma-separated values",
@@ -1291,6 +1307,10 @@
       "displayNamePlaceholder": "e.g. Customer Service",
       "documentCount": "{count, plural, one {# document} other {# documents}}",
       "empty": "No groups. Add the first group above or run migration 0127.",
+      "errors": {
+        "displayName": "Enter the display name, e.g. Sales team",
+        "technicalName": "Enter the technical name, e.g. sales_team"
+      },
       "inactive": "Inactive",
       "intro": "— manage the groups users can be assigned to. Groups control access to documents. A group with assigned users or documents cannot be deleted.",
       "memberCount": "{count, plural, one {# user} other {# users}}",
@@ -1332,6 +1352,10 @@
         "definitionHint": "The system uses this description to assess whether a company meets the signal.",
         "definitionPlaceholder": "Describe how to tell that a company meets this condition — specific words/phrases on the website, sections, job titles.",
         "editTitle": "Edit signal",
+        "errors": {
+          "definition": "Describe how the AI should recognise this signal",
+          "name": "Enter the signal name, e.g. Company has over 50 employees"
+        },
         "name": "Signal name",
         "namePlaceholder": "e.g. Own transport fleet",
         "newTitle": "New signal",
@@ -1456,6 +1480,9 @@
       "codeWrittenHint": "This is not a funnel step but a state the app sets itself (archiving a lead, converting to a partner), so it cannot be removed. You can rename it.",
       "confirmDelete": "Remove the stage \"{name}\"?",
       "confirmDeleteWithLeads": "Remove the stage \"{name}\"?\n\nThe {count} lead(s) on it will move to \"{target}\".",
+      "errors": {
+        "name": "Enter the name of the new stage, e.g. Negotiation"
+      },
       "intro": "Your own names for the funnel stages — rename the existing ones, add a step or remove one you do not need. The stage code stays the same, so a new name shows up across the app while reports and lead records are untouched. An empty name goes back to the built-in one.",
       "kinds": {
         "archived": "archive",
@@ -1633,6 +1660,9 @@
       "saved": "Group updated",
       "title": "Edit group"
     },
+    "errors": {
+      "internalName": "Enter the internal name, e.g. sales-team"
+    },
     "fields": {
       "description": "Description",
       "displayName": "Display name",
@@ -1724,11 +1754,18 @@
       "updated": "User updated"
     },
     "empty": "No users found",
+    "errors": {
+      "chooseGroup": "Choose a group from the list"
+    },
     "featureAccess": {
       "callAnalysis": "Call analyser",
       "callAnalysisDisabled": "Access to Call analyser disabled",
       "callAnalysisEnabled": "Access to Call analyser enabled",
       "callAnalysisHint": "AI analysis of phone call notes, scoring and follow-up",
+      "emailCampaigns": "Email campaigns",
+      "emailCampaignsDisabled": "Access to Email campaigns turned off",
+      "emailCampaignsEnabled": "Access to Email campaigns turned on",
+      "emailCampaignsHint": "Email campaigns to partners and leads via SendGrid",
       "prospects": "Prospects",
       "prospectsDisabled": "Access to Prospects disabled",
       "prospectsEnabled": "Access to Prospects enabled",

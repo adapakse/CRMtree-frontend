@@ -12,6 +12,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
 import { PeriodFilterComponent, PeriodChangeEvent } from '../../../shared/components/period-filter/period-filter.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { LeadStagesService } from '../../../core/services/lead-stages.service';
 
@@ -50,7 +51,7 @@ const TODAY_CALLS_GOAL = 37;
 @Component({
   selector: 'wt-crm-sales-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, TooltipComponent, AddToCalendarComponent, PeriodFilterComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, RouterModule, FormsModule, TooltipComponent, AddToCalendarComponent, PeriodFilterComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('crm')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -427,10 +428,13 @@ const TODAY_CALLS_GOAL = 37;
           </div>
           <div *ngIf="closingTask === t" class="task-close-form" (click)="$event.stopPropagation()">
             <textarea class="task-close-ta" [(ngModel)]="taskCloseComment"
-                      [placeholder]="'crm.salesDashboard.tasks.closeCommentPlaceholder' | transloco" rows="2" autoFocus></textarea>
+                      [placeholder]="'crm.salesDashboard.tasks.closeCommentPlaceholder' | transloco" rows="2" autoFocus
+                      [class.fi-err]="taskCloseSubmitted && !taskCloseComment.trim()"></textarea>
+            @if (taskCloseSubmitted && !taskCloseComment.trim()) { <span class="ferr">{{ 'form.errors.closeComment' | transloco }}</span> }
             <div class="task-close-btns">
+              @if (taskCloseSubmitted) { <wt-form-error-summary [count]="taskCloseComment.trim() ? 0 : 1" /> }
               <button class="btn btn-g btn-sm" (click)="cancelCloseTask()">{{ 'actions.cancel' | transloco }}</button>
-              <button class="btn btn-p btn-sm" [disabled]="!taskCloseComment.trim()"
+              <button class="btn btn-p btn-sm"
                       (click)="confirmCloseTaskDash()">{{ 'actions.close' | transloco }}</button>
             </div>
           </div>
@@ -913,6 +917,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
 
   closingTask:       ActivityTask | null = null;
   taskCloseComment = '';
+  taskCloseSubmitted = false;
 
   private allLeads: Lead[] = [];
 
@@ -1346,6 +1351,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     } else {
       this.closingTask = task;
       this.taskCloseComment = '';
+      this.taskCloseSubmitted = false;
       // The task list has a fixed height and a hidden scrollbar: without this the
       // comment form can open below the visible part and the click looks dead.
       setTimeout(() => this.host.nativeElement.querySelector('.task-close-form')
@@ -1357,12 +1363,18 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   cancelCloseTask() {
     this.closingTask = null;
     this.taskCloseComment = '';
+    this.taskCloseSubmitted = false;
     this.cdr.markForCheck();
   }
 
   confirmCloseTaskDash() {
     const t = this.closingTask;
-    if (!t || !this.taskCloseComment.trim()) return;
+    if (!t) return;
+    if (!this.taskCloseComment.trim()) {
+      this.taskCloseSubmitted = true;
+      return;
+    }
+    this.taskCloseSubmitted = false;
     if (t.source_type !== 'lead' && t.source_type !== 'partner') return;
     const comment = this.taskCloseComment.trim();
     const stamp = new Date().toLocaleString(this.locale.activeLocale(), { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -1379,12 +1391,14 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
         t.body = newBody;
         this.closingTask = null;
         this.taskCloseComment = '';
+        this.taskCloseSubmitted = false;
         this.cdr.markForCheck();
       },
       error: () => {
         t.status = prev;
         this.closingTask = null;
         this.taskCloseComment = '';
+        this.taskCloseSubmitted = false;
         this.cdr.markForCheck();
       },
     });

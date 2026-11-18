@@ -4,7 +4,7 @@ import { NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 /** Line icon for an activity type (replaces the former emoji glyphs), in the colour the emoji had. */
 const TYPE_COLORS: Record<string, string> = {
   task: '#16A34A', call: '#0D9488', email: '#3B82F6', meeting: '#F97316', note: '#EAB308',
-  doc_sent: '#6B7280', training: '#8B5CF6', qbr: '#3B82F6', opportunity: '#F59E0B',
+  doc_sent: '#6B7280', training: '#8B5CF6', qbr: '#3B82F6', opportunity: '#F59E0B', marketing_email: '#3B82F6',
 };
 
 @Component({
@@ -17,6 +17,7 @@ const TYPE_COLORS: Record<string, string> = {
       <svg *ngSwitchCase="'task'" class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
       <svg *ngSwitchCase="'call'" class="ic" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
       <svg *ngSwitchCase="'email'" class="ic" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+      <svg *ngSwitchCase="'marketing_email'" class="ic" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
       <svg *ngSwitchCase="'meeting'" class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
       <svg *ngSwitchCase="'note'" class="ic" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
       <svg *ngSwitchCase="'doc_sent'" class="ic" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/></svg>

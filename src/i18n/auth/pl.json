@@ -16,6 +16,10 @@
   "login": {
     "email": "Email",
     "emailPlaceholder": "jan@firma.pl",
+    "errors": {
+      "email": "Podaj adres e-mail, np. jan.kowalski@firma.pl",
+      "password": "Podaj hasło"
+    },
     "failed": "Błąd logowania",
     "hidePassword": "Ukryj",
     "or": "lub",

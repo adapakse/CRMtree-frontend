@@ -16,6 +16,10 @@
   "login": {
     "email": "E-pošta",
     "emailPlaceholder": "janez@podjetje.si",
+    "errors": {
+      "email": "Vnesite e-poštni naslov, npr. janez.novak@podjetje.si",
+      "password": "Vnesite geslo"
+    },
     "failed": "Prijava ni uspela",
     "hidePassword": "Skrij",
     "or": "ali",

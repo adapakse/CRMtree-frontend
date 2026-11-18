@@ -21,6 +21,10 @@
       "title": "Videz"
     },
     "delete": "Izbriši",
+    "errors": {
+      "pbxToken": "Prilepite svoj Personal Access Token (PAT) iz telefonske centrale",
+      "templateName": "Vnesite ime predloge, npr. Standardna ponudba"
+    },
     "manual": {
       "hint": "Interaktivni priročnik CRMtree s posnetki zaslona. Odpre se v novem zavihku.",
       "open": "Odpri priročnik",

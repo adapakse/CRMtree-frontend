@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
+import { scrollToFirstError } from '../../../shared/forms/form-errors';
 import { CrmApiService, Partner, PartnerStatus, PARTNER_STATUS_LABELS, CrmUser, PartnersReportPartner } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
@@ -13,7 +15,7 @@ type SortDir = 'asc' | 'desc';
 @Component({
   selector: 'wt-crm-partners-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -195,32 +197,68 @@ type SortDir = 'asc' | 'desc';
   </div>
   </div><!-- /content -->
 
-  <!-- Create panel -->
-  <div class="side-panel" *ngIf="showCreate" (click)="showCreate=false">
-    <div class="side-panel-inner" (click)="$event.stopPropagation()">
-      <h3>{{ t('partnersList.create.title') }}</h3>
-      <p class="hint">{{ t('partnersList.create.hint') }}</p>
-      <label>{{ t('partnersList.fields.company') }} *<input [(ngModel)]="newP.company" [placeholder]="t('partnersList.create.companyPlaceholder')"></label>
-      <label>{{ t('partnersList.fields.taxId') }} <span style="font-size:10px;color:var(--gray-400)">{{ t('partnersList.create.taxIdHint') }}</span>
-        <input [(ngModel)]="newP.nip" placeholder="PL1234567890" maxlength="14"
-               (ngModelChange)="onPartnerNipChange()"
-               [style.border-color]="partnerNipError ? '#ef4444' : ''">
-        <span *ngIf="partnerNipError" style="font-size:12px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);margin-top:2px;display:block">{{ partnerNipError }}</span>
-      </label>
-      <label>{{ t('partnersList.fields.contact') }}<input [(ngModel)]="newP.contact_name"></label>
-      <label>{{ t('partnersList.fields.email') }}<input [(ngModel)]="newP.email" type="email"></label>
-      <label>{{ t('partnersList.fields.industry') }}<input [(ngModel)]="newP.industry"></label>
-      <label>{{ t('partnersList.fields.annualTurnover') }}<div style="display:flex;gap:6px"><input [(ngModel)]="newP.contract_value" type="number" min="0" placeholder="0" style="flex:1"><select [(ngModel)]="newP.annual_turnover_currency" style="width:70px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div></label>
-      <label>{{ t('partnersList.fields.licenseCount') }}<input [(ngModel)]="newP.license_count" type="number" min="0"></label>
-      <label *ngIf="isManager">{{ t('partnersList.fields.accountManager') }}
-        <select [(ngModel)]="newP.manager_id">
-          <option value="">{{ t('partnersList.create.unassigned') }}</option>
-          <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
-        </select>
-      </label>
-      <div class="panel-actions">
+  <!-- Create modal (same look as "New lead" in crm-leads-list.component.ts) -->
+  <div class="overlay" *ngIf="showCreate" (click)="showCreate=false">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <div class="modal-icon" style="background:var(--orange-pale)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" width="18" height="18"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg>
+        </div>
+        <div>
+          <div class="modal-title">{{ t('partnersList.create.title') }}</div>
+          <div style="font-size:12px;color:var(--gray-400)">{{ t('partnersList.create.hint') }}</div>
+        </div>
+        <button class="dp-close" style="margin-left:auto" (click)="showCreate=false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="fgrid2">
+          <div class="fg" style="grid-column:1/-1">
+            <label class="fl">{{ t('partnersList.fields.company') }} <span class="req">*</span></label>
+            <input class="fi" [(ngModel)]="newP.company" [placeholder]="t('partnersList.create.companyPlaceholder')" [class.fi-err]="createSubmitted && !newP.company?.trim()">
+            @if (createSubmitted && !newP.company?.trim()) { <span class="ferr">{{ t('fieldErrors.company') }}</span> }
+          </div>
+          <div class="fg">
+            <label class="fl">{{ t('partnersList.fields.taxId') }} <span class="req">*</span></label>
+            <input class="fi" [(ngModel)]="newP.nip" placeholder="PL1234567890" maxlength="14"
+                   (ngModelChange)="onPartnerNipChange()" [class.fi-err]="!!partnerNipError">
+            @if (partnerNipError) { <span class="ferr">{{ partnerNipError }}</span> }
+          </div>
+          <div class="fg">
+            <label class="fl">{{ t('partnersList.fields.industry') }}</label>
+            <input class="fi" [(ngModel)]="newP.industry">
+          </div>
+          <div class="fg">
+            <label class="fl">{{ t('partnersList.fields.contact') }}</label>
+            <input class="fi" [(ngModel)]="newP.contact_name">
+          </div>
+          <div class="fg">
+            <label class="fl">{{ t('partnersList.fields.email') }}</label>
+            <input class="fi" [(ngModel)]="newP.email" type="email">
+          </div>
+          <div class="fg">
+            <label class="fl">{{ t('partnersList.fields.annualTurnover') }}</label>
+            <div style="display:flex;gap:6px">
+              <input class="fi" [(ngModel)]="newP.contract_value" type="number" min="0" placeholder="0" style="flex:1;min-width:0">
+              <select class="fsel" [(ngModel)]="newP.annual_turnover_currency" style="width:84px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="fl">{{ t('partnersList.fields.licenseCount') }}</label>
+            <input class="fi" [(ngModel)]="newP.license_count" type="number" min="0">
+          </div>
+          <div class="fg" *ngIf="isManager" style="grid-column:1/-1">
+            <label class="fl">{{ t('partnersList.fields.accountManager') }}</label>
+            <select class="fsel" [(ngModel)]="newP.manager_id">
+              <option value="">{{ t('partnersList.create.unassigned') }}</option>
+              <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        @if (createSubmitted) { <wt-form-error-summary [count]="createErrorCount()" /> }
         <button class="btn btn-g" (click)="showCreate=false">{{ 'actions.cancel' | transloco }}</button>
-        <button class="btn btn-p" (click)="createPartner()" [disabled]="!newP.company||!!partnerNipError||saving">
+        <button class="btn btn-p" (click)="createPartner()" [disabled]="saving">
           {{ saving ? t('partnersList.create.saving') : t('partnersList.create.submit') }}
         </button>
       </div>
@@ -288,14 +326,23 @@ type SortDir = 'asc' | 'desc';
     .churn-high { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); }
     .churn-medium { background:color-mix(in srgb, #fef9c3 var(--tint-mix), var(--surface)); color:oklch(from #854d0e max(l, var(--text-min-l)) c h); }
     .churn-low { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
-    /* Side panel */
-    .side-panel { position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:100; display:flex; justify-content:flex-end; }
-    .side-panel-inner { background:var(--surface); width:360px; height:100%; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:12px; }
-    .side-panel-inner h3 { margin:0; font-size:16px; font-weight:700; }
-    .hint { font-size:12px; color:var(--gray-400); margin:0; }
-    .side-panel-inner label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; }
-    .side-panel-inner input, .side-panel-inner select { border:1px solid var(--gray-300); border-radius:6px; padding:8px 10px; font-size:14px; outline:none; }
-    .panel-actions { display:flex; gap:8px; margin-top:8px; }
+    /* Create modal — same look as "New lead" (crm-leads-list.component.ts) */
+    .overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(2px); }
+    .modal { background:var(--surface); border-radius:14px; width:560px; max-width:95vw; box-shadow:0 11px 29px rgba(0,0,0,0.162); overflow:hidden; animation:scaleIn .2s ease; }
+    @keyframes scaleIn { from { transform:scale(.95); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .modal-head { padding:18px 22px; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; }
+    .modal-icon { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .modal-title { font-family:'Sora',sans-serif; font-size:16px; font-weight:700; color:var(--gray-900); }
+    .modal-body { padding:20px 22px; max-height:65vh; overflow-y:auto; }
+    .modal-foot { padding:14px 22px; border-top:1px solid var(--gray-200); display:flex; gap:8px; align-items:center; background:var(--gray-50); }
+    .fgrid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .fg { display:flex; flex-direction:column; gap:4px; }
+    .fl { font-size:12px; font-weight:600; color:var(--gray-600); }
+    .fi,.fsel { background:var(--gray-50); border:1.5px solid var(--gray-200); border-radius:8px; padding:8px 12px; font-size:14px; color:var(--gray-800); outline:none; font-family:inherit; width:100%; box-sizing:border-box; }
+    .fi:focus,.fsel:focus { border-color:var(--orange); background:var(--surface); }
+    .dp-close { background:none; border:none; cursor:pointer; color:var(--gray-400); font-size:16px; padding:0; line-height:1; }
+    .dp-close:hover { color:var(--gray-700); }
+    @media (max-width: 600px) { .fgrid2 { grid-template-columns:minmax(0, 1fr); } .fgrid2 > .fg { grid-column:1/-1 !important; } }
   `],
 })
 export class CrmPartnersListComponent implements OnInit, OnDestroy {
@@ -333,6 +380,7 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
 
   newP: Partial<Partner> = { nip: 'PL' };
   partnerNipError = '';
+  createSubmitted = false;
 
   onPartnerNipChange(): void {
     const val = (this.newP.nip || '').trim().toUpperCase();
@@ -499,15 +547,21 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
 
   openCreateForm() {
     this.newP = { nip: 'PL' }; this.partnerNipError = '';
+    this.createSubmitted = false;
     this.showCreate = true;
   }
 
+  createErrorCount(): number {
+    return (this.newP.company?.trim() ? 0 : 1) + (this.partnerNipError ? 1 : 0);
+  }
+
   createPartner() {
-    if (!this.newP.company) return;
-    // Waliduj NIP tylko jeśli podano wartość
-    if (this.newP.nip && this.newP.nip !== 'PL') {
-      this.onPartnerNipChange();
-      if (this.partnerNipError) return;
+    // NIP is required (Adam, 2026-11-18) — validated on every click, also when left empty or as just "PL".
+    this.onPartnerNipChange();
+    if (this.createErrorCount() > 0) {
+      this.createSubmitted = true;
+      scrollToFirstError();
+      return;
     }
     this.saving = true;
     this.api.createPartner(this.newP).subscribe({
