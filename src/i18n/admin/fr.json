@@ -322,17 +322,17 @@
         }
       },
       "enrichment_api_key": {
-        "label": "Enrichment — clé API propre"
+        "label": "Enrichissement — clé API propre"
       },
       "enrichment_ideal_customer": {
         "hint": "Secteurs, taille d’entreprise, région, signaux indiquant une bonne adéquation, ainsi que les entreprises que vous ne souhaitez pas prospecter. Sur cette base, nous configurerons les signaux et la notation.",
-        "label": "Enrichment — profil du client idéal (ICP)"
+        "label": "Enrichissement — profil du client idéal (ICP)"
       },
       "enrichment_licence": {
-        "label": "Enrichment — licence du modèle"
+        "label": "Enrichissement — licence du modèle"
       },
       "enrichment_model": {
-        "label": "Enrichment — modèle préféré",
+        "label": "Enrichissement — modèle préféré",
         "options": {
           "anthropic": {
             "label": "Anthropic Claude (qualité supérieure, coût plus élevé)"
@@ -346,7 +346,7 @@
         }
       },
       "enrichment_monthly_volume": {
-        "label": "Enrichment — combien d’entreprises prévoyez-vous d’analyser par mois ?"
+        "label": "Enrichissement — combien d’entreprises prévoyez-vous d’analyser par mois ?"
       },
       "gmail_apis_enabled": {
         "hint": "API et services → API activées → « + ACTIVER DES API ET DES SERVICES » → rechercher → Activer, pour les deux. L'API Gmail est obligatoire ; l'API Drive ouvre les pièces jointes envoyées en liens Drive.",
@@ -401,7 +401,7 @@
       },
       "lead_sources": {
         "label": "Sources de leads",
-        "placeholder": "Site web, recommandation, cold call, LinkedIn, salons…"
+        "placeholder": "Site web, recommandation, appel à froid, LinkedIn, salons…"
       },
       "modules": {
         "label": "Quels modules doivent être actifs ?",
@@ -419,7 +419,7 @@
             "label": "Intégration des données de vente (DWH)"
           },
           "leads": {
-            "hint": "Entonnoir de vente, activités, calendrier.",
+            "hint": "Pipeline de vente, activités, calendrier.",
             "label": "Leads"
           },
           "onboarding": {
@@ -435,11 +435,11 @@
             "label": "Téléphonie (softphone)"
           },
           "performance": {
-            "hint": "Health score et risque d’attrition du client (churn).",
+            "hint": "Santé du partenaire et risque d’attrition du client.",
             "label": "Performances"
           },
           "prospects": {
-            "hint": "Recherche d’entreprises et leur évaluation automatique par l’IA (Enrichment / ICP).",
+            "hint": "Recherche d’entreprises et leur évaluation automatique par l’IA (Enrichissement / ICP).",
             "label": "Prospects"
           },
           "sales_reports": {
@@ -503,8 +503,8 @@
         "label": "Numéros depuis lesquels les appels doivent être émis"
       },
       "sales_stages": {
-        "hint": "Laissez vide si l’entonnoir par défaut vous convient.",
-        "label": "Étapes de l’entonnoir de vente",
+        "hint": "Laissez vide si le pipeline par défaut vous convient.",
+        "label": "Étapes du pipeline de vente",
         "placeholder": "Nouveau → Qualification → Présentation → Offre → Négociation → Gagné / Perdu"
       },
       "seo_articles_per_day": {
@@ -649,8 +649,8 @@
     },
     "sections": {
       "ai": {
-        "intro": "Les modules Prospects (Enrichment) et Analyse des appels envoient des données à des modèles de langage externes. Vous pouvez utiliser la licence CRMtree ou une licence dédiée, propre à votre entreprise.",
-        "title": "8. Modèles d’IA — Enrichment et Analyse des appels"
+        "intro": "Les modules Prospects (Enrichissement) et Analyse des appels envoient des données à des modèles de langage externes. Vous pouvez utiliser la licence CRMtree ou une licence dédiée, propre à votre entreprise.",
+        "title": "8. Modèles d’IA — Enrichissement et Analyse des appels"
       },
       "billing": {
         "title": "2. Forfait et données de facturation"
@@ -804,67 +804,67 @@
     "catalog": {
       "churn_daily_run_time": {
         "description": "Format HH:MM — à cette heure, le serveur recalcule le scoring et envoie les alertes par e-mail",
-        "label": "Churn : heure du recalcul quotidien"
+        "label": "Attrition : heure du recalcul quotidien"
       },
       "churn_days_t1_max": {
         "description": "Max. de jours sans commande pour le seuil 1",
-        "label": "Churn : seuil 1 de jours — max"
+        "label": "Attrition : seuil 1 de jours — max"
       },
       "churn_days_t1_min": {
         "description": "Min. de jours sans commande pour le seuil 1",
-        "label": "Churn : seuil 1 de jours — min"
+        "label": "Attrition : seuil 1 de jours — min"
       },
       "churn_days_t1_pts": {
         "description": "Points pour 10–20 jours sans commande",
-        "label": "Churn : points pour le seuil 1 de jours"
+        "label": "Attrition : points pour le seuil 1 de jours"
       },
       "churn_days_t2_max": {
         "description": "Max. de jours sans commande pour le seuil 2",
-        "label": "Churn : seuil 2 de jours — max"
+        "label": "Attrition : seuil 2 de jours — max"
       },
       "churn_days_t2_min": {
         "description": "Min. de jours sans commande pour le seuil 2",
-        "label": "Churn : seuil 2 de jours — min"
+        "label": "Attrition : seuil 2 de jours — min"
       },
       "churn_days_t2_pts": {
         "description": "Points pour 21–30 jours sans commande",
-        "label": "Churn : points pour le seuil 2 de jours"
+        "label": "Attrition : points pour le seuil 2 de jours"
       },
       "churn_days_t3_pts": {
         "description": "Points pour >30 jours sans commande",
-        "label": "Churn : points pour le seuil 3 de jours"
+        "label": "Attrition : points pour le seuil 3 de jours"
       },
       "churn_risk_critical": {
         "description": "Points min. pour le niveau de risque : Critique",
-        "label": "Churn : seuil de risque critique"
+        "label": "Attrition : seuil de risque critique"
       },
       "churn_risk_high": {
         "description": "Points min. pour le niveau de risque : Élevé",
-        "label": "Churn : seuil de risque élevé"
+        "label": "Attrition : seuil de risque élevé"
       },
       "churn_risk_low": {
         "description": "Points min. pour le niveau de risque : Faible",
-        "label": "Churn : seuil de risque faible"
+        "label": "Attrition : seuil de risque faible"
       },
       "churn_risk_medium": {
         "description": "Points min. pour le niveau de risque : Moyen",
-        "label": "Churn : seuil de risque moyen"
+        "label": "Attrition : seuil de risque moyen"
       },
       "churn_sales_t1_pct": {
         "description": "% min. de baisse M-2→M-1 pour le seuil 1",
-        "label": "Churn : baisse des ventes seuil 1 %"
+        "label": "Attrition : baisse des ventes seuil 1 %"
       },
       "churn_sales_t1_pts": {
         "description": "Points pour une baisse des ventes ≥30% M-2→M-1",
-        "label": "Churn : points pour le seuil 1 des ventes"
+        "label": "Attrition : points pour le seuil 1 des ventes"
       },
       "churn_sales_t2_pct": {
         "description": "% min. de baisse M-2→M-1 pour le seuil 2",
-        "label": "Churn : baisse des ventes seuil 2 %"
+        "label": "Attrition : baisse des ventes seuil 2 %"
       },
       "churn_sales_t2_pts": {
         "description": "Points pour une baisse des ventes ≥51% M-2→M-1",
-        "label": "Churn : points pour le seuil 2 des ventes"
+        "label": "Attrition : points pour le seuil 2 des ventes"
       },
       "crm_adoption_target_pct": {
         "description": "% cible d'utilisateurs actifs chez le partenaire",
@@ -903,16 +903,16 @@
         "label": "Cycle de vente long (jours)"
       },
       "crm_dashboard_win_stages": {
-        "description": "Étapes du lead considérées comme gagnées (elles influencent le Win Rate et le compteur « Gagnés » du tableau de bord). Format : tableau JSON.",
+        "description": "Étapes du lead considérées comme gagnées (elles influencent le taux de réussite et le compteur « Gagnés » du tableau de bord). Format : tableau JSON.",
         "label": "Étapes du lead considérées comme « gagnées »"
       },
       "crm_global_read": {
-        "description": "Lorsque cette option est activée, tous les utilisateurs du CRM peuvent consulter les Leads, les Partenaires, les Rapports de vente et la Performance sans restriction de visibilité. Les droits de modification restent inchangés.",
+        "description": "Lorsque cette option est activée, tous les utilisateurs du CRM peuvent consulter les Leads, les Partenaires, les Rapports de vente et les Performances sans restriction de visibilité. Les droits de modification restent inchangés.",
         "label": "Lecture globale du CRM"
       },
       "crm_hold_reasons": {
-        "description": "Liste des motifs de Hold. Affichée comme liste déroulante dans le champ « Motif » lorsque vous définissez le statut Hold sur un lead.",
-        "label": "Motifs de Hold d'un lead"
+        "description": "Liste des motifs de mise en attente. Affichée comme liste déroulante dans le champ « Motif » lorsque vous mettez un lead en attente.",
+        "label": "Motifs de mise en attente d’un lead"
       },
       "crm_hot_lead_days": {
         "description": "Jours sans contact → marquer le lead comme froid",
@@ -1004,79 +1004,79 @@
       },
       "health_act_t1_max_days": {
         "description": "Dernière commande dans les N jours → points T1",
-        "label": "Health : max de jours pour l'activité T1"
+        "label": "Santé partenaire : max de jours pour l'activité T1"
       },
       "health_act_t1_pts": {
         "description": "Points pour 1 commande jusqu'à X jours auparavant",
-        "label": "Health : points d'activité T1"
+        "label": "Santé partenaire : points d'activité T1"
       },
       "health_act_t2_max_days": {
         "description": "Max. de jours auparavant pour la fenêtre T2",
-        "label": "Health : max de jours activité T2"
+        "label": "Santé partenaire : max de jours activité T2"
       },
       "health_act_t2_min_days": {
         "description": "Min. de jours auparavant pour la fenêtre T2 (5-10 jours)",
-        "label": "Health : min de jours activité T2"
+        "label": "Santé partenaire : min de jours activité T2"
       },
       "health_act_t2_pts": {
         "description": "Points pour 1 commande dans la fenêtre 5-10 jours",
-        "label": "Health : points d'activité T2"
+        "label": "Santé partenaire : points d'activité T2"
       },
       "health_act_t3_min_orders": {
         "description": "Min. de commandes en 20d pour le seuil T3",
-        "label": "Health : min de commandes activité T3"
+        "label": "Santé partenaire : min de commandes activité T3"
       },
       "health_act_t3_pts": {
         "description": "Points pour 2–5 commandes en 20 jours",
-        "label": "Health : points d'activité T3"
+        "label": "Santé partenaire : points d'activité T3"
       },
       "health_act_t4_min_orders": {
         "description": ">N commandes en 20d → T4 (palier max)",
-        "label": "Health : min de commandes activité T4"
+        "label": "Santé partenaire : min de commandes activité T4"
       },
       "health_act_t4_pts": {
         "description": "Points pour >5 commandes en 20 jours",
-        "label": "Health : points d'activité T4"
+        "label": "Santé partenaire : points d'activité T4"
       },
       "health_good_min": {
         "description": "Points min. pour le statut Sain",
-        "label": "Health : seuil Sain"
+        "label": "Santé partenaire : seuil Sain"
       },
       "health_rev_t1_pct": {
         "description": "% min. de croissance M-2→M-1 pour T1",
-        "label": "Health : croissance T1 %"
+        "label": "Santé partenaire : croissance T1 %"
       },
       "health_rev_t1_pts": {
         "description": "Points pour une croissance ≥20%",
-        "label": "Health : points de croissance T1"
+        "label": "Santé partenaire : points de croissance T1"
       },
       "health_rev_t2_pct": {
         "description": "% min. de croissance M-2→M-1 pour T2",
-        "label": "Health : croissance T2 %"
+        "label": "Santé partenaire : croissance T2 %"
       },
       "health_rev_t2_pts": {
         "description": "Points pour une croissance ≥30%",
-        "label": "Health : points de croissance T2"
+        "label": "Santé partenaire : points de croissance T2"
       },
       "health_rev_t3_pct": {
         "description": "% min. de croissance M-2→M-1 pour T3",
-        "label": "Health : croissance T3 %"
+        "label": "Santé partenaire : croissance T3 %"
       },
       "health_rev_t3_pts": {
         "description": "Points pour une croissance ≥41%",
-        "label": "Health : points de croissance T3"
+        "label": "Santé partenaire : points de croissance T3"
       },
       "health_rev_t4_pct": {
         "description": "% min. de croissance M-2→M-1 pour T4",
-        "label": "Health : croissance T4 %"
+        "label": "Santé partenaire : croissance T4 %"
       },
       "health_rev_t4_pts": {
         "description": "Points pour une croissance >50%",
-        "label": "Health : points de croissance T4"
+        "label": "Santé partenaire : points de croissance T4"
       },
       "health_warn_min": {
         "description": "Points min. pour le statut Attention (en dessous = Risque)",
-        "label": "Health : seuil Attention"
+        "label": "Santé partenaire : seuil Attention"
       },
       "kanban_refresh_interval_sec": {
         "description": "Intervalle en secondes pour l'actualisation automatique du tableau Kanban. Mettez 0 pour désactiver l'actualisation automatique.",
@@ -1187,10 +1187,10 @@
       "intro": "— dictionnaires et seuils utilisés par le module CRM. Modifiez les listes en ajoutant / supprimant des éléments. Les modifications prennent effet après l’enregistrement.",
       "scoring": {
         "activityLast20Days": "Activité (20 derniers jours)",
-        "churnTitle": "Algorithme Churn — paramètres de notation",
+        "churnTitle": "Algorithme d’attrition — paramètres de notation",
         "description": "Description",
-        "healthLevelThresholds": "Seuils du Health Level (points)",
-        "healthTitle": "Health Score — paramètres de notation",
+        "healthLevelThresholds": "Seuils des niveaux de santé (points)",
+        "healthTitle": "Santé du partenaire — paramètres de notation",
         "noOrdersDays": "Absence de commandes (jours)",
         "parameter": "Paramètre",
         "revenueGrowth": "Hausse du revenu (M-2→M-1)",
@@ -1299,7 +1299,7 @@
       "defaultConfig": "Configuration par défaut — elle n’a pas encore été modifiée.",
       "deleteConfirm": "Supprimer le signal « {name} » ?",
       "disableSignal": "Désactiver le signal",
-      "draftInvalid": "La configuration en brouillon totalise {score} / 100 pts. L’Enrichment continue d’utiliser la dernière version valide.",
+      "draftInvalid": "La configuration en brouillon totalise {score} / 100 pts. L’enrichissement continue d’utiliser la dernière version valide.",
       "edit": "Modifier",
       "editing": "Vous modifiez :",
       "enableSignal": "Activer le signal",
@@ -1315,7 +1315,7 @@
         "sessionExpired": "La session a expiré. Veuillez vous reconnecter.",
         "unknownStatus": "inconnue"
       },
-      "intro": "— configuration des signaux notés que l’Enrichment utilise pour évaluer l’adéquation d’une entreprise (ICP).",
+      "intro": "— configuration des signaux notés que l’enrichissement utilise pour évaluer l’adéquation d’une entreprise (ICP).",
       "introTitle": "Signaux ICP",
       "lastUpdateVersion": "Dernière mise à jour : version",
       "loadFailedTitle": "Impossible de charger la configuration ICP.",
@@ -1399,7 +1399,7 @@
       },
       "leadSources": {
         "agent": "Agent",
-        "cold_call": "Cold call",
+        "cold_call": "Appel à froid",
         "inbound": "Demande entrante",
         "inne": "Autre",
         "kampania": "Campagne e-mail",
@@ -1525,7 +1525,7 @@
       "crm": "Paramètres métier CRM",
       "documents": "Dictionnaires de documents",
       "global": "Paramètres globaux",
-      "icp": "Enrichment / ICP",
+      "icp": "Enrichissement / ICP",
       "onboarding": "Modèles d’onboarding",
       "projects": "Projets",
       "tooltips": "Infobulles",
@@ -1545,7 +1545,7 @@
         "leadsKpiAvgCycle": "KPI : Cycle de vente moy.",
         "leadsKpiBudget": "KPI : Budget prévu (PLN)",
         "leadsKpiPipeline": "KPI : Pipeline (PLN)",
-        "leadsKpiWinRate": "KPI : Win Rate",
+        "leadsKpiWinRate": "KPI : Taux de réussite",
         "leadsKpiWon": "KPI : Clôturés / Won (PLN)",
         "leadsLostTitle": "Motifs de perte (titre)",
         "leadsRepsColLeads": "Commerciaux : colonne Leads",
@@ -1554,7 +1554,7 @@
         "leadsRepsColWinRate": "Commerciaux : colonne Win%",
         "leadsRepsColWon": "Commerciaux : colonne Won",
         "leadsRepsTitle": "Résultats des commerciaux (titre)",
-        "leadsSourcesQuality": "Sources : Qualité par source (win rate)",
+        "leadsSourcesQuality": "Sources : Qualité par source (taux de réussite)",
         "leadsSourcesTitle": "Sources des leads (titre)",
         "leadsTrendTitle": "Tendance mensuelle (titre)",
         "leadsVelocityTitle": "Temps dans l’étape – jours moy. (titre)",
@@ -1563,7 +1563,7 @@
         "partnersKpiGrossTurnover": "Chiffre d’affaires brut (PLN)",
         "partnersKpiRevenue": "Revenu / Marge (PLN)",
         "partnersKpiTransactions": "Transactions",
-        "partnersScorecardHealth": "Scorecard : Health",
+        "partnersScorecardHealth": "Fiche d’évaluation : Santé",
         "salesActivity": "Panneau : Activité récente",
         "salesChart": "Panneau : Résultats commerciaux (graphique)",
         "salesKpiNewCompanies": "KPI : Nouvelles entreprises",
@@ -1595,8 +1595,8 @@
       "saved": "Infobulle « {key} » enregistrée",
       "screen": "Écran",
       "screens": {
-        "partnerPerformance": "Performance des partenaires",
-        "salesDashboard": "Sales Dashboard",
+        "partnerPerformance": "Performances des partenaires",
+        "salesDashboard": "Tableau de bord des ventes",
         "salesReports": "Rapports de vente"
       }
     },

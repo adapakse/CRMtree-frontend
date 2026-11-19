@@ -103,8 +103,8 @@
       "importedFrom": "Импорт с",
       "importedTo": "Импорт по",
       "reset": "Сбросить фильтры",
-      "scoreMax": "Score до",
-      "scoreMin": "Score от",
+      "scoreMax": "Оценка до",
+      "scoreMin": "Оценка от",
       "search": "Поиск",
       "searchPlaceholder": "название, ИНН или база",
       "showArchived": "Показать архив",
@@ -255,7 +255,7 @@
       "partner": "Партнёр",
       "partnerBadgeTooltip": "Партнёр с таким ИНН есть в CRM — нажмите, чтобы открыть",
       "processing": "Обработка…",
-      "score": "Score",
+      "score": "Оценка",
       "status": "Статус",
       "taxId": "ИНН"
     },
@@ -351,7 +351,7 @@
     "this_month": "Этот месяц",
     "this_quarter": "Этот квартал",
     "this_week": "Эта неделя",
-    "ytd": "Этот год (YTD)"
+    "ytd": "С начала года"
   },
   "prospectStatus": {
     "archive": "Архив",

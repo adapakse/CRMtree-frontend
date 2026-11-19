@@ -103,8 +103,8 @@
       "importedFrom": "Importat de la",
       "importedTo": "Importat până la",
       "reset": "Resetează filtrele",
-      "scoreMax": "Score max",
-      "scoreMin": "Score min",
+      "scoreMax": "Scor max",
+      "scoreMin": "Scor min",
       "search": "Caută",
       "searchPlaceholder": "nume, CUI sau bază",
       "showArchived": "Arată arhiva",
@@ -255,7 +255,7 @@
       "partner": "Partener",
       "partnerBadgeTooltip": "Un partener cu acest CUI există în CRM — clic pentru a-l deschide",
       "processing": "Se procesează…",
-      "score": "Score",
+      "score": "Scor",
       "status": "Status",
       "taxId": "CUI"
     },
@@ -351,7 +351,7 @@
     "this_month": "Luna aceasta",
     "this_quarter": "Trimestrul acesta",
     "this_week": "Săptămâna aceasta",
-    "ytd": "Anul acesta (YTD)"
+    "ytd": "De la începutul anului"
   },
   "prospectStatus": {
     "archive": "Arhivă",

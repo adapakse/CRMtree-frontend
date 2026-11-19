@@ -103,8 +103,8 @@
       "importedFrom": "Importado desde",
       "importedTo": "Importado hasta",
       "reset": "Restablecer filtros",
-      "scoreMax": "Score máx.",
-      "scoreMin": "Score mín.",
+      "scoreMax": "Puntuación máx.",
+      "scoreMin": "Puntuación mín.",
       "search": "Buscar",
       "searchPlaceholder": "nombre, NIF o base",
       "showArchived": "Mostrar el archivo",
@@ -255,7 +255,7 @@
       "partner": "Partner",
       "partnerBadgeTooltip": "Hay un partner con este NIF en el CRM — haz clic para abrirlo",
       "processing": "Procesando…",
-      "score": "Score",
+      "score": "Puntuación",
       "status": "Estado",
       "taxId": "NIF"
     },
@@ -351,7 +351,7 @@
     "this_month": "Este mes",
     "this_quarter": "Este trimestre",
     "this_week": "Esta semana",
-    "ytd": "Este año (YTD)"
+    "ytd": "En lo que va de año"
   },
   "prospectStatus": {
     "archive": "Archivo",

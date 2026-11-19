@@ -322,17 +322,17 @@
         }
       },
       "enrichment_api_key": {
-        "label": "Enrichment — clave API propia"
+        "label": "Enriquecimiento — clave API propia"
       },
       "enrichment_ideal_customer": {
         "hint": "Sectores, tamaño de empresa, región, señales que indican el encaje y empresas que no desean captar. A partir de ello configuraremos las señales y la puntuación.",
-        "label": "Enrichment — perfil de cliente ideal (ICP)"
+        "label": "Enriquecimiento — perfil de cliente ideal (ICP)"
       },
       "enrichment_licence": {
-        "label": "Enrichment — licencia del modelo"
+        "label": "Enriquecimiento — licencia del modelo"
       },
       "enrichment_model": {
-        "label": "Enrichment — modelo preferido",
+        "label": "Enriquecimiento — modelo preferido",
         "options": {
           "anthropic": {
             "label": "Anthropic Claude (mayor calidad, mayor coste)"
@@ -346,7 +346,7 @@
         }
       },
       "enrichment_monthly_volume": {
-        "label": "Enrichment — ¿cuántas empresas al mes tienen previsto analizar?"
+        "label": "Enriquecimiento — ¿cuántas empresas al mes tienen previsto analizar?"
       },
       "gmail_apis_enabled": {
         "hint": "APIs y servicios → APIs habilitadas → \"+ HABILITAR APIS Y SERVICIOS\" → buscar → Habilitar, para ambas. La API de Gmail es obligatoria; la de Drive abre los adjuntos enviados como enlaces de Drive.",
@@ -401,7 +401,7 @@
       },
       "lead_sources": {
         "label": "Fuentes de leads",
-        "placeholder": "Sitio web, recomendación, cold call, LinkedIn, ferias…"
+        "placeholder": "Sitio web, recomendación, llamada en frío, LinkedIn, ferias…"
       },
       "modules": {
         "label": "¿Qué módulos deben estar activos?",
@@ -435,11 +435,11 @@
             "label": "Telefonía (softphone)"
           },
           "performance": {
-            "hint": "Health score y riesgo de pérdida del cliente (churn).",
+            "hint": "Estado del partner y riesgo de abandono del cliente.",
             "label": "Rendimiento"
           },
           "prospects": {
-            "hint": "Búsqueda de empresas y su valoración automática mediante IA (Enrichment / ICP).",
+            "hint": "Búsqueda de empresas y su valoración automática mediante IA (Enriquecimiento / ICP).",
             "label": "Prospectos"
           },
           "sales_reports": {
@@ -649,8 +649,8 @@
     },
     "sections": {
       "ai": {
-        "intro": "Los módulos Prospectos (Enrichment) y Análisis de llamadas envían datos a modelos de lenguaje externos. Se puede utilizar la licencia de CRMtree o una licencia propia y dedicada de su empresa.",
-        "title": "8. Modelos de IA — Enrichment y Análisis de llamadas"
+        "intro": "Los módulos Prospectos (Enriquecimiento) y Análisis de llamadas envían datos a modelos de lenguaje externos. Se puede utilizar la licencia de CRMtree o una licencia propia y dedicada de su empresa.",
+        "title": "8. Modelos de IA — Enriquecimiento y Análisis de llamadas"
       },
       "billing": {
         "title": "2. Plan y datos de facturación"
@@ -804,67 +804,67 @@
     "catalog": {
       "churn_daily_run_time": {
         "description": "Formato HH:MM — a esta hora el servidor recalcula el scoring y envía las alertas por correo electrónico",
-        "label": "Churn: hora del recálculo diario"
+        "label": "Abandono: hora del recálculo diario"
       },
       "churn_days_t1_max": {
         "description": "Máx. días sin pedido para el umbral 1",
-        "label": "Churn: umbral 1 de días — máx"
+        "label": "Abandono: umbral 1 de días — máx"
       },
       "churn_days_t1_min": {
         "description": "Mín. días sin pedido para el umbral 1",
-        "label": "Churn: umbral 1 de días — mín"
+        "label": "Abandono: umbral 1 de días — mín"
       },
       "churn_days_t1_pts": {
         "description": "Puntos por 10–20 días sin pedido",
-        "label": "Churn: puntos por el umbral 1 de días"
+        "label": "Abandono: puntos por el umbral 1 de días"
       },
       "churn_days_t2_max": {
         "description": "Máx. días sin pedido para el umbral 2",
-        "label": "Churn: umbral 2 de días — máx"
+        "label": "Abandono: umbral 2 de días — máx"
       },
       "churn_days_t2_min": {
         "description": "Mín. días sin pedido para el umbral 2",
-        "label": "Churn: umbral 2 de días — mín"
+        "label": "Abandono: umbral 2 de días — mín"
       },
       "churn_days_t2_pts": {
         "description": "Puntos por 21–30 días sin pedido",
-        "label": "Churn: puntos por el umbral 2 de días"
+        "label": "Abandono: puntos por el umbral 2 de días"
       },
       "churn_days_t3_pts": {
         "description": "Puntos por >30 días sin pedido",
-        "label": "Churn: puntos por el umbral 3 de días"
+        "label": "Abandono: puntos por el umbral 3 de días"
       },
       "churn_risk_critical": {
         "description": "Puntos mín. para el nivel de riesgo: Crítico",
-        "label": "Churn: umbral de riesgo crítico"
+        "label": "Abandono: umbral de riesgo crítico"
       },
       "churn_risk_high": {
         "description": "Puntos mín. para el nivel de riesgo: Alto",
-        "label": "Churn: umbral de riesgo alto"
+        "label": "Abandono: umbral de riesgo alto"
       },
       "churn_risk_low": {
         "description": "Puntos mín. para el nivel de riesgo: Bajo",
-        "label": "Churn: umbral de riesgo bajo"
+        "label": "Abandono: umbral de riesgo bajo"
       },
       "churn_risk_medium": {
         "description": "Puntos mín. para el nivel de riesgo: Medio",
-        "label": "Churn: umbral de riesgo medio"
+        "label": "Abandono: umbral de riesgo medio"
       },
       "churn_sales_t1_pct": {
         "description": "% mín. de caída M-2→M-1 para el umbral 1",
-        "label": "Churn: caída de ventas umbral 1 %"
+        "label": "Abandono: caída de ventas umbral 1 %"
       },
       "churn_sales_t1_pts": {
         "description": "Puntos por una caída de ventas ≥30% M-2→M-1",
-        "label": "Churn: puntos por el umbral 1 de ventas"
+        "label": "Abandono: puntos por el umbral 1 de ventas"
       },
       "churn_sales_t2_pct": {
         "description": "% mín. de caída M-2→M-1 para el umbral 2",
-        "label": "Churn: caída de ventas umbral 2 %"
+        "label": "Abandono: caída de ventas umbral 2 %"
       },
       "churn_sales_t2_pts": {
         "description": "Puntos por una caída de ventas ≥51% M-2→M-1",
-        "label": "Churn: puntos por el umbral 2 de ventas"
+        "label": "Abandono: puntos por el umbral 2 de ventas"
       },
       "crm_adoption_target_pct": {
         "description": "% objetivo de usuarios activos en el partner",
@@ -903,7 +903,7 @@
         "label": "Ciclo de ventas largo (días)"
       },
       "crm_dashboard_win_stages": {
-        "description": "Etapas del lead tratadas como ganadas (afectan al Win Rate y al contador \"Ganados\" del panel). Formato: array JSON.",
+        "description": "Etapas del lead tratadas como ganadas (afectan a la tasa de éxito y al contador \"Ganados\" del panel). Formato: array JSON.",
         "label": "Etapas del lead consideradas \"ganadas\""
       },
       "crm_global_read": {
@@ -911,8 +911,8 @@
         "label": "Lectura global del CRM"
       },
       "crm_hold_reasons": {
-        "description": "Lista de motivos de Hold. Se muestra como lista desplegable en el campo \"Motivo\" cuando estableces el estado Hold en un lead.",
-        "label": "Motivos de Hold del lead"
+        "description": "Lista de motivos de espera. Se muestra como lista desplegable en el campo \"Motivo\" cuando pones un lead en espera.",
+        "label": "Motivos para poner un lead en espera"
       },
       "crm_hot_lead_days": {
         "description": "Días sin contacto → marcar el lead como frío",
@@ -1004,79 +1004,79 @@
       },
       "health_act_t1_max_days": {
         "description": "Último pedido en los últimos N días → puntos T1",
-        "label": "Health: máx días para la actividad T1"
+        "label": "Estado del partner: máx días para la actividad T1"
       },
       "health_act_t1_pts": {
         "description": "Puntos por 1 pedido de hasta hace X días",
-        "label": "Health: puntos de actividad T1"
+        "label": "Estado del partner: puntos de actividad T1"
       },
       "health_act_t2_max_days": {
         "description": "Máx. días atrás para la ventana T2",
-        "label": "Health: máx días de actividad T2"
+        "label": "Estado del partner: máx días de actividad T2"
       },
       "health_act_t2_min_days": {
         "description": "Mín. días atrás para la ventana T2 (5-10 días)",
-        "label": "Health: mín días de actividad T2"
+        "label": "Estado del partner: mín días de actividad T2"
       },
       "health_act_t2_pts": {
         "description": "Puntos por 1 pedido en la ventana de 5-10 días",
-        "label": "Health: puntos de actividad T2"
+        "label": "Estado del partner: puntos de actividad T2"
       },
       "health_act_t3_min_orders": {
         "description": "Mín. pedidos en 20d para el umbral T3",
-        "label": "Health: mín pedidos de actividad T3"
+        "label": "Estado del partner: mín pedidos de actividad T3"
       },
       "health_act_t3_pts": {
         "description": "Puntos por 2–5 pedidos en 20 días",
-        "label": "Health: puntos de actividad T3"
+        "label": "Estado del partner: puntos de actividad T3"
       },
       "health_act_t4_min_orders": {
         "description": ">N pedidos en 20d → T4 (nivel máx)",
-        "label": "Health: mín pedidos de actividad T4"
+        "label": "Estado del partner: mín pedidos de actividad T4"
       },
       "health_act_t4_pts": {
         "description": "Puntos por >5 pedidos en 20 días",
-        "label": "Health: puntos de actividad T4"
+        "label": "Estado del partner: puntos de actividad T4"
       },
       "health_good_min": {
         "description": "Puntos mín. para el estado Saludable",
-        "label": "Health: umbral Saludable"
+        "label": "Estado del partner: umbral Saludable"
       },
       "health_rev_t1_pct": {
         "description": "% mín. de crecimiento M-2→M-1 para T1",
-        "label": "Health: crecimiento T1 %"
+        "label": "Estado del partner: crecimiento T1 %"
       },
       "health_rev_t1_pts": {
         "description": "Puntos por crecimiento ≥20%",
-        "label": "Health: puntos de crecimiento T1"
+        "label": "Estado del partner: puntos de crecimiento T1"
       },
       "health_rev_t2_pct": {
         "description": "% mín. de crecimiento M-2→M-1 para T2",
-        "label": "Health: crecimiento T2 %"
+        "label": "Estado del partner: crecimiento T2 %"
       },
       "health_rev_t2_pts": {
         "description": "Puntos por crecimiento ≥30%",
-        "label": "Health: puntos de crecimiento T2"
+        "label": "Estado del partner: puntos de crecimiento T2"
       },
       "health_rev_t3_pct": {
         "description": "% mín. de crecimiento M-2→M-1 para T3",
-        "label": "Health: crecimiento T3 %"
+        "label": "Estado del partner: crecimiento T3 %"
       },
       "health_rev_t3_pts": {
         "description": "Puntos por crecimiento ≥41%",
-        "label": "Health: puntos de crecimiento T3"
+        "label": "Estado del partner: puntos de crecimiento T3"
       },
       "health_rev_t4_pct": {
         "description": "% mín. de crecimiento M-2→M-1 para T4",
-        "label": "Health: crecimiento T4 %"
+        "label": "Estado del partner: crecimiento T4 %"
       },
       "health_rev_t4_pts": {
         "description": "Puntos por crecimiento >50%",
-        "label": "Health: puntos de crecimiento T4"
+        "label": "Estado del partner: puntos de crecimiento T4"
       },
       "health_warn_min": {
         "description": "Puntos mín. para el estado Atención (por debajo = Riesgo)",
-        "label": "Health: umbral Atención"
+        "label": "Estado del partner: umbral Atención"
       },
       "kanban_refresh_interval_sec": {
         "description": "Intervalo en segundos para la actualización automática del tablero Kanban. Ponlo en 0 para desactivar la actualización automática.",
@@ -1187,10 +1187,10 @@
       "intro": "— catálogos y umbrales que utiliza el módulo CRM. Edita las listas añadiendo o eliminando elementos. Los cambios se aplican al guardar.",
       "scoring": {
         "activityLast20Days": "Actividad (últimos 20 días)",
-        "churnTitle": "Algoritmo de Churn — parámetros de puntuación",
+        "churnTitle": "Algoritmo de abandono — parámetros de puntuación",
         "description": "Descripción",
-        "healthLevelThresholds": "Umbrales de Health Level (puntos)",
-        "healthTitle": "Health Score — parámetros de puntuación",
+        "healthLevelThresholds": "Umbrales de los niveles de estado (puntos)",
+        "healthTitle": "Estado del partner — parámetros de puntuación",
         "noOrdersDays": "Sin pedidos (días)",
         "parameter": "Parámetro",
         "revenueGrowth": "Crecimiento de ingresos (M-2→M-1)",
@@ -1299,7 +1299,7 @@
       "defaultConfig": "Configuración predeterminada — aún no se ha modificado.",
       "deleteConfirm": "¿Eliminar la señal «{name}»?",
       "disableSignal": "Desactivar señal",
-      "draftInvalid": "El borrador de la configuración tiene {score} / 100 pts. Enrichment sigue usando la última versión válida.",
+      "draftInvalid": "El borrador de la configuración tiene {score} / 100 pts. El enriquecimiento sigue usando la última versión válida.",
       "edit": "Editar",
       "editing": "Estás editando:",
       "enableSignal": "Activar señal",
@@ -1399,7 +1399,7 @@
       },
       "leadSources": {
         "agent": "Agente",
-        "cold_call": "Cold call",
+        "cold_call": "Llamada en frío",
         "inbound": "Consulta entrante",
         "inne": "Otro",
         "kampania": "Campaña de correo",
@@ -1525,7 +1525,7 @@
       "crm": "Parámetros CRM",
       "documents": "Catálogos de documentos",
       "global": "Parámetros globales",
-      "icp": "Enrichment / ICP",
+      "icp": "Enriquecimiento / ICP",
       "onboarding": "Plantillas de onboarding",
       "projects": "Proyectos",
       "tooltips": "Ayudas",
@@ -1544,17 +1544,17 @@
         "leadsFunnelTitle": "Embudo de ventas (título)",
         "leadsKpiAvgCycle": "KPI: Ciclo de venta medio",
         "leadsKpiBudget": "KPI: Presupuesto previsto (PLN)",
-        "leadsKpiPipeline": "KPI: Pipeline (PLN)",
-        "leadsKpiWinRate": "KPI: Win Rate",
+        "leadsKpiPipeline": "KPI: Embudo (PLN)",
+        "leadsKpiWinRate": "KPI: Tasa de éxito",
         "leadsKpiWon": "KPI: Cerrados / Ganados (PLN)",
         "leadsLostTitle": "Motivos de la pérdida (título)",
         "leadsRepsColLeads": "Comerciales: columna Leads",
-        "leadsRepsColPipeline": "Comerciales: columna Pipeline",
+        "leadsRepsColPipeline": "Comerciales: columna Embudo",
         "leadsRepsColProgress": "Comerciales: columna Progreso",
         "leadsRepsColWinRate": "Comerciales: columna Win%",
         "leadsRepsColWon": "Comerciales: columna Ganados",
         "leadsRepsTitle": "Resultados de los comerciales (título)",
-        "leadsSourcesQuality": "Orígenes: Calidad por origen (win rate)",
+        "leadsSourcesQuality": "Orígenes: Calidad por origen (tasa de éxito)",
         "leadsSourcesTitle": "Orígenes de los leads (título)",
         "leadsTrendTitle": "Tendencia mensual (título)",
         "leadsVelocityTitle": "Tiempo en la etapa – media de días (título)",
@@ -1563,15 +1563,15 @@
         "partnersKpiGrossTurnover": "Volumen de negocio bruto (PLN)",
         "partnersKpiRevenue": "Ingresos / Margen (PLN)",
         "partnersKpiTransactions": "Transacciones",
-        "partnersScorecardHealth": "Scorecard: Health",
+        "partnersScorecardHealth": "Cuadro de evaluación: Estado",
         "salesActivity": "Panel: Actividad reciente",
         "salesChart": "Panel: Resultados de ventas (gráfico)",
         "salesKpiNewCompanies": "KPI: Empresas nuevas",
         "salesKpiNewContacts": "KPI: Contactos nuevos",
-        "salesKpiNewLeads": "KPI: Oportunidades nuevas (pipeline activo)",
-        "salesKpiPipelineValue": "KPI: Valor de las oportunidades (pipeline)",
+        "salesKpiNewLeads": "KPI: Oportunidades nuevas (embudo activo)",
+        "salesKpiPipelineValue": "KPI: Valor de las oportunidades (embudo)",
         "salesKpiWon": "KPI: Oportunidades ganadas",
-        "salesPipeline": "Panel: Pipeline de ventas",
+        "salesPipeline": "Panel: Embudo de ventas",
         "salesRecentLeads": "Panel: Últimas oportunidades (tabla)",
         "salesTasks": "Panel: Tareas para hoy"
       },
@@ -1596,7 +1596,7 @@
       "screen": "Pantalla",
       "screens": {
         "partnerPerformance": "Rendimiento de los partners",
-        "salesDashboard": "Sales Dashboard",
+        "salesDashboard": "Panel de ventas",
         "salesReports": "Informes de ventas"
       }
     },

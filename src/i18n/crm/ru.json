@@ -176,7 +176,7 @@
         "today": "Сегодня",
         "todayTomorrow": "Сегодня+Завтра"
       },
-      "score": "Score:",
+      "score": "Оценка:",
       "scoreMax": "макс",
       "scoreMin": "мин",
       "searchPlaceholder": "Поиск компании или ИНН...",
@@ -464,7 +464,7 @@
     },
     "cc": "Копия:",
     "checkNew": "Проверить новые",
-    "checkNewTooltip": "Проверить новые письма (debug)",
+    "checkNewTooltip": "Проверить новые письма (отладка)",
     "connecting": "Подключение к Google…",
     "date": "Дата:",
     "debug": {
@@ -644,7 +644,7 @@
       "meeting": "Встреча",
       "note": "Заметка",
       "opportunity": "Сделка",
-      "qbr": "QBR",
+      "qbr": "Квартальный обзор",
       "task": "Задача",
       "training": "Обучение"
     },
@@ -1302,7 +1302,7 @@
         "language": "напр. ru",
         "notes": "Любые заметки…",
         "partnerId": "напр. 42",
-        "source": "напр. выставка, рекомендация, cold call",
+        "source": "напр. выставка, рекомендация, холодный звонок",
         "subdomain": "напр. acme",
         "website": "https://company.ru"
       },
@@ -1450,7 +1450,7 @@
         "last12Months": "Последние 12 мес.",
         "last3Months": "Последние 3 мес.",
         "last6Months": "Последние 6 мес.",
-        "ytd": "YTD {year}"
+        "ytd": "С начала {year} г."
       },
       "productBreakdown": "Разбивка по продуктам",
       "title": "Данные о продажах DWH"
@@ -1550,9 +1550,9 @@
       "contractUntil": "Договор до",
       "crmTurnover": "Оборот CRM",
       "dwhMargin": "DWH Маржа",
-      "dwhMarginHint": "Маржа YTD из DWH",
+      "dwhMarginHint": "Маржа с начала года из DWH",
       "dwhTurnover": "DWH Оборот",
-      "dwhTurnoverHint": "Оборот брутто YTD из DWH"
+      "dwhTurnoverHint": "Оборот брутто с начала года из DWH"
     },
     "taxIdErrors": {
       "countryCode": "Начните с кода страны (2 буквы), напр. PL",
@@ -1602,7 +1602,7 @@
       "currentMonth": "Текущий месяц",
       "currentQuarter": "Текущий квартал",
       "currentWeek": "Текущая неделя",
-      "currentYear": "Текущий год (YTD {year})",
+      "currentYear": "Текущий год (с начала {year} г.)",
       "customRange": "Свой период…",
       "previousMonth": "Предыдущий месяц",
       "previousQuarter": "Предыдущий квартал",
@@ -1661,7 +1661,7 @@
       "leadSources": {
         "title": "Источники лидов",
         "totalCaption": "лидов",
-        "winRate": "{value}% win rate"
+        "winRate": "Доля побед {value}%"
       },
       "leadsShort": "{count} лид.",
       "lostReasons": "Причины проигрыша",
@@ -1669,7 +1669,7 @@
       "periods": {
         "currentMonth": "Текущий месяц",
         "currentQuarter": "Текущий квартал",
-        "currentYear": "Текущий год (YTD {year})",
+        "currentYear": "Текущий год (с начала {year} г.)",
         "last3Months": "Последние 3 месяца",
         "last6Months": "Последние 6 месяцев"
       },
@@ -1720,7 +1720,7 @@
         "topReason": "Главная причина:"
       },
       "sourceQuality": {
-        "title": "Качество по источникам (win rate)"
+        "title": "Качество по источникам (доля побед)"
       },
       "tooltips": {
         "goToOnboarding": "Нажмите, чтобы перейти в раздел «Онбординг»",
@@ -1761,7 +1761,7 @@
         "wonTooltip": "Выиграно: {value} тыс. PLN"
       },
       "external": {
-        "feeRate": "Fee rate: {value}%",
+        "feeRate": "Доля сборов: {value}%",
         "feesPln": "Комиссии (PLN)",
         "grossTurnoverPln": "Оборот брутто (PLN)",
         "margin": "Маржа: {value}%",
@@ -1808,7 +1808,7 @@
       },
       "sources": {
         "campaign": "Кампания",
-        "coldOutreach": "Cold outreach",
+        "coldOutreach": "Холодные контакты",
         "referrals": "Рекомендации",
         "socialMedia": "Соцсети",
         "tradeFairs": "Выставки"
@@ -1858,9 +1858,9 @@
       },
       "modes": {
         "custom": "Свой",
-        "mom": "MoM",
-        "qoq": "QoQ",
-        "yoy": "YoY"
+        "mom": "м/м",
+        "qoq": "кв/кв",
+        "yoy": "г/г"
       },
       "noData": "Нет данных",
       "partners": {
@@ -1939,7 +1939,7 @@
       "healthPoints": "{score} балл.",
       "kpi": {
         "activePartners": "Активных партнёров",
-        "feeRateShare": "{percent}% fee rate",
+        "feeRateShare": "Доля сборов {percent}%",
         "feesPln": "Комиссии (PLN)",
         "productsCount": "Продукты: {count}",
         "revenueMarginPln": "Выручка / Маржа (PLN)",
@@ -1966,11 +1966,11 @@
           "medium": "средне",
           "poor": "слабо"
         },
-        "title": "Scorecard партнёров"
+        "title": "Оценка партнёров"
       },
       "summary": {
-        "feeRate": "Fee rate",
-        "feesCommissions": "Fees / Комиссии",
+        "feeRate": "Доля сборов",
+        "feesCommissions": "Сборы / Комиссии",
         "marginPct": "% маржи",
         "revenueMargin": "Выручка (маржа)",
         "title": "Финансовая сводка"
@@ -2717,7 +2717,7 @@
       "empty": "Нет транзакций, соответствующих критериям.",
       "partner": "Партнёр",
       "products": "Продукты",
-      "reference": "Ref.",
+      "reference": "Номер",
       "status": "Статус",
       "traveler": "Путешественник"
     },

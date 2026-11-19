@@ -176,7 +176,7 @@
         "today": "Hoy",
         "todayTomorrow": "Hoy+Mañana"
       },
-      "score": "Score:",
+      "score": "Puntuación:",
       "scoreMax": "máx",
       "scoreMin": "mín",
       "searchPlaceholder": "Buscar empresa o NIF...",
@@ -341,7 +341,7 @@
     },
     "pipeline": {
       "empty": "Sin datos",
-      "title": "Pipeline de leads"
+      "title": "Embudo de leads"
     },
     "productMix": {
       "title": "Mix de productos ({period})"
@@ -797,7 +797,7 @@
       "dateRequired": "Indica la fecha",
       "edit": "Editar la espera",
       "editTooltip": "En espera hasta {date} — haz clic para editar",
-      "introAfter": "se marcará como en espera — sin efecto en los KPI activos ni en el pipeline mientras dure la espera.",
+      "introAfter": "se marcará como en espera — sin efecto en los KPI activos ni en el embudo mientras dure la espera.",
       "introBefore": "El lead",
       "label": "En espera",
       "reason": "Motivo",
@@ -934,7 +934,7 @@
       "noActivities": "Sin actividades.",
       "note": "Nota",
       "openDetails": "Abrir detalles",
-      "pipeline": "Pipeline",
+      "pipeline": "Embudo",
       "probability": "Probab.",
       "stageValue": "Etapa: {stage}",
       "tabs": {
@@ -1059,7 +1059,7 @@
       "hot": "Calientes",
       "lost": "Perdidos",
       "opportunities": "Oportunidades de venta",
-      "pipeline": "Pipeline (PLN)",
+      "pipeline": "Embudo (PLN)",
       "won": "Ganados"
     },
     "table": {
@@ -1199,21 +1199,21 @@
     "withdraw": {
       "action": "Retirar",
       "confirm": "Confirmar retirada",
-      "confirmPrompt": "¿Retirar «{company}» del onboarding a la etapa «{stage}»? El partner y sus tareas de onboarding se eliminarán y el lead vuelve al pipeline de ventas.",
-      "detailButton": "Retirar del onboarding al pipeline",
-      "detailHint": "Elimina este partner y sus tareas de onboarding — el lead vuelve a la etapa del pipeline seleccionada.",
+      "confirmPrompt": "¿Retirar «{company}» del onboarding a la etapa «{stage}»? El partner y sus tareas de onboarding se eliminarán y el lead vuelve al embudo de ventas.",
+      "detailButton": "Retirar del onboarding al embudo",
+      "detailHint": "Elimina este partner y sus tareas de onboarding — el lead vuelve a la etapa del embudo seleccionada.",
       "detailStagePrompt": "Devolver el lead a la etapa:",
       "failed": "No se pudo retirar del onboarding",
-      "hint": "Retirar del onboarding a una etapa del pipeline",
+      "hint": "Retirar del onboarding a una etapa del embudo",
       "inProgress": "Retirando…",
-      "intro": "{company} se eliminará del onboarding (junto con sus tareas de onboarding) y vuelve al pipeline de ventas en la etapa seleccionada.",
-      "invalidStage": "Esta etapa ya no existe en el pipeline — recarga la página y elige otra",
+      "intro": "{company} se eliminará del onboarding (junto con sus tareas de onboarding) y vuelve al embudo de ventas en la etapa seleccionada.",
+      "invalidStage": "Esta etapa ya no existe en el embudo — recarga la página y elige otra",
       "noPermission": "Solo un jefe de ventas o un administrador puede retirar del onboarding",
       "notFound": "Partner no encontrado — puede que ya se haya retirado o lanzado",
-      "stageLabel": "Etapa del pipeline",
+      "stageLabel": "Etapa del embudo",
       "stagePlaceholder": "— selecciona una etapa —",
-      "stageRequired": "Selecciona la etapa del pipeline a la que vuelve la empresa",
-      "success": "«{company}» ha vuelto al pipeline de ventas",
+      "stageRequired": "Selecciona la etapa del embudo a la que vuelve la empresa",
+      "success": "«{company}» ha vuelto al embudo de ventas",
       "title": "Retirar del onboarding"
     }
   },
@@ -1250,10 +1250,10 @@
         "low": "Bajo",
         "medium": "Medio"
       },
-      "noRisk": "Sin riesgo de churn",
+      "noRisk": "Sin riesgo de abandono",
       "salesDrop": "Caída M-2→M-1",
       "score": "{score} pts",
-      "title": "Riesgo de churn"
+      "title": "Riesgo de abandono"
     },
     "commissionBasis": {
       "bookings": "Número de reservas",
@@ -1302,7 +1302,7 @@
         "language": "p. ej., es",
         "notes": "Notas libres…",
         "partnerId": "p. ej., 42",
-        "source": "p. ej., feria, recomendación, cold call",
+        "source": "p. ej., feria, recomendación, llamada en frío",
         "subdomain": "p. ej., acme",
         "website": "https://empresa.es"
       },
@@ -1380,7 +1380,7 @@
     "header": {
       "activeSince": "Activo desde {date}",
       "backToPartners": "Partners",
-      "churn": "Churn: {level}",
+      "churn": "Abandono: {level}",
       "edit": "Editar",
       "noEditPermission": "No tienes permisos para editar este partner"
     },
@@ -1450,7 +1450,7 @@
         "last12Months": "Últimos 12 meses",
         "last3Months": "Últimos 3 meses",
         "last6Months": "Últimos 6 meses",
-        "ytd": "YTD {year}"
+        "ytd": "En lo que va de {year}"
       },
       "productBreakdown": "Desglose por producto",
       "title": "Datos de ventas del DWH"
@@ -1510,8 +1510,8 @@
         "medium": "Medio"
       },
       "points": "{score} pts",
-      "risk": "Riesgo de churn",
-      "riskWithLevel": "Riesgo de churn: {level}"
+      "risk": "Riesgo de abandono",
+      "riskWithLevel": "Riesgo de abandono: {level}"
     },
     "create": {
       "companyPlaceholder": "Nombre de la empresa",
@@ -1546,13 +1546,13 @@
       "label": "Filtro del informe:"
     },
     "table": {
-      "churn": "Churn",
+      "churn": "Abandono",
       "contractUntil": "Contrato hasta",
       "crmTurnover": "Volumen CRM",
       "dwhMargin": "Margen DWH",
-      "dwhMarginHint": "Margen YTD del DWH",
+      "dwhMarginHint": "Margen en lo que va de año del DWH",
       "dwhTurnover": "Volumen DWH",
-      "dwhTurnoverHint": "Volumen de negocio bruto YTD del DWH"
+      "dwhTurnoverHint": "Volumen de negocio bruto en lo que va de año del DWH"
     },
     "taxIdErrors": {
       "countryCode": "Empieza por el código de país (2 letras), p. ej., PL",
@@ -1602,7 +1602,7 @@
       "currentMonth": "Mes actual",
       "currentQuarter": "Trimestre actual",
       "currentWeek": "Semana actual",
-      "currentYear": "Año actual (YTD {year})",
+      "currentYear": "Año actual (en lo que va de {year})",
       "customRange": "Intervalo personalizado…",
       "previousMonth": "Mes anterior",
       "previousQuarter": "Trimestre anterior",
@@ -1640,7 +1640,7 @@
     "common": {
       "columns": {
         "leads": "Leads",
-        "pipeline": "Pipeline",
+        "pipeline": "Embudo",
         "progress": "Progreso",
         "winRatePct": "Éxito %",
         "won": "Ganados"
@@ -1661,7 +1661,7 @@
       "leadSources": {
         "title": "Orígenes de los leads",
         "totalCaption": "leads",
-        "winRate": "{value}% win rate"
+        "winRate": "{value}% tasa de éxito"
       },
       "leadsShort": "{count} leads",
       "lostReasons": "Motivos de la pérdida",
@@ -1669,7 +1669,7 @@
       "periods": {
         "currentMonth": "Mes actual",
         "currentQuarter": "Trimestre actual",
-        "currentYear": "Año actual (YTD {year})",
+        "currentYear": "Año actual (en lo que va de {year})",
         "last3Months": "Últimos 3 meses",
         "last6Months": "Últimos 6 meses"
       },
@@ -1691,7 +1691,7 @@
       "drilldown": {
         "funnel": "Embudo: {stage}",
         "lost": "Perdidos: {reason}",
-        "pipelineAll": "Pipeline – todos los activos",
+        "pipelineAll": "Embudo – todos los activos",
         "plannedBudget": "Presupuesto previsto – leads del periodo",
         "plannedInPeriod": "Cierre previsto en el periodo",
         "source": "Origen: {source}",
@@ -1720,7 +1720,7 @@
         "topReason": "Motivo principal:"
       },
       "sourceQuality": {
-        "title": "Calidad por origen (win rate)"
+        "title": "Calidad por origen (tasa de éxito)"
       },
       "tooltips": {
         "goToOnboarding": "Haz clic para ir a la sección Onboarding",
@@ -1755,13 +1755,13 @@
         "product": "producto:"
       },
       "chart": {
-        "pipelineTooltip": "Pipeline: {value}k PLN",
+        "pipelineTooltip": "Embudo: {value}k PLN",
         "projectedWeighted": "Valor previsto (ponderado):",
         "title": "Ingresos mensuales",
         "wonTooltip": "Ganados: {value}k PLN"
       },
       "external": {
-        "feeRate": "Fee rate: {value}%",
+        "feeRate": "Porcentaje de tarifas: {value}%",
         "feesPln": "Comisiones (PLN)",
         "grossTurnoverPln": "Volumen de negocio bruto (PLN)",
         "margin": "Margen: {value}%",
@@ -1784,7 +1784,7 @@
       },
       "kpi": {
         "aboveTarget": "Por encima del objetivo",
-        "activePipeline": "Pipeline activo",
+        "activePipeline": "Embudo activo",
         "avgClosingTime": "Tiempo medio de cierre",
         "belowTarget": "Por debajo del objetivo",
         "hotCount": "{count, plural, one {# caliente} other {# calientes}}",
@@ -1808,7 +1808,7 @@
       },
       "sources": {
         "campaign": "Campaña",
-        "coldOutreach": "Cold outreach",
+        "coldOutreach": "Prospección en frío",
         "referrals": "Recomendaciones",
         "socialMedia": "Redes sociales",
         "tradeFairs": "Ferias"
@@ -1906,9 +1906,9 @@
       "churn": {
         "criticalCount": "{count, plural, one {# crítico} other {# críticos}}",
         "daysShort": "{days}d",
-        "empty": "No hay partners con riesgo de churn",
-        "showAll": "Mostrar todos los partners con riesgo de churn",
-        "title": "Riesgo de churn de los partners"
+        "empty": "No hay partners con riesgo de abandono",
+        "showAll": "Mostrar todos los partners con riesgo de abandono",
+        "title": "Riesgo de abandono de los partners"
       },
       "columns": {
         "fees": "Comisiones",
@@ -1939,7 +1939,7 @@
       "healthPoints": "{score} pts",
       "kpi": {
         "activePartners": "Partners activos",
-        "feeRateShare": "{percent}% fee rate",
+        "feeRateShare": "{percent}% de tarifas",
         "feesPln": "Comisiones (PLN)",
         "productsCount": "{count} productos",
         "revenueMarginPln": "Ingresos / Margen (PLN)",
@@ -1966,11 +1966,11 @@
           "medium": "regular",
           "poor": "mal"
         },
-        "title": "Scorecard de partners"
+        "title": "Cuadro de evaluación de partners"
       },
       "summary": {
-        "feeRate": "Fee rate",
-        "feesCommissions": "Fees / Comisiones",
+        "feeRate": "Porcentaje de tarifas",
+        "feesCommissions": "Tarifas / Comisiones",
         "marginPct": "% de margen",
         "revenueMargin": "Ingresos (margen)",
         "title": "Resumen financiero"
@@ -2008,14 +2008,14 @@
     "churn": {
       "allLevels": "Todos los niveles",
       "daysSinceOrder": "días sin pedido",
-      "empty": "No hay partners con riesgo de churn que cumplan los criterios de los filtros.",
+      "empty": "No hay partners con riesgo de abandono que cumplan los criterios de los filtros.",
       "generateResult": "{created, plural, one {Se ha creado # tarea} other {Se han creado # tareas}}, omitidas: {skipped} (ya existen).",
       "generateTasks": "Generar tareas",
       "generating": "Generando…",
-      "noRisk": "Sin riesgo de churn",
+      "noRisk": "Sin riesgo de abandono",
       "salesDrop": "caída M-2→M-1",
       "searchPlaceholder": "Buscar partner…",
-      "showAll": "Mostrar todos los partners con riesgo de churn →"
+      "showAll": "Mostrar todos los partners con riesgo de abandono →"
     },
     "currency": {
       "billionsPln": "{value} mil M PLN",
@@ -2030,12 +2030,12 @@
     },
     "kpi": {
       "filters": {
-        "activeOpportunities": "Oportunidades activas en el pipeline",
+        "activeOpportunities": "Oportunidades activas en el embudo",
         "newLeadsThisWeek": "Leads nuevos – semana actual",
         "newLeadsValueThisWeek": "Leads nuevos – valor de la semana actual",
-        "pipelineValue": "Valor del pipeline"
+        "pipelineValue": "Valor del embudo"
       },
-      "inPipeline": "en el pipeline",
+      "inPipeline": "en el embudo",
       "newLeads": "Leads nuevos",
       "newLeadsValue": "Valor de leads nuevos",
       "newOpportunities": "Oportunidades nuevas",
@@ -2061,12 +2061,12 @@
       "title": "Últimas oportunidades"
     },
     "pipeline": {
-      "empty": "Sin datos del pipeline",
+      "empty": "Sin datos del embudo",
       "modeCount": "Cantidad",
       "modeValue": "Valor",
       "opportunityCount": "{count, plural, one {# oportunidad} other {# oportunidades}}",
-      "title": "Pipeline de ventas",
-      "total": "Valor total del pipeline:"
+      "title": "Embudo de ventas",
+      "total": "Valor total del embudo:"
     },
     "stages": {
       "closed_lost": "Perdidas",
