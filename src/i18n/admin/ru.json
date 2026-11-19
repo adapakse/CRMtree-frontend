@@ -1263,32 +1263,6 @@
         "urgent": "дн. → красный (срочно)"
       }
     },
-    "groupProfiles": {
-      "description": {
-        "accounting": "Отдел финансов и бухгалтерии",
-        "customerService": "Отдел клиентской службы",
-        "hr": "Отдел кадров",
-        "management": "Руководство компании",
-        "marketing": "Отдел маркетинга",
-        "operations": "Операционный отдел",
-        "prospects": "Доступ к модулю «Проспекты» (импорт CSV, обогащение, преобразование в лид).",
-        "sales": "Отдел продаж",
-        "seo": "Проверка и утверждение контента SEObot перед публикацией.",
-        "seoEditorial": "Редакторы SEObot: редактирование, дополнение и утверждение статей перед публикацией."
-      },
-      "displayName": {
-        "accounting": "Бухгалтерия",
-        "customerService": "Клиентская служба",
-        "hr": "Кадры",
-        "management": "Руководство",
-        "marketing": "Маркетинг",
-        "operations": "Операционный отдел",
-        "prospects": "Проспекты",
-        "sales": "Продажи",
-        "seo": "SEO",
-        "seoEditorial": "Редакция SEO"
-      }
-    },
     "groups": {
       "addFailed": "Ошибка добавления группы",
       "addGroup": "Добавить группу",
@@ -1411,11 +1385,6 @@
         "data_administration": "Совместное управление",
         "data_processing_entrustment": "Поручение обработки",
         "no_gdpr": "Без GDPR"
-      },
-      "holdReasons": {
-        "businessPause": "Приостановка деятельности",
-        "internalSituation": "Внутренняя ситуация в компании",
-        "noDecisionMakers": "Нет лиц, принимающих решения"
       },
       "industries": {
         "Education": "Образование",

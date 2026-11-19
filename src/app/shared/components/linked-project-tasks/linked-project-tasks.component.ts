@@ -9,6 +9,7 @@ import { ProjectTaskDueDateComponent } from '../project-deadlines/project-task-d
 import { ProjectTaskTimelinessComponent } from '../project-deadlines/project-task-timeliness.component';
 import { ProjectFinanceTotalsComponent } from '../project-finance-totals/project-finance-totals.component';
 import { CalendarEntry, projectTaskCalendarEntry } from '../../utils/calendar-export.util';
+import { TenantDefaultLabelPipe } from '../../../core/i18n/tenant-default-label.pipe';
 
 /**
  * Read-only list of the projects linked to a lead or a partner, with their
@@ -23,6 +24,7 @@ import { CalendarEntry, projectTaskCalendarEntry } from '../../utils/calendar-ex
   imports: [
     AddToCalendarComponent, ProjectDelayBadgeComponent, ProjectFinanceTotalsComponent, ProjectTaskDueDateComponent,
     ProjectTaskTimelinessComponent, TranslocoDirective,
+    TenantDefaultLabelPipe,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,7 +57,7 @@ import { CalendarEntry, projectTaskCalendarEntry } from '../../utils/calendar-ex
                       <wt-project-task-timeliness [task]="task" [isCompact]="true" />
                     </span>
                     <span class="status" [style.color]="task.status_color" [style.background]="task.status_color + '1F'">
-                      {{ task.status_name }}
+                      {{ task.status_name | tenantLabel:'projectStatuses' }}
                     </span>
                     <span class="assignees">{{ assigneeNames(task) }}</span>
                     <wt-project-task-due-date [task]="task" [emptyLabel]="t('linked.noDueDate')" />

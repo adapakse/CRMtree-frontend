@@ -15,6 +15,7 @@ import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 import { PROJECT_KSEF_STYLES, taskLabel } from './project-ksef.styles';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
+import { TenantDefaultLabelPipe, TenantDefaultLabels } from '../../core/i18n/tenant-default-label.pipe';
 
 const COST_STATUSES: ProjectCostStatus[] = ['incurred', 'planned'];
 // A <select> option cannot be indented with CSS, so the tree depth is drawn with non-breaking spaces.
@@ -29,7 +30,7 @@ const OPTION_INDENT = '   ';
 @Component({
   selector: 'wt-project-ksef-link-form',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective, ProjectKsefLinksTableComponent, FormErrorSummaryComponent],
+  imports: [FormsModule, TranslocoDirective, ProjectKsefLinksTableComponent, FormErrorSummaryComponent, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -69,7 +70,7 @@ const OPTION_INDENT = '   ';
               <select class="fsel" [ngModel]="categoryId()" (ngModelChange)="categoryId.set($event)" [class.fi-err]="submitted() && isCategoryMissing()">
                 <option [ngValue]="null">{{ t('finance.costForm.selectCategory') }}</option>
                 @for (category of activeCategories(); track category.id) {
-                  <option [ngValue]="category.id">{{ category.name }}</option>
+                  <option [ngValue]="category.id">{{ category.name | tenantLabel:'projectCostCategories' }}</option>
                 }
               </select>
               @if (submitted() && isCategoryMissing()) { <span class="ferr">{{ t('finance.errors.category') }}</span> }
@@ -139,6 +140,7 @@ export class ProjectKsefLinkFormComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
   readonly format = inject(ProjectFinanceFormatService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
 
   readonly invoice = input.required<KsefInvoiceDetail>();
   readonly projectId = input.required<string>();
@@ -190,7 +192,7 @@ export class ProjectKsefLinkFormComponent implements OnInit {
   }
 
   costLabel(cost: ProjectCostItem): string {
-    return [this.format.date(cost.date), cost.category_name, this.format.money(cost.amount, this.projectCurrency())].join(', ');
+    return [this.format.date(cost.date), this.tenantLabels.label('projectCostCategories', cost.category_name), this.format.money(cost.amount, this.projectCurrency())].join(', ');
   }
 
   save(): void {

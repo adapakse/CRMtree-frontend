@@ -392,6 +392,110 @@
   "states": {
     "loading": "Caricamento…"
   },
+  "tenantDefaults": {
+    "consentDescriptions": {
+      "classificationTargeting": "Consenso alla profilazione, classificazione e targeting sulla base dei dati sull’attività e sui comportamenti d’acquisto del partner, per personalizzare offerte commerciali e attività di vendita, ai sensi dell’art. 6, par. 1, lett. a) del GDPR.",
+      "marketingComm": "Consenso al trattamento dei dati personali del contatto per l’invio di materiali di marketing, offerte e informazioni su prodotti e servizi per via elettronica e telefonica, ai sensi dell’art. 6, par. 1, lett. a) del GDPR."
+    },
+    "consentLabels": {
+      "classificationTargeting": "Consenso al trattamento per classificazione e targeting",
+      "marketingComm": "Consenso al trattamento dei dati per comunicazioni di marketing"
+    },
+    "contractSubjects": {
+      "accommodation": "Alloggio",
+      "businessTravel": "Viaggi d'affari",
+      "conferences": "Conferenze/Riunioni",
+      "other": "Altro",
+      "system": "Sistema"
+    },
+    "countries": {
+      "at": "Austria",
+      "be": "Belgio",
+      "ch": "Svizzera",
+      "cz": "Repubblica Ceca",
+      "de": "Germania",
+      "dk": "Danimarca",
+      "es": "Spagna",
+      "fi": "Finlandia",
+      "fr": "Francia",
+      "gb": "Regno Unito",
+      "hu": "Ungheria",
+      "it": "Italia",
+      "nl": "Paesi Bassi",
+      "no": "Norvegia",
+      "pl": "Polonia",
+      "ro": "Romania",
+      "ru": "Russia",
+      "se": "Svezia",
+      "sk": "Slovacchia",
+      "ua": "Ucraina"
+    },
+    "groupDescriptions": {
+      "accounting": "Reparto finanza e contabilità",
+      "customerService": "Reparto assistenza clienti",
+      "hr": "Reparto risorse umane",
+      "management": "Consiglio direttivo dell’azienda",
+      "marketing": "Reparto marketing",
+      "operations": "Reparto operazioni",
+      "prospects": "Accesso al modulo Prospect (import CSV, arricchimento, conversione in lead).",
+      "sales": "Reparto vendite",
+      "seo": "Revisione e approvazione dei contenuti di SEObot prima della pubblicazione.",
+      "seoEditorial": "Redattori di SEObot: modifica, completamento e approvazione degli articoli prima della pubblicazione."
+    },
+    "groups": {
+      "accounting": "Contabilità",
+      "customerService": "Assistenza clienti",
+      "hr": "Risorse umane",
+      "management": "Consiglio direttivo",
+      "marketing": "Marketing",
+      "operations": "Operazioni",
+      "prospects": "Prospect",
+      "sales": "Vendite",
+      "seoEditorial": "Redazione SEO"
+    },
+    "holdReasons": {
+      "businessPause": "Pausa dell'attività",
+      "internalSituation": "Situazione interna all'azienda",
+      "noDecisionMakers": "Nessun decisore"
+    },
+    "languages": {
+      "de": "Tedesco",
+      "en": "Inglese",
+      "pl": "Polacco",
+      "ro": "Rumeno",
+      "ru": "Russo"
+    },
+    "lostReasons": {
+      "highPrice": "Prezzo elevato",
+      "incompleteOffer": "Offerta incompleta",
+      "other": "Altro"
+    },
+    "projectCostCategories": {
+      "licences": "Licenze",
+      "materials": "Materiali",
+      "other": "Altro",
+      "ownWork": "Lavoro interno",
+      "subcontractors": "Subappaltatori",
+      "travel": "Viaggi"
+    },
+    "projectPriorities": {
+      "critical": "Critica",
+      "high": "Alta",
+      "low": "Bassa",
+      "medium": "Media"
+    },
+    "projectStatuses": {
+      "done": "Completato",
+      "inProgress": "In corso",
+      "review": "Da verificare",
+      "todo": "Da fare"
+    },
+    "projectTypes": {
+      "meeting": "Riunione",
+      "milestone": "Traguardo",
+      "task": "Attività"
+    }
+  },
   "testEnvironmentBanner": {
     "title": "Versione di test — questo non è l'ambiente di produzione"
   },

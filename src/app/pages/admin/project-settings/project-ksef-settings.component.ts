@@ -6,6 +6,7 @@ import { KsefAdminConfig, KsefApiService, KsefCompany, KsefDocumentGroup } from 
 import { ProjectFinanceFormatService } from '../../../core/services/project-finance-format.service';
 import { PROJECTS_SHARED_STYLES } from '../../projects/projects-shared.styles';
 import { ProjectKsefCompanyFormComponent, describeKsefAdminError } from './project-ksef-company-form.component';
+import { TenantDefaultLabelPipe } from '../../../core/i18n/tenant-default-label.pipe';
 
 const MIN_SYNC_DAYS = 1;
 const MAX_SYNC_DAYS = 365;
@@ -19,7 +20,7 @@ const MAX_SYNC_DAYS = 365;
 @Component({
   selector: 'wt-project-ksef-settings',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective, TranslocoPipe, ProjectKsefCompanyFormComponent],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe, ProjectKsefCompanyFormComponent, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -55,7 +56,7 @@ const MAX_SYNC_DAYS = 365;
           <select id="ksef-invoice-documents-group" class="fsel group" [(ngModel)]="invoiceDocumentsGroupId">
             <option [ngValue]="null">{{ t('ksef.settings.noInvoiceDocumentsGroup') }}</option>
             @for (group of groupOptions(); track group.id) {
-              <option [ngValue]="group.id">{{ group.display_name ?? group.name }}</option>
+              <option [ngValue]="group.id">{{ (group.display_name ?? group.name) | tenantLabel:'groups' }}</option>
             }
           </select>
           <button class="btn btn-g btn-sm" [disabled]="invoiceDocumentsGroupId === (loaded.invoice_documents_group?.id ?? null)"

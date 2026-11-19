@@ -19,6 +19,7 @@ import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
 import { PhoneInputComponent } from '../../../shared/components/phone-input/phone-input.component';
 import { describeHttpError } from '../../../core/services/http-error-message';
 import { amountError, scrollToFirstFieldError } from '../../../shared/utils/field-error.util';
+import { TenantDefaultLabelPipe } from '../../../core/i18n/tenant-default-label.pipe';
 
 const ACTIVITY_TYPES_WITH_LABEL = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity'];
 const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketing' };
@@ -27,7 +28,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
   selector: 'wt-crm-leads-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, FormsModule, ActTypeIconComponent, PhoneInputComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, RouterModule, FormsModule, ActTypeIconComponent, PhoneInputComponent, TranslocoDirective, TranslocoPipe, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -179,7 +180,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                (click)="selectLead(lead)">
             <div class="lead-company" style="display:flex;align-items:center;gap:6px">
               <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
-              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #15803d max(l, var(--text-min-l)) c h);border-radius:6px;padding:1px 4px;margin-left:4px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
+              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason | tenantLabel:'holdReasons'">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #15803d max(l, var(--text-min-l)) c h);border-radius:6px;padding:1px 4px;margin-left:4px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
             </div>
             <div class="lead-contact" *ngIf="lead.contact_name">
               {{ lead.contact_name }}<span *ngIf="lead.contact_title" style="color:var(--gray-400)"> · {{ lead.contact_title }}</span>
@@ -379,7 +380,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <div class="td" style="display:flex;align-items:center;gap:8px">
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
-          <div style="font-weight:650;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span>
+          <div style="font-weight:650;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason | tenantLabel:'holdReasons'">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span>
             <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0"
                   style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
             <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0"

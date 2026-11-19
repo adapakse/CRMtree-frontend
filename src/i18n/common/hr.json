@@ -392,6 +392,110 @@
   "states": {
     "loading": "Učitavanje…"
   },
+  "tenantDefaults": {
+    "consentDescriptions": {
+      "classificationTargeting": "Privola za izradu profila, klasifikaciju i ciljanje na temelju podataka o aktivnosti i kupovnom ponašanju partnera, u svrhu personalizacije poslovnih ponuda i prodajnih aktivnosti, u skladu s člankom 6. stavkom 1. točkom (a) GDPR-a.",
+      "marketingComm": "Privola za obradu osobnih podataka kontakta u svrhu slanja marketinških materijala, ponuda i informacija o proizvodima i uslugama elektroničkim putem i telefonom, u skladu s člankom 6. stavkom 1. točkom (a) GDPR-a."
+    },
+    "consentLabels": {
+      "classificationTargeting": "Privola za obradu u svrhu klasifikacije i ciljanja",
+      "marketingComm": "Privola za obradu podataka u svrhu marketinške komunikacije"
+    },
+    "contractSubjects": {
+      "accommodation": "Smještaj",
+      "businessTravel": "Poslovna putovanja",
+      "conferences": "Konferencije/Sastanci",
+      "other": "Ostalo",
+      "system": "Sustav"
+    },
+    "countries": {
+      "at": "Austrija",
+      "be": "Belgija",
+      "ch": "Švicarska",
+      "cz": "Češka",
+      "de": "Njemačka",
+      "dk": "Danska",
+      "es": "Španjolska",
+      "fi": "Finska",
+      "fr": "Francuska",
+      "gb": "Ujedinjena Kraljevina",
+      "hu": "Mađarska",
+      "it": "Italija",
+      "nl": "Nizozemska",
+      "no": "Norveška",
+      "pl": "Poljska",
+      "ro": "Rumunjska",
+      "ru": "Rusija",
+      "se": "Švedska",
+      "sk": "Slovačka",
+      "ua": "Ukrajina"
+    },
+    "groupDescriptions": {
+      "accounting": "Odjel za financije i računovodstvo",
+      "customerService": "Odjel korisničke podrške",
+      "hr": "Kadrovski odjel",
+      "management": "Uprava društva",
+      "marketing": "Marketinški odjel",
+      "operations": "Operativni odjel",
+      "prospects": "Pristup modulu Prospekti (uvoz CSV, obogaćivanje, pretvorba u lead).",
+      "sales": "Prodajni odjel",
+      "seo": "Pregled i odobrenje sadržaja SEObota prije objave.",
+      "seoEditorial": "Urednici SEObota: uređivanje, dopunjavanje i odobravanje članaka prije objave."
+    },
+    "groups": {
+      "accounting": "Računovodstvo",
+      "customerService": "Korisnička podrška",
+      "hr": "Kadrovi",
+      "management": "Uprava",
+      "marketing": "Marketing",
+      "operations": "Operacije",
+      "prospects": "Prospekti",
+      "sales": "Prodaja",
+      "seoEditorial": "Uredništvo SEO"
+    },
+    "holdReasons": {
+      "businessPause": "Pauza u poslovanju",
+      "internalSituation": "Interna situacija u poduzeću",
+      "noDecisionMakers": "Nema donositelja odluka"
+    },
+    "languages": {
+      "de": "Njemački",
+      "en": "Engleski",
+      "pl": "Poljski",
+      "ro": "Rumunjski",
+      "ru": "Ruski"
+    },
+    "lostReasons": {
+      "highPrice": "Visoka cijena",
+      "incompleteOffer": "Nepotpuna ponuda",
+      "other": "Ostalo"
+    },
+    "projectCostCategories": {
+      "licences": "Licence",
+      "materials": "Materijali",
+      "other": "Ostalo",
+      "ownWork": "Vlastiti rad",
+      "subcontractors": "Podizvođači",
+      "travel": "Putovanja"
+    },
+    "projectPriorities": {
+      "critical": "Kritični",
+      "high": "Visoki",
+      "low": "Niski",
+      "medium": "Srednji"
+    },
+    "projectStatuses": {
+      "done": "Završeno",
+      "inProgress": "U tijeku",
+      "review": "Na provjeri",
+      "todo": "Za napraviti"
+    },
+    "projectTypes": {
+      "meeting": "Sastanak",
+      "milestone": "Prekretnica",
+      "task": "Zadatak"
+    }
+  },
   "testEnvironmentBanner": {
     "title": "Testna verzija — ovo nije produkcijsko okruženje"
   },

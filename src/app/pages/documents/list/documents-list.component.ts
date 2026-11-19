@@ -17,6 +17,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { DetailPanelComponent } from '../detail-panel/detail-panel.component';
 import { NewDocumentPanelComponent } from '../new-panel/new-document-panel.component';
+import { TenantDefaultLabelPipe } from '../../../core/i18n/tenant-default-label.pipe';
 
 const STATUSES: { key: DocStatus | 'all'; labelKey: string }[] = [
   { key: 'all',          labelKey: 'list.statusFilters.all' },
@@ -41,7 +42,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
 @Component({
   selector: 'wt-documents-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoDirective, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent, DetailPanelComponent, NewDocumentPanelComponent, PaymentStatusBadgeComponent],
+  imports: [CommonModule, FormsModule, TranslocoDirective, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent, DetailPanelComponent, NewDocumentPanelComponent, PaymentStatusBadgeComponent, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -78,7 +79,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
         <select class="sel" [(ngModel)]="selectedGroup" (ngModelChange)="loadDocuments()">
           <option value="">{{ t('list.filters.allGroups') }}</option>
           @for (g of groups(); track g.id) {
-            <option [value]="g.id">{{ g.display_name }}</option>
+            <option [value]="g.id">{{ g.display_name | tenantLabel:'groups' }}</option>
           }
         </select>
         <select class="sel" [(ngModel)]="selectedType" (ngModelChange)="loadDocuments()">

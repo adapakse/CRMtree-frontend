@@ -19,6 +19,7 @@ import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
 import { scrollToFirstError } from '../../shared/forms/form-errors';
+import { TenantDefaultLabelPipe } from '../../core/i18n/tenant-default-label.pipe';
 
 const COST_STATUSES: ProjectCostStatus[] = ['incurred', 'planned'];
 const DOCUMENT_SEARCH_LIMIT = 10;
@@ -40,7 +41,7 @@ interface CostForm {
 @Component({
   selector: 'wt-project-cost-form',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective, TranslocoPipe, TypeaheadComponent, ProjectDocumentLinkComponent, FormErrorSummaryComponent],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe, TypeaheadComponent, ProjectDocumentLinkComponent, FormErrorSummaryComponent, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -70,7 +71,7 @@ interface CostForm {
               <select class="fsel" [(ngModel)]="form.category_id" [class.fi-err]="missing('category')">
                 <option [ngValue]="null">{{ t('finance.costForm.selectCategory') }}</option>
                 @for (category of selectableCategories(); track category.id) {
-                  <option [ngValue]="category.id">{{ category.name }}</option>
+                  <option [ngValue]="category.id">{{ category.name | tenantLabel:'projectCostCategories' }}</option>
                 }
               </select>
               @if (missing('category')) { <span class="ferr">{{ t('finance.errors.category') }}</span> }

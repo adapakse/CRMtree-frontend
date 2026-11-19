@@ -10,6 +10,7 @@ import { ListQueryState } from '../../shared/list/list-query';
 import { FilterSet, ProjectListFiltersService, TaskFilterId } from './project-list-filters.service';
 import { INDENT_PX_PER_LEVEL, buildTaskRows } from './project-task-tree.util';
 import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
+import { TenantDefaultLabelPipe } from '../../core/i18n/tenant-default-label.pipe';
 
 /**
  * The whole project as a task tree — the default look of the Tasks tab. Its
@@ -20,7 +21,7 @@ import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
 @Component({
   selector: 'wt-project-task-list',
   standalone: true,
-  imports: [NgStyle, TranslocoDirective, ListColumnHeaderComponent, ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent],
+  imports: [NgStyle, TranslocoDirective, ListColumnHeaderComponent, ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -71,18 +72,18 @@ import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
                     </div>
                   </td>
                   <td>
-                    @if (typeOf(row.task); as type) { <span class="chip" [ngStyle]="chipStyle(type.color)">{{ type.name }}</span> }
+                    @if (typeOf(row.task); as type) { <span class="chip" [ngStyle]="chipStyle(type.color)">{{ type.name | tenantLabel:'projectTypes' }}</span> }
                   </td>
                   <td>
                     @if (statusOf(row.task); as status) {
                       <span class="chip" [ngStyle]="chipStyle(status.color)">
-                        <span class="chip-dot" [style.background]="status.color"></span>{{ status.name }}
+                        <span class="chip-dot" [style.background]="status.color"></span>{{ status.name | tenantLabel:'projectStatuses' }}
                       </span>
                     }
                   </td>
                   <td>
                     @if (priorityOf(row.task); as priority) {
-                      <span class="chip" [ngStyle]="chipStyle(priority.color)">{{ priority.name }}</span>
+                      <span class="chip" [ngStyle]="chipStyle(priority.color)">{{ priority.name | tenantLabel:'projectPriorities' }}</span>
                     }
                   </td>
                   <td class="assignees">{{ assigneeNames(row.task) }}</td>

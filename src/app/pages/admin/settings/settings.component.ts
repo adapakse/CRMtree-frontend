@@ -21,6 +21,8 @@ import { LanguagePickerComponent } from '../../../shared/components/language-pic
 import { environment } from '../../../../environments/environment';
 import { Tenant } from '../../../core/models/models';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
+import { TenantDefaultLabels } from '../../../core/i18n/tenant-default-label.pipe';
+import { TenantDictionary } from '../../../core/i18n/tenant-default-labels';
 
 interface SettingField {
   key: string;
@@ -230,11 +232,14 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
   },
 };
 
-// Słowniki, których elementy są zapisane jako gotowy tekst, a nie kod — patrz
-// freeTextItemLabel(). Kody tych słowników nie mogą stać w tym pliku, bo są po
-// polsku, a i18n:check tego nie dopuszcza; żyją więc w plikach tłumaczeń.
-const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
+// Dictionaries whose items are stored as ready text, not as a code: a seeded
+// default shows translated next to the stored value (see tenant-default-labels.ts).
+const FREE_TEXT_DICTIONARIES: Record<string, TenantDictionary> = {
   crm_hold_reasons: 'holdReasons',
+  crm_lost_reasons: 'lostReasons',
+  crm_partner_countries: 'countries',
+  crm_partner_languages: 'languages',
+  doc_contract_subjects: 'contractSubjects',
 };
 
 const AI_ASSISTANT_PURPOSE = 'assistant';
@@ -1773,6 +1778,7 @@ export class SettingsComponent implements OnInit {
 
   auth                = inject(AuthService);
   private transloco     = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
   private localeService = inject(LocaleService);
 
   loading   = signal(true);
@@ -1891,11 +1897,11 @@ export class SettingsComponent implements OnInit {
       this.toast.info(this.transloco.translate('admin.settings.groups.cannotDelete'));
       return;
     }
-    if (!confirm(this.transloco.translate('admin.settings.groups.deleteConfirm', { name: g.display_name }))) return;
+    if (!confirm(this.transloco.translate('admin.settings.groups.deleteConfirm', { name: this.groupDisplayName(g) }))) return;
     this.http.delete(`${environment.apiUrl}/admin/settings/groups/${g.id}`).subscribe({
       next: () => {
         this.groups.update(list => list.filter(x => x.id !== g.id));
-        this.toast.success(this.transloco.translate('admin.settings.groups.deleted', { name: g.display_name }));
+        this.toast.success(this.transloco.translate('admin.settings.groups.deleted', { name: this.groupDisplayName(g) }));
       },
       error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.settings.groups.deleteFailed')),
     });
@@ -1975,11 +1981,6 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Polskie teksty zakresu `admin` są tu potrzebne obok języka aktywnego:
-    // wartości itemLabels w polskim służą za odcisk palca elementów słownika
-    // zapisanych jako gotowy tekst (patrz freeTextItemLabel). Dla polskiego
-    // interfejsu to ten sam, już wczytany plik, więc nic nie dociąga.
-    this.transloco.load('admin/pl').subscribe({ error: () => undefined });
     // Karta dostawcy AI stoi w zakładce otwieranej domyślnie, więc wczytujemy ją od razu.
     this.loadAiConfig();
     this.loadFieldDefinitions();
@@ -2101,8 +2102,8 @@ export class SettingsComponent implements OnInit {
     if (labels?.codes.includes(item)) {
       return this.transloco.translate(`admin.settings.itemLabels.${labels.group}.${item}`);
     }
-    const freeText = FREE_TEXT_ITEM_GROUPS[key];
-    return freeText ? this.freeTextItemLabel(freeText, item) : item;
+    const dictionary = FREE_TEXT_DICTIONARIES[key];
+    return dictionary ? this.tenantLabels.label(dictionary, item) : item;
   }
 
   /**
@@ -2129,35 +2130,16 @@ export class SettingsComponent implements OnInit {
   }
 
   /**
-   * Słowniki, których elementy są zapisane jako GOTOWY TEKST, nie jako kod
-   * techniczny (powody Holda zaseedowane migracją 0294). Tłumaczenia trzymamy
-   * pod własnymi slugami, a polska wartość służy za odcisk palca: podmieniamy
-   * tylko wtedy, gdy element jest dokładnie taki jak zaseedowany domyślny.
-   * Wartość dopisana przez admina tenanta zostaje nietknięta — to jego słownik.
-   */
-  /**
-   * Nazwa wyświetlana i opis grupy uprawnień (`group_profiles`) są zaseedowane
-   * po polsku, a admin tenanta może je zmienić — więc podmieniamy je na
-   * tłumaczenie tylko wtedy, gdy są dokładnie takie jak polskie domyślne.
-   * Dopasowanie idzie po WARTOŚCI, nie po kodzie grupy (`g.name`), bo dwie
-   * grupy mają ten sam kod `SEO` przy różnych nazwach i opisach. Sam kod
-   * zostaje nietknięty — używa go słownik importu CSV.
+   * Display name and description of a permission group (`group_profiles`) are
+   * seeded and editable by the tenant admin, so only an unchanged default is
+   * translated. The technical `g.name` stays untouched — the CSV import uses it.
    */
   groupDisplayName(g: { display_name?: string | null }): string {
-    return this.freeTextItemLabel('groupProfiles.displayName', g.display_name ?? '');
+    return this.tenantLabels.label('groups', g.display_name);
   }
 
   groupDescription(g: { description?: string | null }): string {
-    return this.freeTextItemLabel('groupProfiles.description', g.description ?? '');
-  }
-
-  private freeTextItemLabel(group: string, item: string): string {
-    const polish = this.transloco.translateObject(`admin.settings.itemLabels.${group}`, {}, 'pl');
-    if (!polish || typeof polish !== 'object') return item;
-    const slug = Object.keys(polish).find(k => (polish as Record<string, string>)[k] === item);
-    if (!slug) return item;
-    const translated = this.transloco.translate(`admin.settings.itemLabels.${group}.${slug}`);
-    return translated.startsWith('admin.settings.') ? item : translated;
+    return this.tenantLabels.label('groupDescriptions', g.description);
   }
 
   addJsonItem(field: SettingField): void {

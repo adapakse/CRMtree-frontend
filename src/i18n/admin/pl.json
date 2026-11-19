@@ -1263,32 +1263,6 @@
         "urgent": "dni → czerwony (pilne)"
       }
     },
-    "groupProfiles": {
-      "description": {
-        "accounting": "Dział finansów i księgowości",
-        "customerService": "Dział obsługi klienta",
-        "hr": "Dział kadr i zasobów ludzkich",
-        "management": "Zarząd firmy",
-        "marketing": "Dział marketingu",
-        "operations": "Dział operacyjny",
-        "prospects": "Dostęp do modułu Prospektów (import CSV, enrichment, konwersja na lead).",
-        "sales": "Dział sprzedaży",
-        "seo": "Przegląd i akceptacja treści SEObota przed publikacją.",
-        "seoEditorial": "Redaktorzy SEObota: edycja, uzupełnianie i akceptacja artykułów przed publikacją."
-      },
-      "displayName": {
-        "accounting": "Accounting",
-        "customerService": "Obsługa Klienta",
-        "hr": "HR",
-        "management": "Zarząd",
-        "marketing": "Marketing",
-        "operations": "Operations",
-        "prospects": "Prospekty",
-        "sales": "Sprzedaż",
-        "seo": "SEO",
-        "seoEditorial": "Redakcja SEO"
-      }
-    },
     "groups": {
       "addFailed": "Błąd dodawania grupy",
       "addGroup": "Dodaj grupę",
@@ -1411,11 +1385,6 @@
         "data_administration": "Współadministrowanie",
         "data_processing_entrustment": "Powierzenie przetwarzania",
         "no_gdpr": "Brak GDPR"
-      },
-      "holdReasons": {
-        "businessPause": "Przerwa w działalności",
-        "internalSituation": "Sytuacja wewnątrz firmy",
-        "noDecisionMakers": "Brak osób decyzyjnych"
       },
       "industries": {
         "Education": "Edukacja",

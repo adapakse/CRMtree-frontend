@@ -12,6 +12,7 @@ import { ProjectKsefInvoicePickerComponent } from './project-ksef-invoice-picker
 import { ProjectKsefOtherLinksComponent } from './project-ksef-other-links.component';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
+import { TenantDefaultLabelPipe } from '../../core/i18n/tenant-default-label.pipe';
 
 /**
  * "Costs" section of the task panel. Someone with finance read rights sees
@@ -26,6 +27,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
   imports: [
     TranslocoDirective, ProjectCostFormComponent, ProjectDocumentLinkComponent,
     ProjectKsefInvoiceBadgeComponent, ProjectKsefInvoicePickerComponent, ProjectKsefOtherLinksComponent,
+    TenantDefaultLabelPipe,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,7 +52,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
             <li class="item">
               <span class="date">{{ format.date(item.date) }}</span>
               <span class="what">
-                {{ item.category_name }}
+                {{ item.category_name | tenantLabel:'projectCostCategories' }}
                 @if (item.status === 'planned') { <span class="pill status-pill">{{ t('finance.costStatuses.planned') }}</span> }
                 @if (details(item); as text) { <span class="secondary">{{ text }}</span> }
                 @if (item.ksef_invoice; as invoice) { <wt-project-ksef-invoice-badge class="invoice" [invoice]="invoice" /> }

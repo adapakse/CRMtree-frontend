@@ -14,6 +14,7 @@ import { ProjectKsefOtherLinksComponent } from './project-ksef-other-links.compo
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
+import { TenantDefaultLabelPipe, TenantDefaultLabels } from '../../core/i18n/tenant-default-label.pipe';
 
 // Filter value for cost items that belong to no task.
 const WITHOUT_TASK = 'none';
@@ -35,6 +36,7 @@ interface FilterOption {
   imports: [
     FormsModule, TranslocoDirective, ProjectCostFormComponent, ProjectDocumentLinkComponent,
     ProjectKsefInvoiceBadgeComponent, ProjectKsefInvoicePickerComponent, ProjectKsefOtherLinksComponent,
+    TenantDefaultLabelPipe,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -93,7 +95,7 @@ interface FilterOption {
               @for (item of visibleCosts(); track item.id) {
                 <tr [class.has-note]="item.other_links.length > 0">
                   <td class="nowrap">{{ format.date(item.date) }}</td>
-                  <td>{{ item.category_name }}</td>
+                  <td>{{ item.category_name | tenantLabel:'projectCostCategories' }}</td>
                   <td class="description">{{ item.description }}</td>
                   <td>
                     @if (item.task_id; as taskId) {
@@ -187,6 +189,7 @@ export class ProjectFinanceCostsComponent {
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
   readonly format = inject(ProjectFinanceFormatService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
 
   readonly projectId = input.required<string>();
   readonly projectKey = input.required<string>();
@@ -213,7 +216,7 @@ export class ProjectFinanceCostsComponent {
 
   // Filters offer only what occurs in the list, so no choice leads to an empty table.
   readonly categoryOptions = computed(() => uniqueOptions(
-    this.costs().map(item => ({ id: item.category_id, label: item.category_name }))));
+    this.costs().map(item => ({ id: item.category_id, label: this.tenantLabels.label('projectCostCategories', item.category_name) }))));
   readonly taskOptions = computed(() => uniqueOptions(
     this.costs()
       .filter(item => item.task_id !== null)

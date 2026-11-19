@@ -13,6 +13,7 @@ import { LeadStagesService } from '../../../core/services/lead-stages.service';
 import { CrmEmailCampaignAudienceComponent, ExclusionRow, KNOWN_EXCLUSIONS } from './crm-email-campaign-audience.component';
 import { SENDGRID_TEMPLATES_URL } from './campaign-period';
 import { EMAIL_CAMPAIGNS_SHARED_STYLES } from './email-campaigns.styles';
+import { TenantDefaultLabels } from '../../../core/i18n/tenant-default-label.pipe';
 
 type PickListKey = 'industries' | 'tags' | 'owners';
 type ChipKey = 'statuses' | 'stages' | 'sizes' | 'segments';
@@ -369,6 +370,7 @@ export class CrmEmailCampaignEditorComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly transloco = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
   private readonly stages = inject(LeadStagesService);
 
   readonly templatesUrl = SENDGRID_TEMPLATES_URL;
@@ -426,7 +428,7 @@ export class CrmEmailCampaignEditorComponent implements OnInit, OnDestroy {
 
   /** The consent type the campaign requires, per tenant; null leaves the choice to the server. */
   readonly consentKey = computed(() => this.options()?.consent_key || this.sendgridStatus()?.consent_key || null);
-  readonly consentLabel = computed(() => this.options()?.consent_label || this.sendgridStatus()?.consent_label
+  readonly consentLabel = computed(() => this.tenantLabels.label('consentLabels', this.options()?.consent_label || this.sendgridStatus()?.consent_label)
     || this.transloco.translate('campaigns.common.marketingConsent'));
   /** The selected template was tested after its last change (the server checks the same before sending). */
   readonly isTested = computed(() => {

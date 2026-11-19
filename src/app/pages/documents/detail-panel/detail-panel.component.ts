@@ -25,6 +25,7 @@ import { DEFAULT_LOCALE } from '../../../core/i18n/locales';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { scrollToFirstError } from '../../../shared/forms/form-errors';
+import { TenantDefaultLabelPipe, TenantDefaultLabels } from '../../../core/i18n/tenant-default-label.pipe';
 
 // Built-in values have translated names; any other value comes from App
 // Settings and is its own display name.
@@ -51,7 +52,7 @@ interface SelectOption { value: string; label: string; }
 @Component({
   selector: 'wt-detail-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe, PaymentStatusBadgeComponent, InvoiceFieldsComponent, DocumentProjectLinksComponent, CustomFieldsComponent, FormErrorSummaryComponent],
+  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe, PaymentStatusBadgeComponent, InvoiceFieldsComponent, DocumentProjectLinksComponent, CustomFieldsComponent, FormErrorSummaryComponent, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -136,11 +137,11 @@ interface SelectOption { value: string; label: string; }
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.group_id">
                     @for (g of groups(); track g.id) {
-                      <option [value]="g.id">{{ g.display_name ?? g.name }}</option>
+                      <option [value]="g.id">{{ (g.display_name ?? g.name) | tenantLabel:'groups' }}</option>
                     }
                   </select>
                 } @else {
-                  <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ doc.group_display ?? doc.group_name }}</div>
+                  <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ (doc.group_display ?? doc.group_name) | tenantLabel:'groups' }}</div>
                 }
               </div>
               <div class="fg">
@@ -701,6 +702,7 @@ export class DetailPanelComponent implements OnChanges {
   private settingsSvc = inject(AppSettingsService);
   private crmApi      = inject(CrmApiService);
   private transloco   = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
   private locale      = inject(LocaleService);
   auth                = inject(AuthService);
 
@@ -741,7 +743,7 @@ export class DetailPanelComponent implements OnChanges {
   get countryOptions(): SelectOption[] {
     try {
       const raw = this.settingsSvc.settings()?.['crm_partner_countries'];
-      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: value }));
+      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: this.tenantLabels.label('countries', value) }));
     } catch { }
     return this.fallbackOptions('countries', FALLBACK_COUNTRY_KEYS);
   }
@@ -749,7 +751,7 @@ export class DetailPanelComponent implements OnChanges {
   get contractSubjectOptions(): SelectOption[] {
     try {
       const raw = this.settingsSvc.settings()?.['doc_contract_subjects'];
-      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: value }));
+      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: this.tenantLabels.label('contractSubjects', value) }));
     } catch { }
     return this.fallbackOptions('contractSubjects', FALLBACK_CONTRACT_SUBJECT_KEYS);
   }

@@ -12,6 +12,7 @@ import { ListQueryState } from '../../shared/list/list-query';
 import { CalendarEntry, projectTaskCalendarEntry } from '../../shared/utils/calendar-export.util';
 import { FilterSet, ProjectListFiltersService, TaskFilterId } from './project-list-filters.service';
 import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
+import { TenantDefaultLabelPipe } from '../../core/i18n/tenant-default-label.pipe';
 
 const ALWAYS_SHOWN_COLUMN_COUNT = 8;
 
@@ -26,6 +27,7 @@ const ALWAYS_SHOWN_COLUMN_COUNT = 8;
   imports: [
     NgStyle, TranslocoDirective, TranslocoPipe, AddToCalendarComponent, ListColumnHeaderComponent, ListPagerComponent,
     ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent,
+    TenantDefaultLabelPipe,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,16 +73,16 @@ const ALWAYS_SHOWN_COLUMN_COUNT = 8;
                 </td>
                 @if (showsProject()) { <td class="secondary-cell">{{ task.project_name }}</td> }
                 <td>
-                  @if (task.type_name && task.type_color) { <span class="chip" [ngStyle]="chipStyle(task.type_color)">{{ task.type_name }}</span> }
+                  @if (task.type_name && task.type_color) { <span class="chip" [ngStyle]="chipStyle(task.type_color)">{{ task.type_name | tenantLabel:'projectTypes' }}</span> }
                 </td>
                 <td>
                   <span class="chip" [ngStyle]="chipStyle(task.status_color)">
-                    <span class="chip-dot" [style.background]="task.status_color"></span>{{ task.status_name }}
+                    <span class="chip-dot" [style.background]="task.status_color"></span>{{ task.status_name | tenantLabel:'projectStatuses' }}
                   </span>
                 </td>
                 <td>
                   @if (task.priority_name && task.priority_color) {
-                    <span class="chip" [ngStyle]="chipStyle(task.priority_color)">{{ task.priority_name }}</span>
+                    <span class="chip" [ngStyle]="chipStyle(task.priority_color)">{{ task.priority_name | tenantLabel:'projectPriorities' }}</span>
                   }
                 </td>
                 @if (showsAssignees()) { <td class="secondary-cell">{{ assigneeNames(task) }}</td> }
