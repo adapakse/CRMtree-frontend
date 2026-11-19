@@ -154,12 +154,12 @@
       "yes": "Kasni"
     },
     "endDate": "Završetak",
-    "manager": "PM",
+    "manager": "Voditelj projekta",
     "myRole": "Moja uloga",
     "myRoleValues": {
       "controller": "Kontrolor",
       "participant": "Sudionik",
-      "pm": "PM"
+      "pm": "Voditelj projekta"
     },
     "name": "Naziv zadatka",
     "number": "Broj",
@@ -180,7 +180,7 @@
       "key": "Ključ",
       "name": "Naziv",
       "overdue": "Zadaci izvan roka",
-      "pm": "PM",
+      "pm": "Voditelj projekta",
       "progress": "Napredak",
       "revenue": "Prihod",
       "start_date": "Početak",
@@ -634,7 +634,7 @@
       "controller": "Kontrolor",
       "external_participant": "Vanjski sudionik",
       "internal_participant": "Interni sudionik",
-      "pm": "PM"
+      "pm": "Voditelj projekta"
     },
     "statusCategories": {
       "done": "Završeno",
@@ -722,7 +722,7 @@
       "title": "Dodatna polja"
     },
     "endDateChange": {
-      "hint": "Neobavezno. PM će razlog vidjeti u e-poruci o promjeni roka; bit će spremljen i u povijesti zadatka.",
+      "hint": "Neobavezno. Voditelj projekta će razlog vidjeti u e-poruci o promjeni roka; bit će spremljen i u povijesti zadatka.",
       "placeholder": "npr. kasna isporuka od klijenta",
       "reason": "Razlog promjene roka"
     },
@@ -785,7 +785,7 @@
       "overdue": "Izvan roka",
       "progress": "Napredak",
       "project": "Projekt",
-      "projectManagers": "PM",
+      "projectManagers": "Voditelji projekata",
       "revenue": "Prihod",
       "startDate": "Početak"
     },
@@ -829,7 +829,7 @@
       "errors": {
         "name": "Upišite naziv polja, npr. Broj narudžbe"
       },
-      "hint": "Ovdje definirana polja PM može dodati u svoj projekt (Kartica projekta → Dodatna polja zadataka) i odlučiti jesu li obavezna. Vrstu polja nije moguće promijeniti nakon izrade.",
+      "hint": "Ovdje definirana polja voditelj projekta može dodati u svoj projekt (Kartica projekta → Dodatna polja zadataka) i odlučiti jesu li obavezna. Vrstu polja nije moguće promijeniti nakon izrade.",
       "newNamePlaceholder": "Naziv novog polja…",
       "optionsPlaceholder": "Vrijednosti odvojene zarezom",
       "optionsRequired": "Popis mora imati barem jednu vrijednost",
@@ -838,7 +838,7 @@
     },
     "finance": {
       "disableConfirm": "Isključiti financije projekata? Podaci će ostati sačuvani, ali će nestati iz prikaza svih korisnika.",
-      "hint": "Nakon uključivanja PM i administrator u projektu vode proračun, troškove i prihode, a kontrolor ih može pregledavati. Sažetak financija projekta vidi i svatko tko ima pristup kartici povezanog leada ili partnera.",
+      "hint": "Nakon uključivanja voditelj projekta i administrator u projektu vode proračun, troškove i prihode, a kontrolor ih može pregledavati. Sažetak financija projekta vidi i svatko tko ima pristup kartici povezanog leada ili partnera.",
       "saveFailed": "Promjena postavke financija nije uspjela",
       "title": "Financije projekata",
       "toggle": "Uključi financije projekata"
@@ -853,7 +853,7 @@
     },
     "transitions": {
       "discardConfirm": "Imate nespremljene izmjene prijelaza. Odbaciti ih?",
-      "hint": "PM uvijek može promijeniti status u bilo koji. Sudionici mijenjaju status samo u zadacima koji su im dodijeljeni i ako imaju pune ovlasti. Kontrolor mijenja status u svakom zadatku projekta.",
+      "hint": "Voditelj projekta uvijek može promijeniti status u bilo koji. Sudionici mijenjaju status samo u zadacima koji su im dodijeljeni i ako imaju pune ovlasti. Kontrolor mijenja status u svakom zadatku projekta.",
       "matrixCorner": "Iz statusa ↓ / u status →",
       "saveButton": "Spremi prijelaze",
       "saveFailed": "Spremanje prijelaza nije uspjelo",

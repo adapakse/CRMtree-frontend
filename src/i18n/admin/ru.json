@@ -1730,7 +1730,7 @@
       "callAnalysis": "Анализатор звонков",
       "callAnalysisDisabled": "Доступ к Анализатору звонков отключён",
       "callAnalysisEnabled": "Доступ к Анализатору звонков включён",
-      "callAnalysisHint": "ИИ-анализ заметок о звонках, оценка и follow-up",
+      "callAnalysisHint": "ИИ-анализ заметок о звонках, оценка и следующие шаги",
       "emailCampaigns": "Email-рассылки",
       "emailCampaignsDisabled": "Доступ к Email-рассылкам выключен",
       "emailCampaignsEnabled": "Доступ к Email-рассылкам включён",

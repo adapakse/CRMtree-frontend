@@ -154,12 +154,12 @@
       "yes": "In ritardo"
     },
     "endDate": "Fine",
-    "manager": "PM",
+    "manager": "Project manager",
     "myRole": "Il mio ruolo",
     "myRoleValues": {
       "controller": "Revisore",
       "participant": "Partecipante",
-      "pm": "PM"
+      "pm": "Project manager"
     },
     "name": "Nome dell'attività",
     "number": "Numero",
@@ -180,7 +180,7 @@
       "key": "Chiave",
       "name": "Nome",
       "overdue": "Attività scadute",
-      "pm": "PM",
+      "pm": "Project manager",
       "progress": "Avanzamento",
       "revenue": "Ricavo",
       "start_date": "Inizio",
@@ -634,7 +634,7 @@
       "controller": "Revisore",
       "external_participant": "Partecipante esterno",
       "internal_participant": "Partecipante interno",
-      "pm": "PM"
+      "pm": "Project manager"
     },
     "statusCategories": {
       "done": "Completato",
@@ -722,7 +722,7 @@
       "title": "Campi aggiuntivi"
     },
     "endDateChange": {
-      "hint": "Facoltativo. Il PM vedrà il motivo nell'e-mail sulla modifica della scadenza; verrà salvato anche nella cronologia dell'attività.",
+      "hint": "Facoltativo. Il project manager vedrà il motivo nell'e-mail sulla modifica della scadenza; verrà salvato anche nella cronologia dell'attività.",
       "placeholder": "es. consegna tardiva da parte del cliente",
       "reason": "Motivo della modifica della scadenza"
     },
@@ -785,12 +785,12 @@
       "overdue": "Scadute",
       "progress": "Avanzamento",
       "project": "Progetto",
-      "projectManagers": "PM",
+      "projectManagers": "Project manager",
       "revenue": "Ricavo",
       "startDate": "Inizio"
     },
     "loadFailed": "Impossibile aprire la panoramica dei progetti",
-    "noProjects": "Non sei PM né revisore di alcun progetto aperto.",
+    "noProjects": "Non sei project manager né revisore di alcun progetto aperto.",
     "noTasks": "Nei tuoi progetti non ci sono attività.",
     "tabs": {
       "projects": "Progetti",
@@ -829,7 +829,7 @@
       "errors": {
         "name": "Inserisci il nome del campo, ad es. Numero d'ordine"
       },
-      "hint": "Il PM può aggiungere i campi definiti qui al proprio progetto (Scheda progetto → Campi aggiuntivi delle attività) e decidere se sono obbligatori. Il tipo di campo non può essere modificato dopo la creazione.",
+      "hint": "Il project manager può aggiungere i campi definiti qui al proprio progetto (Scheda progetto → Campi aggiuntivi delle attività) e decidere se sono obbligatori. Il tipo di campo non può essere modificato dopo la creazione.",
       "newNamePlaceholder": "Nome del nuovo campo…",
       "optionsPlaceholder": "Valori separati da virgola",
       "optionsRequired": "L'elenco deve avere almeno un valore",
@@ -838,7 +838,7 @@
     },
     "finance": {
       "disableConfirm": "Disattivare le finanze dei progetti? I dati verranno conservati, ma scompariranno dalla vista di tutti gli utenti.",
-      "hint": "Dopo l'attivazione il PM e l'amministratore gestiscono nel progetto budget, costi e ricavi, mentre il revisore può consultarli. Il riepilogo delle finanze del progetto è visibile anche a chiunque abbia accesso alla scheda del lead o del partner collegato.",
+      "hint": "Dopo l'attivazione il project manager e l'amministratore gestiscono nel progetto budget, costi e ricavi, mentre il revisore può consultarli. Il riepilogo delle finanze del progetto è visibile anche a chiunque abbia accesso alla scheda del lead o del partner collegato.",
       "saveFailed": "Impossibile modificare l'impostazione delle finanze",
       "title": "Finanze dei progetti",
       "toggle": "Attiva le finanze dei progetti"
@@ -853,7 +853,7 @@
     },
     "transitions": {
       "discardConfirm": "Hai modifiche alle transizioni non salvate. Vuoi scartarle?",
-      "hint": "Il PM può sempre cambiare lo stato in uno qualsiasi. I partecipanti cambiano lo stato solo nelle attività a cui sono assegnati e per cui hanno permessi completi. Il revisore cambia lo stato in ogni attività del progetto.",
+      "hint": "Il project manager può sempre cambiare lo stato in uno qualsiasi. I partecipanti cambiano lo stato solo nelle attività a cui sono assegnati e per cui hanno permessi completi. Il revisore cambia lo stato in ogni attività del progetto.",
       "matrixCorner": "Dallo stato ↓ / allo stato →",
       "saveButton": "Salva transizioni",
       "saveFailed": "Impossibile salvare le transizioni",

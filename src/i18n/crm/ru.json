@@ -154,19 +154,19 @@
     "errors": {
       "bulkFailed": "Ошибка массовой операции",
       "deleteFailed": "Ошибка удаления",
-      "followUpUpdateFailed": "Ошибка обновления follow-up",
+      "followUpUpdateFailed": "Ошибка обновления следующего шага",
       "reanalyzeFailed": "Ошибка повторного анализа",
       "statusChangeFailed": "Ошибка изменения статуса"
     },
     "filters": {
-      "allFollowUps": "Все follow-up",
+      "allFollowUps": "Все следующие шаги",
       "allLinks": "Все связи",
       "allSalespeople": "Все менеджеры по продажам",
       "allStatuses": "Все статусы",
       "firstCall": "Первый звонок:",
-      "followUpDate": "Дата follow-up:",
-      "followUpDone": "Follow-up выполнен",
-      "followUpRequired": "Follow-up требуется",
+      "followUpDate": "Дата следующего шага:",
+      "followUpDone": "Следующий шаг выполнен",
+      "followUpRequired": "Требуется следующий шаг",
       "lastCall": "Последний звонок:",
       "noLinks": "Нет связей",
       "presets": {
@@ -185,11 +185,11 @@
     },
     "followUp": {
       "done": "Выполнен",
-      "label": "Follow-up",
-      "markDoneTitle": "Нажмите, чтобы отметить follow-up как выполненный",
+      "label": "Следующий шаг",
+      "markDoneTitle": "Нажмите, чтобы отметить следующий шаг как выполненный",
       "notRequired": "Не требуется",
       "required": "Требуется",
-      "undoTitle": "Follow-up выполнен. Нажмите, чтобы отменить."
+      "undoTitle": "Следующий шаг выполнен. Нажмите, чтобы отменить."
     },
     "header": {
       "analyze": "Анализировать ({count})",
@@ -655,7 +655,7 @@
       "onboarding": "Внедрение"
     },
     "priorities": {
-      "asap": "ASAP",
+      "asap": "Срочный",
       "important": "Важный",
       "low": "Низкий",
       "medium": "Средний"

@@ -154,12 +154,12 @@
       "yes": "Retrasados"
     },
     "endDate": "Fin",
-    "manager": "PM",
+    "manager": "Jefe de proyecto",
     "myRole": "Mi rol",
     "myRoleValues": {
       "controller": "Revisor",
       "participant": "Participante",
-      "pm": "PM"
+      "pm": "Jefe de proyecto"
     },
     "name": "Nombre de la tarea",
     "number": "Número",
@@ -180,7 +180,7 @@
       "key": "Clave",
       "name": "Nombre",
       "overdue": "Tareas vencidas",
-      "pm": "PM",
+      "pm": "Jefe de proyecto",
       "progress": "Progreso",
       "revenue": "Ingresos",
       "start_date": "Inicio",
@@ -634,7 +634,7 @@
       "controller": "Revisor",
       "external_participant": "Participante externo",
       "internal_participant": "Participante interno",
-      "pm": "PM"
+      "pm": "Jefe de proyecto"
     },
     "statusCategories": {
       "done": "Finalizado",
@@ -722,7 +722,7 @@
       "title": "Campos adicionales"
     },
     "endDateChange": {
-      "hint": "Opcional. El PM verá el motivo en el correo sobre el cambio de fecha límite; también se guardará en el historial de la tarea.",
+      "hint": "Opcional. El jefe de proyecto verá el motivo en el correo sobre el cambio de fecha límite; también se guardará en el historial de la tarea.",
       "placeholder": "p. ej., entrega retrasada del cliente",
       "reason": "Motivo del cambio de fecha límite"
     },
@@ -785,7 +785,7 @@
       "overdue": "Vencidas",
       "progress": "Progreso",
       "project": "Proyecto",
-      "projectManagers": "PM",
+      "projectManagers": "Jefes de proyecto",
       "revenue": "Ingresos",
       "startDate": "Inicio"
     },
@@ -829,7 +829,7 @@
       "errors": {
         "name": "Escribe el nombre del campo, p. ej. Número de pedido"
       },
-      "hint": "El PM puede añadir a su proyecto los campos definidos aquí (Ficha del proyecto → Campos adicionales de tareas) y decidir si son obligatorios. El tipo de campo no se puede cambiar una vez creado.",
+      "hint": "El jefe de proyecto puede añadir a su proyecto los campos definidos aquí (Ficha del proyecto → Campos adicionales de tareas) y decidir si son obligatorios. El tipo de campo no se puede cambiar una vez creado.",
       "newNamePlaceholder": "Nombre del nuevo campo…",
       "optionsPlaceholder": "Valores separados por comas",
       "optionsRequired": "La lista debe tener al menos un valor",
@@ -838,7 +838,7 @@
     },
     "finance": {
       "disableConfirm": "¿Desactivar las finanzas de proyectos? Los datos se conservarán, pero desaparecerán de la vista de todos los usuarios.",
-      "hint": "Una vez activadas, el PM y el administrador gestionan en el proyecto el presupuesto, los costes y los ingresos, y el revisor puede consultarlos. El resumen de las finanzas del proyecto también lo ve cualquier persona con acceso a la ficha del lead o del partner vinculado.",
+      "hint": "Una vez activadas, el jefe de proyecto y el administrador gestionan en el proyecto el presupuesto, los costes y los ingresos, y el revisor puede consultarlos. El resumen de las finanzas del proyecto también lo ve cualquier persona con acceso a la ficha del lead o del partner vinculado.",
       "saveFailed": "No se pudo cambiar el ajuste de finanzas",
       "title": "Finanzas de proyectos",
       "toggle": "Activar las finanzas de proyectos"
@@ -853,7 +853,7 @@
     },
     "transitions": {
       "discardConfirm": "Tienes cambios sin guardar en las transiciones. ¿Descartarlos?",
-      "hint": "El PM siempre puede cambiar el estado a cualquier otro. Los participantes cambian el estado solo en las tareas a las que están asignados y en las que tienen permisos completos. El revisor cambia el estado en cualquier tarea del proyecto.",
+      "hint": "El jefe de proyecto siempre puede cambiar el estado a cualquier otro. Los participantes cambian el estado solo en las tareas a las que están asignados y en las que tienen permisos completos. El revisor cambia el estado en cualquier tarea del proyecto.",
       "matrixCorner": "Del estado ↓ / al estado →",
       "saveButton": "Guardar transiciones",
       "saveFailed": "No se pudieron guardar las transiciones",

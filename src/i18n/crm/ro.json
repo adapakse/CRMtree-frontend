@@ -154,19 +154,19 @@
     "errors": {
       "bulkFailed": "Eroare la operațiunea în masă",
       "deleteFailed": "Eroare la ștergere",
-      "followUpUpdateFailed": "Eroare la actualizarea follow-up-ului",
+      "followUpUpdateFailed": "Eroare la actualizarea pasului următor",
       "reanalyzeFailed": "Eroare la reanalizare",
       "statusChangeFailed": "Eroare la schimbarea statusului"
     },
     "filters": {
-      "allFollowUps": "Toate follow-up-urile",
+      "allFollowUps": "Toți pașii următori",
       "allLinks": "Toate asocierile",
       "allSalespeople": "Toți agenții de vânzări",
       "allStatuses": "Toate statusurile",
       "firstCall": "Primul apel:",
-      "followUpDate": "Dată follow-up:",
-      "followUpDone": "Follow-up efectuat",
-      "followUpRequired": "Follow-up necesar",
+      "followUpDate": "Data pasului următor:",
+      "followUpDone": "Pas următor efectuat",
+      "followUpRequired": "Pas următor necesar",
       "lastCall": "Ultimul apel:",
       "noLinks": "Fără asocieri",
       "presets": {
@@ -185,11 +185,11 @@
     },
     "followUp": {
       "done": "Efectuat",
-      "label": "Follow-up",
-      "markDoneTitle": "Faceți clic pentru a marca follow-up-ul ca efectuat",
+      "label": "Pas următor",
+      "markDoneTitle": "Faceți clic pentru a marca pasul următor ca efectuat",
       "notRequired": "Nu este necesar",
       "required": "Necesar",
-      "undoTitle": "Follow-up efectuat. Faceți clic pentru a anula."
+      "undoTitle": "Pas următor efectuat. Faceți clic pentru a anula."
     },
     "header": {
       "analyze": "Analizare ({count})",
@@ -655,7 +655,7 @@
       "onboarding": "Implementare"
     },
     "priorities": {
-      "asap": "ASAP",
+      "asap": "Urgent",
       "important": "Important",
       "low": "Scăzut",
       "medium": "Mediu"

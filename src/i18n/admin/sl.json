@@ -1730,7 +1730,7 @@
       "callAnalysis": "Analizator klicev",
       "callAnalysisDisabled": "Dostop do Analizatorja klicev onemogočen",
       "callAnalysisEnabled": "Dostop do Analizatorja klicev omogočen",
-      "callAnalysisHint": "Analiza zapiskov klicev z UI, ocena in follow-up",
+      "callAnalysisHint": "Analiza zapiskov klicev z UI, ocena in naslednji koraki",
       "emailCampaigns": "E-poštne kampanje",
       "emailCampaignsDisabled": "Dostop do E-poštnih kampanj izklopljen",
       "emailCampaignsEnabled": "Dostop do E-poštnih kampanj vklopljen",

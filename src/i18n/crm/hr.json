@@ -154,19 +154,19 @@
     "errors": {
       "bulkFailed": "Pogreška skupne radnje",
       "deleteFailed": "Pogreška pri brisanju",
-      "followUpUpdateFailed": "Pogreška pri ažuriranju follow-upa",
+      "followUpUpdateFailed": "Pogreška pri ažuriranju sljedećeg koraka",
       "reanalyzeFailed": "Pogreška pri ponovnoj analizi",
       "statusChangeFailed": "Pogreška pri promjeni statusa"
     },
     "filters": {
-      "allFollowUps": "Svi follow-upovi",
+      "allFollowUps": "Svi sljedeći koraci",
       "allLinks": "Sve poveznice",
       "allSalespeople": "Svi prodavači",
       "allStatuses": "Svi statusi",
       "firstCall": "Prvi poziv:",
-      "followUpDate": "Datum follow-upa:",
-      "followUpDone": "Follow-up obavljen",
-      "followUpRequired": "Follow-up potreban",
+      "followUpDate": "Datum sljedećeg koraka:",
+      "followUpDone": "Sljedeći korak obavljen",
+      "followUpRequired": "Potreban sljedeći korak",
       "lastCall": "Zadnji poziv:",
       "noLinks": "Bez poveznica",
       "presets": {
@@ -185,11 +185,11 @@
     },
     "followUp": {
       "done": "Obavljen",
-      "label": "Follow-up",
-      "markDoneTitle": "Kliknite da biste follow-up označili kao obavljen",
+      "label": "Sljedeći korak",
+      "markDoneTitle": "Kliknite da biste sljedeći korak označili kao obavljen",
       "notRequired": "Nije potreban",
       "required": "Potreban",
-      "undoTitle": "Follow-up je obavljen. Kliknite za poništavanje."
+      "undoTitle": "Sljedeći korak je obavljen. Kliknite za poništavanje."
     },
     "header": {
       "analyze": "Analiziraj ({count})",
@@ -655,7 +655,7 @@
       "onboarding": "Uvođenje"
     },
     "priorities": {
-      "asap": "ASAP",
+      "asap": "Hitno",
       "important": "Važno",
       "low": "Nisko",
       "medium": "Srednje"
