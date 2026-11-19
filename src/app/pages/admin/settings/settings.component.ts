@@ -651,8 +651,8 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                       <td colspan="3" style="padding:4px 20px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.schedule') }}</td>
                     </tr>
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:8px 20px;color:var(--gray-700)">{{ churnTimeField()!.label }}</td>
-                      <td style="padding:8px 12px;color:var(--gray-400);font-size:12px">{{ churnTimeField()!.description }}</td>
+                      <td style="padding:8px 20px;color:var(--gray-700)">{{ fieldLabel(churnTimeField()!) }}</td>
+                      <td style="padding:8px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(churnTimeField()!) }}</td>
                       <td style="padding:8px 16px;text-align:right">
                         <input class="fi" type="text" placeholder="HH:MM"
                                style="width:76px;text-align:center;padding:4px 8px;font-size:12px"

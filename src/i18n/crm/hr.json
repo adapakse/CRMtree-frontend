@@ -2012,7 +2012,7 @@
       "generateResult": "Izrađeno: {created, plural, one {# zadatak} few {# zadatka} other {# zadataka}}, preskočeno: {skipped} (već postoje).",
       "generateTasks": "Generiraj zadatke",
       "generating": "Generiranje…",
-      "noRisk": "Nema rizika churna",
+      "noRisk": "Nema rizika odljeva",
       "salesDrop": "pad M-2→M-1",
       "searchPlaceholder": "Traži partnera…",
       "showAll": "Prikaži sve partnere s rizikom odljeva →"

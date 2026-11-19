@@ -223,7 +223,7 @@
     "menu": {
       "delete": "Izbriši",
       "inspect": "Pregled",
-      "putOnHold": "Zadrži (Hold)",
+      "putOnHold": "Zadrži",
       "restoreFromArchive": "Obnovi iz arhiva",
       "restoreFromHold": "Obnovi iz zadržanja"
     },
