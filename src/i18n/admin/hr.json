@@ -27,6 +27,13 @@
       "subtitle": "Trajno brisanje dokumenta, leada ili partnera zajedno sa svim povezanim podacima i zapisima.",
       "title": "Brisanje zapisa"
     },
+    "errors": {
+      "confirmPhrase": "Upišite točno „{phrase}” za potvrdu",
+      "selectDoc": "Potražite dokument i kliknite ga na popisu",
+      "selectFile": "Odaberite JSON datoteku s izvezenim postavkama",
+      "selectLead": "Potražite lead i kliknite ga na popisu",
+      "selectPartner": "Potražite partnera i kliknite ga na popisu"
+    },
     "purge": {
       "confirm": "Potvrdi",
       "docs": {
@@ -705,6 +712,9 @@
       "body": "Jeste li sigurni da želite izbrisati PBX token za {name}? Korisnik neće moći koristiti softphone.",
       "title": "Izbriši PBX token"
     },
+    "errors": {
+      "token": "Zalijepite Personal Access Token (PAT) iz centrale"
+    },
     "loadError": "Pogreška pri učitavanju podataka.",
     "loading": "Učitavanje…",
     "modal": {
@@ -758,6 +768,9 @@
       "detected": "Prepoznat: {provider}",
       "detectedShort": "prepoznat po ključu",
       "detecting": "Prepoznajem dobavljača…",
+      "errors": {
+        "key": "Zalijepite API ključ pružatelja (npr. sk-…) ili odaberite spremljeni ključ"
+      },
       "intro": "Svaka funkcija ima vlastitog dobavljača, ključ i model — obogaćivanje može raditi kod jednog, a analiza poziva kod drugog. Zalijepite ključ, dobavljača prepoznajemo sami. Spremanje provjerava postavku kod dobavljača; ključ je šifriran i više se nikada ne prikazuje.",
       "loading": "Učitavanje konfiguracije UI…",
       "model": "Model",
@@ -1193,6 +1206,9 @@
       "deleteConfirm": "Izbrisati polje „{name}“?",
       "deleteTooltip": "Izbriši polje — moguće samo dok nijedan zapis nema vrijednost",
       "empty": "Ovaj obrazac nema dodatnih polja.",
+      "errors": {
+        "name": "Upišite naziv polja, npr. Broj klijenta"
+      },
       "hint": "Polja koja sami definirate za ovaj obrazac. Vrsta polja poslije se ne može promijeniti — da biste je promijenili, isključite polje i dodajte novo. Isključeno polje nestaje s obrasca, ali već unesene vrijednosti ostaju.",
       "newNamePlaceholder": "Naziv novog polja",
       "optionsPlaceholder": "Vrijednosti odvojene zarezom",
@@ -1291,6 +1307,10 @@
       "displayNamePlaceholder": "npr. Korisnička podrška",
       "documentCount": "{count, plural, one {# dokument} few {# dokumenta} other {# dokumenata}}",
       "empty": "Nema grupa. Dodajte prvu grupu iznad ili pokrenite migraciju 0127.",
+      "errors": {
+        "displayName": "Upišite prikazni naziv, npr. Prodajni tim",
+        "technicalName": "Upišite tehnički naziv, npr. sales_team"
+      },
       "inactive": "Neaktivna",
       "intro": "— upravljajte grupama kojima se mogu dodjeljivati korisnici. Grupe određuju pristup dokumentima. Grupu s dodijeljenim korisnicima ili dokumentima nije moguće izbrisati.",
       "memberCount": "{count, plural, one {# korisnik} few {# korisnika} other {# korisnika}}",
@@ -1332,6 +1352,10 @@
         "definitionHint": "Na temelju ovog opisa sustav ocjenjuje ispunjava li tvrtka dani signal.",
         "definitionPlaceholder": "Opišite po čemu se prepoznaje da tvrtka ispunjava ovaj uvjet — konkretne riječi/fraze na stranici, odjeljci, radna mjesta.",
         "editTitle": "Uredi signal",
+        "errors": {
+          "definition": "Opišite po čemu AI treba prepoznati ovaj signal",
+          "name": "Upišite naziv signala, npr. Tvrtka ima više od 50 zaposlenih"
+        },
         "name": "Naziv signala",
         "namePlaceholder": "npr. Vlastiti vozni park",
         "newTitle": "Novi signal",
@@ -1456,6 +1480,9 @@
       "codeWrittenHint": "Ovo nije korak prodajnog toka nego stanje koje aplikacija postavlja sama (arhiviranje, pretvaranje u partnera), pa se ne može izbrisati. Preimenovanje je moguće.",
       "confirmDelete": "Želite li ukloniti fazu „{name}”?",
       "confirmDeleteWithLeads": "Želite li ukloniti fazu „{name}”?\n\n{count} potencijalnih klijenata na njoj prelazi u „{target}”.",
+      "errors": {
+        "name": "Upišite naziv nove faze, npr. Pregovori"
+      },
       "intro": "Vlastiti nazivi faza prodajnog toka — preimenujte postojeće, dodajte korak ili uklonite nepotreban. Kod faze ostaje isti, pa se novo ime pojavljuje u cijeloj aplikaciji, a izvještaji i podaci o potencijalnim klijentima ostaju nedirnuti. Prazan naziv vraća ugrađeni.",
       "kinds": {
         "archived": "arhiva",
@@ -1633,6 +1660,9 @@
       "saved": "Grupa je ažurirana",
       "title": "Uređivanje grupe"
     },
+    "errors": {
+      "internalName": "Upišite interni naziv, npr. prodaja"
+    },
     "fields": {
       "description": "Opis",
       "displayName": "Prikazni naziv",
@@ -1724,11 +1754,18 @@
       "updated": "Korisnik je ažuriran"
     },
     "empty": "Nema pronađenih korisnika",
+    "errors": {
+      "chooseGroup": "Odaberite grupu s popisa"
+    },
     "featureAccess": {
       "callAnalysis": "Analizator poziva",
       "callAnalysisDisabled": "Pristup Analizatoru poziva onemogućen",
       "callAnalysisEnabled": "Pristup Analizatoru poziva omogućen",
       "callAnalysisHint": "AI analiza bilješki poziva, ocjena i follow-up",
+      "emailCampaigns": "E-mail kampanje",
+      "emailCampaignsDisabled": "Pristup E-mail kampanjama isključen",
+      "emailCampaignsEnabled": "Pristup E-mail kampanjama uključen",
+      "emailCampaignsHint": "E-mail kampanje partnerima i leadovima putem SendGrida",
       "prospects": "Potencijalni klijenti",
       "prospectsDisabled": "Pristup Potencijalnim klijentima isključen",
       "prospectsEnabled": "Pristup Potencijalnim klijentima uključen",

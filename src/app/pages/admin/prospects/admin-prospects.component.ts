@@ -2,7 +2,8 @@ import { Component, inject, signal, computed, OnInit, OnDestroy, HostListener, C
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -235,20 +236,20 @@ interface DiscoveredCompany {
   selector: 'wt-admin-prospects',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, TranslocoDirective],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('prospects')],
   template: `
     <ng-container *transloco="let t; prefix: 'prospects'">
     <div id="topbar">
       <span class="page-title">{{ t('admin.title') }}</span>
       <span class="tsp"></span>
-      <button class="btn btn-g" (click)="openDiscovery()" [title]="t('admin.discoveryTooltip')">🔍 {{ t('admin.discovery') }}</button>
-      <button class="btn btn-g" (click)="exportCsv()">⬇ {{ t('admin.exportCsv') }}</button>
+      <button class="btn btn-g" (click)="openDiscovery()" [title]="t('admin.discoveryTooltip')"><i class="ei ei-search"></i> {{ t('admin.discovery') }}</button>
+      <button class="btn btn-g" (click)="exportCsv()"><i class="ei ei-download"></i> {{ t('admin.exportCsv') }}</button>
       <button class="btn btn-p"
         [disabled]="batch().running || enriching()"
         (click)="startBatch()">
         @if (batch().running) {
-          ⏳ {{ t('admin.enrichmentProgress', { done: batch().done, total: batch().total }) }}
+          <i class="ei ei-hourglass"></i> {{ t('admin.enrichmentProgress', { done: batch().done, total: batch().total }) }}
         } @else {
           ▶ {{ t('admin.runEnrichment') }}
         }
@@ -276,7 +277,7 @@ interface DiscoveredCompany {
         </div>
         <div style="display:flex;gap:10px;align-items:center">
           <label class="btn btn-g" style="cursor:pointer;margin:0">
-            📁 {{ t('admin.import.chooseFile') }}
+            <span aria-hidden="true">📄</span> {{ t('admin.import.chooseFile') }}
             <input type="file" accept=".csv" style="display:none"
               (change)="onFileSelected($event)">
           </label>
@@ -300,6 +301,7 @@ interface DiscoveredCompany {
               [style.color]="importResult()!.errors! > 0 ? 'oklch(from #92400e max(l, var(--text-min-l)) c h)' : 'oklch(from #166534 max(l, var(--text-min-l)) c h)'">
               ✓ {{ t('admin.import.added') }} <b>{{ importResult()!.added }}</b> &nbsp;|&nbsp;
               {{ t('admin.import.skipped') }} <b>{{ importResult()!.skipped }}</b> &nbsp;|&nbsp;
+              @if (importResult()!.skipped_in_crm) { {{ t('admin.import.skippedInCrm') }} <b>{{ importResult()!.skipped_in_crm }}</b> &nbsp;|&nbsp; }
               {{ t('admin.import.errors') }} <b>{{ importResult()!.errors }}</b> &nbsp;|&nbsp;
               {{ t('admin.import.totalRows') }} <b>{{ importResult()!.total }}</b>
               @if (importResult()!.detected_encoding) {
@@ -322,6 +324,20 @@ interface DiscoveredCompany {
                   }
                 </div>
               }
+              @if (importResult()!.in_crm?.length) {
+                <div style="margin-top:8px;border-top:1px solid var(--gray-200);padding-top:8px">
+                  <div style="font-weight:600;margin-bottom:4px">{{ t('admin.import.inCrmTitle') }}</div>
+                  @for (d of importResult()!.in_crm!; track d.row) {
+                    <div style="font-size:12px;margin-bottom:2px">• NIP {{ d.nip }} —
+                      @if (d.existsAs === 'partner') {
+                        <a style="cursor:pointer;text-decoration:underline" (click)="goToPartner(d.existingId, d.nip)">{{ t('admin.import.inCrmPartner') }}: {{ d.existingName }}</a>
+                      } @else {
+                        <a style="cursor:pointer;text-decoration:underline" (click)="goToLead(+d.existingId, d.nip)">{{ t('admin.import.inCrmLead') }}: {{ d.existingName }}</a>
+                      }
+                    </div>
+                  }
+                </div>
+              }
             </div>
           }
         }
@@ -329,7 +345,7 @@ interface DiscoveredCompany {
 
       <!-- Filtry -->
       <div class="card filter-card">
-        <div style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end">
+        <div class="filter-fields" style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end">
 
           <div class="fld">
             <label>{{ t('admin.filters.search') }}</label>
@@ -388,9 +404,7 @@ interface DiscoveredCompany {
               (ngModelChange)="onFilterChange()">
           </div>
 
-          <button class="btn btn-g" style="height:36px" (click)="resetFilters()">
-            {{ t('admin.filters.reset') }}
-          </button>
+          <button type="button" class="btn-reset" (click)="resetFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ 'list.clearFilters' | transloco }}</button>
 
           <label style="display:flex;align-items:center;gap:8px;height:36px;font-size:14px;color:var(--gray-700);cursor:pointer;user-select:none">
             <input type="checkbox"
@@ -410,17 +424,17 @@ interface DiscoveredCompany {
             ⏸️ {{ t('admin.status.hold') }}
           </button>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkSetStatus('archived')">
-            📦 {{ t('admin.bulk.archive') }}
+            <i class="ei ei-package"></i> {{ t('admin.bulk.archive') }}
           </button>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkSetStatus('pending')">
             ▶ {{ t('admin.bulk.restore') }}
           </button>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkReProcess()">
-            🔄 Re-process
+            <i class="ei ei-refresh"></i> Re-process
           </button>
           <span style="flex:1"></span>
           <button class="btn btn-d" [disabled]="bulkActioning()" (click)="bulkDelete()">
-            🗑 {{ t('admin.bulk.deleteSelected') }}
+            <i class="ei ei-trash"></i> {{ t('admin.bulk.deleteSelected') }}
           </button>
           <button class="btn btn-g" (click)="clearSelection()">✕ {{ t('admin.bulk.cancel') }}</button>
         </div>
@@ -431,7 +445,7 @@ interface DiscoveredCompany {
         {{ t('admin.summary.shown') }} <b style="color:var(--gray-700)">{{ total() }}</b> / <b style="color:var(--gray-700)">{{ grandTotal() }}</b>
         @if (batch().running) {
           &nbsp;|&nbsp; <span style="color: var(--orange-text)">
-            ⏳ {{ t('admin.summary.inProgress', { done: batch().done, total: batch().total }) }}
+            <i class="ei ei-hourglass"></i> {{ t('admin.summary.inProgress', { done: batch().done, total: batch().total }) }}
             {{ t('admin.summary.errorCount', { count: batch().errors }) }}
           </span>
         }
@@ -504,19 +518,19 @@ interface DiscoveredCompany {
                     <button (click)="$event.stopPropagation(); goToPartner(p.partner_nav_id!, p.nip)"
                       [title]="t('admin.table.partnerBadgeTooltip')"
                       style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface));border:1px solid #6ee7b7;color:oklch(from #065f46 max(l, var(--text-min-l)) c h);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
-                      🤝 Partner
+                      <i class="ei ei-handshake"></i> Partner
                     </button>
                   } @else if (p.crm_lead_id) {
                     <button (click)="$event.stopPropagation(); goToLead(p.crm_lead_id!, p.nip)"
                       [title]="t('admin.table.convertedLeadTooltip')"
                       style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));border:1px solid #93c5fd;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
-                      🏷 Lead
+                      <i class="ei ei-tag"></i> Lead
                     </button>
                   } @else if (p.has_lead) {
                     <button (click)="$event.stopPropagation(); goToLead(p.lead_id!, p.nip)"
                       [title]="t('admin.table.leadBadgeTooltip')"
                       style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));border:1px solid #93c5fd;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
-                      🏷 Lead
+                      <i class="ei ei-tag"></i> Lead
                     </button>
                   }
                 </div>
@@ -528,7 +542,7 @@ interface DiscoveredCompany {
                     <span style="display:inline-flex;align-items:center;gap:2px">
                       <a [href]="p.website_url" target="_blank"
                         style="font-size:12px;color: var(--orange-text);text-decoration:none" (click)="$event.stopPropagation()">
-                        🌐 {{ shortUrl(p.website_url) }}
+                        <i class="ei ei-globe"></i> {{ shortUrl(p.website_url) }}
                       </a>
                       @if (p.website_status === 'ok') {
                         <span style="font-size:10px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-weight:700;line-height:1" [title]="t('admin.website.okShort')">✓</span>
@@ -636,9 +650,8 @@ interface DiscoveredCompany {
                   </button>
                 } @else {
                   <button class="btn btn-p btn-sm"
-                    [disabled]="toLeadLoading() === p.id || !qualifiesForLead(p)"
-                    [style.opacity]="qualifiesForLead(p) ? '1' : '0.4'"
-                    (click)="toLead(p)"
+                    [disabled]="toLeadLoading() === p.id"
+                    (click)="qualifiesForLead(p) ? toLead(p) : explainLeadBlocked(p)"
                     [title]="leadButtonTooltip(p)">
                     @if (toLeadLoading() === p.id) { … } @else { → {{ t('admin.table.lead') }} }
                   </button>
@@ -651,7 +664,7 @@ interface DiscoveredCompany {
                   [disabled]="statusActioning() === p.id"
                   (click)="openMenuFor($event, p.id)"
                   [title]="t('admin.table.actions')">
-                  @if (statusActioning() === p.id) { ⏳ } @else { ⋮ }
+                  @if (statusActioning() === p.id) { <i class="ei ei-hourglass"></i> } @else { ⋮ }
                 </button>
               </td>
             </tr>
@@ -757,23 +770,23 @@ interface DiscoveredCompany {
                           <div style="display:flex;align-items:center;gap:8px">
                             <a [href]="p.website_url" target="_blank" (click)="$event.stopPropagation()"
                               style="color: var(--orange-text);text-decoration:none;font-size:12px">
-                              🌐 {{ p.website_url }}
+                              <i class="ei ei-globe"></i> {{ p.website_url }}
                             </a>
                             @if (p.website_status === 'ok') {
                               <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.website.ok')">✓ {{ t('admin.website.fetched') }}</span>
                             } @else if (p.website_status === 'blocked') {
                               <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
-                                [title]="t('admin.website.blocked')">⚠ Cloudflare</span>
+                                [title]="t('admin.website.blocked')"><i class="ei ei-warn"></i> Cloudflare</span>
                             } @else if (p.website_status === 'failed') {
                               <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
-                                [title]="t('admin.website.failed')">⚠ {{ t('admin.website.noContent') }}</span>
+                                [title]="t('admin.website.failed')"><i class="ei ei-warn"></i> {{ t('admin.website.noContent') }}</span>
                             } @else if (p.website_status === 'not_found') {
                               <span style="font-size:10px;font-weight:600;color:var(--gray-400);white-space:nowrap"
                                 [title]="t('admin.website.notFound')">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
                             } @else if (p.website_status === 'unconfirmed') {
                               <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
-                                [title]="t('admin.website.unconfirmed')">⚠ {{ t('admin.website.unconfirmedLabel') }}</span>
+                                [title]="t('admin.website.unconfirmed')"><i class="ei ei-warn"></i> {{ t('admin.website.unconfirmedLabel') }}</span>
                             }
                           </div>
                         }
@@ -796,7 +809,7 @@ interface DiscoveredCompany {
                                 [title]="t('admin.linkedin.ok')">✓ {{ t('admin.website.fetched') }}</span>
                             } @else if (p.linkedin_status === 'blocked') {
                               <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
-                                [title]="t('admin.linkedin.blocked')">⚠ {{ t('admin.linkedin.blockedLabel') }}</span>
+                                [title]="t('admin.linkedin.blocked')"><i class="ei ei-warn"></i> {{ t('admin.linkedin.blockedLabel') }}</span>
                             } @else if (p.linkedin_status === 'not_found') {
                               <span style="font-size:10px;font-weight:600;color:var(--gray-400);white-space:nowrap"
                                 [title]="t('admin.linkedin.notFound')">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
@@ -805,7 +818,7 @@ interface DiscoveredCompany {
                         }
                         @if (p.enrichment_status === 'no_website') {
                           <div style="color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));padding:4px 8px;border-radius:8px;margin-top:4px;font-size:12px">
-                            ⚠ {{ t('admin.detail.noWebsiteHalted') }}
+                            <i class="ei ei-warn"></i> {{ t('admin.detail.noWebsiteHalted') }}
                           </div>
                         }
                         @if (p.enrichment_error) {
@@ -853,10 +866,10 @@ interface DiscoveredCompany {
                                   <a [href]="'mailto:' + p.decision_maker_email"
                                     style="color: var(--orange-text);text-decoration:none"
                                     (click)="$event.stopPropagation()">
-                                    ✉ {{ p.decision_maker_email }}
+                                    <i class="ei ei-mail"></i> {{ p.decision_maker_email }}
                                   </a>
                                 } @else {
-                                  <span style="color:var(--gray-400)">✉ —</span>
+                                  <span style="color:var(--gray-400)"><i class="ei ei-mail"></i> —</span>
                                 }
                                 <button class="icon-btn" [title]="t('admin.edit.editEmail')" (click)="startEditContactField(p, 'email', $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
                               </span>
@@ -871,7 +884,7 @@ interface DiscoveredCompany {
                               </div>
                             } @else {
                               <span style="display:inline-flex;align-items:center;gap:4px">
-                                <span style="color:var(--gray-700);font-size:12px">📞 {{ p.decision_maker_phone || '—' }}</span>
+                                <span style="color:var(--gray-700);font-size:12px"><i class="ei ei-phone"></i> {{ p.decision_maker_phone || '—' }}</span>
                                 <button class="icon-btn" [title]="t('admin.edit.editPhone')" (click)="startEditContactField(p, 'phone', $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
                               </span>
                             }
@@ -906,7 +919,7 @@ interface DiscoveredCompany {
                               <div style="display:flex;gap:6px">
                                 <input class="inp inp-sm" style="flex:1" [maxlength]="contactTextMaxLength"
                                   [placeholder]="t('admin.edit.contactName')" [(ngModel)]="c.name">
-                                <button class="icon-btn icon-btn-danger" [title]="t('admin.edit.removeContact')" (click)="removeKeyContactDraft($index, $event)">🗑</button>
+                                <button class="icon-btn icon-btn-danger" [title]="t('admin.edit.removeContact')" (click)="removeKeyContactDraft($index, $event)"><i class="ei ei-trash"></i></button>
                               </div>
                               <input class="inp inp-sm" [maxlength]="contactTextMaxLength"
                                 [placeholder]="t('admin.edit.contactTitle')" [(ngModel)]="c.title">
@@ -955,14 +968,14 @@ interface DiscoveredCompany {
                                   <a [href]="'mailto:' + c.email"
                                     style="color: var(--orange-text);text-decoration:none"
                                     (click)="$event.stopPropagation()">
-                                    ✉ {{ c.email }}
+                                    <i class="ei ei-mail"></i> {{ c.email }}
                                   </a>
                                 }
                                 @if (c.phone) {
                                   <a [href]="'tel:' + c.phone"
                                     style="color:var(--gray-700);text-decoration:none"
                                     (click)="$event.stopPropagation()">
-                                    📞 {{ c.phone }}
+                                    <i class="ei ei-phone"></i> {{ c.phone }}
                                   </a>
                                 }
                               </div>
@@ -1153,7 +1166,7 @@ interface DiscoveredCompany {
 
         @if (activeMenuProspect()!.enrichment_status !== 'archived') {
           <button class="mi" (click)="setStatus(activeMenuProspect()!, 'archived'); closeMenu()">
-            📦 {{ t('admin.bulk.archive') }}
+            <i class="ei ei-package"></i> {{ t('admin.bulk.archive') }}
           </button>
         } @else {
           <button class="mi" (click)="setStatus(activeMenuProspect()!, 'pending'); closeMenu()">
@@ -1162,19 +1175,19 @@ interface DiscoveredCompany {
         }
 
         <button class="mi" (click)="openReprocessDialog(activeMenuProspect()!)">
-          🔄 Re-process
+          <i class="ei ei-refresh"></i> Re-process
         </button>
 
         @if (activeMenuProspect()!.enrichment_log) {
           <button class="mi" (click)="openInspect(activeMenuProspect()!)">
-            🔍 {{ t('admin.menu.inspect') }}
+            <i class="ei ei-search"></i> {{ t('admin.menu.inspect') }}
           </button>
         }
 
         <div class="mi-sep"></div>
 
         <button class="mi mi-danger" (click)="deleteProspect(activeMenuProspect()!)">
-          🗑 {{ t('admin.menu.delete') }}
+          <i class="ei ei-trash"></i> {{ t('admin.menu.delete') }}
         </button>
       </div>
     }
@@ -1195,13 +1208,15 @@ interface DiscoveredCompany {
           <input class="inp" style="width:100%;box-sizing:border-box"
             [(ngModel)]="toLeadNipValue"
             maxlength="13"
-            placeholder="0000000000">
+            placeholder="0000000000"
+            [class.fi-err]="isToLeadSubmitted && toLeadNipDigits.length !== 10">
           @if (toLeadNipDigits !== toLeadDialog()!.nip) {
             <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);font-weight:600">
               {{ t('admin.toLead.changed') }}
             </span>
           }
         </div>
+        @if (isToLeadSubmitted && toLeadNipDigits.length !== 10) { <span class="ferr">{{ t('admin.errors.nip') }}</span> }
         <div style="font-size:12px;color:var(--gray-500);margin-bottom:16px">
           {{ t('admin.toLead.taxIdHint') }}
           @if (toLeadNipDigits !== toLeadDialog()!.nip && toLeadNipDigits.length === 10) {
@@ -1238,10 +1253,11 @@ interface DiscoveredCompany {
         }
 
         <div style="display:flex;gap:8px;justify-content:flex-end">
+          @if (isToLeadSubmitted) { <wt-form-error-summary [count]="toLeadNipDigits.length === 10 ? 0 : 1" /> }
           <button class="btn btn-g"
             (click)="toLeadDialog.set(null)">{{ t('admin.bulk.cancel') }}</button>
           <button class="btn btn-p"
-            [disabled]="toLeadNipDigits.length !== 10 || !!toLeadLoading()"
+            [disabled]="!!toLeadLoading()"
             (click)="confirmToLead()">
             {{ toLeadLoading() ? t('admin.toLead.creating') : toLeadDuplicateError() ? t('admin.toLead.createAnyway') : t('admin.toLead.create') }}
           </button>
@@ -1256,7 +1272,7 @@ interface DiscoveredCompany {
 
         <div class="inspect-header">
           <div class="inspect-title">
-            <span style="font-size:12px;color:var(--gray-500);font-weight:500">🔍 {{ t('admin.inspect.heading') }}</span>
+            <span style="font-size:12px;color:var(--gray-500);font-weight:500"><i class="ei ei-search"></i> {{ t('admin.inspect.heading') }}</span>
             <span class="inspect-company">{{ inspectTarget()!.company_name || inspectTarget()!.nip }}</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
@@ -1389,7 +1405,7 @@ interface DiscoveredCompany {
                   [class.inspect-badge-err]="!inspectTarget()!.enrichment_log!.website?.url || inspectTarget()!.enrichment_log!.website?.identity_check_failed">WWW</span>
                 <span style="font-size:12px">
                   @if (inspectTarget()!.enrichment_log!.website?.identity_check_failed) {
-                    ⚠ {{ t('admin.website.unconfirmedLabel') }}
+                    <i class="ei ei-warn"></i> {{ t('admin.website.unconfirmedLabel') }}
                   } @else {
                     {{ inspectTarget()!.enrichment_log!.website?.url ? t('admin.inspect.found') : t('admin.inspect.noWebsite') }}
                   }
@@ -1547,10 +1563,10 @@ interface DiscoveredCompany {
                     @if (c.title) { <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">{{ c.title }}</div> }
                     <div style="display:flex;flex-direction:column;gap:2px">
                       @if (c.email) {
-                        <a [href]="'mailto:' + c.email" style="color: var(--orange-text);text-decoration:none;font-size:12px" (click)="$event.stopPropagation()">✉ {{ c.email }}</a>
+                        <a [href]="'mailto:' + c.email" style="color: var(--orange-text);text-decoration:none;font-size:12px" (click)="$event.stopPropagation()"><i class="ei ei-mail"></i> {{ c.email }}</a>
                       }
                       @if (c.phone) {
-                        <span style="color:var(--gray-700);font-size:12px">📞 {{ c.phone }}</span>
+                        <span style="color:var(--gray-700);font-size:12px"><i class="ei ei-phone"></i> {{ c.phone }}</span>
                       }
                     </div>
                   </div>
@@ -1589,13 +1605,13 @@ interface DiscoveredCompany {
           @if (reprocessTarget()?.website_status === 'ok') {
             <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">✓ {{ t('admin.website.fetched') }}</span>
           } @else if (reprocessTarget()?.website_status === 'blocked') {
-            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)" [title]="t('admin.website.blockedShort')">⚠ Cloudflare</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)" [title]="t('admin.website.blockedShort')"><i class="ei ei-warn"></i> Cloudflare</span>
           } @else if (reprocessTarget()?.website_status === 'failed') {
-            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)">⚠ {{ t('admin.website.noContent') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)"><i class="ei ei-warn"></i> {{ t('admin.website.noContent') }}</span>
           } @else if (reprocessTarget()?.website_status === 'not_found') {
             <span style="font-size:10px;font-weight:600;color:var(--gray-400)">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
           } @else if (reprocessTarget()?.website_status === 'unconfirmed') {
-            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)">⚠ {{ t('admin.website.unconfirmedLabel') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)"><i class="ei ei-warn"></i> {{ t('admin.website.unconfirmedLabel') }}</span>
           }
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:12px"
@@ -1607,7 +1623,7 @@ interface DiscoveredCompany {
           @if (reprocessTarget()?.linkedin_status === 'ok') {
             <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">✓ {{ t('admin.website.fetched') }}</span>
           } @else if (reprocessTarget()?.linkedin_status === 'blocked') {
-            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)">⚠ {{ t('admin.linkedin.blockedLabel') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)"><i class="ei ei-warn"></i> {{ t('admin.linkedin.blockedLabel') }}</span>
           } @else if (reprocessTarget()?.linkedin_status === 'not_found') {
             <span style="font-size:10px;font-weight:600;color:var(--gray-400)">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
           }
@@ -1627,7 +1643,7 @@ interface DiscoveredCompany {
 
         <div style="display:flex;gap:8px;justify-content:flex-end">
           <button class="btn btn-g" (click)="reprocessTarget.set(null)">{{ t('admin.bulk.cancel') }}</button>
-          <button class="btn btn-p" (click)="confirmReprocess()">🔄 {{ t('admin.reprocess.submit') }}</button>
+          <button class="btn btn-p" (click)="confirmReprocess()"><i class="ei ei-refresh"></i> {{ t('admin.reprocess.submit') }}</button>
         </div>
       </div>
     }
@@ -1639,7 +1655,7 @@ interface DiscoveredCompany {
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div>
-            <div style="font-weight:700;font-size:16px;color:var(--gray-800)">🔍 {{ t('admin.discovery') }}</div>
+            <div style="font-weight:700;font-size:16px;color:var(--gray-800)"><i class="ei ei-search"></i> {{ t('admin.discovery') }}</div>
             <div style="font-size:12px;color:var(--gray-500);margin-top:2px">
               {{ t('admin.discoveryModal.subtitle') }}
             </div>
@@ -1654,7 +1670,9 @@ interface DiscoveredCompany {
               [(ngModel)]="discoverySeedName"
               [placeholder]="t('admin.discoveryModal.companyNamePlaceholder')"
               [disabled]="discoveryLoading()"
+              [class.fi-err]="isDiscoverySubmitted && !discoverySeedName.trim()"
               (keydown.enter)="startDiscovery()">
+            @if (isDiscoverySubmitted && !discoverySeedName.trim()) { <span class="ferr">{{ t('admin.errors.seedName') }}</span> }
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--gray-700);display:block;margin-bottom:4px">{{ t('admin.discoveryModal.taxId') }}</label>
@@ -1662,7 +1680,9 @@ interface DiscoveredCompany {
               [(ngModel)]="discoverySeedNip"
               placeholder="1234567890"
               [disabled]="discoveryLoading()"
+              [class.fi-err]="isDiscoverySubmitted && isDiscoveryNipInvalid()"
               (keydown.enter)="startDiscovery()">
+            @if (isDiscoverySubmitted && isDiscoveryNipInvalid()) { <span class="ferr">{{ t('admin.errors.nip') }}</span> }
           </div>
         </div>
 
@@ -1673,11 +1693,11 @@ interface DiscoveredCompany {
             </div>
             @if (discoveryResults().length > 0) {
               <div style="font-size:12px;color:var(--gray-500);margin-top:4px">
-                ⏳ {{ t('admin.discoveryModal.searching') }}
+                <i class="ei ei-hourglass"></i> {{ t('admin.discoveryModal.searching') }}
                 <b style="color: var(--orange-text)"> {{ t('admin.discoveryModal.foundCount', { count: discoveryResults().length }) }}</b>
               </div>
             } @else {
-              <div style="font-size:12px;color:var(--gray-500);margin-top:4px">⏳ {{ t('admin.discoveryModal.searching') }}</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:4px"><i class="ei ei-hourglass"></i> {{ t('admin.discoveryModal.searching') }}</div>
             }
           </div>
         }
@@ -1685,11 +1705,12 @@ interface DiscoveredCompany {
 
         <div style="display:flex;gap:8px;margin-bottom:16px">
           <button class="btn btn-p"
-            [disabled]="discoveryLoading() || !discoverySeedName.trim() || discoverySeedNip.replace(/\D/g,'').length !== 10"
+            [disabled]="discoveryLoading()"
             (click)="startDiscovery()">
             ▶ {{ t('admin.discoveryModal.search') }}
           </button>
           <button class="btn btn-g" (click)="cancelDiscovery()">{{ t('admin.bulk.cancel') }}</button>
+          @if (isDiscoverySubmitted) { <wt-form-error-summary [count]="(discoverySeedName.trim() ? 0 : 1) + (isDiscoveryNipInvalid() ? 1 : 0)" /> }
           @if (discoveryResults().length > 0 && !discoveryLoading()) {
             <span style="align-self:center;font-size:12px;color:var(--gray-500)">
               {{ t('admin.detail.industry') }} <b style="color:var(--gray-700)">{{ discoveryIndustry() || '—' }}</b>
@@ -1742,7 +1763,7 @@ interface DiscoveredCompany {
                       [placeholder]="t('admin.table.taxId')"
                       [title]="t('admin.discoveryModal.enterTaxIdManually')">
                     @if (c.nip) {
-                      <div style="font-size:10px;color:oklch(from #f59e0b max(l, var(--text-min-l)) c h);margin-top:1px">⚠ {{ t('admin.discoveryModal.unverified') }}</div>
+                      <div style="font-size:10px;color:oklch(from #f59e0b max(l, var(--text-min-l)) c h);margin-top:1px"><i class="ei ei-warn"></i> {{ t('admin.discoveryModal.unverified') }}</div>
                     }
                     <!-- Wyszukiwanie NIP-u w internecie jest płatne, więc odpala
                          się tylko z tego przycisku — nigdy automatycznie dla
@@ -1752,7 +1773,7 @@ interface DiscoveredCompany {
                       [disabled]="c.resolvingNip"
                       (click)="resolveNip($index)"
                       [title]="t('admin.discoveryModal.resolveTaxIdTooltip')">
-                      @if (c.resolvingNip) { ⏳ } @else { 🔍 {{ t('admin.discoveryModal.resolveTaxId') }} }
+                      @if (c.resolvingNip) { <i class="ei ei-hourglass"></i> } @else { <i class="ei ei-search"></i> {{ t('admin.discoveryModal.resolveTaxId') }} }
                     </button>
                   }
                 </div>
@@ -1806,10 +1827,11 @@ interface DiscoveredCompany {
                 @if (discoveryDone()!.batchStarted) { {{ t('admin.discoveryModal.andEnrichmentStarted') }} }
               </div>
             } @else {
+              @if (isDiscoveryAddSubmitted && discoverySelectedCount() === 0) { <span class="pf-err" role="alert">{{ t('admin.errors.selectCompanies') }}</span> }
               <button class="btn btn-p"
-                [disabled]="discoveryAdding() || discoverySelectedCount() === 0"
+                [disabled]="discoveryAdding()"
                 (click)="bulkAddAndEnrich()">
-                @if (discoveryAdding()) { ⏳ {{ t('admin.discoveryModal.adding') }} } @else { ▶ {{ t('admin.discoveryModal.addAndEnrich') }} }
+                @if (discoveryAdding()) { <i class="ei ei-hourglass"></i> {{ t('admin.discoveryModal.adding') }} } @else { ▶ {{ t('admin.discoveryModal.addAndEnrich') }} }
               </button>
             }
           </div>
@@ -1910,6 +1932,8 @@ interface DiscoveredCompany {
     /* overflow: clip rounds the corners without creating a scroll box, so the
        sticky table header keeps sticking to the page scroll. */
     .tbl-card { background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow:clip; }
+    /* narrower than the table: it scrolls sideways in its card instead of being cut off */
+    @media (max-width: 1279px) { .tbl-card { overflow-x:auto; } }
     .tbl { width:100%; border-collapse:collapse; font-size:12px; }
     .tbl th {
       background:var(--gray-50); text-align:left; padding:8px 10px 14px;
@@ -2367,6 +2391,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   importFile   = signal<File | null>(null);
   importResult = signal<{
     added?: number; skipped?: number; errors?: number; total?: number;
+    skipped_in_crm?: number;
+    in_crm?: { row: number; nip: string; existsAs: 'lead' | 'partner'; existingId: string; existingName: string }[];
     detected_columns?: string[]; error_details?: string[];
     detected_encoding?: string;
     fatal_error?: string;
@@ -2609,6 +2635,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   // ── "Znajdź konkurencję" ───────────────────────────────────────
 
   openDiscovery() {
+    this.isDiscoverySubmitted = false;
+    this.isDiscoveryAddSubmitted = false;
     this.discoverySeedName = '';
     this.discoverySeedNip  = '';
     this.discoveryResults.set([]);
@@ -2627,7 +2655,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   startDiscovery() {
     const name = this.discoverySeedName.trim();
     const nip  = this.discoverySeedNip.replace(/\D/g, '');
-    if (!name || nip.length !== 10) return;
+    this.isDiscoverySubmitted = !name || nip.length !== 10;
+    if (this.isDiscoverySubmitted) return;
 
     this.discoveryAbort?.abort();
     this.discoveryAbort = new AbortController();
@@ -2735,7 +2764,19 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     this.discoveryResults.update(r => r.map(c => ({ ...c, selected: checked && !!(c.nip || c.nip_edit) })));
   }
 
+  isDiscoverySubmitted = false;
+  isDiscoveryAddSubmitted = false;
+  isToLeadSubmitted = false;
+
+  isDiscoveryNipInvalid(): boolean { return this.discoverySeedNip.replace(/\D/g, '').length !== 10; }
+
+  explainLeadBlocked(p: Prospect): void {
+    this.toast.info(this.leadButtonTooltip(p));
+  }
+
   bulkAddAndEnrich() {
+    this.isDiscoveryAddSubmitted = this.discoverySelectedCount() === 0;
+    if (this.isDiscoveryAddSubmitted) return;
     const toAdd = this.discoveryResults()
       .filter(c => c.selected)
       .map(c => ({
@@ -2918,6 +2959,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   // ── → Lead ──────────────────────────────────────────────────────
 
   toLead(p: Prospect) {
+    this.isToLeadSubmitted = false;
     this.toLeadAssignedTo.set('');
     this.toLeadDuplicateError.set(null);
     this.toLeadNipValue = p.nip || '';
@@ -2934,7 +2976,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     const p = this.toLeadDialog();
     if (!p) return;
     const nip = this.toLeadNipValue.replace(/\D/g, '');
-    if (nip.length !== 10) return;
+    this.isToLeadSubmitted = nip.length !== 10;
+    if (this.isToLeadSubmitted) return;
     this.toLeadLoading.set(p.id);
     this.toLeadDuplicateError.set(null);
     const body: Record<string, string> = {};

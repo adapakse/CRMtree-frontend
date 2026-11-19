@@ -9,6 +9,7 @@ import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@js
 import { environment } from '../../../../environments/environment';
 import { ToastService } from '../../../core/services/toast.service';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 
 const API = `${environment.apiUrl}/admin/pbx`;
 
@@ -26,7 +27,7 @@ interface PbxUserRow {
 @Component({
   selector: 'wt-admin-pbx',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoDirective],
+  imports: [CommonModule, FormsModule, TranslocoDirective, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('admin')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -136,7 +137,7 @@ interface PbxUserRow {
                 <div class="ap-input-row">
                   <!-- A password field makes browsers autofill the user filter as a
                        login and the PAT as a saved password. Mask a text field instead. -->
-                  <input id="pbx-pat-token" name="pbx-pat-token" type="text" class="fi" [(ngModel)]="patToken"
+                  <input id="pbx-pat-token" name="pbx-pat-token" type="text" class="fi" [(ngModel)]="patToken" [class.fi-err]="isTokenSubmitted && !patToken.trim()"
                          [class.ap-token-masked]="!isTokenVisible"
                          [placeholder]="t('pbx.modal.patPlaceholder')" autocomplete="new-password"
                          autocapitalize="off" autocorrect="off" spellcheck="false"
@@ -145,13 +146,15 @@ interface PbxUserRow {
                     {{ isTokenVisible ? t('pbx.actions.hide') : t('pbx.actions.show') }}
                   </button>
                 </div>
+                @if (isTokenSubmitted && !patToken.trim()) { <span class="ferr">{{ t('pbx.errors.token') }}</span> }
                 <div class="ap-field-hint">{{ t('pbx.modal.patHint') }}</div>
               </div>
             </div>
 
             <div class="ap-modal-footer">
+              @if (isTokenSubmitted) { <wt-form-error-summary [count]="patToken.trim() ? 0 : 1" /> }
               <button class="btn btn-g" (click)="closeEdit()">{{ t('pbx.actions.cancel') }}</button>
-              <button class="btn btn-p" [disabled]="isSaving() || !patToken.trim()"
+              <button class="btn btn-p" [disabled]="isSaving()"
                       (click)="saveToken()">
                 {{ isSaving() ? t('pbx.actions.saving') : t('pbx.actions.save') }}
               </button>
@@ -274,6 +277,7 @@ export class AdminPbxComponent implements OnInit {
 
   searchQuery     = signal('');
   patToken        = '';
+  isTokenSubmitted = false;
   isTokenVisible  = false;
 
   filteredUsers = computed(() => {
@@ -297,6 +301,7 @@ export class AdminPbxComponent implements OnInit {
   }
 
   openEdit(user: PbxUserRow): void {
+    this.isTokenSubmitted = false;
     this.patToken       = '';
     this.isTokenVisible = false;
     this.editUser.set(user);
@@ -310,7 +315,11 @@ export class AdminPbxComponent implements OnInit {
 
   saveToken(): void {
     const user = this.editUser();
-    if (!user || !this.patToken.trim()) return;
+    if (!user) return;
+    if (!this.patToken.trim()) {
+      this.isTokenSubmitted = true;
+      return;
+    }
     this.isSaving.set(true);
 
     this.http.put<{ ok: boolean; direct_phone: string | null }>(

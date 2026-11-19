@@ -1,10 +1,11 @@
-import { Component, inject, Input, Output, EventEmitter, signal, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, Input, Output, EventEmitter, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
+import { scrollToFirstError } from '../../../shared/forms/form-errors';
 import { DocumentService } from '@core/services/document.service';
 import { GroupProfile, Document, DocType, GdprType, CreateDocumentPayload } from '@core/models/models';
-import { ToastService } from '@core/services/toast.service';
 import { AppSettingsService } from '@core/services/app-settings.service';
 import { CrmApiService } from '../../../core/services/crm-api.service';
 import { LocaleService } from '@core/i18n/locale.service';
@@ -29,7 +30,7 @@ interface SelectOption { value: string; label: string; }
 @Component({
   selector: 'wt-new-document-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, InvoiceFieldsComponent],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, InvoiceFieldsComponent, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -54,37 +55,41 @@ interface SelectOption { value: string; label: string; }
 
             <div class="fg full">
               <label class="fl">{{ t('labels.fields.documentName') }} <span class="req">*</span></label>
-              <input class="fi" [placeholder]="t('newDocument.namePlaceholder')" [(ngModel)]="form.name">
+              <input class="fi" [placeholder]="t('newDocument.namePlaceholder')" [(ngModel)]="form.name" [class.fi-err]="missing('name')">
+              @if (missing('name')) { <span class="ferr">{{ t('newDocument.errors.name') }}</span> }
             </div>
 
             <div class="fg">
               <label class="fl">{{ t('labels.fields.documentType') }} <span class="req">*</span></label>
-              <select class="fsel" [(ngModel)]="form.doc_type">
+              <select class="fsel" [(ngModel)]="form.doc_type" [class.fi-err]="missing('doc_type')">
                 <option value="">{{ t('newDocument.chooseType') }}</option>
                 @for (option of docTypeOptions; track option.value) {
                   <option [value]="option.value">{{ option.label }}</option>
                 }
               </select>
+              @if (missing('doc_type')) { <span class="ferr">{{ t('newDocument.errors.docType') }}</span> }
             </div>
 
             <div class="fg">
               <label class="fl">{{ t('labels.fields.gdprClassification') }} <span class="req">*</span></label>
-              <select class="fsel" [(ngModel)]="form.gdpr_type">
+              <select class="fsel" [(ngModel)]="form.gdpr_type" [class.fi-err]="missing('gdpr_type')">
                 <option value="">{{ t('newDocument.chooseGdpr') }}</option>
                 @for (option of gdprTypeOptions; track option.value) {
                   <option [value]="option.value">{{ option.label }}</option>
                 }
               </select>
+              @if (missing('gdpr_type')) { <span class="ferr">{{ t('newDocument.errors.gdprType') }}</span> }
             </div>
 
             <div class="fg">
               <label class="fl">{{ t('labels.fields.group') }} <span class="req">*</span></label>
-              <select class="fsel" [(ngModel)]="form.group_id">
+              <select class="fsel" [(ngModel)]="form.group_id" [class.fi-err]="missing('group_id')">
                 <option value="">{{ t('newDocument.chooseGroup') }}</option>
                 @for (g of groups; track g.id) {
                   <option [value]="g.id">{{ g.display_name }}</option>
                 }
               </select>
+              @if (missing('group_id')) { <span class="ferr">{{ t('newDocument.errors.group') }}</span> }
             </div>
 
             <!-- Owner -->
@@ -119,27 +124,29 @@ interface SelectOption { value: string; label: string; }
             @if (!isInvoice) {
               <div class="fg">
                 <label class="fl">{{ t('labels.fields.contractSubject') }} <span class="req">*</span></label>
-                <select class="fsel" [(ngModel)]="form.contract_subject">
+                <select class="fsel" [(ngModel)]="form.contract_subject" [class.fi-err]="missing('contract_subject')">
                   <option value="">{{ t('labels.options.choose') }}</option>
                   @for (subject of contractSubjectOptions; track subject.value) {
                     <option [value]="subject.value">{{ subject.label }}</option>
                   }
                 </select>
+                @if (missing('contract_subject')) { <span class="ferr">{{ t('newDocument.errors.contractSubject') }}</span> }
               </div>
             }
 
             <div class="fg">
               <label class="fl">{{ t(isInvoice ? 'labels.fields.buyer' : 'labels.fields.entity1') }} <span class="req">*</span></label>
               @if (entity1Options.length > 0) {
-                <select class="fsel" [(ngModel)]="entity1">
+                <select class="fsel" [(ngModel)]="entity1" [class.fi-err]="missing('entity1')">
                   <option value="">{{ t('newDocument.chooseEntity') }}</option>
                   @for (opt of entity1Options; track opt) {
                     <option [value]="opt">{{ opt }}</option>
                   }
                 </select>
               } @else {
-                <input class="fi" [placeholder]="t('labels.placeholders.entity1')" [(ngModel)]="entity1">
+                <input class="fi" [placeholder]="t('labels.placeholders.entity1')" [(ngModel)]="entity1" [class.fi-err]="missing('entity1')">
               }
+              @if (missing('entity1')) { <span class="ferr">{{ t(isInvoice ? 'newDocument.errors.buyer' : 'newDocument.errors.entity1') }}</span> }
             </div>
             <div class="fg">
               <label class="fl">{{ t(isInvoice ? 'labels.fields.seller' : 'labels.fields.entity2') }}</label>
@@ -147,16 +154,18 @@ interface SelectOption { value: string; label: string; }
             </div>
             <div class="fg">
               <label class="fl">{{ t(isInvoice ? 'labels.fields.sellerTaxId' : 'labels.fields.counterpartyTaxId') }} <span class="req">*</span></label>
-              <input class="fi" [placeholder]="t('labels.placeholders.taxId')" maxlength="15" [(ngModel)]="form.nip">
+              <input class="fi" [placeholder]="t('labels.placeholders.taxId')" maxlength="15" [(ngModel)]="form.nip" [class.fi-err]="missing('nip')">
+              @if (missing('nip')) { <span class="ferr">{{ t('newDocument.errors.nip') }}</span> }
             </div>
             <div class="fg">
               <label class="fl">{{ t('labels.fields.counterpartyCountry') }} <span class="req">*</span></label>
-              <select class="fsel" [(ngModel)]="form.country">
+              <select class="fsel" [(ngModel)]="form.country" [class.fi-err]="missing('country')">
                 <option value="">{{ t('labels.options.chooseCountry') }}</option>
                 @for (country of countryOptions; track country.value) {
                   <option [value]="country.value">{{ country.label }}</option>
                 }
               </select>
+              @if (missing('country')) { <span class="ferr">{{ t('newDocument.errors.country') }}</span> }
             </div>
 
           </div>
@@ -198,11 +207,11 @@ interface SelectOption { value: string; label: string; }
                (drop)="onDrop($event)"
                (click)="fileInput.click()">
             @if (selectedFile) {
-              <div style="font-size:14px;font-weight:600;color:var(--gray-800)">📄 {{ selectedFile.name }}</div>
+              <div style="font-size:14px;font-weight:600;color:var(--gray-800)"><i class="ei ei-file"></i> {{ selectedFile.name }}</div>
               <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ formatSize(selectedFile.size) }}</div>
               <button class="btn btn-g btn-sm" style="margin-top:8px" (click)="$event.stopPropagation();selectedFile=null">{{ t('newDocument.file.remove') }}</button>
             } @else {
-              <div style="margin-bottom:8px;color:var(--gray-400)">📂</div>
+              <div style="margin-bottom:8px;color:var(--gray-400)"><i class="ei ei-folder-open"></i></div>
               <div style="font-size:14px;font-weight:600;color:var(--gray-700)">{{ t('newDocument.file.dropHint') }}</div>
               <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ t('newDocument.file.formats') }}</div>
             }
@@ -211,8 +220,9 @@ interface SelectOption { value: string; label: string; }
         </div>
 
         <div class="pf">
+          @if (submitted) { <wt-form-error-summary [count]="errorCount()" /> }
           <button class="btn btn-g" (click)="close.emit()">{{ 'actions.cancel' | transloco }}</button>
-          <button class="btn btn-p" [disabled]="!isValid() || saving()" (click)="save()">
+          <button class="btn btn-p" [disabled]="saving()" (click)="save()">
             @if (saving()) { <span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:var(--surface);display:inline-block"></span> }
             {{ t('newDocument.create') }}
           </button>
@@ -231,6 +241,7 @@ interface SelectOption { value: string; label: string; }
     .pc:hover { background: var(--gray-100); color: var(--gray-700); }
     .pb { padding: 24px; flex: 1; }
     .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
+    @media (max-width: 767px) { .pf { flex-wrap: wrap; padding: 12px 16px; } }
   `],
 })
 export class NewDocumentPanelComponent implements OnInit {
@@ -239,9 +250,9 @@ export class NewDocumentPanelComponent implements OnInit {
   @Output() created = new EventEmitter<Document>();
 
   private docSvc      = inject(DocumentService);
-  private toast       = inject(ToastService);
   private settingsSvc = inject(AppSettingsService);
   private crmApi      = inject(CrmApiService);
+  private host        = inject<ElementRef<HTMLElement>>(ElementRef);
   private transloco   = inject(TranslocoService);
   private locale      = inject(LocaleService);
 
@@ -345,12 +356,27 @@ export class NewDocumentPanelComponent implements OnInit {
     entities: [], tags: [],
   };
 
-  isValid(): boolean {
-    return !!(
-      this.form.name.trim() && this.form.doc_type && this.form.gdpr_type &&
-      this.form.group_id && this.entity1.trim() &&
-      this.form.nip.trim() && this.form.country && (this.isInvoice || this.form.contract_subject)
-    );
+  /** Set by the first click on "Create document"; from then on errors show at the fields. */
+  submitted = false;
+  private readonly REQUIRED_FIELDS = ['name', 'doc_type', 'gdpr_type', 'group_id', 'contract_subject', 'entity1', 'nip', 'country'];
+
+  missing(field: string): boolean { return this.submitted && this.invalid(field); }
+  errorCount(): number { return this.REQUIRED_FIELDS.filter(field => this.invalid(field)).length; }
+  isValid(): boolean { return this.errorCount() === 0; }
+
+  private invalid(field: string): boolean {
+    const f = this.form;
+    switch (field) {
+      case 'name':             return !f.name.trim();
+      case 'doc_type':         return !f.doc_type;
+      case 'gdpr_type':        return !f.gdpr_type;
+      case 'group_id':         return !f.group_id;
+      case 'contract_subject': return !this.isInvoice && !f.contract_subject;
+      case 'entity1':          return !this.entity1.trim();
+      case 'nip':              return !f.nip.trim();
+      case 'country':          return !f.country;
+    }
+    return false;
   }
 
   onExpDateModeChange(): void {
@@ -378,7 +404,11 @@ export class NewDocumentPanelComponent implements OnInit {
   }
 
   save(): void {
-    if (!this.isValid()) return;
+    if (!this.isValid()) {
+      this.submitted = true;
+      scrollToFirstError(this.host.nativeElement);
+      return;
+    }
     this.saving.set(true);
     this.docSvc.create({
       name:             this.form.name,
@@ -400,7 +430,8 @@ export class NewDocumentPanelComponent implements OnInit {
       file:             this.selectedFile ?? undefined,
     }).subscribe({
       next: doc => { this.saving.set(false); this.created.emit(doc); },
-      error: () => { this.saving.set(false); this.toast.error(this.transloco.translate('documents.newDocument.createFailed')); },
+      // The save-error interceptor already shows the API's specific reason; a generic toast on top would hide it.
+      error: () => this.saving.set(false),
     });
   }
 

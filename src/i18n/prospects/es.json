@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} empresas…",
     "errors": {
       "aiNoCredit": "Sin saldo en la cuenta de IA",
+      "nip": "El NIP debe tener 10 dígitos, p. ej. 1234567890",
       "searchFailedWithReason": "Falló la búsqueda: {reason}",
+      "seedName": "Escribe el nombre de la empresa modelo, p. ej. ABC S.L.",
+      "selectCompanies": "Marca al menos una empresa en la lista",
       "taxIdConflict": "Conflicto de NIF — otro registro ya usa este número."
     },
     "exportCsv": "Exportar CSV",
@@ -120,10 +123,14 @@
       "fatalError": "Error de importación:",
       "heading": "Importar empresas desde CSV",
       "importing": "Importando…",
+      "inCrmLead": "Lead",
+      "inCrmPartner": "Socio",
+      "inCrmTitle": "Omitidos porque ya están en el CRM:",
       "optionalColumns": "www, krs, company_name/nazwa, branża, profil, zatrudnienie, obrot, rok, miasto, województwo, PKD-ID, PKD-opis, Osoba Decyzyjna, Stanowisko, Komórka, Telefon, Email",
       "optionalLabel": "Detectadas automáticamente:",
       "requiredLabel": "Columnas obligatorias:",
       "skipped": "Omitidos (duplicados):",
+      "skippedInCrm": "Omitidos (ya en el CRM):",
       "submit": "Importar",
       "totalRows": "Filas en total:",
       "wwwHint": "Si indicas la columna www, se omite la búsqueda automática (más barato y rápido)."

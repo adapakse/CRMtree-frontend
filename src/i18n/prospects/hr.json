@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} firmi…",
     "errors": {
       "aiNoCredit": "Na UI računu nema sredstava",
+      "nip": "NIP mora imati 10 znamenki, npr. 1234567890",
       "searchFailedWithReason": "Traženje nije uspjelo: {reason}",
+      "seedName": "Upišite naziv uzorne tvrtke, npr. ABC d.o.o.",
+      "selectCompanies": "Označite barem jednu tvrtku na popisu",
       "taxIdConflict": "Konflikt OIB-a — drugi zapis već koristi ovaj broj."
     },
     "exportCsv": "Izvoz CSV",
@@ -120,10 +123,14 @@
       "fatalError": "Pogreška uvoza:",
       "heading": "Uvoz firmi iz CSV",
       "importing": "Uvoz u tijeku…",
+      "inCrmLead": "Lead",
+      "inCrmPartner": "Partner",
+      "inCrmTitle": "Preskočeno jer su već u CRM-u:",
       "optionalColumns": "www, krs, company_name/nazwa, branża, profil, zatrudnienie, obrot, rok, miasto, województwo, PKD-ID, PKD-opis, Osoba Decyzyjna, Stanowisko, Komórka, Telefon, Email",
       "optionalLabel": "Prepoznaju se automatski:",
       "requiredLabel": "Obavezni stupci:",
       "skipped": "Preskočeno (duplikati):",
+      "skippedInCrm": "Preskočeno (već u CRM-u):",
       "submit": "Uvezi",
       "totalRows": "Redova ukupno:",
       "wwwHint": "Stupac www omogućuje preskočiti automatsko traženje (jeftinije i brže)."

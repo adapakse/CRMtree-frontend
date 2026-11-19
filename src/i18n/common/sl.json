@@ -50,6 +50,14 @@
     "uploadFailed": "Datoteke ni bilo mogoče naložiti: {name}.",
     "uploading": "Nalaganje…"
   },
+  "form": {
+    "errors": {
+      "closeComment": "Vnesite komentar, kaj je bilo narejeno, npr. »Ponudba poslana«",
+      "title": "Vnesite naslov"
+    },
+    "fixErrors": "Popravite polja, označena z rdečo ({count})",
+    "noChanges": "Ni sprememb za shranjevanje"
+  },
   "httpErrors": {
     "badRequest": "Nekateri podatki niso pravilni. Preverite polja in poskusite znova.",
     "badRequestDetails": "Napačni podatki: {details}",

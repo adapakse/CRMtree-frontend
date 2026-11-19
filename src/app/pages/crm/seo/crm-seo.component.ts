@@ -80,18 +80,18 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
           <button type="button" class="fchip section-toggle" [class.on]="showChannels()" (click)="showChannels.set(!showChannels())">{{ t('seo.main.sections.channels') }}</button>
           <button type="button" class="fchip section-toggle" [class.on]="showCalendar()" (click)="showCalendar.set(!showCalendar())">{{ t('seo.main.sections.calendar') }}</button>
           <button type="button" class="fchip section-toggle" [class.on]="showSettings()" (click)="showSettings.set(!showSettings())">{{ t('seo.main.sections.settings') }}</button>
-          <button type="button" class="btn btn-p btn-sm" (click)="generate()" [disabled]="generating()">
+          <button type="button" class="btn btn-p" (click)="generate()" [disabled]="generating()">
             @if (generating()) { {{ t('seo.main.generate.inProgress') }} } @else { {{ t('seo.main.generate.action') }} }
           </button>
           <div class="gsc-status">
             @if (gsc()?.connected) {
               <span class="gsc-badge gsc-connected">{{ t('seo.main.gsc.connected', { siteUrl: gsc()?.site_url }) }}</span>
-              <button type="button" class="btn btn-g btn-sm" (click)="syncGsc()" [disabled]="syncingGsc()">
+              <button type="button" class="btn btn-g" (click)="syncGsc()" [disabled]="syncingGsc()">
                 @if (syncingGsc()) { {{ t('seo.main.gsc.syncing') }} } @else { {{ t('seo.main.gsc.syncNow') }} }
               </button>
-              <button type="button" class="btn btn-g btn-sm" (click)="disconnectGsc()">{{ t('seo.main.gsc.disconnect') }}</button>
+              <button type="button" class="btn btn-g" (click)="disconnectGsc()">{{ t('seo.main.gsc.disconnect') }}</button>
             } @else {
-              <button type="button" class="btn btn-g btn-sm" (click)="connectGsc()">{{ t('seo.main.gsc.connect') }}</button>
+              <button type="button" class="btn btn-g" (click)="connectGsc()">{{ t('seo.main.gsc.connect') }}</button>
             }
           </div>
         </div>
@@ -244,7 +244,7 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
                 <button type="button" class="btn btn-d btn-sm" (click)="unpublish(d.id)">{{ t('seo.main.actions.cancelSchedule') }}</button>
               }
               @if (d.status === 'draft' || d.status === 'in_review' || d.status === 'needs_update') {
-                <button type="button" class="btn btn-p btn-sm" (click)="approve(d.id)" [disabled]="pendingSlotCount() > 0"
+                <button type="button" class="btn btn-p btn-sm" (click)="approve(d.id)"
                         [title]="pendingSlotCount() > 0 ? t('seo.main.actions.pendingSlotsHint') : ''">
                   @if (editScheduledAt) { {{ t('seo.main.actions.approveAndSchedule') }} } @else { {{ t('seo.main.actions.approveAndPublish') }} }
                 </button>
@@ -372,6 +372,15 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
     .seo-header h1 { font-size: 1.4rem; margin: 0; }
     .section-title { font-size: 1.05rem; font-weight: 700; color: var(--gray-900); margin: 0 0 0.75rem; }
     .header-actions { display:flex; align-items:center; gap: 0.75rem; }
+    /* the header has more buttons than fit next to the title even beside the full sidebar: they wrap */
+    .seo-header { flex-wrap: wrap; gap: 12px; }
+    .header-actions { flex-wrap: wrap; gap: 8px; }
+    .gsc-status { display: flex; flex-wrap: wrap; gap: 8px; }
+    @media (max-width: 767px) {
+      .seo-page { padding: 16px; }
+      .seo-header h1 { flex: 1 1 100%; }
+      .seo-layout { grid-template-columns: minmax(0, 1fr) !important; }
+    }
     .gsc-badge { font-size: 0.82rem; padding: 0.4rem 0.8rem; border-radius: var(--radius); }
     .gsc-connected { background: var(--orange-pale); color: var(--orange-dark); }
     .status-tabs { display:flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
@@ -734,6 +743,10 @@ export class CrmSeoComponent implements OnInit {
   }
 
   approve(id: number): void {
+    if (this.pendingSlotCount() > 0) {
+      this.toast.info(this.transloco.translate('crm.seo.main.actions.pendingSlotsHint'));
+      return;
+    }
     this.seoService.approve(id).subscribe({
       next: (d) => {
         this.toast.success(d.status === 'scheduled' ? this.transloco.translate('crm.seo.main.toasts.scheduled') : this.transloco.translate('crm.seo.main.toasts.published'));

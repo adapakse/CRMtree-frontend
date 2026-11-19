@@ -50,6 +50,14 @@
     "uploadFailed": "Impossibile caricare il file: {name}.",
     "uploading": "Caricamento…"
   },
+  "form": {
+    "errors": {
+      "closeComment": "Inserisci un commento su cosa è stato fatto, ad es. “Offerta inviata”",
+      "title": "Inserisci un titolo"
+    },
+    "fixErrors": "Correggi i campi evidenziati in rosso ({count})",
+    "noChanges": "Nessuna modifica da salvare"
+  },
   "httpErrors": {
     "badRequest": "Alcuni dati non sono validi. Controlla i campi e riprova.",
     "badRequestDetails": "Dati non validi: {details}",

@@ -128,7 +128,7 @@ interface KpiData {
       <div class="stat-card">
         <div class="stat-val">{{ kpi.active }}</div>
         <div class="stat-lbl">{{ t('reports.common.kpi.activeLeads') }}</div>
-        <div class="stat-trend">{{ t('reports.overview.kpi.hotCount', { count: kpi.hot }) }} 🔥</div>
+        <div class="stat-trend">{{ t('reports.overview.kpi.hotCount', { count: kpi.hot }) }} <i class="ei ei-flame"></i></div>
       </div>
     </div>
 
@@ -221,7 +221,7 @@ interface KpiData {
         </div>
         <!-- Projected -->
         <div class="proj-box" *ngIf="projected > 0">
-          <span>📈 {{ t('reports.overview.chart.projectedWeighted') }}</span>
+          <span><i class="ei ei-trending-up"></i> {{ t('reports.overview.chart.projectedWeighted') }}</span>
           <strong style="color: var(--orange-text)">{{ formatPLN(projected) }} PLN</strong>
         </div>
       </div>
@@ -234,7 +234,7 @@ interface KpiData {
       <div class="card" style="padding:20px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
           <div class="card-title">{{ t('reports.common.salespeopleResults') }}</div>
-          <span class="mini-lbl" *ngIf="salesByPerson.length > 0" style="color:oklch(from #0ea5e9 max(l, var(--text-min-l)) c h);display:inline-flex;align-items:center;gap:4px">📥 {{ t('reports.overview.external.source') }}</span>
+          <span class="mini-lbl" *ngIf="salesByPerson.length > 0" style="color:oklch(from #0ea5e9 max(l, var(--text-min-l)) c h);display:inline-flex;align-items:center;gap:4px"><i class="ei ei-inbox"></i> {{ t('reports.overview.external.source') }}</span>
         </div>
 
         <!-- Tabela z danych zewnętrznych (gdy dostępne) -->
@@ -388,7 +388,7 @@ interface KpiData {
           </div>
         </div>
         <div class="insight-box" *ngIf="topLostReason">
-          💡 <strong>{{ t('reports.overview.lostReasons.insightLabel') }}</strong> {{ t('reports.overview.lostReasons.insight', { percent: topLostReason.pct, reason: topLostReason.label }) }}
+          <i class="ei ei-bulb"></i> <strong>{{ t('reports.overview.lostReasons.insightLabel') }}</strong> {{ t('reports.overview.lostReasons.insight', { percent: topLostReason.pct, reason: topLostReason.label }) }}
         </div>
       </div>
     </div>

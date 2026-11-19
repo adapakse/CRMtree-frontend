@@ -16,6 +16,10 @@
   "login": {
     "email": "Email",
     "emailPlaceholder": "ivan@company.com",
+    "errors": {
+      "email": "Введите адрес e-mail, например ivan.petrov@firma.ru",
+      "password": "Введите пароль"
+    },
     "failed": "Ошибка входа",
     "hidePassword": "Скрыть",
     "or": "или",

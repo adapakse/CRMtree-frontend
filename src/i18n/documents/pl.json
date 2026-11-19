@@ -102,6 +102,9 @@
     },
     "signus": {
       "emailsPlaceholder": "anna@firma.com, partner@example.com",
+      "errors": {
+        "emails": "Podaj adresy e-mail podpisujących, oddzielone przecinkami, np. jan@firma.pl, anna@firma.pl"
+      },
       "info": "Dokument zostanie wysłany do API Signus. Każda osoba podpisująca dostanie e-mail. Podpisane wersje są automatycznie archiwizowane.",
       "modalTitle": "Rozpocznij podpisywanie elektroniczne",
       "sectionTitle": "Podpis elektroniczny (Signus)",
@@ -143,6 +146,9 @@
       "assigned": "Przypisano zadanie — wysłano powiadomienie e-mail",
       "cancelled": "Anulowano zadanie",
       "dueDate": "Termin",
+      "errors": {
+        "assignTo": "Wyszukaj osobę i kliknij ją na liście"
+      },
       "message": "Wiadomość",
       "messagePlaceholder": "Opcjonalna wiadomość dla osoby przypisanej…",
       "selected": "Wybrano: {name}",
@@ -343,6 +349,17 @@
     "chooseType": "— Wybierz typ —",
     "create": "Utwórz dokument",
     "createFailed": "Nie udało się utworzyć dokumentu",
+    "errors": {
+      "buyer": "Podaj nabywcę z faktury",
+      "contractSubject": "Wybierz przedmiot umowy",
+      "country": "Wybierz kraj kontrahenta",
+      "docType": "Wybierz typ dokumentu",
+      "entity1": "Podaj pierwszą stronę umowy, np. CRMtree Sp. z o.o.",
+      "gdprType": "Wybierz klasyfikację RODO",
+      "group": "Wybierz grupę, która będzie widzieć dokument",
+      "name": "Podaj nazwę dokumentu, np. Umowa partnerska — ABC Sp. z o.o.",
+      "nip": "Podaj NIP kontrahenta, np. 1234567890"
+    },
     "file": {
       "dropHint": "Upuść plik tutaj lub kliknij, aby wybrać",
       "formats": "PDF, DOCX — maks. 50 MB",

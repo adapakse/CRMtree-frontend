@@ -94,6 +94,9 @@
     "tasks": {
       "bulk": {
         "closeSelected": "Închidere sarcini selectate",
+        "errors": {
+          "noneSelected": "Bifați cel puțin o sarcină din listă"
+        },
         "selectOverdue": "Selectare toate sarcinile cu termen depășit",
         "selectedCount": "{count, plural, one {# selectată} few {# selectate} other {# de selectate}}"
       },
@@ -531,24 +534,39 @@
     "writeNew": "Scrieți un e-mail nou"
   },
   "fieldErrors": {
+    "caption": "Introduceți o descriere, de ex. Panoul rapoartelor de vânzări",
     "closeDate": "Alegeți data estimată de închidere",
     "company": "Introduceți numele firmei",
+    "competitorUrl": "Introduceți site-ul concurentului, de ex. concurent.ro",
     "contactName": "Introduceți numele complet al persoanei de contact",
     "contactTitle": "Alegeți funcția persoanei de contact",
     "email": "Introduceți o adresă de e-mail, de ex. ion@firma.ro",
+    "featureTag": "Introduceți funcția prezentată, de ex. Rapoarte",
     "firstContact": "Alegeți data primului contact",
+    "fullName": "Introduceți numele complet, de ex. Ana Popescu",
+    "groupName": "Introduceți numele grupului, de ex. Lanțuri hoteliere",
+    "imageFile": "Alegeți un fișier imagine (PNG, JPG sau WEBP)",
     "industry": "Alegeți un domeniu",
     "lostReason": "Alegeți motivul pierderii",
+    "message": "Introduceți textul mesajului",
     "onlinePct": "Alegeți ponderea vânzărilor online",
     "phone": "Introduceți un număr de telefon, de ex. +48 600 000 000",
+    "pillarName": "Introduceți numele pilonului, de ex. Călătorii de afaceri",
     "probability": "Alegeți șansa de câștig",
+    "recipients": "Adăugați cel puțin un destinatar, de ex. ion.popescu@firma.ro",
     "salesperson": "Atribuiți un agent de vânzări",
     "saveFailed": "Salvarea nu a reușit. Încercați din nou — dacă eroarea se repetă, anunțați administratorul.",
     "source": "Alegeți de unde a venit lead-ul",
+    "subject": "Introduceți subiectul mesajului",
+    "title": "Introduceți un titlu, de ex. Întâlnire despre ofertă",
     "value": "Introduceți o sumă — dacă nu o știți, scrieți 0",
     "valueNegative": "Suma nu poate fi negativă",
     "valueTooLarge": "Sumă prea mare — maximum 999.999.999.999",
-    "website": "Introduceți site-ul firmei, de ex. firma.ro"
+    "website": "Introduceți site-ul firmei, de ex. firma.ro",
+    "whatsappTemplate": "Alegeți un șablon și completați toate câmpurile lui",
+    "wordpressAppPassword": "Lipiți parola de aplicație din profilul WordPress (de ex. abcd efgh ijkl mnop)",
+    "wordpressUrl": "Introduceți adresa site-ului WordPress, de ex. https://blog.firma.ro",
+    "wordpressUser": "Introduceți numele de utilizator WordPress"
   },
   "history": {
     "activityAdded": "Activitate adăugată: {title}",
@@ -622,6 +640,7 @@
       "call": "Apel",
       "doc_sent": "Document",
       "email": "E-mail",
+      "marketing_email": "Campanie e-mail",
       "meeting": "Întâlnire",
       "note": "Notiță",
       "opportunity": "Oportunitate",
@@ -795,6 +814,10 @@
       "title": "Informații"
     },
     "loadError": "Eroare la încărcarea leadului.",
+    "missingContact": {
+      "email": "Acest lead nu are adresă de e-mail — adăugați-o în „Editează datele”",
+      "phone": "Acest lead nu are număr de telefon — adăugați-l în „Editează datele”"
+    },
     "nip": {
       "countryCodeRequired": "Începeți cu codul de țară (2 litere), de ex. PL",
       "duplicate": "Acest cod fiscal este deja atribuit altei firme în CRM",
@@ -1142,11 +1165,13 @@
       "newTask": "Sarcină nouă",
       "note": "Notiță",
       "notePlaceholder": "Informații suplimentare…",
+      "partnerRequired": "Alegeți un partener în partea de sus a paginii pentru a adăuga o sarcină",
       "step": "Pasul procesului",
       "time": "Ora",
       "timeHint": "(opțional, implicit 09:00)",
       "title": "Titlul sarcinii",
-      "titlePlaceholder": "Denumirea sarcinii"
+      "titlePlaceholder": "Denumirea sarcinii",
+      "titleRequired": "Introduceți un titlu pentru sarcină, de ex. „Semnarea contractului-cadru”"
     },
     "taskTypes": {
       "call": "Apel"
@@ -1170,6 +1195,26 @@
       "calendar": "Calendar",
       "partners": "Parteneri",
       "timeline": "Cronologie"
+    },
+    "withdraw": {
+      "action": "Retrage",
+      "confirm": "Confirmă retragerea",
+      "confirmPrompt": "Retragi „{company}” din onboarding în etapa „{stage}”? Partenerul și sarcinile sale de onboarding vor fi șterse, iar leadul revine în pipeline-ul de vânzări.",
+      "detailButton": "Retrage din onboarding în pipeline",
+      "detailHint": "Șterge acest partener și sarcinile sale de onboarding — leadul revine la etapa selectată a pipeline-ului.",
+      "detailStagePrompt": "Readu leadul la etapa:",
+      "failed": "Retragerea din onboarding nu a reușit",
+      "hint": "Retrage din onboarding într-o etapă a pipeline-ului",
+      "inProgress": "Se retrage…",
+      "intro": "{company} va fi eliminată din onboarding (împreună cu sarcinile de onboarding) și revine în pipeline-ul de vânzări la etapa selectată.",
+      "invalidStage": "Această etapă nu mai există în pipeline — reîncarcă pagina și alege alta",
+      "noPermission": "Doar un manager de vânzări sau un administrator poate retrage din onboarding",
+      "notFound": "Partenerul nu a fost găsit — poate a fost deja retras sau lansat",
+      "stageLabel": "Etapa pipeline-ului",
+      "stagePlaceholder": "— alege o etapă —",
+      "stageRequired": "Alege etapa pipeline-ului în care revine compania",
+      "success": "„{company}” a revenit în pipeline-ul de vânzări",
+      "title": "Retrage din onboarding"
     }
   },
   "partnerDetail": {
@@ -1565,6 +1610,32 @@
       "previousYear": "Anul anterior ({year})"
     }
   },
+  "personConsents": {
+    "cancel": "Anulează",
+    "companyHint": "Campaniile e-mail nu îl folosesc — contează consimțământul persoanei de mai sus.",
+    "companyTitle": "Consimțământul firmei (vechi)",
+    "deniedPlaceholder": "de ex. refuz la telefon",
+    "errors": {
+      "note": "Descrieți cum a fost obținut consimțământul (cel puțin 3 caractere), de ex. formular la târg 12.10"
+    },
+    "grantedPlaceholder": "de ex. verbal la întâlnirea din 12.11, formular la târg",
+    "loadFailed": "Consimțămintele nu au putut fi încărcate.",
+    "loading": "Se încarcă…",
+    "mainContact": "contact principal",
+    "noPeople": "Nu există persoane cu adresă de e-mail. Adăugați o persoană de contact cu e-mail pentru a-i înregistra consimțământul.",
+    "noteOptional": "Notă (opțional)",
+    "noteRequired": "Cum a fost obținut? (obligatoriu)",
+    "save": "Salvează",
+    "sources": {
+      "sendgrid_spam": "e-mail raportat ca spam",
+      "sendgrid_unsubscribe": "dezabonare dintr-un e-mail"
+    },
+    "values": {
+      "denied": "Nu este de acord",
+      "granted": "Este de acord",
+      "no_data": "Necunoscut"
+    }
+  },
   "reports": {
     "common": {
       "columns": {
@@ -1572,7 +1643,7 @@
         "pipeline": "Pipeline",
         "progress": "Progres",
         "winRatePct": "Câștig %",
-        "won": "Won"
+        "won": "Câștigate"
       },
       "days": "{count, plural, one {# zi} few {# zile} other {# de zile}}",
       "exportPdf": "Export PDF",

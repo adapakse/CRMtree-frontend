@@ -12,6 +12,7 @@
     "dashboard": "Дашборд",
     "dataManagement": "Управление данными",
     "documents": "Документы",
+    "emailCampaigns": "Email-рассылки",
     "groupsAndRoles": "Группы и роли",
     "leads": "Лиды",
     "mySettings": "Мои настройки",
@@ -41,11 +42,13 @@
     "superAdmin": "Суперадмин"
   },
   "sidebar": {
+    "closeMenu": "Закрыть меню",
     "collapse": "Свернуть меню",
     "doneEditing": "Готово",
     "editMenu": "Изменить меню",
     "expand": "Развернуть меню",
     "hideItem": "Скрыть",
+    "openMenu": "Открыть меню",
     "showItem": "Показать"
   },
   "user": {

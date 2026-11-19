@@ -5,6 +5,7 @@ import {
   CrmSeoService, SeoContent, SeoEnrichmentSlot, SeoScreenshot, SeoSlotType, SeoSlotValue,
 } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 
 const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
   expert_comment: 'crm.seo.contentSlots.types.expert_comment',
@@ -19,7 +20,7 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
   selector: 'wt-seo-content-slots',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('crm')],
   template: `
     <ng-container *transloco="let t; prefix: 'crm'">
@@ -105,10 +106,13 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
                     }
                     <details class="upload-new">
                       <summary>{{ t('seo.contentSlots.screenshots.uploadNew') }}</summary>
-                      <input #fileInput type="file" accept="image/png,image/jpeg,image/webp" (change)="newFile = fileInput.files?.[0] ?? null">
+                      <input #fileInput type="file" accept="image/png,image/jpeg,image/webp" (change)="newFile = fileInput.files?.[0] ?? null" [class.fi-err]="uploadSubmitted && !newFile">
+                      @if (uploadSubmitted && !newFile) { <span class="ferr">{{ t('fieldErrors.imageFile') }}</span> }
                       <label class="field-label" [for]="slot.id + '-caption'">{{ t('seo.contentSlots.fields.caption') }}</label>
-                      <input class="field-input" [id]="slot.id + '-caption'" [(ngModel)]="newCaption">
-                      <button type="button" class="btn btn-g btn-sm" (click)="uploadAndSelect(slot)" [disabled]="!newFile || !newCaption.trim() || busy()">{{ t('seo.contentSlots.screenshots.uploadToLibrary') }}</button>
+                      <input class="field-input" [id]="slot.id + '-caption'" [(ngModel)]="newCaption" [class.fi-err]="uploadSubmitted && !newCaption.trim()">
+                      @if (uploadSubmitted && !newCaption.trim()) { <span class="ferr">{{ t('fieldErrors.caption') }}</span> }
+                      @if (uploadSubmitted) { <wt-form-error-summary [count]="(newFile ? 0 : 1) + (newCaption.trim() ? 0 : 1)" /> }
+                      <button type="button" class="btn btn-g btn-sm" (click)="uploadAndSelect(slot)" [disabled]="busy()">{{ t('seo.contentSlots.screenshots.uploadToLibrary') }}</button>
                     </details>
                   }
                 }
@@ -182,6 +186,7 @@ export class SeoContentSlotsComponent {
   screenshotId: number | null = null;
   newFile: File | null = null;
   newCaption = '';
+  uploadSubmitted = false;
 
   typeLabel(type: SeoSlotType): string {
     return this.transloco.translate(SLOT_TYPE_LABELS[type]);
@@ -217,7 +222,11 @@ export class SeoContentSlotsComponent {
   }
 
   uploadAndSelect(slot: SeoEnrichmentSlot): void {
-    if (!this.newFile) return;
+    if (!this.newFile || !this.newCaption.trim()) {
+      this.uploadSubmitted = true;
+      return;
+    }
+    this.uploadSubmitted = false;
     this.busy.set(true);
     this.seoService.uploadScreenshot(this.newFile, slot.feature_tag || 'Produkt', this.newCaption.trim()).subscribe({
       next: (shot) => {

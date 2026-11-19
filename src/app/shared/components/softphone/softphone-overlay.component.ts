@@ -32,7 +32,7 @@ function fmtDuration(sec: number): string {
             background:#dc2626;color:#fff;border-radius:10px;padding:12px 20px;
             font-size:14px;font-weight:600;max-width:360px;text-align:center;
             box-shadow:0 4px 16px rgba(0,0,0,.3)">
-  🎙️ {{micErrorMsg}}
+  <i class="ei ei-mic"></i> {{micErrorMsg}}
 </div>
 
 <!-- ── Dialog potwierdzenia ─────────────────────────────── -->
@@ -46,7 +46,7 @@ function fmtDuration(sec: number): string {
     </select>
     <input class="sp-number-input" [(ngModel)]="editNumber" placeholder="+48 600 000 000" (keydown.enter)="confirm()">
     <div class="sp-row" style="gap:8px;margin-top:4px">
-      <button class="sp-btn sp-btn-call" (click)="confirm()">📞 {{ t('calls.call') }}</button>
+      <button class="sp-btn sp-btn-call" (click)="confirm()"><i class="ei ei-phone"></i> {{ t('calls.call') }}</button>
       <button class="sp-btn sp-btn-cancel" (click)="cancelPending()">{{ 'actions.cancel' | transloco }}</button>
     </div>
   </div>
@@ -57,7 +57,7 @@ function fmtDuration(sec: number): string {
 
   <!-- Połączenie przychodzące -->
   <ng-container *ngIf="call.phase === 'incoming'">
-    <div class="sp-phase-label sp-label-incoming">📲 {{ t('softphone.incoming.title') }}</div>
+    <div class="sp-phase-label sp-label-incoming"><i class="ei ei-smartphone"></i> {{ t('softphone.incoming.title') }}</div>
     <div class="sp-caller">{{ call.displayName }}</div>
 
     <!-- Spinner lookup -->
@@ -73,7 +73,7 @@ function fmtDuration(sec: number): string {
                    border:1px solid #3BAA5D;border-radius:6px;padding:8px 10px;
                    margin-top:6px;cursor:pointer;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);font-size:12px;
                    font-weight:600;font-family:inherit">
-      🔗 {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
+      <i class="ei ei-link"></i> {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
     </button>
 
     <!-- Nie znaleziono -->
@@ -93,9 +93,7 @@ function fmtDuration(sec: number): string {
   <!-- Dzwoni / Wybieranie / Odbieranie -->
   <ng-container *ngIf="call.phase === 'dialing' || call.phase === 'ringing'">
     <div class="sp-phase-label">
-      {{ call.phase === 'ringing' && call.direction === 'inbound'
-           ? '🟢 ' + t('softphone.incoming.answering')
-           : call.phase === 'ringing' ? '🔔 ' + t('softphone.phases.ringing') : '📡 ' + t('softphone.phases.dialing') }}
+      @if (call.phase === 'ringing' && call.direction === 'inbound') { <i class="ei ei-dot" style="color:#16A34A"></i> {{ t('softphone.incoming.answering') }} } @else { @if (call.phase === 'ringing') { <i class="ei ei-bell"></i> {{ t('softphone.phases.ringing') }} } @else { <i class="ei ei-signal"></i> {{ t('softphone.phases.dialing') }} } }
     </div>
     <div class="sp-caller">{{ call.displayName }}</div>
     <button class="sp-btn sp-btn-hangup" style="margin-top:8px" (click)="hangup()">{{ t('softphone.hangUp') }}</button>
@@ -103,7 +101,7 @@ function fmtDuration(sec: number): string {
 
   <!-- Aktywna rozmowa -->
   <ng-container *ngIf="call.phase === 'active'">
-    <div class="sp-phase-label sp-label-active">🟢 {{ t('softphone.phases.active') }}</div>
+    <div class="sp-phase-label sp-label-active"><i class="ei ei-dot" style="color:#16A34A"></i> {{ t('softphone.phases.active') }}</div>
     <div class="sp-caller">{{ call.displayName }}</div>
 
     <div *ngIf="call.contextLoading"
@@ -116,7 +114,7 @@ function fmtDuration(sec: number): string {
                    border:1px solid #3BAA5D;border-radius:6px;padding:8px 10px;
                    margin-top:6px;cursor:pointer;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);font-size:12px;
                    font-weight:600;font-family:inherit">
-      🔗 {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
+      <i class="ei ei-link"></i> {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
     </button>
 
     <div class="sp-duration">{{ fmtDuration(call.durationSec) }}</div>
@@ -131,7 +129,7 @@ function fmtDuration(sec: number): string {
 
     <div class="sp-row" style="gap:8px;margin-top:8px">
       <button class="sp-btn sp-btn-mute" [class.muted]="call.muted" (click)="toggleMute()">
-        {{ call.muted ? '🔇 ' + t('softphone.muted') : '🎤 ' + t('softphone.mute') }}
+        @if (call.muted) { <i class="ei ei-volume-x"></i> {{ t('softphone.muted') }} } @else { <i class="ei ei-mic"></i> {{ t('softphone.mute') }} }
       </button>
       <button class="sp-btn sp-btn-hangup" (click)="hangup()">{{ t('softphone.hangUp') }}</button>
     </div>
@@ -139,7 +137,7 @@ function fmtDuration(sec: number): string {
 
   <!-- Formularz notatki po zakończeniu -->
   <ng-container *ngIf="call.phase === 'post-call'">
-    <div class="sp-phase-label">📞 {{ t('softphone.postCall.title') }}</div>
+    <div class="sp-phase-label"><i class="ei ei-phone"></i> {{ t('softphone.postCall.title') }}</div>
     <div class="sp-caller" style="font-size:14px">
       {{ call.displayName }}
       <span *ngIf="call.durationSec > 0" style="color:var(--gray-400);font-weight:400"> · {{ fmtDuration(call.durationSec) }}</span>

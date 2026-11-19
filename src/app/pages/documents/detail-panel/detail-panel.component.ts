@@ -23,6 +23,8 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { DEFAULT_LOCALE } from '../../../core/i18n/locales';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
+import { scrollToFirstError } from '../../../shared/forms/form-errors';
 
 // Built-in values have translated names; any other value comes from App
 // Settings and is its own display name.
@@ -49,7 +51,7 @@ interface SelectOption { value: string; label: string; }
 @Component({
   selector: 'wt-detail-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe, PaymentStatusBadgeComponent, InvoiceFieldsComponent, DocumentProjectLinksComponent, CustomFieldsComponent],
+  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe, PaymentStatusBadgeComponent, InvoiceFieldsComponent, DocumentProjectLinksComponent, CustomFieldsComponent, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -72,7 +74,7 @@ interface SelectOption { value: string; label: string; }
 
         <!-- Tabs -->
         <div style="padding:16px 24px 0">
-          <div class="tabs" style="margin-bottom:0">
+          <div class="tabs doc-tabs" style="margin-bottom:0">
             @for (tab of tabs; track tab.id) {
               <button class="tab-btn" [class.active]="activeTab === tab.id" (click)="activeTab = tab.id">
                 {{ t(tab.labelKey) }}<wt-tooltip [key]="tab.tooltip"></wt-tooltip>
@@ -323,7 +325,7 @@ interface SelectOption { value: string; label: string; }
                 <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
                   @for (p of linkedPartners(); track p.id) {
                     <div style="display:flex;align-items:center;gap:8px;background:var(--gray-50);border-radius:12px;padding:8px 12px">
-                      <span style="font-size:14px">🤝</span>
+                      <span style="font-size:14px"><i class="ei ei-handshake"></i></span>
                       <span style="font-size:14px;font-weight:600;flex:1">{{ p.company }}</span>
                       @if (doc._access === 'full') {
                         <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;line-height:1;display:inline-flex;padding:4px" (click)="unlinkPartner(p)" [title]="t('detail.partners.unlink')">✕</button>
@@ -362,7 +364,7 @@ interface SelectOption { value: string; label: string; }
 
             @if (doc.document_group_name) {
               <div style="background:var(--orange-pale);border-radius:12px;padding:12px 16px;font-size:12px;color:var(--orange-dark)">
-                📎 {{ t('detail.overview.packagePart') }} <strong>{{ doc.document_group_name }}</strong>
+                <i class="ei ei-paperclip"></i> {{ t('detail.overview.packagePart') }} <strong>{{ doc.document_group_name }}</strong>
               </div>
             }
           }
@@ -377,12 +379,12 @@ interface SelectOption { value: string; label: string; }
             @if (doc.blob_name) {
               @if (!isPdf) {
                 <div class="empty-state">
-                  <div class="empty-icon">📄</div>
+                  <div class="empty-icon"><i class="ei ei-file"></i></div>
                   <div class="empty-title">{{ t('detail.preview.unavailable') }}</div>
-                  <div style="font-size:12px;color:var(--gray-400);margin-top:6px;text-align:center;max-width:320px">
+                  <div style="font-size:12px;color:var(--gray-400);margin:6px auto 0;text-align:center;max-width:320px">
                     {{ t('detail.preview.unavailableFormat') }}<br>{{ t('detail.preview.unavailableHint') }}
                   </div>
-                  <button class="btn btn-g" style="margin-top:16px" (click)="downloadDoc()">⬇ {{ t('detail.preview.downloadFile') }}</button>
+                  <button class="btn btn-g" style="margin-top:16px" (click)="downloadDoc()"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> {{ t('detail.preview.downloadFile') }}</button>
                 </div>
               } @else {
                 <div style="background:var(--gray-100);border-radius:14px;overflow:hidden;height:600px;position:relative">
@@ -393,7 +395,7 @@ interface SelectOption { value: string; label: string; }
                   }
                   @if (previewError()) {
                     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--gray-500)">
-                      <span style="font-size:32px">⚠️</span>
+                      <span class="ico-tile ico-tile--warn"><i class="ei ei-warn"></i></span>
                       <span style="font-size:14px">{{ previewError() }}</span>
                     </div>
                   }
@@ -404,7 +406,7 @@ interface SelectOption { value: string; label: string; }
               }
             } @else {
               <div class="empty-state">
-                <div class="empty-icon">📎</div>
+                <div class="empty-icon"><i class="ei ei-paperclip"></i></div>
                 <div class="empty-title">{{ t('detail.preview.noFile') }}</div>
                 @if (doc._access === 'full') {
                   <label class="btn btn-p" style="margin-top:12px;cursor:pointer">
@@ -439,17 +441,17 @@ interface SelectOption { value: string; label: string; }
                     @if (v.blob_size_bytes) { · {{ formatSize(v.blob_size_bytes) }} }
                   </div>
                 </div>
-                <button class="btn btn-g btn-sm" (click)="downloadVersion(v)">⬇ {{ t('detail.actions.download') }}</button>
+                <button class="btn btn-g btn-sm" (click)="downloadVersion(v)"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> {{ t('detail.actions.download') }}</button>
               </div>
             }
             @empty {
-              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">{{ t('detail.versions.empty') }}</div></div>
+              <div class="empty-state"><div class="empty-icon"><i class="ei ei-clipboard"></i></div><div class="empty-title">{{ t('detail.versions.empty') }}</div></div>
             }
           }
 
           <!-- ATTACHMENTS -->
           @if (activeTab === 'attachments') {
-            @if (doc._access === 'full') {
+            @if (doc._access === 'full' && attachments().length) {
               <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
                 <label class="btn btn-p" style="cursor:pointer">
                   <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> {{ t('detail.attachments.add') }}
@@ -510,12 +512,12 @@ interface SelectOption { value: string; label: string; }
           <!-- HISTORY TIMELINE -->
           @if (activeTab === 'history') {
             @if (history().length === 0) {
-              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">{{ t('detail.history.empty') }}</div></div>
+              <div class="empty-state"><div class="empty-icon"><i class="ei ei-clipboard"></i></div><div class="empty-title">{{ t('detail.history.empty') }}</div></div>
             } @else {
               <ul class="tl">
                 @for (entry of history(); track entry.id) {
                   <li class="tli">
-                    <div class="tdot dot-w">{{ historyIcon(entry.action) }}</div>
+                    <div class="tdot dot-w"><i class="ei ei-{{ historyIcon(entry.action) }}"></i></div>
                     <div>
                       <div class="tlt">{{ historyLabel(entry) }}</div>
                       <div class="tlm">
@@ -541,7 +543,8 @@ interface SelectOption { value: string; label: string; }
                            [placeholder]="t('detail.workflow.userSearchPlaceholder')"
                            [(ngModel)]="wf.assignSearch"
                            (ngModelChange)="onUserSearch($event)"
-                           (blur)="hideDropdown()">
+                           (blur)="hideDropdown()"
+                           [class.fi-err]="wfSubmitted && !wf.assignTo">
                     @if (userDropdown().length > 0) {
                       <div class="udrop">
                         @for (u of userDropdown(); track u.id) {
@@ -556,6 +559,8 @@ interface SelectOption { value: string; label: string; }
                       <div style="margin-top:4px;font-size:12px;color: var(--orange-text);font-weight:500">
                         {{ t('detail.workflow.selected', { name: wf.assignToName }) }}
                       </div>
+                    } @else if (wfSubmitted) {
+                      <span class="ferr">{{ t('detail.workflow.errors.assignTo') }}</span>
                     }
                   </div>
                 </div>
@@ -577,15 +582,18 @@ interface SelectOption { value: string; label: string; }
                   <textarea class="fta" [placeholder]="t('detail.workflow.messagePlaceholder')" [(ngModel)]="wf.message"></textarea>
                 </div>
               </div>
-              <button class="btn btn-p" style="margin-top:20px" [disabled]="!wf.assignTo" (click)="assignTask()">
-                📨 {{ t('detail.workflow.assign') }}
-              </button>
+              <div style="margin-top:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+                <button class="btn btn-p" (click)="assignTask()">
+                  <i class="ei ei-mail"></i> {{ t('detail.workflow.assign') }}
+                </button>
+                @if (wfSubmitted) { <wt-form-error-summary [count]="wf.assignTo ? 0 : 1" /> }
+              </div>
             }
 
             @if (doc._access === 'full' && doc.blob_name && !isStoredInvoice) {
               <div class="sec-title" style="margin-top:24px">{{ t('detail.signus.sectionTitle') }}</div>
               <button class="btn btn-p" (click)="openSignus()">
-                ✍ {{ t('detail.signus.start') }}
+                <i class="ei ei-pencil"></i> {{ t('detail.signus.start') }}
               </button>
             }
 
@@ -609,13 +617,13 @@ interface SelectOption { value: string; label: string; }
         <!-- Panel Footer -->
         <div class="pf">
           @if (doc._access === 'full' && doc.blob_name) {
-            <button class="btn btn-g" (click)="downloadDoc()">⬇ {{ t('detail.actions.download') }}</button>
+            <button class="btn btn-g" (click)="downloadDoc()"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> {{ t('detail.actions.download') }}</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
-            <button class="btn btn-d" (click)="deleteDoc()">🗑 {{ t('detail.actions.delete') }}</button>
+            <button class="btn btn-d" (click)="deleteDoc()"><svg class="ic" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg> {{ t('detail.actions.delete') }}</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
-            <button class="btn btn-p" (click)="saveDoc()">💾 {{ t('detail.actions.saveChanges') }}</button>
+            <button class="btn btn-p" (click)="saveDoc()"><svg class="ic" viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5zM8 3v5h7V3M8 21v-7h8v7"/></svg> {{ t('detail.actions.saveChanges') }}</button>
           }
           <button class="btn btn-g" (click)="close.emit()">{{ 'actions.close' | transloco }}</button>
         </div>
@@ -627,7 +635,7 @@ interface SelectOption { value: string; label: string; }
       <div class="mol open" (click)="signusOpen = false">
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
-            <div class="moico" style="background:color-mix(in srgb, #F5F3FF var(--tint-mix), var(--surface));color:oklch(from #7e22ce max(l, var(--text-min-l)) c h)">✍</div>
+            <div class="moico" style="background:color-mix(in srgb, #F5F3FF var(--tint-mix), var(--surface));color:oklch(from #7e22ce max(l, var(--text-min-l)) c h)"><i class="ei ei-pencil"></i></div>
             <div>
               <div class="mot">{{ t('detail.signus.modalTitle') }}</div>
               <div class="mos">{{ doc.doc_number }} · {{ doc.name }}</div>
@@ -636,15 +644,18 @@ interface SelectOption { value: string; label: string; }
           <div style="padding:24px">
             <div class="fg" style="margin-bottom:16px">
               <label class="fl">{{ t('detail.signus.signatories') }} <span class="req">*</span></label>
-              <textarea class="fta" style="min-height:60px" [placeholder]="t('detail.signus.emailsPlaceholder')" [(ngModel)]="signusEmails"></textarea>
+              <textarea class="fta" style="min-height:60px" [placeholder]="t('detail.signus.emailsPlaceholder')" [(ngModel)]="signusEmails"
+                        [class.fi-err]="signusSubmitted && !signusEmails.trim()"></textarea>
+              @if (signusSubmitted && !signusEmails.trim()) { <span class="ferr">{{ t('detail.signus.errors.emails') }}</span> }
             </div>
             <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;font-size:12px;color:var(--gray-500)">
-              ℹ {{ t('detail.signus.info') }}
+              <i class="ei ei-info"></i> {{ t('detail.signus.info') }}
             </div>
           </div>
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:8px;justify-content:flex-end;background:var(--gray-50)">
+            @if (signusSubmitted) { <wt-form-error-summary [count]="signusEmails.trim() ? 0 : 1" /> }
             <button class="btn btn-g" (click)="signusOpen = false">{{ 'actions.close' | transloco }}</button>
-            <button class="btn btn-p" [disabled]="!signusEmails.trim()" (click)="confirmSignus()">{{ t('detail.signus.send') }} →</button>
+            <button class="btn btn-p" (click)="confirmSignus()">{{ t('detail.signus.send') }} →</button>
           </div>
         </div>
       </div>
@@ -665,6 +676,7 @@ interface SelectOption { value: string; label: string; }
     .pc:hover { background: var(--gray-100); color: var(--gray-700); }
     .pb { padding: 24px; flex: 1; }
     .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
+    @media (max-width: 767px) { .pf { flex-wrap: wrap; padding: 12px 16px; } }
     .mol { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); animation: fadeIn .15s ease; }
     .mo { background: var(--surface); border-radius: 12px; width: 460px; max-width: 95vw; box-shadow: var(--shadow-lg); overflow: hidden; animation: scaleIn .2s ease; }
     .moh { padding: 20px 24px 16px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; }
@@ -833,6 +845,8 @@ export class DetailPanelComponent implements OnChanges {
   partnerDropdown      = signal<any[]>([]);
   private partnerSearchTimer: ReturnType<typeof setTimeout> | null = null;
   signusEmails = '';
+  signusSubmitted = false;
+  wfSubmitted = false;
 
   wf = { assignTo: '', assignToName: '', assignSearch: '', taskType: 'read', message: '', dueDate: '' };
   userDropdown = signal<User[]>([]);
@@ -1063,7 +1077,7 @@ export class DetailPanelComponent implements OnChanges {
     this.docSvc.uploadAttachment(this.doc.id, file, file.name).subscribe({
       next: att => {
         this.attachments.update(list => [...list, att]);
-        this.attachmentEvents.update(evts => [{icon:'📎', title: this.transloco.translate('documents.detail.history.actions.attachment_uploaded', { name: file.name }), date: new Date().toISOString()}, ...evts]);
+        this.attachmentEvents.update(evts => [{icon:'paperclip', title: this.transloco.translate('documents.detail.history.actions.attachment_uploaded', { name: file.name }), date: new Date().toISOString()}, ...evts]);
         this.toast.success(this.transloco.translate('documents.detail.attachments.uploaded'));
         this.reloadHistory();
       },
@@ -1082,7 +1096,7 @@ export class DetailPanelComponent implements OnChanges {
       next: () => {
         this.toast.success(this.transloco.translate('documents.detail.versions.uploaded'));
         this.reloadHistory();
-        this.attachmentEvents.update(evts => [{icon:'📎', title: this.transloco.translate('documents.detail.attachments.events.newVersion', { name: attName }), date: new Date().toISOString()}, ...evts]);
+        this.attachmentEvents.update(evts => [{icon:'paperclip', title: this.transloco.translate('documents.detail.attachments.events.newVersion', { name: attName }), date: new Date().toISOString()}, ...evts]);
         this.attachmentsLoaded = false;
         this.docSvc.getAttachments(this.doc.id).subscribe(list => { this.attachments.set(list); this.attachmentsLoaded = true; });
       },
@@ -1106,7 +1120,7 @@ export class DetailPanelComponent implements OnChanges {
     const attName = this.attachments().find((a:any) => a.id === attId)?.name ?? attId;
     this.docSvc.deleteAttachment(this.doc.id, attId).subscribe(() => {
       this.attachments.update(list => list.filter((a: any) => a.id !== attId));
-      this.attachmentEvents.update(evts => [{icon:'🗑', title: this.transloco.translate('documents.detail.attachments.events.deleted', { name: attName }), date: new Date().toISOString()}, ...evts]);
+      this.attachmentEvents.update(evts => [{icon:'trash', title: this.transloco.translate('documents.detail.attachments.events.deleted', { name: attName }), date: new Date().toISOString()}, ...evts]);
       this.toast.success(this.transloco.translate('documents.detail.attachments.deleted'));
       this.reloadHistory();
     });
@@ -1114,27 +1128,27 @@ export class DetailPanelComponent implements OnChanges {
 
   historyIcon(action: string): string {
     const map: Record<string,string> = {
-      document_created:            '📄',
-      document_updated:            '✏️',
-      document_deleted:            '🗑',
-      document_downloaded:         '⬇️',
-      metadata_updated:            '✏️',
-      tag_added:                   '🏷️',
-      tag_removed:                 '🏷️',
-      tag_updated:                 '🏷️',
-      status_changed:              '🔄',
-      version_uploaded:            '📤',
-      workflow_task_created:       '📝',
-      workflow_task_completed:     '✅',
-      workflow_task_cancelled:     '❌',
-      signing_initiated:           '✍️',
-      signing_completed:           '✅',
-      signing_failed:              '❌',
-      attachment_uploaded:         '📎',
-      attachment_version_uploaded: '📎',
-      attachment_deleted:          '🗑',
+      document_created:            'file',
+      document_updated:            'pencil',
+      document_deleted:            'trash',
+      document_downloaded:         'download',
+      metadata_updated:            'pencil',
+      tag_added:                   'tag',
+      tag_removed:                 'tag',
+      tag_updated:                 'tag',
+      status_changed:              'refresh',
+      version_uploaded:            'send',
+      workflow_task_created:       'note',
+      workflow_task_completed:     'check-circle',
+      workflow_task_cancelled:     'x-circle',
+      signing_initiated:           'pencil',
+      signing_completed:           'check-circle',
+      signing_failed:              'x-circle',
+      attachment_uploaded:         'paperclip',
+      attachment_version_uploaded: 'paperclip',
+      attachment_deleted:          'trash',
     };
-    return map[action] ?? '📋';
+    return map[action] ?? 'clipboard';
   }
 
   historyLabel(entry: any): string {
@@ -1232,6 +1246,12 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   assignTask(): void {
+    if (!this.wf.assignTo) {
+      this.wfSubmitted = true;
+      scrollToFirstError();
+      return;
+    }
+    this.wfSubmitted = false;
     this.wfSvc.assignTask(this.doc.id, {
       assigned_to: this.wf.assignTo,
       task_type:   this.wf.taskType,
@@ -1256,9 +1276,13 @@ export class DetailPanelComponent implements OnChanges {
     });
   }
 
-  openSignus(): void { this.signusOpen = true; this.signusEmails = ''; }
+  openSignus(): void { this.signusOpen = true; this.signusEmails = ''; this.signusSubmitted = false; }
 
   confirmSignus(): void {
+    if (!this.signusEmails.trim()) {
+      this.signusSubmitted = true;
+      return;
+    }
     const signatories = this.signusEmails.split(',').map(e => ({ email: e.trim() })).filter(s => s.email);
     this.docSvc.initiateSigning(this.doc.id, signatories).subscribe({
       next: (res: any) => {

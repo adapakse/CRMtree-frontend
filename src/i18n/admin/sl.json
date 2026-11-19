@@ -27,6 +27,13 @@
       "subtitle": "Trajno brisanje dokumenta, leada ali partnerja skupaj z vsemi povezanimi podatki in dnevniki.",
       "title": "Brisanje zapisov"
     },
+    "errors": {
+      "confirmPhrase": "Vnesite natanko »{phrase}« za potrditev",
+      "selectDoc": "Poiščite dokument in ga kliknite na seznamu",
+      "selectFile": "Izberite datoteko JSON z izvoženimi nastavitvami",
+      "selectLead": "Poiščite lead in ga kliknite na seznamu",
+      "selectPartner": "Poiščite partnerja in ga kliknite na seznamu"
+    },
     "purge": {
       "confirm": "Potrdi",
       "docs": {
@@ -705,6 +712,9 @@
       "body": "Res želite izbrisati žeton PBX za {name}? Uporabnik ne bo mogel uporabljati softphona.",
       "title": "Izbriši žeton PBX"
     },
+    "errors": {
+      "token": "Prilepite Personal Access Token (PAT) iz telefonske centrale"
+    },
     "loadError": "Napaka pri nalaganju podatkov.",
     "loading": "Nalaganje…",
     "modal": {
@@ -758,6 +768,9 @@
       "detected": "Prepoznan: {provider}",
       "detectedShort": "prepoznan po ključu",
       "detecting": "Prepoznavam ponudnika…",
+      "errors": {
+        "key": "Prilepite ključ API ponudnika (npr. sk-…) ali izberite shranjen ključ"
+      },
       "intro": "Vsaka funkcija ima svojega ponudnika, ključ in model — obogatitev lahko teče pri enem, analiza klicev pa pri drugem. Prilepite ključ, ponudnika prepoznamo sami. Shranjevanje preveri nastavitev pri ponudniku; ključ je šifriran in ni nikoli več prikazan.",
       "loading": "Nalaganje konfiguracije UI…",
       "model": "Model",
@@ -1193,6 +1206,9 @@
       "deleteConfirm": "Ali izbrišem polje „{name}“?",
       "deleteTooltip": "Izbriši polje — mogoče le, dokler noben zapis nima vrednosti",
       "empty": "Ta obrazec nima dodatnih polj.",
+      "errors": {
+        "name": "Vnesite ime polja, npr. Številka stranke"
+      },
       "hint": "Polja, ki jih za ta obrazec določite sami. Vrste polja pozneje ni mogoče spremeniti — če jo želite spremeniti, polje izklopite in dodajte novo. Izklopljeno polje izgine z obrazca, že vnesene vrednosti pa ostanejo.",
       "newNamePlaceholder": "Ime novega polja",
       "optionsPlaceholder": "Vrednosti, ločene z vejico",
@@ -1291,6 +1307,10 @@
       "displayNamePlaceholder": "npr. Podpora strankam",
       "documentCount": "{count, plural, one {# dokument} two {# dokumenta} few {# dokumenti} other {# dokumentov}}",
       "empty": "Ni skupin. Dodajte prvo skupino zgoraj ali zaženite migracijo 0127.",
+      "errors": {
+        "displayName": "Vnesite prikazno ime, npr. Prodajna ekipa",
+        "technicalName": "Vnesite tehnično ime, npr. sales_team"
+      },
       "inactive": "Neaktivna",
       "intro": "— upravljajte skupine, ki jim lahko dodelite uporabnike. Skupine nadzorujejo dostop do dokumentov. Skupine z dodeljenimi uporabniki ali dokumenti ni mogoče izbrisati.",
       "memberCount": "{count, plural, one {# uporabnik} two {# uporabnika} few {# uporabniki} other {# uporabnikov}}",
@@ -1332,6 +1352,10 @@
         "definitionHint": "Na podlagi tega opisa sistem oceni, ali podjetje izpolnjuje ta signal.",
         "definitionPlaceholder": "Opišite, po čem je mogoče prepoznati, da podjetje izpolnjuje ta pogoj — konkretne besede/fraze na spletni strani, razdelki, delovna mesta.",
         "editTitle": "Uredi signal",
+        "errors": {
+          "definition": "Opišite, po čem naj AI prepozna ta signal",
+          "name": "Vnesite ime signala, npr. Podjetje ima več kot 50 zaposlenih"
+        },
         "name": "Ime signala",
         "namePlaceholder": "npr. Lasten vozni park",
         "newTitle": "Nov signal",
@@ -1456,6 +1480,9 @@
       "codeWrittenHint": "To ni korak lijaka, ampak stanje, ki ga aplikacija nastavi sama (arhiviranje, pretvorba v partnerja), zato ga ni mogoče izbrisati. Preimenovati ga je mogoče.",
       "confirmDelete": "Ali želite odstraniti fazo »{name}«?",
       "confirmDeleteWithLeads": "Ali želite odstraniti fazo »{name}«?\n\n{count} potencialnih strank na njej se bo premaknilo v »{target}«.",
+      "errors": {
+        "name": "Vnesite ime nove faze, npr. Pogajanja"
+      },
       "intro": "Lastna imena faz lijaka — preimenujte obstoječe, dodajte korak ali odstranite nepotrebnega. Koda faze ostane enaka, zato se novo ime pokaže po vsej aplikaciji, poročila in podatki o potencialnih strankah pa ostanejo nedotaknjeni. Prazno ime se vrne na vgrajeno.",
       "kinds": {
         "archived": "arhiv",
@@ -1633,6 +1660,9 @@
       "saved": "Skupina posodobljena",
       "title": "Urejanje skupine"
     },
+    "errors": {
+      "internalName": "Vnesite interno ime, npr. prodaja"
+    },
     "fields": {
       "description": "Opis",
       "displayName": "Prikazno ime",
@@ -1724,11 +1754,18 @@
       "updated": "Uporabnik posodobljen"
     },
     "empty": "Ni najdenih uporabnikov",
+    "errors": {
+      "chooseGroup": "Izberite skupino s seznama"
+    },
     "featureAccess": {
       "callAnalysis": "Analizator klicev",
       "callAnalysisDisabled": "Dostop do Analizatorja klicev onemogočen",
       "callAnalysisEnabled": "Dostop do Analizatorja klicev omogočen",
       "callAnalysisHint": "Analiza zapiskov klicev z UI, ocena in follow-up",
+      "emailCampaigns": "E-poštne kampanje",
+      "emailCampaignsDisabled": "Dostop do E-poštnih kampanj izklopljen",
+      "emailCampaignsEnabled": "Dostop do E-poštnih kampanj vklopljen",
+      "emailCampaignsHint": "E-poštne kampanje za partnerje in leade prek SendGrida",
       "prospects": "Potencialne stranke",
       "prospectsDisabled": "Dostop do Potencialnih strank izklopljen",
       "prospectsEnabled": "Dostop do Potencialnih strank vklopljen",

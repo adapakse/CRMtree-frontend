@@ -21,6 +21,10 @@
       "title": "Aspetto"
     },
     "delete": "Elimina",
+    "errors": {
+      "pbxToken": "Incolla il tuo Personal Access Token (PAT) del centralino",
+      "templateName": "Inserisci il nome del modello, ad es. Offerta standard"
+    },
     "manual": {
       "hint": "Manuale interattivo di CRMtree con schermate. Si apre in una nuova scheda.",
       "open": "Apri il manuale",

@@ -16,6 +16,10 @@
   "login": {
     "email": "Email",
     "emailPlaceholder": "mario@azienda.it",
+    "errors": {
+      "email": "Inserisci il tuo indirizzo e-mail, ad es. mario.rossi@azienda.it",
+      "password": "Inserisci la password"
+    },
     "failed": "Errore di accesso",
     "hidePassword": "Nascondi",
     "or": "oppure",

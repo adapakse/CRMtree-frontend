@@ -232,6 +232,10 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a class="sub" href="#p1-calls-followup">Follow-ups und CRM-Aufgaben</a>
 <a class="sub" href="#p1-calls-example">Beispiele</a>
 <a class="sub" href="#p1-calls-faq">Fragen und Antworten</a>
+<a href="#p1-campaigns">E-Mail-Kampagnen</a>
+<a class="sub" href="#p1-campaigns-new">Neue Kampagne</a>
+<a class="sub" href="#p1-campaigns-results">Kampagnenergebnisse</a>
+<a class="sub" href="#p1-campaigns-consents">Einwilligungen pro Person auf der Karte</a>
 <div class="part">Teil 2 · Administrator</div>
 <a href="#p2-start">So funktioniert es</a>
 <a class="sub" href="#p2-access">Wo Sie die Einstellungen finden</a>
@@ -265,6 +269,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a href="#p2-projects">Projekteinstellungen</a>
 <a class="sub" href="#p2-ksef">KSeF – Eingangsrechnungen</a>
 <a href="#p2-pbx">Telefonie und Gesprächsanalyse</a>
+<a href="#p2-sendgrid">E-Mail-Kampagnen: SendGrid-Konto</a>
 <a href="#p2-import">CSV-Import und -Export</a>
 <a href="#p2-data">Datenverwaltung</a>
 <a href="#p2-logs">Audit-Protokolle</a>
@@ -436,9 +441,9 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="webfig"><img loading="lazy" src="img/en_w04_leads_timeline.jpg?v=20261113" width="1440" height="900" alt="Zeitachsen-Panel"><figcaption>Das Panel „Aktivitätenkalender“: Piotrs Plan für den 2. November.</figcaption></figure>
 
 <h4 id="p1-leads-mobile"><span class="tag mob">MOBILE</span>Leads auf dem Handy</h4>
-<p>Die Registerkarte <b>„Leads“</b> hat ein Feld <b>„Firma, Person, Telefon suchen …“</b> und Chips für <b>„Heiß“</b> und jede Phase (<b>„Neu“</b>, <b>„Qualifizierung“</b>, <b>„Präsentation“</b> und so weiter). Zuletzt aktualisierte Leads stehen oben. Jede Kachel zeigt die nächste Aktivität, zum Beispiel <b>„Überfällig: …“</b> in Rot, gefolgt von Kontakt, Wert und Wahrscheinlichkeit. Das Trichtersymbol in der oberen rechten Ecke öffnet die <b>„Filter“</b>: <b>„Phase“</b> (einschließlich Archiviert), <b>„Quelle“</b>, Schalter für <b>„Heiß“</b>, <b>„Nur zurückgestellte“</b> und <b>„Nur meine“</b> sowie für Vertriebsleiter <b>„Vertriebsmitarbeiter“</b>. Abschließen mit <b>„Löschen“</b> oder <b>„Anwenden“</b>.</p>
+<p>Die Registerkarte <b>„Leads“</b> hat ein Feld <b>„Firma, Person, Telefon suchen …“</b> und Chips für <b>„Heiß“</b> und jede Phase (<b>„Neu“</b>, <b>„Qualifizierung“</b>, <b>„Präsentation“</b> und so weiter). Zuletzt aktualisierte Leads stehen oben. Die erste Zeile einer Kachel zeigt Firma und Wert (zum Beispiel <b>„250.000 zł“</b>), die zweite den Kontakt mit der Wahrscheinlichkeit, rechts die Phase. Eine dritte Zeile erscheint nur bei einer terminierten Aktivität: eine überfällige als rotes Etikett <b>„Überfällig · 10. Nov. · …“</b>, die nächste geplante in Grau. Eine Flamme neben dem Namen kennzeichnet einen heißen Lead. Das Trichtersymbol in der oberen rechten Ecke öffnet die <b>„Filter“</b>: <b>„Phase“</b> (einschließlich Archiviert), <b>„Quelle“</b>, Schalter für <b>„Heiß“</b>, <b>„Nur zurückgestellte“</b> und <b>„Nur meine“</b> sowie für Vertriebsleiter <b>„Vertriebsmitarbeiter“</b>. Abschließen mit <b>„Löschen“</b> oder <b>„Anwenden“</b>.</p>
 <div class="phones">
-<figure class="phone"><img loading="lazy" src="img/en_t13_leads_list.jpg?v=20261113" width="540" height="1083" alt="Lead-Liste auf dem Handy"><figcaption>„Leads“: Suche, Phasen-Chips und Lead-Kacheln.</figcaption></figure>
+<figure class="phone"><img loading="lazy" src="img/en_t13_leads_list.jpg?v=20261116d" width="540" height="1083" alt="Lead-Liste auf dem Handy"><figcaption>„Leads“: Suche, Phasen-Chips und Lead-Kacheln.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t14_leads_filters.jpg?v=20261113" width="540" height="1083" alt="Lead-Filter"><figcaption>„Filter“: Phase, Quelle, heiß, zurückgestellt, nur meine.</figcaption></figure>
 </div>
 </section>
@@ -736,7 +741,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„Zeitachse“</b> und <b>„Kalender“</b>: dieselben Aufgaben auf einer Zeitachse und in einem Kalender.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_w10_onboarding.jpg?v=20261113" width="1440" height="900" alt="Partner-Onboarding-Board"><figcaption>Fala Media Demo bei „Vertragsunterzeichnung“ (Schritt 1/4), noch keine Aufgaben, „Freischaltung“ verfügbar.</figcaption></figure>
-<p>Die Schaltfläche <b>„Freischaltung“</b> wird verfügbar, sobald alle Aufgaben des Partners erledigt sind (oder wenn es keine gibt). Bis dahin zeigt sie ein Vorhängeschloss und die Zahl der erledigten Aufgaben. Nach Ihrer Bestätigung wird der Partner „Aktiv“ und wechselt ins Partnerregister; der Link „Partnerprofil“ öffnet seine Karte.</p>
+<p>Die Schaltfläche <b>„Freischaltung“</b> wird verfügbar, sobald alle Aufgaben des Partners erledigt sind (oder wenn es keine gibt). Bis dahin zeigt sie ein Vorhängeschloss; ein Klick zeigt, wie viele Aufgaben noch offen sind. Nach Ihrer Bestätigung wird der Partner „Aktiv“ und wechselt ins Partnerregister; der Link „Partnerprofil“ öffnet seine Karte.</p>
+<p><b>Zurück in die Pipeline.</b> Ein Vertriebsleiter oder Administrator kann einen Partner aus dem Onboarding zurückziehen, wenn es zu früh gestartet wurde oder das Unternehmen abgesprungen ist: Schaltfläche <b>„🔄 Rückzug“</b> auf dem Board (oder <b>„Aus dem Onboarding in die Pipeline zurückziehen“</b> auf der Partnerkarte), <b>„Pipeline-Phase“</b> wählen und <b>„Zurückziehen bestätigen“</b>. Der Partner und seine Onboarding-Aufgaben werden gelöscht; der Lead kehrt in die gewählte Phase zurück und kann später erneut ins Onboarding gehen.</p>
 
 <h4 id="p1-onboarding-card">Onboarding auf der Partnerkarte</h4>
 <p>Ein Partner im Onboarding hat oben auf seiner Karte ein Panel mit den vier Schritten, die jeweils zeigen, wie viele ihrer Aufgaben erledigt sind. Klicken Sie auf einen Schritt, um seine Aufgaben zu sehen. Haken Sie eine Aufgabe mit dem Kreis daneben ab; CRMtree hält fest, wer sie wann erledigt hat. Verspätete Aufgaben erhalten ein rotes Etikett „Überfällig“.</p>
@@ -1419,6 +1425,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>Fügen Sie alle optionalen Spalten hinzu, die Sie haben: <code>www</code>, <code>krs</code>, Name, Branche, Mitarbeiterzahl, Stadt, Region, PKD-Code und Angaben zum Entscheider (Name, Position, Abteilung, Telefon, E-Mail). Eine Spalte <code>www</code> macht das Finden der Website schneller und günstiger.</li>
 <li>Klicken Sie auf <b>„CSV-Datei auswählen“</b>, dann auf <b>„Importieren“</b>.</li>
 <li>Prüfen Sie die Zusammenfassung: „Hinzugefügt“, „Übersprungen (Duplikate)“, „Fehler“, „Zeilen insgesamt“. Zeilen mit einer ungültigen Steuernummer (sie muss 10 Ziffern haben) werden übersprungen und unter „Fehlerdetails“ aufgeführt.</li>
+<li>Firmen, die im CRM bereits als Lead oder Partner geführt werden (gleiche NIP), werden übersprungen: Sie erscheinen unter <b>„Übersprungen (bereits im CRM)“</b> mit einem Link zu ihrer Karte.</li>
 </ol>
 <div class="callout"><b>Duplikate</b>Ein Unternehmen mit derselben Steuernummer wird nie zweimal angelegt. Stattdessen aktualisiert der Import den vorhandenen Datensatz: Ausgefüllte Zellen überschreiben die alten Werte, leere Zellen lassen sie unverändert. Die Datei kann UTF-8 oder Windows-1250 sein, durch Semikolons oder Kommas getrennt, bis 10 MB.</div>
 
@@ -1619,6 +1626,28 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p><b>Ich habe Notizen importiert, aber nichts ist passiert.</b> Klicken Sie nach dem Import auf „Analysieren (N)“. Der Import allein startet die Analyse nicht.</p>
 <p><b>Eine Zeile zeigt „Fehler“.</b> Erweitern Sie sie, um den Grund zu sehen. Liegt er in der KI-Einrichtung, informieren Sie den Administrator und nutzen Sie dann „Neu analysieren“.</p>
 <p><b>Gibt es die Analyse in der mobilen App?</b> Nein. Die Aufgaben „Follow-up telefoniczny“ erscheinen jedoch zusammen mit Ihren anderen Aufgaben auf Ihrem Handy.</p>
+</section>
+
+<section class="ch" id="p1-campaigns">
+<h3>E-Mail-Kampagnen</h3>
+<p>Das Modul sendet E-Mails an Kontaktpersonen von Partnern und Leads mit der erforderlichen Einwilligung. Der Versand läuft über das SendGrid-Konto Ihrer Firma, die Vorlagen werden in SendGrid (Dynamic Templates) gestaltet. Den Menüpunkt CRM → <b>„E-Mail-Kampagnen“</b> sehen Sie, wenn ein Administrator Ihnen den Zugriff <b>„E-Mail-Kampagnen“</b> gegeben hat.</p>
+<p>Der Bildschirm hat die Tabs <b>„Kampagnen“</b>, <b>„Vorlagen“</b> und <b>„Ergebnisse“</b> (ein Administrator sieht auch <b>„SendGrid-Einstellungen“</b>). Die Kampagnenliste hat Filter, Sortierung, den Status als Schaltflächen (<b>„Entwürfe“</b>, <b>„Versendet“</b>…) und die Aktionen <b>„Duplizieren“</b>, <b>„Archivieren“</b>, <b>„Wiederherstellen“</b>. Ist SendGrid nicht konfiguriert, erscheint über der Liste <b>„SendGrid ist nicht konfiguriert“</b>.</p>
+
+<h4 id="p1-campaigns-new">Neue Kampagne</h4>
+<ol class="steps">
+<li>Klicken Sie auf <b>„Neue Kampagne“</b> und geben Sie einen Namen ein.</li>
+<li><b>„Welche E-Mail senden wir?“</b> — wählen Sie eine SendGrid-Vorlage. <b>„Ansehen, wie die E-Mail aussieht“</b> zeigt eine Vorschau.</li>
+<li><b>„Wer soll sie erhalten?“</b> — wählen Sie Gruppen (z. B. <b>„Alle mit Einwilligung“</b>) oder laden Sie eine <b>„Liste aus einer CSV-Datei“</b> hoch. <b>„Liste eingrenzen“</b> fügt Filter hinzu: Partnerstatus, Lead-Phase, Vertriebsmitarbeiter, Branche, Tags, letzter Kontakt.</li>
+<li>In <b>„Versandeinstellungen“</b> legen Sie den Abstand zwischen E-Mails an dieselbe Firma und den Auftraggeber fest.</li>
+<li>Rechts sehen Sie live, wie viele Personen die E-Mail erhalten und warum manche ausgelassen werden (keine Einwilligung, abgemeldet, unzustellbare Adresse…).</li>
+<li><b>„Entwurf speichern“</b>, dann <b>„Test an mich senden“</b>. Erst nach dem Test funktioniert <b>„Über SendGrid senden“</b>.</li>
+</ol>
+
+<h4 id="p1-campaigns-results">Kampagnenergebnisse</h4>
+<p>Der Tab <b>„Ergebnisse“</b> zeigt Zustellungen, Öffnungen, Klicks, Abmeldungen und Adressprobleme — die Zahlen kommen von SendGrid. Die Tabelle <b>„Firmen, die geklickt haben“</b> führt zur Karte des Leads oder Partners. Auf der Karte erscheint der Versand als Aktivität <b>„E-Mail-Kampagne“</b>. Den Bericht laden Sie mit <b>„Bericht herunterladen (.xlsx)“</b> herunter.</p>
+
+<h4 id="p1-campaigns-consents">Einwilligungen pro Person auf der Karte</h4>
+<p>Im Abschnitt <b>„Marketing-Einwilligungen“</b> der Lead- und Partnerkarte hat jede Kontaktperson mit E-Mail-Adresse eine eigene Einwilligung: <b>„Stimmt zu“</b>, <b>„Stimmt nicht zu“</b> oder <b>„Unbekannt“</b>. Bei „Stimmt zu“ muss notiert werden, wie die Einwilligung eingeholt wurde. Kampagnen nutzen nur diese Einwilligungen. Eine Abmeldung oder Spam-Meldung in SendGrid entzieht die Einwilligung automatisch. Darunter bleibt <b>„Firmeneinwilligung (alt)“</b> — Kampagnen verwenden sie nicht.</p>
 </section>
 
 <h2 class="part-title" id="p2"><span class="num">2</span> Administrator</h2>
@@ -1985,6 +2014,19 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="example"><span class="lbl">BEISPIEL · NEUER VERTRIEBSMITARBEITER</span>
 <p>Ein neuer Vertriebsmitarbeiter kommt hinzu, und der Administrator legt ein Konto mit der Rolle „Vertriebsmitarbeiter“ an.</p>
 <p class="res">Die neue Person hat keinen Menüpunkt „Gesprächsanalyse“, bis der Administrator auf ihrer Karte „Gesprächsanalyse“ ankreuzt. In den Demodaten haben Anna, Piotr und Ewa Zugriff, Tomasz nicht.</p></div>
+</section>
+
+<section class="ch" id="p2-sendgrid">
+<h3>E-Mail-Kampagnen: SendGrid-Konto</h3>
+<p>Jede Organisation sendet über ihr eigenes SendGrid-Konto. CRMtree schaltet das Modul für Ihre Organisation ein, der Administrator gibt Personen Zugriff: Benutzerkarte → <b>„Funktionszugriff“</b> → <b>„E-Mail-Kampagnen“</b>. Ein Administrator hat immer Zugriff.</p>
+<ol class="steps">
+<li>Öffnen Sie <b>„E-Mail-Kampagnen“</b> → <b>„SendGrid-Einstellungen“</b>.</li>
+<li>Fügen Sie den <b>„API-Schlüssel“</b> aus SendGrid ein (Settings → API Keys). Nach dem Speichern sehen Sie nur „gespeichert, endet auf ••••1234“ sowie <b>„Ändern“</b> und <b>„Entfernen“</b>.</li>
+<li>Füllen Sie <b>„Absenderadresse“</b> (in SendGrid verifiziert), <b>„Absendername“</b>, optional <b>„Reply-to“</b> und die <b>„ID der Abmeldegruppe (ASM)“</b> aus.</li>
+<li>Wählen Sie unter <b>„Für Kampagnen erforderliche Einwilligung“</b> eine Einwilligungsart oder lassen Sie „Automatisch“.</li>
+<li>Kopieren Sie die <b>„Webhook-Adresse“</b>, fügen Sie sie in SendGrid → Settings → Mail Settings → Event Webhook hinzu, wählen Sie die Ereignisse und aktivieren Sie Signed Event Webhook. Fügen Sie den <b>„Öffentlichen Webhook-Schlüssel“</b> ein.</li>
+<li>Klicken Sie auf <b>„Speichern“</b> und dann auf <b>„Verbindung prüfen“</b> — Sie sehen die Anzahl der Vorlagen in SendGrid.</li>
+</ol>
 </section>
 
 <section class="ch" id="p2-import">

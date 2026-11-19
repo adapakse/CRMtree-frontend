@@ -18,7 +18,7 @@ type CallState = 'dialing' | 'connected' | 'ended';
   <div class="call-card">
     <!-- Dialing -->
     <ng-container *ngIf="state === 'dialing'">
-      <div class="call-icon">📞</div>
+      <div class="call-icon"><i class="ei ei-phone"></i></div>
       <div class="call-label">{{ t('callSimulator.connecting') }}</div>
       <div class="call-number">{{phoneNumber}}</div>
       <div class="call-dots"><span></span><span></span><span></span></div>
@@ -27,7 +27,7 @@ type CallState = 'dialing' | 'connected' | 'ended';
 
     <!-- Connected -->
     <ng-container *ngIf="state === 'connected'">
-      <div class="call-icon call-icon-active">📞</div>
+      <div class="call-icon call-icon-active"><i class="ei ei-phone"></i></div>
       <div class="call-label call-connected">{{ t('callSimulator.connected') }}</div>
       <div class="call-number">{{phoneNumber}}</div>
       <div class="call-timer">{{timerLabel}}</div>
@@ -36,12 +36,12 @@ type CallState = 'dialing' | 'connected' | 'ended';
 
     <!-- Ended -->
     <ng-container *ngIf="state === 'ended'">
-      <div class="call-icon">📵</div>
+      <div class="call-icon"><i class="ei ei-phone"></i></div>
       <div class="call-label">{{ t('callSimulator.ended') }}</div>
       <div class="call-number">{{phoneNumber}}</div>
       <div class="call-timer">{{ t('callSimulator.duration', { time: timerLabel }) }}</div>
       <div *ngIf="saving" class="call-saving">{{ t('callSimulator.savingNote') }}</div>
-      <div *ngIf="saved" class="call-saved">✅ {{ t('callSimulator.noteSaved') }}</div>
+      <div *ngIf="saved" class="call-saved"><i class="ei ei-check-circle"></i> {{ t('callSimulator.noteSaved') }}</div>
     </ng-container>
   </div>
 </div>
@@ -60,7 +60,7 @@ type CallState = 'dialing' | 'connected' | 'ended';
   display: flex; flex-direction: column; align-items: center; gap: 10px;
   box-shadow: 0 14px 39px rgba(0,0,0,0.325);
 }
-.call-icon { font-size: 48px; margin-bottom: 4px; }
+.call-icon { width: 48px; height: 48px; border-radius: 12px; font-size: 24px; margin-bottom: 4px; display: inline-flex; align-items: center; justify-content: center; background: var(--orange-pale); color: var(--orange-text); }
 .call-icon-active { animation: ring .8s ease-in-out infinite alternate; }
 @keyframes ring { from { transform: rotate(-10deg); } to { transform: rotate(10deg); } }
 .call-label { font-size: 14px; color: var(--gray-400); letter-spacing: .5px; }

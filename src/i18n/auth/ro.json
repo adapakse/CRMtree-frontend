@@ -16,6 +16,10 @@
   "login": {
     "email": "E-mail",
     "emailPlaceholder": "ion@firma.ro",
+    "errors": {
+      "email": "Introduceți adresa de e-mail, de ex. ion.popescu@firma.ro",
+      "password": "Introduceți parola"
+    },
     "failed": "Eroare la conectare",
     "hidePassword": "Ascundere",
     "or": "sau",

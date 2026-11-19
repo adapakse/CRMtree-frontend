@@ -4,6 +4,10 @@ export const PROJECT_FINANCE_STYLES = `
   .block { padding:18px 20px; display:flex; flex-direction:column; gap:12px; }
   .block-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .block-head .sec-title { flex:1; margin:0; }
+  @media (max-width: 767px) {
+    .block-head .sec-title { flex:1 1 100%; }
+    .block-head > select.filter { flex:1 1 100%; max-width:100%; min-width:0; }
+  }
   .hint { margin:0; font-size:12px; color:var(--gray-500); line-height:1.5; }
   .amount { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
   table.grid th.amount { text-align:right; }

@@ -50,6 +50,14 @@
     "uploadFailed": "Failed to upload file: {name}.",
     "uploading": "Uploading…"
   },
+  "form": {
+    "errors": {
+      "closeComment": "Enter a comment on what was done, e.g. “Offer sent”",
+      "title": "Enter a title"
+    },
+    "fixErrors": "Fix the fields marked in red ({count})",
+    "noChanges": "No changes to save"
+  },
   "httpErrors": {
     "badRequest": "Some of the data is invalid. Check the fields and try again.",
     "badRequestDetails": "Invalid data: {details}",

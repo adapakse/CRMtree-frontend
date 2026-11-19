@@ -232,6 +232,10 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a class="sub" href="#p1-calls-followup">Follow-up-uri și sarcini CRM</a>
 <a class="sub" href="#p1-calls-example">Exemple</a>
 <a class="sub" href="#p1-calls-faq">Întrebări și răspunsuri</a>
+<a href="#p1-campaigns">Campanii e-mail</a>
+<a class="sub" href="#p1-campaigns-new">Campanie nouă</a>
+<a class="sub" href="#p1-campaigns-results">Rezultatele campaniilor</a>
+<a class="sub" href="#p1-campaigns-consents">Consimțăminte pe persoană pe fișă</a>
 <div class="part">Partea 2 · Administrator</div>
 <a href="#p2-start">Cum funcționează</a>
 <a class="sub" href="#p2-access">Unde găsiți setările</a>
@@ -265,6 +269,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a href="#p2-projects">Setările proiectelor</a>
 <a class="sub" href="#p2-ksef">KSeF – facturi de costuri</a>
 <a href="#p2-pbx">Telefonie și analizorul de apeluri</a>
+<a href="#p2-sendgrid">Campanii e-mail: contul SendGrid</a>
 <a href="#p2-import">Import și export CSV</a>
 <a href="#p2-data">Gestionarea datelor</a>
 <a href="#p2-logs">Jurnale de audit</a>
@@ -436,9 +441,9 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="webfig"><img loading="lazy" src="img/en_w04_leads_timeline.jpg?v=20261113" width="1440" height="900" alt="Panoul de cronologie"><figcaption>Panoul „Calendarul activităților”: planul lui Piotr pentru 2 noiembrie.</figcaption></figure>
 
 <h4 id="p1-leads-mobile"><span class="tag mob">MOBILE</span>Leaduri pe telefon</h4>
-<p>Fila <b>„Leaduri”</b> are o casetă <b>„Căutați companie, persoană, telefon…”</b> și chipuri pentru <b>„Fierbinți”</b> și pentru fiecare etapă (<b>„Nou”</b>, <b>„Calificare”</b>, <b>„Prezentare”</b> și așa mai departe). Leadurile actualizate recent apar primele. Fiecare casetă arată următoarea activitate, de exemplu <b>„Restantă: …”</b> în roșu, urmată de contact, valoare și probabilitate. Pictograma pâlnie din colțul din dreapta sus deschide <b>„Filtre”</b>: <b>„Etapă”</b> (inclusiv Arhivat), <b>„Sursă”</b>, comutatoare pentru <b>„Fierbinți”</b>, <b>„Doar în așteptare”</b> și <b>„Doar ale mele”</b>, iar pentru manageri <b>„Agent de vânzări”</b>. Încheiați cu <b>„Resetare”</b> sau <b>„Aplicare”</b>.</p>
+<p>Fila <b>„Leaduri”</b> are o casetă <b>„Căutați companie, persoană, telefon…”</b> și chipuri pentru <b>„Fierbinți”</b> și pentru fiecare etapă (<b>„Nou”</b>, <b>„Calificare”</b>, <b>„Prezentare”</b> și așa mai departe). Leadurile actualizate recent apar primele. Primul rând al cardului arată compania și valoarea (de exemplu <b>„250 mii zł”</b>), al doilea contactul cu probabilitatea, iar în dreapta etapa. Un al treilea rând apare doar pentru o activitate cu termen: cea restantă ca etichetă roșie <b>„Restante · 10 nov. · …”</b>, următoarea planificată cu gri. O flacără lângă nume marchează un lead fierbinte. Pictograma pâlnie din colțul din dreapta sus deschide <b>„Filtre”</b>: <b>„Etapă”</b> (inclusiv Arhivat), <b>„Sursă”</b>, comutatoare pentru <b>„Fierbinți”</b>, <b>„Doar în așteptare”</b> și <b>„Doar ale mele”</b>, iar pentru manageri <b>„Agent de vânzări”</b>. Încheiați cu <b>„Resetare”</b> sau <b>„Aplicare”</b>.</p>
 <div class="phones">
-<figure class="phone"><img loading="lazy" src="img/en_t13_leads_list.jpg?v=20261113" width="540" height="1083" alt="Lista de leaduri pe telefon"><figcaption>„Leaduri”: căutare, chipuri de etapă și casete de leaduri.</figcaption></figure>
+<figure class="phone"><img loading="lazy" src="img/en_t13_leads_list.jpg?v=20261116d" width="540" height="1083" alt="Lista de leaduri pe telefon"><figcaption>„Leaduri”: căutare, chipuri de etapă și casete de leaduri.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t14_leads_filters.jpg?v=20261113" width="540" height="1083" alt="Filtre pentru leaduri"><figcaption>„Filtre”: etapă, sursă, fierbinte, în așteptare, doar ale mele.</figcaption></figure>
 </div>
 </section>
@@ -736,7 +741,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„Cronologie”</b> și <b>„Calendar”</b>: aceleași sarcini pe o cronologie și într-un calendar.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_w10_onboarding.jpg?v=20261113" width="1440" height="900" alt="Tabla Onboarding parteneri"><figcaption>Fala Media Demo la „Semnarea contractului” (Pasul 1/4), fără sarcini încă, „Lansare” disponibilă.</figcaption></figure>
-<p>Butonul <b>„Lansare”</b> devine disponibil după ce toate sarcinile partenerului sunt finalizate (sau când nu există niciuna). Până atunci afișează un lacăt și numărul sarcinilor finalizate. După ce confirmați, partenerul devine „Activ” și trece în registrul partenerilor; linkul „Profilul partenerului” deschide fișa lui.</p>
+<p>Butonul <b>„Lansare”</b> devine disponibil după ce toate sarcinile partenerului sunt finalizate (sau când nu există niciuna). Până atunci afișează un lacăt, iar un clic arată câte sarcini au mai rămas. După ce confirmați, partenerul devine „Activ” și trece în registrul partenerilor; linkul „Profilul partenerului” deschide fișa lui.</p>
+<p><b>Retragere în pipeline.</b> Un manager de vânzări sau un administrator poate retrage un partener din onboarding când acesta a pornit prea devreme sau compania a renunțat: butonul <b>„🔄 Retrage”</b> de pe tablă (sau <b>„Retrage din onboarding în pipeline”</b> pe fișa partenerului), alegeți <b>„Etapa pipeline-ului”</b> și <b>„Confirmă retragerea”</b>. Partenerul și sarcinile sale de onboarding sunt șterse; leadul revine la etapa aleasă și poate fi trimis din nou în onboarding.</p>
 
 <h4 id="p1-onboarding-card">Onboarding pe fișa partenerului</h4>
 <p>Un partener aflat în onboarding are în partea de sus a fișei un panou cu cei patru pași, fiecare arătând câte dintre sarcinile sale sunt finalizate. Faceți clic pe un pas pentru a-i vedea sarcinile. Bifați o sarcină cu cercul de lângă ea; CRMtree înregistrează cine a finalizat-o și când. Sarcinile întârziate primesc o etichetă roșie „Restantă”.</p>
@@ -1419,6 +1425,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>Adăugați coloanele opționale pe care le aveți: <code>www</code>, <code>krs</code>, denumire, industrie, număr de angajați, oraș, regiune, cod PKD și datele persoanei de decizie (nume, funcție, departament, telefon, e-mail). O coloană <code>www</code> face găsirea site-ului mai rapidă și mai ieftină.</li>
 <li>Faceți clic pe <b>„Alege un fișier CSV”</b>, apoi pe <b>„Importă”</b>.</li>
 <li>Verificați rezumatul: „Adăugate”, „Omise (duplicate)”, „Erori”, „Rânduri în total”. Rândurile cu un cod fiscal invalid (trebuie să aibă 10 cifre) sunt omise și listate la „Detalii despre erori”.</li>
+<li>Firmele care sunt deja în CRM ca Lead sau Partener (același NIP) sunt omise: apar la <b>„Omise (deja în CRM)”</b> cu un link către fișa lor.</li>
 </ol>
 <div class="callout"><b>Duplicate</b>O companie cu același cod fiscal nu este niciodată creată de două ori. Importul actualizează în schimb înregistrarea existentă: celulele completate suprascriu valorile vechi, iar celulele goale le lasă neschimbate. Fișierul poate fi UTF-8 sau Windows-1250, separat prin punct și virgulă sau virgule, de până la 10 MB.</div>
 
@@ -1619,6 +1626,28 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p><b>Am importat note, dar nu s-a întâmplat nimic.</b> Faceți clic pe „Analizează (N)” după import. Importul singur nu pornește analiza.</p>
 <p><b>Un rând afișează „Eroare”.</b> Extindeți-l pentru a vedea motivul. Dacă motivul este configurarea AI, anunțați administratorul, apoi folosiți „Reanalizare”.</p>
 <p><b>Este analizorul în aplicația mobilă?</b> Nu. Sarcinile „Follow-up telefoniczny” apar însă pe telefon, împreună cu celelalte sarcini ale dumneavoastră.</p>
+</section>
+
+<section class="ch" id="p1-campaigns">
+<h3>Campanii e-mail</h3>
+<p>Modulul trimite e-mailuri persoanelor de contact ale partenerilor și leadurilor care și-au dat consimțământul necesar. Trimiterea trece prin contul SendGrid al firmei, iar șabloanele se proiectează în SendGrid (Dynamic Templates). Vedeți CRM → <b>„Campanii e-mail”</b> în meniu când un administrator v-a dat accesul <b>„Campanii e-mail”</b>.</p>
+<p>Ecranul are filele <b>„Campanii”</b>, <b>„Șabloane”</b> și <b>„Rezultate”</b> (administratorul vede și <b>„Setări SendGrid”</b>). Lista campaniilor are filtre, sortare, statusul ca butoane (<b>„Ciorne”</b>, <b>„Trimise”</b>…) și acțiunile <b>„Duplicare”</b>, <b>„Arhivare”</b>, <b>„Restaurare”</b>. Dacă SendGrid nu este configurat, deasupra listei apare <b>„SendGrid nu este configurat”</b>.</p>
+
+<h4 id="p1-campaigns-new">Campanie nouă</h4>
+<ol class="steps">
+<li>Dați clic pe <b>„Campanie nouă”</b> și introduceți un nume.</li>
+<li><b>„Ce e-mail trimitem?”</b> — alegeți un șablon SendGrid. <b>„Vedeți cum arată e-mailul”</b> afișează previzualizarea.</li>
+<li><b>„Cine trebuie să-l primească?”</b> — alegeți grupuri (de ex. <b>„Toți cu consimțământ”</b>) sau încărcați o <b>„Listă dintr-un fișier CSV”</b>. <b>„Restrângere listă”</b> adaugă filtre: statusul partenerului, etapa leadului, agentul de vânzări, domeniul, etichetele, ultimul contact.</li>
+<li>În <b>„Setări de trimitere”</b> setați intervalul dintre e-mailurile către aceeași firmă și solicitantul.</li>
+<li>În dreapta vedeți în timp real câte persoane primesc e-mailul și de ce unele sunt omise (fără consimțământ, dezabonare, adresă respinsă…).</li>
+<li><b>„Salvare ciornă”</b>, apoi <b>„Trimitere test către mine”</b>. Abia după test funcționează <b>„Trimitere prin SendGrid”</b>.</li>
+</ol>
+
+<h4 id="p1-campaigns-results">Rezultatele campaniilor</h4>
+<p>Fila <b>„Rezultate”</b> arată livrările, deschiderile, clicurile, dezabonările și problemele de adresă — cifrele vin de la SendGrid. Tabelul <b>„Firme care au dat clic”</b> duce la fișa leadului sau a partenerului. Pe fișă, trimiterea apare ca activitate <b>„Campanie e-mail”</b>. Descărcați raportul cu <b>„Descărcare raport (.xlsx)”</b>.</p>
+
+<h4 id="p1-campaigns-consents">Consimțăminte pe persoană pe fișă</h4>
+<p>În secțiunea <b>„Acorduri de marketing”</b> a fișei leadului și a partenerului, fiecare persoană de contact cu adresă de e-mail are propriul consimțământ: <b>„Este de acord”</b>, <b>„Nu este de acord”</b> sau <b>„Necunoscut”</b>. La „Este de acord” trebuie notat cum a fost obținut. Campaniile folosesc doar aceste consimțăminte. Dezabonarea sau raportarea de spam în SendGrid retrage automat consimțământul. Dedesubt rămâne <b>„Consimțământul firmei (vechi)”</b> — campaniile nu îl folosesc.</p>
 </section>
 
 <h2 class="part-title" id="p2"><span class="num">2</span> Administrator</h2>
@@ -1985,6 +2014,19 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="example"><span class="lbl">EXEMPLU · AGENT DE VÂNZĂRI NOU</span>
 <p>Un agent de vânzări nou se alătură, iar administratorul creează un cont cu rolul „Agent de vânzări”.</p>
 <p class="res">Noua persoană nu are elementul de meniu „Analiza apelurilor” până când administratorul bifează „Analizor de apeluri” pe fișa ei. În datele demo, Anna, Piotr și Ewa au acces, Tomasz nu.</p></div>
+</section>
+
+<section class="ch" id="p2-sendgrid">
+<h3>Campanii e-mail: contul SendGrid</h3>
+<p>Fiecare organizație trimite din propriul cont SendGrid. CRMtree activează modulul pentru organizația dvs., iar administratorul dă acces persoanelor: fișa utilizatorului → <b>„Acces la funcții”</b> → <b>„Campanii e-mail”</b>. Administratorul are mereu acces.</p>
+<ol class="steps">
+<li>Deschideți <b>„Campanii e-mail”</b> → <b>„Setări SendGrid”</b>.</li>
+<li>Lipiți <b>„Cheie API”</b> din SendGrid (Settings → API Keys). După salvare se vede doar „salvată, se termină cu ••••1234” și <b>„Modificare”</b> și <b>„Ștergere”</b>.</li>
+<li>Completați <b>„Adresa expeditorului”</b> (verificată în SendGrid), <b>„Numele expeditorului”</b>, opțional <b>„Reply-to”</b>, și <b>„ID-ul grupului de dezabonare (ASM)”</b>.</li>
+<li>La <b>„Consimțământ necesar pentru campanii”</b> alegeți un tip de consimțământ sau lăsați „Automat”.</li>
+<li>Copiați <b>„Adresa webhookului”</b>, adăugați-o în SendGrid → Settings → Mail Settings → Event Webhook, bifați evenimentele și activați Signed Event Webhook. Lipiți <b>„Cheia publică a webhookului”</b>.</li>
+<li>Dați clic pe <b>„Salvare”</b>, apoi pe <b>„Verificare conexiune”</b> — vedeți numărul de șabloane din SendGrid.</li>
+</ol>
 </section>
 
 <section class="ch" id="p2-import">

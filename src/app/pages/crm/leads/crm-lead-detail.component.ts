@@ -36,7 +36,9 @@ import { WhatsappTemplatePickerComponent } from '../../../shared/components/what
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
 import { QuillModule } from 'ngx-quill';
+import { PersonConsentsComponent } from '../../../shared/components/person-consents/person-consents.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
@@ -63,16 +65,16 @@ interface WhatsappConvUiState {
   selector: 'wt-crm-lead-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, PhoneInputComponent, ActTypeIconComponent, ActivityCountBadgeComponent, PhoneCallSimulatorComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe],
+            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent, PersonConsentsComponent],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
-<div style="display:flex;flex-direction:column;height:100%;overflow:hidden;padding:24px;box-sizing:border-box;gap:24px" *ngIf="lead">
+<div class="card-page" style="display:flex;flex-direction:column;height:100%;overflow:hidden;padding:24px;box-sizing:border-box;gap:24px" *ngIf="lead">
 
   <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0">
+  <div class="card-hdr" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0">
     <button type="button" class="back-link" routerLink="/crm/leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>{{ t('leadDetail.header.backToLeads') }}</button>
-    <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+    <div class="card-hdr-name" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
       <div *ngIf="lead.logo_url && logoSasUrl" style="width:36px;height:36px;border-radius:50%;background-size:cover;background-position:center;box-shadow:var(--shadow-sm);flex-shrink:0;background-color:var(--gray-50)"
            [style.background-image]="logoSasUrl"></div>
       <h1 style="font-size:22px;font-weight:800;margin:0;color:var(--gray-800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{lead.company}}</h1>
@@ -80,9 +82,9 @@ interface WhatsappConvUiState {
     <span class="stage-badge"
           [style.background]="stages.pillBackground(lead.stage)"
           [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span>
-    <span *ngIf="lead.hot" style="background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🔥{{ t('leadDetail.header.hot') }}</span>
+    <span *ngIf="lead.hot" style="background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🔥 {{ t('leadDetail.header.hot') }}</span>
     <span *ngIf="lead.hold_active" style="background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));color:var(--gray-700);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px" title="{{lead.hold_reason}}">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div class="card-hdr-actions" style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-quiet btn-sm hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
               [style.background]="lead.hold_active ? 'color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))' : ''"
               [style.color]="lead.hold_active ? 'var(--gray-700)' : ''"
@@ -98,7 +100,7 @@ interface WhatsappConvUiState {
         <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>{{ t('email.label') }}
         <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
       </button>
-      <button class="btn btn-quiet btn-sm hdr-btn" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? t('leadDetail.edit.title') : t('leadDetail.edit.noPermission')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>{{ t('leadDetail.header.edit') }}</button>
+      <button class="btn btn-quiet btn-sm hdr-btn" (click)="canEdit ? openEdit() : explainNoPermission()" [title]="canEdit ? t('leadDetail.edit.title') : t('leadDetail.edit.noPermission')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>{{ t('leadDetail.header.edit') }}</button>
       <button class="btn btn-quiet btn-sm hdr-btn" *ngIf="!lead.converted_at && canEdit" (click)="openTestAccountModal()" [title]="t('leadDetail.testAccount.openTooltip')">
         <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>{{ t('leadDetail.testAccount.title') }}
         <span *ngIf="testAccount?.status==='created'" class="ta-badge-ok">✓</span>
@@ -109,15 +111,15 @@ interface WhatsappConvUiState {
   </div>
 
   <!-- BODY: 3 kolumny -->
-  <div [style.grid-template-columns]="leftCollapsed ? '32px 1fr 260px' : '260px 1fr 260px'" style="flex:1;display:grid;gap:16px;overflow:hidden;min-height:0">
+  <div class="card-body" [class.left-collapsed]="leftCollapsed" [style.grid-template-columns]="leftCollapsed ? '32px 1fr 260px' : '260px 1fr 260px'" style="flex:1;display:grid;gap:16px;overflow:hidden;min-height:0">
 
     <!-- LEWA: Informacje -->
-    <div class="lead-card" style="display:flex;flex-direction:column;min-height:0" [class.left-panel-collapsed]="leftCollapsed">
+    <div class="lead-card card-col-left" style="display:flex;flex-direction:column;min-height:0" [class.left-panel-collapsed]="leftCollapsed">
       <div class="left-panel-hdr">
         <span *ngIf="!leftCollapsed" class="left-panel-title">{{ t('leadDetail.info.title') }}</span>
         <button type="button" class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed ? t('leadDetail.info.expandPanel') : t('leadDetail.info.collapsePanel')" [attr.aria-label]="leftCollapsed ? t('leadDetail.info.expandPanel') : t('leadDetail.info.collapsePanel')">@if (leftCollapsed) { <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></svg> } @else { <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/></svg> }</button>
       </div>
-      <div *ngIf="!leftCollapsed" style="padding:16px;overflow-y:auto;flex:1">
+      <div *ngIf="!leftCollapsed" class="card-info-scroll" style="padding:16px;overflow-y:auto;flex:1">
 
       <!-- Firma -->
       <div class="info-section">
@@ -129,7 +131,7 @@ interface WhatsappConvUiState {
           <span class="val val-line"><a class="link" [href]="'https://'+lead.website" target="_blank" [title]="lead.website">{{lead.website}}</a></span>
         </div>
         <div class="info-kv kv-row" *ngIf="lead.industry"><span class="lbl">{{ t('leadDetail.fields.industry') }}</span><span class="val">{{lead.industry}}</span></div>
-        <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥{{ t('leadDetail.fields.hotLead') }}</div>
+        <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥 {{ t('leadDetail.fields.hotLead') }}</div>
         <div *ngIf="lead.hold_active" style="display:inline-flex;flex-direction:column;gap:4px;background:var(--gray-100);color:var(--gray-700);font-size:12px;padding:8px 12px;border-radius:10px;font-weight:600;margin-top:4px">
           <span style="display:inline-flex;align-items:center;gap:4px">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
           <span style="font-weight:400;color:var(--gray-500)">{{lead.hold_reason}}</span>
@@ -175,7 +177,7 @@ interface WhatsappConvUiState {
 
       <!-- Agent -->
       <div class="info-section" *ngIf="lead.agent_name || lead.agent_email || lead.agent_phone">
-        <div class="info-section-title" style="color: var(--orange-text)">🤝 {{ t('leadDetail.sections.agent') }}</div>
+        <div class="info-section-title" style="color: var(--orange-text)"><i class="ei ei-handshake"></i> {{ t('leadDetail.sections.agent') }}</div>
         <div class="info-kv kv-row" *ngIf="lead.agent_name"><span class="lbl">{{ t('leadDetail.fields.fullName') }}</span><span class="val fw">{{lead.agent_name}}</span></div>
         <div class="info-kv kv-row" *ngIf="lead.agent_email">
           <span class="lbl">{{ t('leadDetail.fields.email') }}</span>
@@ -226,7 +228,12 @@ interface WhatsappConvUiState {
 
       <!-- Zgody marketingowe -->
       <div class="info-section">
-        <div class="info-section-title" style="margin-bottom:12px">✅ {{ t('consents.title') }}</div>
+        <div class="info-section-title" style="margin-bottom:12px"><i class="ei ei-check-circle"></i> {{ t('consents.title') }}</div>
+        <!-- Per-person consents: e-mail campaigns use only these -->
+        <wt-person-consents kind="leads" [entityId]="lead.id" [canEdit]="canEditConsents"
+                            [reloadKey]="(lead.email || '') + (lead.extra_contacts | json)"></wt-person-consents>
+        <div style="font-size:12px;font-weight:600;color:var(--gray-500);margin:14px 0 8px;padding-top:10px;border-top:1px solid var(--gray-100)">{{ t('personConsents.companyTitle') }}</div>
+        <div style="font-size:12px;color:var(--gray-400);line-height:1.5;margin:-4px 0 8px">{{ t('personConsents.companyHint') }}</div>
         <div *ngIf="consentLoading" style="text-align:center;color:var(--gray-400);font-size:12px;padding:8px">{{ 'states.loading' | transloco }}</div>
         <div *ngFor="let ct of consents" style="margin-bottom:14px">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:4px">
@@ -259,8 +266,9 @@ interface WhatsappConvUiState {
         <button *ngIf="canEditConsents && consents.length" class="btn btn-sm" (click)="saveConsents()"
                 [class.btn-p]="consentsDirty" [class.btn-g]="!consentsDirty"
                 [disabled]="savingConsents || !consentsDirty"
+                [title]="consentsDirty ? '' : ('form.noChanges' | transloco)"
                 style="width:100%;margin-top:4px">
-          {{savingConsents ? t('consents.saving') : consentsDirty ? '💾 ' + t('consents.save') : '✓ ' + t('consents.saved')}}
+          @if (savingConsents) { {{ t('consents.saving') }} } @else { @if (consentsDirty) { <i class="ei ei-save"></i> {{ t('consents.save') }} } @else { ✓ {{ t('consents.saved') }} } }
         </button>
       </div>
 
@@ -268,13 +276,13 @@ interface WhatsappConvUiState {
     </div>
 
     <!-- ŚRODEK: Aktywności (tabs: Aktywności | Historia) -->
-    <div class="lead-card" style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
+    <div class="lead-card card-col-mid" style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
 
       <!-- STAGE STEPPER BAR -->
-      <div style="background:var(--surface);border-bottom:1px solid var(--gray-100);padding:12px 16px;flex-shrink:0;display:flex;align-items:center;gap:8px">
+      <div class="stage-bar" style="background:var(--surface);border-bottom:1px solid var(--gray-100);padding:12px 16px;flex-shrink:0;display:flex;align-items:center;gap:8px">
         <!-- Onboarding in progress: blue banner -->
         <ng-container *ngIf="lead.stage==='onboarding'">
-          <span style="font-size:15px">⏳</span>
+          <span style="font-size:16px"><i class="ei ei-hourglass"></i></span>
           <span style="color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);font-weight:700;font-size:14px">{{ t('leadDetail.onboarding.inProgress') }}</span>
           <span style="font-size:12px;color:var(--gray-500);margin-left:4px">— {{ t('leadDetail.onboarding.partnerInProgress') }}</span>
           <span style="flex:1"></span>
@@ -283,7 +291,7 @@ interface WhatsappConvUiState {
         </ng-container>
         <!-- Onboarded: locked banner -->
         <ng-container *ngIf="lead.stage==='onboarded'">
-          <span style="font-size:15px">✅</span>
+          <span style="font-size:16px"><i class="ei ei-check-circle"></i></span>
           <span style="color:oklch(from #15803d max(l, var(--text-min-l)) c h);font-weight:700;font-size:14px">{{ t('leadDetail.onboarding.completedPartnerActive') }}</span>
           <span style="flex:1"></span>
           <span style="font-size:12px;color:var(--gray-400)">{{ t('leadDetail.onboarding.leadLocked') }}</span>
@@ -291,7 +299,7 @@ interface WhatsappConvUiState {
         </ng-container>
         <!-- Closed lost: red banner mode -->
         <ng-container *ngIf="stages.isLost(lead.stage)">
-          <span style="font-size:15px">⛔</span>
+          <span style="font-size:16px"><i class="ei ei-ban"></i></span>
           <span style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-weight:700;font-size:14px">{{ stageLabel(lead.stage) }}</span>
           <span *ngIf="lead.lost_reason" style="font-size:12px;color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">· {{lead.lost_reason}}</span>
           <span style="flex:1"></span>
@@ -299,23 +307,23 @@ interface WhatsappConvUiState {
         </ng-container>
         <!-- Normal stepper mode -->
         <ng-container *ngIf="!stages.isLost(lead.stage) && lead.stage!=='onboarded' && lead.stage!=='onboarding'">
-          <button class="stage-arrow-btn" [disabled]="!prevStage() || !canEdit" (click)="quickChangeStage(prevStage()!)" [title]="t('leadDetail.stage.previous')">‹</button>
-          <div style="flex:1;display:flex;align-items:flex-start;padding-top:2px">
+          <button class="stage-arrow-btn" [disabled]="!prevStage()" (click)="canEdit ? quickChangeStage(prevStage()!) : explainNoPermission()" [title]="t('leadDetail.stage.previous')">‹</button>
+          <div class="stepper-track" style="flex:1;display:flex;align-items:flex-start;padding-top:2px">
             <ng-container *ngFor="let s of orderedStageOptions; let last=last">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div class="stepper-step" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
                 <div class="stepper-slot"><div class="stepper-dot" [ngStyle]="stepperDotStyle(s.key)"
                      (click)="isStageAllowed(s.key) && canEdit && quickChangeStage(s.key)"
                      [style.cursor]="canEdit && isStageAllowed(s.key) ? 'pointer' : 'default'"
                      [title]="s.label"></div></div>
                 <div class="stepper-label" [ngStyle]="stepperLabelStyle(s.key)">{{s.label}}</div>
               </div>
-              <div *ngIf="!last" style="flex:0 0 8px;height:2px;margin-top:8px;border-radius:1px"
+              <div *ngIf="!last" class="stepper-gap" style="flex:0 0 8px;height:2px;margin-top:8px;border-radius:1px"
                    [style.background]="isStageCompleted(s.key) ? '#22c55e' : 'var(--gray-300)'"></div>
             </ng-container>
           </div>
-          <button class="stage-arrow-btn" [disabled]="!nextStage() || !canEdit" (click)="quickChangeStage(nextStage()!)" [title]="t('leadDetail.stage.next')">›</button>
+          <button class="stage-arrow-btn" [disabled]="!nextStage()" (click)="canEdit ? quickChangeStage(nextStage()!) : explainNoPermission()" [title]="t('leadDetail.stage.next')">›</button>
           <!-- Awaryjne wyjście w przegraną istnieje tylko, gdy tenant ma taki etap -->
-          <button *ngIf="canEdit && !stages.isWon(lead.stage) && stages.lostKey() as lostKey" class="stage-arrow-btn" style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);border-color:color-mix(in srgb, #fecaca var(--tint-mix), var(--surface))" (click)="quickChangeStage(lostKey)" [title]="stageLabel(lostKey)">⛔</button>
+          <button *ngIf="canEdit && !stages.isWon(lead.stage) && stages.lostKey() as lostKey" class="stage-arrow-btn" style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);border-color:color-mix(in srgb, #fecaca var(--tint-mix), var(--surface))" (click)="quickChangeStage(lostKey)" [title]="stageLabel(lostKey)"><i class="ei ei-ban"></i></button>
         </ng-container>
       </div>
 
@@ -355,7 +363,9 @@ interface WhatsappConvUiState {
             <wt-act-type-icon [type]="actForm.type"></wt-act-type-icon> {{actTypeName(actForm.type)}}
           </div>
           <!-- Edytowalny tytuł tylko dla Spotkania i Maila (Mail ma osobny formularz w zakładce „Maile") -->
-          <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" [placeholder]="t('meetings.titleRequiredPlaceholder')" class="act-input">
+          <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" [placeholder]="t('meetings.titleRequiredPlaceholder')" class="act-input"
+                 [class.fi-err]="actSubmitted && !actForm.title?.trim()">
+          @if (actSubmitted && !actForm.title?.trim()) { <span class="ferr">{{ t('fieldErrors.title') }}</span> }
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;align-items:start">
             <label style="font-size:12px;color:var(--gray-500);font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.dueDate') }}
               <div style="position:relative">
@@ -380,12 +390,12 @@ interface WhatsappConvUiState {
                        [style.background]="actDueDatePreset==='custom' ? 'color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface))' : 'var(--surface)'"
                        [style.color]="actDueDatePreset==='custom' ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-700)'"
                        [style.fontWeight]="actDueDatePreset==='custom' ? '600' : '400'"
-                       (mousedown)="selectDueDatePreset('custom')">📅 {{ t('activity.customDate') }}</div>
+                       (mousedown)="selectDueDatePreset('custom')"><i class="ei ei-calendar"></i> {{ t('activity.customDate') }}</div>
                 </div>
               </div>
               <div *ngIf="actDueDatePreset && actDueDatePreset!=='custom' && actForm.type!=='task'" style="display:flex;align-items:center;gap:4px;margin-top:2px">
                 <input type="time" [(ngModel)]="actDueDateHour" (change)="setActDueDateHour(actDueDateHour)" class="act-input" style="width:96px;font-size:12px">
-                <button type="button" class="act-ctrl-btn del" (click)="clearDueDate()">🗑</button>
+                <button type="button" class="act-ctrl-btn del" (click)="clearDueDate()"><i class="ei ei-trash"></i></button>
               </div>
               <input *ngIf="actDueDatePreset==='custom'" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:12px;margin-top:2px">
             </label>
@@ -432,6 +442,7 @@ interface WhatsappConvUiState {
           <quill-editor [(ngModel)]="actForm.body" [modules]="quillModules" [placeholder]="t('activity.form.bodyPlaceholder')" style="display:block" theme="snow"></quill-editor>
           <wt-pending-attachments *ngIf="actForm.type==='task' || actForm.type==='note'" [(files)]="pendingActivityFiles"></wt-pending-attachments>
           <div style="display:flex;gap:8px;justify-content:flex-end">
+            @if (actSubmitted) { <wt-form-error-summary [count]="actForm.title?.trim() ? 0 : 1" /> }
             <button class="btn btn-g btn-sm" (click)="showNewActivity=false; pendingActivityFiles=[]">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn btn-p btn-sm" (click)="addActivity()" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
           </div>
@@ -453,12 +464,12 @@ interface WhatsappConvUiState {
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:var(--gray-400);margin-left:auto;white-space:nowrap">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}}</span>
               <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:var(--gray-400);margin-left:auto;white-space:nowrap">{{ t('activity.card.createdAt', { date: (a.created_at|date:'dd.MM.yyyy HH:mm') }) }}</span>
-              <wt-add-to-calendar *ngIf="a.activity_at && a.type !== 'email' && a.type !== 'note'"
+              <wt-add-to-calendar *ngIf="a.activity_at && a.type !== 'email' && a.type !== 'marketing_email' && a.type !== 'note'"
                                   [entry]="calendarEntryOf(a)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
             </div>
             <div style="font-size:12px;font-weight:600;color:var(--gray-800);margin-bottom:2px">{{a.title}}</div>
             <div class="act-meta" style="margin-bottom:4px">
-              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+              <span *ngIf="a.assigned_to_name"><i class="ei ei-user"></i> {{a.assigned_to_name}}</span>
               <span *ngIf="!a.assigned_to_name && a.created_by_name">{{a.created_by_name}}</span>
             </div>
             <div *ngIf="a.body" class="act-card-body">
@@ -473,7 +484,7 @@ interface WhatsappConvUiState {
               <button *ngIf="a.status==='closed'" class="btn btn-g btn-sm" (click)="reopenActivity(a)" [disabled]="savingActivity">↩{{ t('activity.card.reopen') }}</button>
             </div>
             <div class="act-card-controls">
-              <button *ngIf="canEdit" class="act-ctrl-btn del" (click)="$event.stopPropagation(); deleteActivity(a)" [title]="t('activity.card.delete')">🗑️</button>
+              <button *ngIf="canEdit" class="act-ctrl-btn del" (click)="$event.stopPropagation(); deleteActivity(a)" [title]="t('activity.card.delete')"><i class="ei ei-trash"></i></button>
             </div>
           </ng-container>
           <!-- Inline edit mode -->
@@ -515,15 +526,15 @@ interface WhatsappConvUiState {
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
           <ng-container *ngIf="settings.settings().crm_training_mode">
-            <button class="btn btn-g btn-sm" (click)="debugProcessEmail()" [disabled]="debugProcessing" [title]="t('email.checkNewTooltip')">{{debugProcessing ? '⏳' : '🔄'}} {{ t('email.checkNew') }}</button>
+            <button class="btn btn-g btn-sm" (click)="debugProcessEmail()" [disabled]="debugProcessing" [title]="t('email.checkNewTooltip')">@if (debugProcessing) { … } @else { <i class="ei ei-refresh"></i> } {{ t('email.checkNew') }}</button>
           </ng-container>
-          <button class="btn btn-p btn-sm" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ ' + t('email.connecting') : t('email.new')}}</button>
+          <button class="btn btn-p btn-sm" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">@if (connectingEmail) { {{ t('email.connecting') }} } @else { {{ t('email.new') }} }</button>
         </div>
 
         <!-- INLINE COMPOSE -->
         <div *ngIf="showEmailCompose" class="lead-form-box" style="margin-bottom:16px">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:4px">✉️ {{ t('email.new') }}</div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:4px"><i class="ei ei-mail"></i> {{ t('email.new') }}</div>
             <button class="close-btn" style="font-size:14px" (click)="showEmailCompose=false">✕</button>
           </div>
           <!-- Provider row — always visible when compose is open. Every user connects
@@ -541,10 +552,10 @@ interface WhatsappConvUiState {
                       [title]="emailAddress">{{ t('email.from') }} <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
                 <button type="button" (click)="disconnectEmail()" style="background:none;border:none;cursor:pointer;color:var(--gray-500);font-size:10px;text-decoration:underline;flex-shrink:0;padding:0">{{ t('email.disconnect') }}</button>
               </div>
-              <div *ngIf="!emailProviderKey" class="lead-note lead-note-warn">⚠️ {{ t('email.notConfigured') }}</div>
+              <div *ngIf="!emailProviderKey" class="lead-note lead-note-warn"><i class="ei ei-warn"></i> {{ t('email.notConfigured') }}</div>
             </div>
             </ng-container>
-            <div *ngIf="settings.settings().crm_training_mode" class="lead-note lead-note-warn">🎓 {{ t('email.trainingMode') }}</div>
+            <div *ngIf="settings.settings().crm_training_mode" class="lead-note lead-note-warn"><i class="ei ei-graduation"></i> {{ t('email.trainingMode') }}</div>
           </div>
           <!-- Email form — shown when connected or training mode -->
           <ng-container *ngIf="emailConnected || settings.settings().crm_training_mode">
@@ -556,13 +567,14 @@ interface WhatsappConvUiState {
               </select>
             </div>
             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.to') }}
-              <div class="participant-chips">
+              <div class="participant-chips" [class.fi-err]="emailSubmitted && !emailForm.recipientList?.length">
                 <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button></span>
                 <input class="participant-input" [(ngModel)]="recipientQuery" (input)="onRecipientInput()" (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()" (blur)="showRecipientSug=false" [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
                 <div *ngIf="showRecipientSug" class="suggest-dropdown">
                   <div *ngFor="let s of recipientSuggestions" class="suggest-item" (mousedown)="pickRecipientSug(s)"><span style="font-weight:600">{{s.name||s.email}}</span><span style="color:var(--gray-400);font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span></div>
                 </div>
               </div>
+              @if (emailSubmitted && !emailForm.recipientList?.length) { <span class="ferr">{{ t('fieldErrors.recipients') }}</span> }
             </label>
             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.cc') }}
               <div class="participant-chips">
@@ -574,23 +586,25 @@ interface WhatsappConvUiState {
               </div>
             </label>
             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.subject') }}
-              <input class="act-input" [(ngModel)]="emailForm.subject" [placeholder]="t('email.placeholders.subject')">
+              <input class="act-input" [(ngModel)]="emailForm.subject" [placeholder]="t('email.placeholders.subject')" [class.fi-err]="emailSubmitted && !emailForm.subject?.trim()">
+              @if (emailSubmitted && !emailForm.subject?.trim()) { <span class="ferr">{{ t('fieldErrors.subject') }}</span> }
             </label>
             <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.body')" style="display:block" theme="snow"></quill-editor>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:var(--gray-500);flex:1;min-width:0">
-              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" class="btn btn-g btn-sm" style="flex-shrink:0" (click)="openDrivePicker()" [disabled]="drivePickerLoading">{{drivePickerLoading ? '⏳ ' + ('states.loading' | transloco) : '📁 ' + t('email.fromGoogleDrive')}}</button>
+              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" class="btn btn-g btn-sm" style="flex-shrink:0" (click)="openDrivePicker()" [disabled]="drivePickerLoading">@if (drivePickerLoading) { {{ ('states.loading' | transloco) }} } @else { <i class="ei ei-folder"></i> {{ t('email.fromGoogleDrive') }} }</button>
             </div>
             <div *ngIf="driveNeedsReauth" class="lead-note lead-note-warn">
-              ⚠️ {{ t('email.driveReauthRequired') }}
+              <i class="ei ei-warn"></i> {{ t('email.driveReauthRequired') }}
             </div>
             <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-              <span *ngFor="let f of emailAttachments; let i=index" class="file-chip">📎{{f.name}}<button (click)="removeAttachment(i)">✕</button></span>
+              <span *ngFor="let f of emailAttachments; let i=index" class="file-chip"><i class="ei ei-paperclip"></i> {{f.name}}<button (click)="removeAttachment(i)">✕</button></span>
             </div>
-            <div *ngIf="emailError" class="lead-note lead-note-err">⚠️ {{emailError}}</div>
+            <div *ngIf="emailError" class="lead-note lead-note-err"><i class="ei ei-warn"></i> {{emailError}}</div>
             <div style="display:flex;gap:8px;justify-content:flex-end">
+              @if (emailSubmitted) { <wt-form-error-summary [count]="emailErrorCount()" /> }
               <button class="btn btn-g btn-sm" (click)="showEmailCompose=false">{{ 'actions.cancel' | transloco }}</button>
-              <button class="btn btn-p btn-sm" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ ' + t('email.sending') : '📤 ' + t('email.sendAction')}}</button>
+              <button class="btn btn-p btn-sm" (click)="sendEmail()" [disabled]="sendingEmail">@if (sendingEmail) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.sendAction') }} }</button>
             </div>
           </ng-container>
         </div>
@@ -603,7 +617,7 @@ interface WhatsappConvUiState {
           <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;user-select:none"
                [style.background]="expandedEmailId===a.id ? 'color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))' : hasUnreadInActivity(a) ? 'var(--gray-50)' : 'var(--surface)'"
                (click)="toggleEmailExpand(a)">
-            <span style="font-size:16px;flex-shrink:0">📧</span>
+            <span style="font-size:16px;flex-shrink:0"><i class="ei ei-mail"></i></span>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:8px">
                 <strong style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{a.title}}</strong>
@@ -660,10 +674,11 @@ interface WhatsappConvUiState {
               <!-- Collapsible fields -->
               <ng-container *ngIf="showReplyDetails">
                 <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.to') }}
-                  <div class="participant-chips">
+                  <div class="participant-chips" [class.fi-err]="inlineReplySubmitted && !inlineReplyForm.recipientList?.length">
                     <span *ngFor="let r of inlineReplyForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.recipientList.splice(i,1)" type="button">✕</button></span>
                     <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
                   </div>
+                  @if (inlineReplySubmitted && !inlineReplyForm.recipientList?.length) { <span class="ferr">{{ t('fieldErrors.recipients') }}</span> }
                 </label>
                 <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.cc') }}
                   <div class="participant-chips">
@@ -672,27 +687,31 @@ interface WhatsappConvUiState {
                   </div>
                 </label>
                 <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.subject') }}
-                  <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
+                  <input class="act-input" [(ngModel)]="inlineReplyForm.subject" [class.fi-err]="inlineReplySubmitted && !inlineReplyForm.subject?.trim()">
+                  @if (inlineReplySubmitted && !inlineReplyForm.subject?.trim()) { <span class="ferr">{{ t('fieldErrors.subject') }}</span> }
                 </label>
               </ng-container>
-              <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.replyBody')" style="display:block" theme="snow"></quill-editor>
+              <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.replyBody')" style="display:block" theme="snow"
+                            [class.fi-err]="inlineReplySubmitted && !inlineReplyForm.body?.trim()"></quill-editor>
+              @if (inlineReplySubmitted && !inlineReplyForm.body?.trim()) { <span class="ferr">{{ t('fieldErrors.message') }}</span> }
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:12px;color:var(--gray-500);flex:1;min-width:0">
-                <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" class="btn btn-g btn-sm" style="flex-shrink:0" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading">{{drivePickerLoading ? '⏳ ' + ('states.loading' | transloco) : '📁 ' + t('email.fromDrive')}}</button>
+                <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" class="btn btn-g btn-sm" style="flex-shrink:0" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading">@if (drivePickerLoading) { {{ ('states.loading' | transloco) }} } @else { <i class="ei ei-folder"></i> {{ t('email.fromDrive') }} }</button>
               </div>
               <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-                <span *ngFor="let f of inlineReplyAttachments; let i=index" class="file-chip">📎{{f.name}}<button (click)="removeInlineReplyAttachment(i)">✕</button></span>
+                <span *ngFor="let f of inlineReplyAttachments; let i=index" class="file-chip"><i class="ei ei-paperclip"></i> {{f.name}}<button (click)="removeInlineReplyAttachment(i)">✕</button></span>
               </div>
-              <div *ngIf="inlineReplyError" class="lead-note lead-note-err">⚠️ {{inlineReplyError}}</div>
+              <div *ngIf="inlineReplyError" class="lead-note lead-note-err"><i class="ei ei-warn"></i> {{inlineReplyError}}</div>
               <div style="display:flex;gap:8px;justify-content:flex-end">
+                @if (inlineReplySubmitted) { <wt-form-error-summary [count]="inlineReplyErrorCount()" /> }
                 <button class="btn btn-g btn-sm" (click)="cancelInlineReply()">{{ 'actions.cancel' | transloco }}</button>
-                <button class="btn btn-p btn-sm" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}</button>
+                <button class="btn btn-p btn-sm" (click)="sendInlineReply()" [disabled]="inlineReplySending">@if (inlineReplySending) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.reply.send') }} }</button>
               </div>
             </div>
             <div *ngIf="!showReplyInline" style="display:flex;gap:8px">
               <button *ngIf="a.gmail_thread_id && canEdit && canReplyToActivity(a)" class="btn btn-g btn-sm" (click)="startInlineReply(a)"
                       [title]="threadCanReply ? '' : t('email.thread.ownedByTooltip', { owner: threadOwnerEmail || t('email.thread.anotherUser') })">
-                {{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}
+                @if (threadCanReply) { ↩ {{ t('email.reply.action') }} } @else { <i class="ei ei-mail"></i> {{ t('email.writeNew') }} }
               </button>
             </div>
           </div>
@@ -706,13 +725,13 @@ interface WhatsappConvUiState {
 
         <!-- "Brak numeru" tylko gdy naprawdę nie ma też żadnej historii do pokazania. -->
         <div *ngIf="whatsappConfigured===false && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-          <div style="font-size:32px">💬</div>
+          <div class="ico-tile ico-tile--lg" style="margin:0 auto 0px"><i class="ei ei-message"></i></div>
           <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800)">WhatsApp</div>
           <div style="font-size:14px;color:var(--gray-400);text-align:center">{{ t('whatsapp.notConfigured') }}</div>
         </div>
 
         <div *ngIf="whatsappConfigured===true" id="wa-new-message" class="lead-form-box">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:4px">💬 {{ t('whatsapp.newMessage') }}</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:4px"><i class="ei ei-message"></i> {{ t('whatsapp.newMessage') }}</div>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border-radius:8px;overflow:hidden">
@@ -722,30 +741,33 @@ interface WhatsappConvUiState {
 
           <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('whatsapp.toField') }}
             <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
-                   placeholder="+48 123 123 123">
+                   placeholder="+48 123 123 123" [class.fi-err]="whatsappSubmitted && (!whatsappToPhone.trim() || whatsappToPhoneMissingCountryCode)">
+            @if (whatsappSubmitted && !whatsappToPhone.trim()) { <span class="ferr">{{ t('fieldErrors.phone') }}</span> }
           </label>
           <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:12px;color:oklch(from #b45309 max(l, var(--text-min-l)) c h)">{{ t('whatsapp.missingCountryCode') }}</div>
 
           <div class="wa-mode-switch">
-            <button type="button" class="fchip" [class.on]="whatsappMode==='template'" [disabled]="whatsappSending" (click)="whatsappMode='template'">📋 {{ t('whatsapp.mode.template') }}</button>
-            <button type="button" class="fchip" [class.on]="whatsappMode==='text'" [disabled]="whatsappSending" (click)="whatsappMode='text'">✏️ {{ t('whatsapp.mode.text') }}</button>
+            <button type="button" class="fchip" [class.on]="whatsappMode==='template'" [disabled]="whatsappSending" (click)="whatsappMode='template'"><i class="ei ei-clipboard"></i> {{ t('whatsapp.mode.template') }}</button>
+            <button type="button" class="fchip" [class.on]="whatsappMode==='text'" [disabled]="whatsappSending" (click)="whatsappMode='text'"><i class="ei ei-pencil"></i> {{ t('whatsapp.mode.text') }}</button>
           </div>
           <div *ngIf="whatsappMode==='text' && whatsappToPhone.trim() && !whatsappToPhoneMissingCountryCode && !isWhatsappWindowOpen(whatsappToPhone)" class="wa-window-hint">
-            🕒 {{ t('whatsapp.window.closedHint') }}
+            <i class="ei ei-clock"></i> {{ t('whatsapp.window.closedHint') }}
           </div>
 
           <label *ngIf="whatsappMode==='text'" style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('whatsapp.messageBody') }}
             <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
-                      [placeholder]="t('whatsapp.messagePlaceholder')"></textarea>
+                      [placeholder]="t('whatsapp.messagePlaceholder')" [class.fi-err]="whatsappSubmitted && !canSendWhatsappContent"></textarea>
           </label>
           <wt-whatsapp-template-picker *ngIf="whatsappMode==='template'" [disabled]="!canEdit || whatsappSending"
                                        (selectionChange)="whatsappTemplateSelection=$event" />
+          @if (whatsappSubmitted && !canSendWhatsappContent) { <span class="ferr">{{ t(whatsappMode === 'text' ? 'fieldErrors.message' : 'fieldErrors.whatsappTemplate') }}</span> }
 
-          <div *ngIf="whatsappError" class="lead-note lead-note-err">⚠️ {{whatsappError}}</div>
-          <div *ngIf="whatsappSuccess" class="lead-note lead-note-ok">✅ {{ t('whatsapp.sent') }}</div>
+          <div *ngIf="whatsappError" class="lead-note lead-note-err"><i class="ei ei-warn"></i> {{whatsappError}}</div>
+          <div *ngIf="whatsappSuccess" class="lead-note lead-note-ok"><i class="ei ei-check-circle"></i> {{ t('whatsapp.sent') }}</div>
 
           <div style="display:flex;gap:8px;justify-content:flex-end">
-            <button class="btn btn-p btn-sm" [disabled]="!canEdit || !whatsappToPhone.trim() || !canSendWhatsappContent || whatsappToPhoneMissingCountryCode || whatsappSending"
+            @if (whatsappSubmitted) { <wt-form-error-summary [count]="whatsappErrorCount()" /> }
+            <button class="btn btn-p btn-sm" [disabled]="whatsappSending"
                     (click)="sendWhatsapp()">
               {{ whatsappSending ? t('whatsapp.sending') : t('whatsapp.send') }}
             </button>
@@ -763,7 +785,7 @@ interface WhatsappConvUiState {
             <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;user-select:none"
                  [style.background]="getWhatsappConvState(conv.phone).expanded ? 'color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))' : 'var(--surface)'"
                  (click)="toggleWhatsappConvExpanded(conv.phone)">
-              <span style="font-size:16px;flex-shrink:0">💬</span>
+              <span style="font-size:16px;flex-shrink:0"><i class="ei ei-message"></i></span>
               <div style="flex:1;min-width:0">
                 <div style="display:flex;align-items:center;gap:8px">
                   <strong style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t('whatsapp.conversation') }}</strong>
@@ -786,7 +808,7 @@ interface WhatsappConvUiState {
                     <span style="font-weight:600">{{formatWhatsappHistoryPhone(h.direction==='outgoing' ? h.to_phone : h.from_phone)}}</span>
                   </span>
                   <span style="display:flex;align-items:center;gap:8px">
-                    <span *ngIf="h.direction==='outgoing' && h.status==='failed'" class="wa-failed" [title]="t('whatsapp.status.failedHint')">⚠️ {{ t('whatsapp.status.failed') }}</span>
+                    <span *ngIf="h.direction==='outgoing' && h.status==='failed'" class="wa-failed" [title]="t('whatsapp.status.failedHint')"><i class="ei ei-warn"></i> {{ t('whatsapp.status.failed') }}</span>
                     <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
                   </span>
                 </div>
@@ -801,8 +823,8 @@ interface WhatsappConvUiState {
               <div *ngIf="!getWhatsappConvState(conv.phone).replyOpen" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
                 <button *ngIf="isWhatsappWindowOpen(conv.phone)" class="btn btn-g btn-sm" (click)="startWhatsappConvReply(conv.phone)">↩{{ t('whatsapp.reply.action') }}</button>
                 <ng-container *ngIf="!isWhatsappWindowOpen(conv.phone)">
-                  <button class="btn btn-g btn-sm" (click)="startWhatsappTemplateTo(conv.phone)">📋{{ t('whatsapp.window.sendTemplate') }}</button>
-                  <span class="wa-window-note">🕒 {{ t('whatsapp.window.closedShort') }}</span>
+                  <button class="btn btn-g btn-sm" (click)="startWhatsappTemplateTo(conv.phone)"><i class="ei ei-clipboard"></i> {{ t('whatsapp.window.sendTemplate') }}</button>
+                  <span class="wa-window-note"><i class="ei ei-clock"></i> {{ t('whatsapp.window.closedShort') }}</span>
                 </ng-container>
               </div>
 
@@ -812,12 +834,13 @@ interface WhatsappConvUiState {
                 <textarea class="act-input" [ngModel]="getWhatsappConvState(conv.phone).replyMessage"
                           (ngModelChange)="setWhatsappConvReplyMessage(conv.phone, $event)"
                           [disabled]="getWhatsappConvState(conv.phone).replySending" rows="3"
-                          [placeholder]="t('whatsapp.reply.placeholder')"></textarea>
-                <div *ngIf="getWhatsappConvState(conv.phone).replyError" class="lead-note lead-note-err">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
+                          [placeholder]="t('whatsapp.reply.placeholder')"
+                          [class.fi-err]="!!getWhatsappConvState(conv.phone).replyError && !getWhatsappConvState(conv.phone).replyMessage.trim()"></textarea>
+                <div *ngIf="getWhatsappConvState(conv.phone).replyError" class="lead-note lead-note-err"><i class="ei ei-warn"></i> {{getWhatsappConvState(conv.phone).replyError}}</div>
                 <div style="display:flex;gap:8px;justify-content:flex-end">
                   <button class="btn btn-g btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">{{ 'actions.cancel' | transloco }}</button>
-                  <button class="btn btn-p btn-sm" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
-                    {{ getWhatsappConvState(conv.phone).replySending ? '⏳ ' + t('whatsapp.reply.sending') : '📤 ' + t('whatsapp.reply.send') }}
+                  <button class="btn btn-p btn-sm" [disabled]="getWhatsappConvState(conv.phone).replySending" (click)="sendWhatsappConvReply(conv.phone)">
+                    @if (getWhatsappConvState(conv.phone).replySending) { {{ t('whatsapp.reply.sending') }} } @else { <i class="ei ei-send"></i> {{ t('whatsapp.reply.send') }} }
                   </button>
                 </div>
               </div>
@@ -830,7 +853,7 @@ interface WhatsappConvUiState {
       <div *ngIf="midTab==='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
 
         <div *ngIf="smsThreadError" class="lead-note lead-note-warn" style="font-size:14px;padding:12px 16px">
-          ⚠️ {{smsThreadError}}
+          <i class="ei ei-warn"></i> {{smsThreadError}}
         </div>
 
         <div *ngIf="smsLoading && smsConversations.length===0" style="font-size:12px;color:var(--gray-400);padding:4px 0">{{ 'states.loading' | transloco }}</div>
@@ -842,7 +865,7 @@ interface WhatsappConvUiState {
                [style.background]="getSmsConvState(conv.number).expanded ? 'color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))' : 'var(--surface)'"
                (click)="toggleSmsConvExpanded(conv.number)">
             <div style="display:flex;flex-direction:column;gap:2px;overflow:hidden">
-              <strong style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 {{conv.label}}</strong>
+              <strong style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="ei ei-message"></i> {{conv.label}}</strong>
               <span style="font-size:12px;color:var(--gray-400)" *ngIf="conv.messages.length">
                 {{ t('sms.last') }} {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
               </span>
@@ -870,13 +893,14 @@ interface WhatsappConvUiState {
               <textarea [ngModel]="getSmsConvState(conv.number).replyMessage"
                         (ngModelChange)="setSmsConvReplyMessage(conv.number, $event)"
                         rows="1" class="fta" style="flex:1;resize:none;min-height:0"
-                        [placeholder]="t('sms.messagePlaceholder')" [disabled]="!canEdit || getSmsConvState(conv.number).sending"></textarea>
-              <button class="btn btn-p btn-sm" [disabled]="!canEdit || getSmsConvState(conv.number).sending || !getSmsConvState(conv.number).replyMessage.trim()"
+                        [placeholder]="t('sms.messagePlaceholder')" [disabled]="!canEdit || getSmsConvState(conv.number).sending"
+                        [class.fi-err]="!!getSmsConvState(conv.number).error && !getSmsConvState(conv.number).replyMessage.trim()"></textarea>
+              <button class="btn btn-p btn-sm" [disabled]="getSmsConvState(conv.number).sending"
                       (click)="sendSmsToConv(conv)">
-                {{ getSmsConvState(conv.number).sending ? '⏳' : t('sms.send') }}
+                @if (getSmsConvState(conv.number).sending) { … } @else { {{ t('sms.send') }} }
               </button>
             </div>
-            <div *ngIf="getSmsConvState(conv.number).error" style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-size:12px;padding:0 12px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
+            <div *ngIf="getSmsConvState(conv.number).error" style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-size:12px;padding:0 12px 8px"><i class="ei ei-warn"></i> {{getSmsConvState(conv.number).error}}</div>
           </div>
         </div>
       </div>
@@ -884,20 +908,20 @@ interface WhatsappConvUiState {
     </div>
 
     <!-- PRAWA: Mock call/email + Konwertuj info -->
-    <div class="shadow-room" style="overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:0">
+    <div class="shadow-room card-col-right" style="overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:0">
 
       <!-- Komunikacja -->
       <div class="side-box">
-        <div class="side-box-title">📞 {{ t('activity.communication') }}</div>
-        <button class="comm-btn" *ngIf="canEdit" (click)="mockCall()" [disabled]="!lead.phone">
-          <span style="font-size:16px">📞</span>
+        <div class="side-box-title"><i class="ei ei-phone"></i> {{ t('activity.communication') }}</div>
+        <button class="comm-btn" *ngIf="canEdit" (click)="lead.phone ? mockCall() : explainMissingContact('phone')">
+          <span style="font-size:16px"><i class="ei ei-phone"></i></span>
           <div style="flex:1;text-align:left">
             <div style="font-size:12px;font-weight:600">{{ t('calls.call') }}</div>
             <div style="font-size:10px;color:var(--gray-400)">{{lead.phone || t('calls.noNumber')}}</div>
           </div>
         </button>
-        <button class="comm-btn" *ngIf="canEdit" (click)="openEmailCompose()" [disabled]="!lead.email" style="margin-top:8px">
-          <span style="font-size:16px">✉️</span>
+        <button class="comm-btn" *ngIf="canEdit" (click)="lead.email ? openEmailCompose() : explainMissingContact('email')" style="margin-top:8px">
+          <span style="font-size:16px"><i class="ei ei-mail"></i></span>
           <div style="flex:1;text-align:left">
             <div style="font-size:12px;font-weight:600">{{ t('email.send') }}</div>
             <div style="font-size:10px;color:var(--gray-400)">{{lead.email || t('email.noAddress')}}</div>
@@ -909,12 +933,12 @@ interface WhatsappConvUiState {
       <!-- Powiązane dokumenty -->
       <div class="side-box">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
-          <div class="side-box-title" style="margin-bottom:0">📎 {{ t('documents.titleWithCount', { count: linkedDocs.length }) }}</div>
+          <div class="side-box-title" style="margin-bottom:0"><i class="ei ei-paperclip"></i> {{ t('documents.titleWithCount', { count: linkedDocs.length }) }}</div>
           <button class="btn btn-g btn-sm" *ngIf="canEdit" (click)="showDocPicker=true">+ {{ t('documents.add') }}</button>
         </div>
         <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:var(--gray-400);text-align:center;padding:8px">{{ t('documents.none') }}</div>
         <div *ngFor="let d of linkedDocs" style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--gray-100);cursor:pointer" (click)="openDocument(d)" [title]="t('documents.open')">
-          <span style="font-size:13px">📄</span>
+          <span style="font-size:14px"><i class="ei ei-file"></i></span>
           <div style="flex:1;min-width:0">
             <div style="font-size:12px;font-weight:600;color:var(--gray-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{d.document_title||'#'+d.document_id}}</div>
             <div style="font-size:10px;color:var(--gray-400)"><span *ngIf="d.doc_number">#{{d.doc_number}} · </span>{{d.doc_type}}</div>
@@ -926,7 +950,7 @@ interface WhatsappConvUiState {
       <!-- Historia zmian — mini sekcja -->
       <div class="side-box">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
-          <div class="side-box-title" style="margin-bottom:0">🕐 {{ t('history.title') }}</div>
+          <div class="side-box-title" style="margin-bottom:0"><i class="ei ei-clock"></i> {{ t('history.title') }}</div>
           <button *ngIf="history.length" class="btn btn-g btn-sm" (click)="showHistoryModal=true">{{ t('history.showAll') }}</button>
         </div>
         <div *ngIf="historyLoading" style="text-align:center;color:var(--gray-400);font-size:12px;padding:8px">{{ 'states.loading' | transloco }}</div>
@@ -942,12 +966,12 @@ interface WhatsappConvUiState {
 
       <!-- Onboarding -->
       <div *ngIf="!lead.converted_at && canEdit" class="side-box" style="background:var(--orange-pale)">
-        <div class="side-box-title" style="color:var(--orange-dark)">🚀 {{ t('leadDetail.onboarding.start') }}</div>
+        <div class="side-box-title" style="color:var(--orange-dark)"><i class="ei ei-play"></i> {{ t('leadDetail.onboarding.start') }}</div>
         <div style="font-size:12px;color:var(--orange-dark);margin-bottom:12px">{{ t('leadDetail.onboarding.hint') }}</div>
         <button class="btn btn-p btn-sm" style="width:100%;box-shadow:none" (click)="showConvert=true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15c-1.5 1.3-2 4-2 6 2 0 4.7-.5 6-2"/><path d="M9 18l-3-3c1-4 4-9 10-11 1 0 2 0 3 1 1 1 1 2 1 3-2 6-7 9-11 10z"/><circle cx="15" cy="9" r="1.6"/><path d="M8 12H4l2-3h4M12 16v4l3-2v-4"/></svg>{{ t('leadDetail.onboarding.start') }} →</button>
       </div>
       <div *ngIf="lead.converted_at && lead.stage==='onboarding'" class="side-box" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))">
-        <div style="font-size:12px;font-weight:700;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);margin-bottom:4px;display:flex;align-items:center;gap:4px">⏳ {{ t('leadDetail.onboarding.inProgress') }}</div>
+        <div style="font-size:12px;font-weight:700;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);margin-bottom:4px;display:flex;align-items:center;gap:4px"><i class="ei ei-hourglass"></i> {{ t('leadDetail.onboarding.inProgress') }}</div>
         <div style="font-size:12px;color:var(--gray-400);margin-bottom:6px">{{ t('leadDetail.onboarding.startedAt') }} {{lead.converted_at|date:'dd.MM.yyyy'}}</div>
         <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px">{{ t('leadDetail.onboarding.inProgressHint') }}</div>
         <a routerLink="/crm/onboarding" style="font-size:12px;color:oklch(from #2563eb max(l, var(--text-min-l)) c h);font-weight:600;text-decoration:none">→ {{ t('leadDetail.onboarding.goTo') }}</a>
@@ -970,7 +994,7 @@ interface WhatsappConvUiState {
 <div class="modal-overlay" *ngIf="showHistoryModal" (click)="showHistoryModal=false">
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(600px,100%);max-height:80vh;display:flex;flex-direction:column;gap:0;padding:0">
     <div class="modal-header" style="flex-shrink:0">
-      <h3>🕐 {{ t('history.title') }}</h3>
+      <h3><i class="ei ei-clock"></i> {{ t('history.title') }}</h3>
       <button class="close-btn" (click)="showHistoryModal=false">✕</button>
     </div>
     <div style="padding:12px 24px;flex-shrink:0;border-bottom:1px solid var(--gray-100)">
@@ -994,7 +1018,7 @@ interface WhatsappConvUiState {
 <div class="modal-overlay" *ngIf="showThreadModal" (click)="showThreadModal=false">
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(680px,100%)">
     <div class="modal-header">
-      <h3>💬 {{ t('email.thread.title') }}</h3>
+      <h3><i class="ei ei-message"></i> {{ t('email.thread.title') }}</h3>
       <button class="close-btn" (click)="showThreadModal=false">✕</button>
     </div>
     <div class="modal-body" style="gap:8px">
@@ -1017,14 +1041,14 @@ interface WhatsappConvUiState {
         <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
              style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px" (click)="$event.stopPropagation()">
           <span *ngFor="let att of m.attachments" class="att-chip" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h)">
-            📎 {{att.filename}}
+            <i class="ei ei-paperclip"></i> {{att.filename}}
             <span class="att-chip-actions">
               <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
               <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
             </span>
           </span>
           <span *ngFor="let att of m.sentAttachments" class="att-chip" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
-            📎 {{att.filename}}
+            <i class="ei ei-paperclip"></i> {{att.filename}}
             <span class="att-chip-actions">
               <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
               <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
@@ -1037,7 +1061,7 @@ interface WhatsappConvUiState {
     </div>
     <div class="modal-footer">
       <button class="btn btn-g" (click)="showThreadModal=false">{{ 'actions.close' | transloco }}</button>
-      <button class="btn btn-p" (click)="replyToCurrentThread()" [title]="threadCanReply ? '' : t('email.thread.ownedByTooltip', { owner: threadOwnerEmail || t('email.thread.anotherUser') })">{{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}</button>
+      <button class="btn btn-p" (click)="replyToCurrentThread()" [title]="threadCanReply ? '' : t('email.thread.ownedByTooltip', { owner: threadOwnerEmail || t('email.thread.anotherUser') })">@if (threadCanReply) { ↩ {{ t('email.reply.action') }} } @else { <i class="ei ei-mail"></i> {{ t('email.writeNew') }} }</button>
     </div>
   </div>
 </div>
@@ -1046,7 +1070,7 @@ interface WhatsappConvUiState {
 <div class="modal-overlay" *ngIf="showMsgModal" (click)="closeMsgModal()">
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(720px,100%);max-height:90vh;display:flex;flex-direction:column">
     <div class="modal-header">
-      <h3>📧 {{msgModalMsg?.subject}}</h3>
+      <h3><i class="ei ei-mail"></i> {{msgModalMsg?.subject}}</h3>
       <button class="close-btn" (click)="closeMsgModal()">✕</button>
     </div>
     <div class="modal-body" style="gap:12px;overflow-y:auto;flex:1" *ngIf="msgModalMsg">
@@ -1064,14 +1088,14 @@ interface WhatsappConvUiState {
       <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
            style="display:flex;flex-wrap:wrap;gap:6px">
         <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);font-size:12px;padding:4px 10px">
-          📎 {{att.filename}}
+          <i class="ei ei-paperclip"></i> {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
             <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
           </span>
         </span>
         <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);font-size:12px;padding:4px 10px">
-          📎 {{att.filename}}
+          <i class="ei ei-paperclip"></i> {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
             <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
@@ -1084,7 +1108,7 @@ interface WhatsappConvUiState {
         <!-- Do -->
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           {{ t('email.fields.to') }}
-          <div class="participant-chips">
+          <div class="participant-chips" [class.fi-err]="msgReplySubmitted && !msgModalForm.recipientList?.length">
             <span *ngFor="let r of msgModalForm.recipientList; let i=index" class="participant-chip">
               {{r}}<button (click)="msgModalForm.recipientList.splice(i,1)" type="button">✕</button>
             </span>
@@ -1092,6 +1116,7 @@ interface WhatsappConvUiState {
                    (keydown.enter)="pushMsgRecipient()" (keydown.Tab)="pushMsgRecipient()"
                    [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
           </div>
+          @if (msgReplySubmitted && !msgModalForm.recipientList?.length) { <span class="ferr">{{ t('fieldErrors.recipients') }}</span> }
         </label>
         <!-- DW -->
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
@@ -1108,7 +1133,8 @@ interface WhatsappConvUiState {
         <!-- Temat -->
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           {{ t('email.fields.subject') }}
-          <input class="act-input" [(ngModel)]="msgModalForm.subject" [placeholder]="t('email.placeholders.subject')">
+          <input class="act-input" [(ngModel)]="msgModalForm.subject" [placeholder]="t('email.placeholders.subject')" [class.fi-err]="msgReplySubmitted && !msgModalForm.subject?.trim()">
+          @if (msgReplySubmitted && !msgModalForm.subject?.trim()) { <span class="ferr">{{ t('fieldErrors.subject') }}</span> }
         </label>
         <!-- Treść -->
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
@@ -1122,26 +1148,27 @@ interface WhatsappConvUiState {
             <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:var(--gray-500);flex:1;min-width:0">
             <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" class="btn btn-g btn-sm" style="flex-shrink:0"
                     (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading">
-              <span *ngIf="!drivePickerLoading">📁 {{ t('email.fromGoogleDrive') }}</span>
-              <span *ngIf="drivePickerLoading">⏳ {{ 'states.loading' | transloco }}</span>
+              <span *ngIf="!drivePickerLoading"><i class="ei ei-folder"></i> {{ t('email.fromGoogleDrive') }}</span>
+              <span *ngIf="drivePickerLoading"><i class="ei ei-hourglass"></i> {{ 'states.loading' | transloco }}</span>
             </button>
           </div>
           <div *ngIf="msgModalAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
             <span *ngFor="let f of msgModalAttachments; let i=index" class="file-chip">
-              📎{{f.name}}
+              <i class="ei ei-paperclip"></i> {{f.name}}
               <button (click)="removeMsgReplyAttachment(i)">✕</button>
             </span>
           </div>
         </div>
-        <div *ngIf="msgModalError" class="lead-note lead-note-err">⚠️ {{msgModalError}}</div>
+        <div *ngIf="msgModalError" class="lead-note lead-note-err"><i class="ei ei-warn"></i> {{msgModalError}}</div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-g" (click)="closeMsgModal()">{{ 'actions.close' | transloco }}</button>
-      <button *ngIf="!msgModalReply && emailConnected" class="btn btn-g" (click)="startMsgReply()">{{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}</button>
+      <button *ngIf="!msgModalReply && emailConnected" class="btn btn-g" (click)="startMsgReply()">@if (threadCanReply) { ↩ {{ t('email.reply.action') }} } @else { <i class="ei ei-mail"></i> {{ t('email.writeNew') }} }</button>
+      @if (msgModalReply && msgReplySubmitted) { <wt-form-error-summary [count]="msgReplyErrorCount()" /> }
       <button *ngIf="msgModalReply && emailConnected" class="btn btn-p" (click)="sendMsgReply()"
-              [disabled]="msgModalSending || !msgModalForm.recipientList?.length || !msgModalForm.subject">
-        {{msgModalSending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}
+              [disabled]="msgModalSending">
+        @if (msgModalSending) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.reply.send') }} }
       </button>
     </div>
   </div>
@@ -1158,11 +1185,11 @@ interface WhatsappConvUiState {
       <div class="edit-section">
         <div class="edit-section-title">{{ t('leadDetail.edit.sections.basic') }}</div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.companyName') }} *<input [(ngModel)]="editForm.company" [placeholder]="t('leadDetail.fields.companyName')" required [class.fi-err]="editMissing('company')">@if (editMissing('company')) { <span class="ferr">{{ t('fieldErrors.company') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.companyName') }} <span class="req">*</span><input [(ngModel)]="editForm.company" [placeholder]="t('leadDetail.fields.companyName')" required [class.fi-err]="editMissing('company')">@if (editMissing('company')) { <span class="ferr">{{ t('fieldErrors.company') }}</span> }</label>
           <label>{{ t('leadDetail.fields.stage') }}<select [(ngModel)]="editForm.stage"><option *ngFor="let s of allowedStageOptions" [value]="s.key">{{s.label}}</option></select></label>
         </div>
         <div class="edit-row" *ngIf="stages.isLost(editForm.stage)">
-          <label class="full" style="color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">{{ t('leadDetail.fields.lostReason') }} *
+          <label class="full" style="color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">{{ t('leadDetail.fields.lostReason') }} <span class="req">*</span>
             <select [(ngModel)]="editForm.lost_reason"
                     [class.fi-err]="editMissing('lostReason')">
               <option value="">{{ t('leadDetail.edit.chooseReason') }}</option>
@@ -1174,19 +1201,19 @@ interface WhatsappConvUiState {
         <div class="edit-row"><button type="button" class="fchip hot-chip" [class.on]="editForm.hot" [attr.aria-pressed]="!!editForm.hot" [title]="t('leadsList.newLead.hotHint')" (click)="editForm.hot = !editForm.hot">🔥 {{ t('leadDetail.fields.hotLead') }}</button></div>
       </div>
       <div class="edit-section">
-        <div class="edit-section-title">{{ t('leadDetail.fields.website') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></div>
+        <div class="edit-section-title">{{ t('leadDetail.fields.website') }} <span *ngIf="requiresFullFields" class="req">*</span></div>
         <div style="display:flex;gap:8px;align-items:center">
           <input class="fi" style="flex:1"
                  [(ngModel)]="editForm.website" [placeholder]="t('leadDetail.edit.placeholders.website')"
-                 [class.fi-err]="editMissing('website')"
+                 [class.fi-err]="editMissing('website') || (enrichSubmitted && !editForm.website?.trim())"
                  (keydown.enter)="runDetailEnrich()">
           <button class="btn btn-g" style="flex-shrink:0"
                   (click)="runDetailEnrich()"
-                  [disabled]="!editForm.website||detailEnriching">
-            {{detailEnriching ? '⏳ ' + t('leadDetail.enrich.loading') : '🔍 ' + t('leadDetail.enrich.action')}}
+                  [disabled]="detailEnriching">
+            @if (detailEnriching) { {{ t('leadDetail.enrich.loading') }} } @else { <i class="ei ei-search"></i> {{ t('leadDetail.enrich.action') }} }
           </button>
         </div>
-        @if (editMissing('website')) { <span class="ferr">{{ t('fieldErrors.website') }}</span> }
+        @if (editMissing('website') || (enrichSubmitted && !editForm.website?.trim())) { <span class="ferr">{{ t('fieldErrors.website') }}</span> }
         <div *ngIf="detailEnrichDone" class="lead-note lead-note-ok" style="margin-top:8px">
           ✓ {{ t('leadDetail.enrich.done') }}
         </div>
@@ -1194,21 +1221,21 @@ interface WhatsappConvUiState {
       <div class="edit-section">
         <div class="edit-section-title">{{ t('leadDetail.sections.contact') }}</div>
         <div class="edit-row">
-          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.fullName') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></span>
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.fullName') }} <span *ngIf="requiresFullFields" class="req">*</span></span>
             <input [(ngModel)]="editForm.contact_name" [placeholder]="t('leadDetail.edit.placeholders.fullName')"
                    [class.fi-err]="editMissing('contactName')">
             @if (editMissing('contactName')) { <span class="ferr">{{ t('fieldErrors.contactName') }}</span> }
           </label>
-          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.contactTitle') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></span><select [(ngModel)]="editForm.contact_title"
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.contactTitle') }} <span *ngIf="requiresFullFields" class="req">*</span></span><select [(ngModel)]="editForm.contact_title"
                    [class.fi-err]="editMissing('contactTitle')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select>@if (editMissing('contactTitle')) { <span class="ferr">{{ t('fieldErrors.contactTitle') }}</span> }</label>
         </div>
         <div class="edit-row">
-          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.email') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></span>
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.email') }} <span *ngIf="requiresFullFields" class="req">*</span></span>
             <input [(ngModel)]="editForm.email" type="email" [placeholder]="t('leadDetail.edit.placeholders.email')"
                    [class.fi-err]="editMissing('email')">
             @if (editMissing('email')) { <span class="ferr">{{ t('fieldErrors.email') }}</span> }
           </label>
-          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.phone') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></span>
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.phone') }} <span *ngIf="requiresFullFields" class="req">*</span></span>
             <wt-phone-input [(ngModel)]="editForm.phone" [invalid]="editMissing('phone')" />
             @if (editMissing('phone')) { <span class="ferr">{{ t('fieldErrors.phone') }}</span> }
           </label>
@@ -1239,7 +1266,7 @@ interface WhatsappConvUiState {
       <div class="edit-section">
         <div class="edit-section-title">{{ t('leadDetail.fields.nip') }}</div>
         <div class="edit-row">
-          <label class="full"><span style="display:flex;align-items:center;gap:4px;margin-bottom:4px">{{ t('leadDetail.fields.nip') }} <span style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></span>
+          <label class="full"><span style="display:flex;align-items:center;gap:4px;margin-bottom:4px">{{ t('leadDetail.fields.nip') }} <span class="req">*</span></span>
             <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
                    (ngModelChange)="validateEditNip()"
                    [class.fi-err]="!!editNipError">
@@ -1250,23 +1277,23 @@ interface WhatsappConvUiState {
       <div class="edit-section">
         <div class="edit-section-title">{{ t('leadDetail.edit.sections.sales') }}</div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.annualTurnover') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><div style="display:flex;gap:6px"><input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1" [class.fi-err]="editMissing('value') || !!amountError(editForm.value_pln)"><select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div>@if (editMissing('value')) { <span class="ferr">{{ t('fieldErrors.value') }}</span> }@if (amountError(editForm.value_pln); as amountKey) { <span class="ferr">{{ t('fieldErrors.' + amountKey) }}</span> }</label>
-          <label>{{ t('leadDetail.fields.onlinePct') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><select [(ngModel)]="editForm.online_pct" [class.fi-err]="editMissing('onlinePct')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select>@if (editMissing('onlinePct')) { <span class="ferr">{{ t('fieldErrors.onlinePct') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.annualTurnover') }} <span *ngIf="requiresFullFields" class="req">*</span><div style="display:flex;gap:6px"><input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1" [class.fi-err]="editMissing('value') || !!amountError(editForm.value_pln)"><select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div>@if (editMissing('value')) { <span class="ferr">{{ t('fieldErrors.value') }}</span> }@if (amountError(editForm.value_pln); as amountKey) { <span class="ferr">{{ t('fieldErrors.' + amountKey) }}</span> }</label>
+          <label>{{ t('leadDetail.fields.onlinePct') }} <span *ngIf="requiresFullFields" class="req">*</span><select [(ngModel)]="editForm.online_pct" [class.fi-err]="editMissing('onlinePct')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select>@if (editMissing('onlinePct')) { <span class="ferr">{{ t('fieldErrors.onlinePct') }}</span> }</label>
         </div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.firstContact') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><input [(ngModel)]="editForm.first_contact_date" type="date" [class.fi-err]="editMissing('firstContact')">@if (editMissing('firstContact')) { <span class="ferr">{{ t('fieldErrors.firstContact') }}</span> }</label>
-          <label>{{ t('leadDetail.fields.closeDate') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><input [(ngModel)]="editForm.close_date" type="date" [class.fi-err]="editMissing('closeDate')">@if (editMissing('closeDate')) { <span class="ferr">{{ t('fieldErrors.closeDate') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.firstContact') }} <span *ngIf="requiresFullFields" class="req">*</span><input [(ngModel)]="editForm.first_contact_date" type="date" [class.fi-err]="editMissing('firstContact')">@if (editMissing('firstContact')) { <span class="ferr">{{ t('fieldErrors.firstContact') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.closeDate') }} <span *ngIf="requiresFullFields" class="req">*</span><input [(ngModel)]="editForm.close_date" type="date" [class.fi-err]="editMissing('closeDate')">@if (editMissing('closeDate')) { <span class="ferr">{{ t('fieldErrors.closeDate') }}</span> }</label>
         </div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.source') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()" [class.fi-err]="editMissing('source')"><option value="">{{ t('leadDetail.edit.none') }}</option>
+          <label>{{ t('leadDetail.fields.source') }} <span *ngIf="requiresFullFields" class="req">*</span><select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()" [class.fi-err]="editMissing('source')"><option value="">{{ t('leadDetail.edit.none') }}</option>
                   @for (s of sourcesWithoutGroup(); track s.value) { <option [value]="s.value">{{sourceOptionLabel(s)}}</option> }
                   @for (g of sourceGroups(); track g) { <optgroup [label]="g">@for (s of sourcesInGroup(g); track s.value) { <option [value]="s.value">{{sourceOptionLabel(s)}}</option> }</optgroup> }
                   </select>@if (editMissing('source')) { <span class="ferr">{{ t('fieldErrors.source') }}</span> }</label>
-          <label>{{ t('leadDetail.fields.industry') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><select [(ngModel)]="editForm.industry" [class.fi-err]="editMissing('industry')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select>@if (editMissing('industry')) { <span class="ferr">{{ t('fieldErrors.industry') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.industry') }} <span *ngIf="requiresFullFields" class="req">*</span><select [(ngModel)]="editForm.industry" [class.fi-err]="editMissing('industry')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select>@if (editMissing('industry')) { <span class="ferr">{{ t('fieldErrors.industry') }}</span> }</label>
         </div>
         <ng-container *ngIf="editForm.source==='agent'">
           <div style="background:var(--orange-pale);border-radius:12px;padding:12px 16px;display:flex;flex-direction:column;gap:12px;margin-top:4px">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color: var(--orange-text);display:flex;align-items:center;gap:4px">🤝 {{ t('leadDetail.edit.sections.agent') }}</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color: var(--orange-text);display:flex;align-items:center;gap:4px"><i class="ei ei-handshake"></i> {{ t('leadDetail.edit.sections.agent') }}</div>
             <div class="edit-row">
               <label>{{ t('leadDetail.fields.fullName') }}<input [(ngModel)]="editForm.agent_name" [placeholder]="t('leadDetail.edit.placeholders.fullName')"></label>
               <label>{{ t('leadDetail.fields.phone') }}<wt-phone-input [(ngModel)]="editForm.agent_phone" /></label>
@@ -1275,8 +1302,8 @@ interface WhatsappConvUiState {
           </div>
         </ng-container>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.salesperson') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><select [(ngModel)]="editForm.assigned_to" [class.fi-err]="editMissing('salesperson')"><option value="">{{ t('leadDetail.edit.unassigned') }}</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select>@if (editMissing('salesperson')) { <span class="ferr">{{ t('fieldErrors.salesperson') }}</span> }</label>
-          <label>{{ t('leadDetail.fields.probabilityPct') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><select [(ngModel)]="editForm.probability" [class.fi-err]="editMissing('probability')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select>@if (editMissing('probability')) { <span class="ferr">{{ t('fieldErrors.probability') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.salesperson') }} <span *ngIf="requiresFullFields" class="req">*</span><select [(ngModel)]="editForm.assigned_to" [class.fi-err]="editMissing('salesperson')"><option value="">{{ t('leadDetail.edit.unassigned') }}</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select>@if (editMissing('salesperson')) { <span class="ferr">{{ t('fieldErrors.salesperson') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.probabilityPct') }} <span *ngIf="requiresFullFields" class="req">*</span><select [(ngModel)]="editForm.probability" [class.fi-err]="editMissing('probability')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select>@if (editMissing('probability')) { <span class="ferr">{{ t('fieldErrors.probability') }}</span> }</label>
         </div>
         <div class="edit-row">
           <label class="full">{{ t('leadDetail.fields.tagsHint') }}<input [(ngModel)]="editForm.tagsStr" placeholder="tag1, tag2"></label>
@@ -1310,7 +1337,7 @@ interface WhatsappConvUiState {
 <!-- Document Picker Modal -->
 <div class="modal-overlay" *ngIf="showDocPicker" (click)="showDocPicker=false">
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(640px,100%)">
-    <div class="modal-header"><h3>📎 {{ t('documents.picker.title') }}</h3><button class="close-btn" (click)="showDocPicker=false">✕</button></div>
+    <div class="modal-header"><h3><i class="ei ei-paperclip"></i> {{ t('documents.picker.title') }}</h3><button class="close-btn" (click)="showDocPicker=false">✕</button></div>
     <div class="modal-body" style="gap:12px">
       <div style="font-size:12px;color:var(--gray-500)">{{ t('documents.picker.hint') }}</div>
       <input type="search" class="fi" [(ngModel)]="docSearch" (ngModelChange)="onDocSearch()" [placeholder]="t('documents.picker.searchPlaceholder')">
@@ -1324,15 +1351,15 @@ interface WhatsappConvUiState {
              [title]="doc._access==='read' ? t('documents.picker.readOnlyTooltip') : ''"
              [style.background]="isLinked(doc.id)?'color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface))':'var(--surface)'"
              (click)="toggleLinkDoc(doc)">
-          <span style="font-size:16px">📄</span>
+          <span style="font-size:16px"><i class="ei ei-file"></i></span>
           <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--gray-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{doc.name}}</div><div style="font-size:10px;color:var(--gray-400)"><span *ngIf="doc.doc_number">#{{doc.doc_number}} · </span>{{doc.doc_type}}</div></div>
-          <span *ngIf="doc._access==='read'" style="font-size:12px;color:var(--gray-400)">🔒 {{ t('documents.picker.readOnly') }}</span>
+          <span *ngIf="doc._access==='read'" style="font-size:12px;color:var(--gray-400)"><i class="ei ei-lock"></i> {{ t('documents.picker.readOnly') }}</span>
           <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:12px;font-weight:700;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">✓ {{ t('documents.picker.added') }}</span>
           <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:12px;color:var(--gray-400)">{{ t('documents.add') }}</span>
         </div>
       </div>
       <div *ngIf="linkDocError" class="lead-note lead-note-err">
-        ⚠ {{linkDocError}}
+        <i class="ei ei-warn"></i> {{linkDocError}}
       </div>
     </div>
     <div class="modal-footer"><button class="btn btn-g" (click)="showDocPicker=false">{{ 'actions.close' | transloco }}</button></div>
@@ -1344,7 +1371,7 @@ interface WhatsappConvUiState {
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(660px,100%)">
     <div class="modal-header">
       <div style="display:flex;flex-direction:column;gap:2px">
-        <h3>🖥️ {{ t('leadDetail.testAccount.title') }}</h3>
+        <h3><i class="ei ei-monitor"></i> {{ t('leadDetail.testAccount.title') }}</h3>
         <div style="font-size:12px;color:var(--gray-400);font-weight:400">{{lead?.company}}<span *ngIf="lead?.nip"> · {{ t('leadDetail.fields.nip') }}: {{lead?.nip}}</span></div>
       </div>
       <button class="close-btn" (click)="closeTestAccountModal()">✕</button>
@@ -1354,7 +1381,7 @@ interface WhatsappConvUiState {
 
       <!-- Status: konto już założone -->
       <div *ngIf="testAccount?.status==='created'" class="ta-status-ok">
-        <span style="font-size:22px">✅</span>
+        <span class="ico-tile"><i class="ei ei-check-circle"></i></span>
         <div style="flex:1">
           <div style="font-size:12px;font-weight:700;color:oklch(from #15803d max(l, var(--text-min-l)) c h)">{{ t('leadDetail.testAccount.created') }}</div>
           <div style="font-size:12px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-family:monospace;margin-top:2px">
@@ -1364,7 +1391,7 @@ interface WhatsappConvUiState {
           <div *ngIf="testAccount!.price_list_url" style="margin-top:4px">
             <a [href]="testAccount!.price_list_url" target="_blank"
                style="font-size:12px;color:oklch(from #2563eb max(l, var(--text-min-l)) c h);text-decoration:underline">
-              📋 {{ t('leadDetail.testAccount.openPriceList') }}
+              <i class="ei ei-clipboard"></i> {{ t('leadDetail.testAccount.openPriceList') }}
             </a>
           </div>
           <div style="font-size:10px;color:var(--gray-500);margin-top:2px">{{ t('leadDetail.testAccount.numberHint') }}</div>
@@ -1373,7 +1400,7 @@ interface WhatsappConvUiState {
 
       <!-- Status: błąd poprzedniego wywołania -->
       <div *ngIf="testAccount?.status==='error'" class="ta-status-err">
-        <span style="font-size:22px">⚠️</span>
+        <span class="ico-tile ico-tile--warn"><i class="ei ei-warn"></i></span>
         <div>
           <div style="font-size:12px;font-weight:700;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">{{ t('leadDetail.testAccount.previousError') }}</div>
           <div style="font-size:12px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);margin-top:2px">{{testAccount!.last_error}}</div>
@@ -1383,7 +1410,7 @@ interface WhatsappConvUiState {
 
       <!-- Błąd bieżącego wywołania -->
       <div *ngIf="testAccountError" class="ta-status-err">
-        <span style="font-size:20px">❌</span>
+        <span class="ico-tile ico-tile--danger"><i class="ei ei-x-circle"></i></span>
         <div style="font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-weight:600">{{testAccountError}}</div>
       </div>
 
@@ -1391,10 +1418,10 @@ interface WhatsappConvUiState {
       <div class="ta-section">
         <div class="ta-section-title">{{ t('leadDetail.testAccount.sections.technical') }}</div>
         <div class="ta-row">
-          <label>{{ t('leadDetail.testAccount.fields.subdomain') }} *
+          <label>{{ t('leadDetail.testAccount.fields.subdomain') }} <span class="req">*</span>
             <input [(ngModel)]="taForm.subdomain" [placeholder]="t('leadDetail.testAccount.placeholders.subdomain')" [style.border-color]="taSubmitAttempt&&!taForm.subdomain?'#ef4444':''">
           </label>
-          <label>{{ t('leadDetail.testAccount.fields.language') }} *
+          <label>{{ t('leadDetail.testAccount.fields.language') }} <span class="req">*</span>
             <select [(ngModel)]="taForm.language" [style.border-color]="taSubmitAttempt&&!taForm.language?'#ef4444':''">
               <option value="">{{ t('leadDetail.testAccount.choose') }}</option>
               <option value="PL">{{ t('leadDetail.testAccount.languages.pl') }}</option>
@@ -1406,7 +1433,7 @@ interface WhatsappConvUiState {
           </label>
         </div>
         <div class="ta-row">
-          <label>{{ t('leadDetail.testAccount.fields.currency') }} *
+          <label>{{ t('leadDetail.testAccount.fields.currency') }} <span class="req">*</span>
             <select [(ngModel)]="taForm.partner_currency" [style.border-color]="taSubmitAttempt&&!taForm.partner_currency?'#ef4444':''">
               <option value="">{{ t('leadDetail.testAccount.choose') }}</option>
               <option value="PLN">PLN</option>
@@ -1416,7 +1443,7 @@ interface WhatsappConvUiState {
               <option value="CHF">CHF</option>
             </select>
           </label>
-          <label>{{ t('leadDetail.testAccount.fields.country') }} *
+          <label>{{ t('leadDetail.testAccount.fields.country') }} <span class="req">*</span>
             <select [(ngModel)]="taForm.country" [style.border-color]="taSubmitAttempt&&!taForm.country?'#ef4444':''">
               <option value="">{{ t('leadDetail.testAccount.choose') }}</option>
               <option value="PL">{{ t('leadDetail.testAccount.countries.pl') }}</option>
@@ -1438,20 +1465,20 @@ interface WhatsappConvUiState {
       <div class="ta-section">
         <div class="ta-section-title">{{ t('leadDetail.testAccount.sections.billing') }}</div>
         <div class="ta-row">
-          <label class="full">{{ t('leadDetail.testAccount.fields.street') }} *
+          <label class="full">{{ t('leadDetail.testAccount.fields.street') }} <span class="req">*</span>
             <input [(ngModel)]="taForm.billing_address" [placeholder]="t('leadDetail.testAccount.placeholders.street')" [style.border-color]="taSubmitAttempt&&!taForm.billing_address?'#ef4444':''">
           </label>
         </div>
         <div class="ta-row">
-          <label>{{ t('leadDetail.testAccount.fields.zip') }} *
+          <label>{{ t('leadDetail.testAccount.fields.zip') }} <span class="req">*</span>
             <input [(ngModel)]="taForm.billing_zip" [placeholder]="t('leadDetail.testAccount.placeholders.zip')" [style.border-color]="taSubmitAttempt&&!taForm.billing_zip?'#ef4444':''">
           </label>
-          <label>{{ t('leadDetail.testAccount.fields.city') }} *
+          <label>{{ t('leadDetail.testAccount.fields.city') }} <span class="req">*</span>
             <input [(ngModel)]="taForm.billing_city" [placeholder]="t('leadDetail.testAccount.placeholders.city')" [style.border-color]="taSubmitAttempt&&!taForm.billing_city?'#ef4444':''">
           </label>
         </div>
         <div class="ta-row">
-          <label>{{ t('leadDetail.testAccount.fields.billingCountry') }} *
+          <label>{{ t('leadDetail.testAccount.fields.billingCountry') }} <span class="req">*</span>
             <select [(ngModel)]="taForm.billing_country" [style.border-color]="taSubmitAttempt&&!taForm.billing_country?'#ef4444':''">
               <option value="">{{ t('leadDetail.testAccount.choose') }}</option>
               <option value="PL">{{ t('leadDetail.testAccount.countries.pl') }}</option>
@@ -1466,7 +1493,7 @@ interface WhatsappConvUiState {
               <option value="RU">{{ t('leadDetail.testAccount.countries.ru') }}</option>
             </select>
           </label>
-          <label>{{ t('leadDetail.testAccount.fields.billingEmail') }} *
+          <label>{{ t('leadDetail.testAccount.fields.billingEmail') }} <span class="req">*</span>
             <input [(ngModel)]="taForm.billing_email_address" type="email" [placeholder]="t('leadDetail.testAccount.placeholders.billingEmail')" [style.border-color]="taSubmitAttempt&&!taForm.billing_email_address?'#ef4444':''">
           </label>
         </div>
@@ -1476,15 +1503,15 @@ interface WhatsappConvUiState {
       <div class="ta-section">
         <div class="ta-section-title">{{ t('leadDetail.testAccount.sections.admin') }}</div>
         <div class="ta-row">
-          <label>{{ t('leadDetail.testAccount.fields.firstName') }} *
+          <label>{{ t('leadDetail.testAccount.fields.firstName') }} <span class="req">*</span>
             <input [(ngModel)]="taForm.admin_first_name" [placeholder]="t('leadDetail.testAccount.placeholders.firstName')" [style.border-color]="taSubmitAttempt&&!taForm.admin_first_name?'#ef4444':''">
           </label>
-          <label>{{ t('leadDetail.testAccount.fields.lastName') }} *
+          <label>{{ t('leadDetail.testAccount.fields.lastName') }} <span class="req">*</span>
             <input [(ngModel)]="taForm.admin_last_name" [placeholder]="t('leadDetail.testAccount.placeholders.lastName')" [style.border-color]="taSubmitAttempt&&!taForm.admin_last_name?'#ef4444':''">
           </label>
         </div>
         <div class="ta-row">
-          <label class="full">{{ t('leadDetail.testAccount.fields.adminEmail') }} *
+          <label class="full">{{ t('leadDetail.testAccount.fields.adminEmail') }} <span class="req">*</span>
             <input [(ngModel)]="taForm.admin_email" type="email" [placeholder]="t('leadDetail.testAccount.placeholders.adminEmail')" [style.border-color]="taSubmitAttempt&&!taForm.admin_email?'#ef4444':''">
           </label>
         </div>
@@ -1495,8 +1522,8 @@ interface WhatsappConvUiState {
     <div class="modal-footer">
       <button class="btn btn-g" (click)="closeTestAccountModal()">{{ 'actions.cancel' | transloco }}</button>
       <button class="btn btn-p" (click)="submitTestAccount()" [disabled]="submittingTestAccount" style="min-width:180px">
-        <span *ngIf="!submittingTestAccount">🖥️ {{testAccount?.status==='created' ? t('leadDetail.testAccount.retry') : t('leadDetail.testAccount.create')}}</span>
-        <span *ngIf="submittingTestAccount">⏳ {{ t('leadDetail.testAccount.creating') }}</span>
+        <span *ngIf="!submittingTestAccount"><i class="ei ei-monitor"></i> {{testAccount?.status==='created' ? t('leadDetail.testAccount.retry') : t('leadDetail.testAccount.create')}}</span>
+        <span *ngIf="submittingTestAccount"><i class="ei ei-hourglass"></i> {{ t('leadDetail.testAccount.creating') }}</span>
       </button>
     </div>
   </div>
@@ -1539,7 +1566,7 @@ interface WhatsappConvUiState {
 <!-- Rozpocznij onboarding dialog -->
 <div class="modal-overlay" *ngIf="showConvert" (click)="showConvert=false">
   <div class="modal" (click)="$event.stopPropagation()">
-    <h3>🚀 {{ t('leadDetail.onboarding.start') }}</h3>
+    <h3><i class="ei ei-play"></i> {{ t('leadDetail.onboarding.start') }}</h3>
     <p style="margin-bottom:16px">{{ t('leadDetail.onboarding.introBefore') }} <strong>{{lead?.company}}</strong> {{ t('leadDetail.onboarding.introAfter') }}</p>
     <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
       <label style="font-size:14px;color:var(--gray-700);display:flex;flex-direction:column;gap:4px">
@@ -1569,39 +1596,39 @@ interface WhatsappConvUiState {
       <span style="font-size:12px;font-weight:600;color:var(--gray-500)">{{actTypeName(selectedAct.type)}}</span>
       <span class="act-status-badge act-status-{{selectedAct.status||'new'}}">{{actStatusLabel(selectedAct.status||'new')}}</span>
       <span style="flex:1"></span>
-      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" class="btn btn-g btn-sm" (click)="startEditActModal()">✏️ {{ t('activity.modal.edit') }}</button>
+      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" class="btn btn-g btn-sm" (click)="startEditActModal()"><i class="ei ei-pencil"></i> {{ t('activity.modal.edit') }}</button>
       <button class="close-btn" (click)="closeActModal()">✕</button>
     </div>
     <!-- Widok -->
     <div *ngIf="!actModalEditMode" style="padding:20px 24px;display:flex;flex-direction:column;gap:12px">
       <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800)">{{selectedAct.title}}</div>
       <div *ngIf="selectedAct.activity_at" style="display:flex;gap:12px;font-size:14px;align-items:flex-start">
-        <span class="act-modal-lbl">📅 {{ t('activity.modal.dateTime') }}</span>
+        <span class="act-modal-lbl"><i class="ei ei-calendar"></i> {{ t('activity.modal.dateTime') }}</span>
         <span>{{selectedAct.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
       </div>
       <div *ngIf="selectedAct.assigned_to_name" style="display:flex;gap:12px;font-size:14px;align-items:flex-start">
-        <span class="act-modal-lbl">👤 {{ t('activity.modal.assignedTo') }}</span>
+        <span class="act-modal-lbl"><i class="ei ei-user"></i> {{ t('activity.modal.assignedTo') }}</span>
         <span>{{selectedAct.assigned_to_name}}</span>
       </div>
       <div *ngIf="selectedAct.created_by_name" style="display:flex;gap:12px;font-size:14px;align-items:flex-start">
-        <span class="act-modal-lbl">✍️ {{ t('activity.modal.addedBy') }}</span>
+        <span class="act-modal-lbl"><i class="ei ei-pencil"></i> {{ t('activity.modal.addedBy') }}</span>
         <span>{{selectedAct.created_by_name}}</span>
       </div>
       <div *ngIf="selectedAct.meeting_location" style="display:flex;gap:12px;font-size:14px">
-        <span class="act-modal-lbl">📍 {{ t('meetings.location') }}</span>
+        <span class="act-modal-lbl"><i class="ei ei-map-pin"></i> {{ t('meetings.location') }}</span>
         <span>{{selectedAct.meeting_location}}</span>
       </div>
       <div *ngIf="selectedAct.participants" style="display:flex;gap:12px;font-size:14px">
-        <span class="act-modal-lbl">👥 {{ t('meetings.participants') }}</span>
+        <span class="act-modal-lbl"><i class="ei ei-users"></i> {{ t('meetings.participants') }}</span>
         <span style="word-break:break-all">{{selectedAct.participants}}</span>
       </div>
       <div *ngIf="selectedAct.body" style="display:flex;gap:12px;font-size:14px;align-items:flex-start">
-        <span class="act-modal-lbl">📝 {{ t('activity.modal.description') }}</span>
+        <span class="act-modal-lbl"><i class="ei ei-note"></i> {{ t('activity.modal.description') }}</span>
         <span style="white-space:pre-line">{{selectedAct.body}}</span>
       </div>
       <wt-entity-attachments *ngIf="selectedAct.type==='task' || selectedAct.type==='note'" sourceType="lead-activity" [sourceId]="selectedAct.id"></wt-entity-attachments>
       <div *ngIf="selectedAct.close_comment" style="display:flex;gap:12px;font-size:14px">
-        <span class="act-modal-lbl">💬 {{ t('activity.modal.comment') }}</span>
+        <span class="act-modal-lbl"><i class="ei ei-message"></i> {{ t('activity.modal.comment') }}</span>
         <span style="font-style:italic">{{selectedAct.close_comment}}</span>
       </div>
       <!-- Zamknij — tylko dla zadań, bez komentarza -->
@@ -1614,19 +1641,20 @@ interface WhatsappConvUiState {
       <div style="display:flex;flex-direction:column;gap:4px">
         <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.modal.type') }}</label>
         <select [(ngModel)]="actEditForm.type" class="act-sel">
-          <option value="task">✅ {{ t('labels.activityTypes.task') }}</option>
-          <option value="call">📞 {{ t('labels.activityTypes.call') }}</option>
-          <option value="meeting">🤝 {{ t('labels.activityTypes.meeting') }}</option>
-          <option value="note">📝 {{ t('labels.activityTypes.note') }}</option>
-          <option value="doc_sent">📄 {{ t('labels.activityTypes.doc_sent') }}</option>
-          <option value="training">🎓 {{ t('labels.activityTypes.training') }}</option>
-          <option value="qbr">📊 {{ t('labels.activityTypes.qbr') }}</option>
-          <option value="opportunity">💡 {{ t('labels.activityTypes.opportunity') }}</option>
+          <option value="task">{{ t('labels.activityTypes.task') }}</option>
+          <option value="call">{{ t('labels.activityTypes.call') }}</option>
+          <option value="meeting">{{ t('labels.activityTypes.meeting') }}</option>
+          <option value="note">{{ t('labels.activityTypes.note') }}</option>
+          <option value="doc_sent">{{ t('labels.activityTypes.doc_sent') }}</option>
+          <option value="training">{{ t('labels.activityTypes.training') }}</option>
+          <option value="qbr">{{ t('labels.activityTypes.qbr') }}</option>
+          <option value="opportunity">{{ t('labels.activityTypes.opportunity') }}</option>
         </select>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px">
-        <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.modal.title') }} <span style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">*</span></label>
-        <input [(ngModel)]="actEditForm.title" class="act-input">
+        <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.modal.title') }} <span class="req">*</span></label>
+        <input [(ngModel)]="actEditForm.title" class="act-input" [class.fi-err]="actEditSubmitted && !actEditForm.title?.trim()">
+        @if (actEditSubmitted && !actEditForm.title?.trim()) { <span class="ferr">{{ t('fieldErrors.title') }}</span> }
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div style="display:flex;flex-direction:column;gap:4px">
@@ -1656,8 +1684,9 @@ interface WhatsappConvUiState {
         <textarea [(ngModel)]="actEditForm.body" rows="4" class="act-input" style="resize:vertical"></textarea>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+        @if (actEditSubmitted) { <wt-form-error-summary [count]="actEditForm.title?.trim() ? 0 : 1" /> }
         <button class="btn btn-g" (click)="actModalEditMode=false">{{ 'actions.cancel' | transloco }}</button>
-        <button class="btn btn-p" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : t('activity.modal.saveChanges')}}</button>
+        <button class="btn btn-p" (click)="saveEditActivityModal()" [disabled]="savingActivity">{{savingActivity ? '…' : t('activity.modal.saveChanges')}}</button>
       </div>
     </div>
   </div>
@@ -1675,6 +1704,7 @@ interface WhatsappConvUiState {
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
+    @media (max-width:1279px) { :host { overflow-y:auto; overflow-x:hidden; } }
     .hdr-btn { position:relative; box-sizing:border-box; height:32px; padding:0 12px !important; font-size:12px !important; border-radius:10px !important; }
     .hdr-btn:has(> svg:first-child) { padding-left:10px !important; }
     .hdr-btn.btn-quiet { gap:6px !important; }
@@ -1929,6 +1959,21 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   editForm: any  = {};
   editNipError = '';
   editSubmitted = false;
+  emailSubmitted = false;
+  inlineReplySubmitted = false;
+  msgReplySubmitted = false;
+  whatsappSubmitted = false;
+  enrichSubmitted = false;
+  actEditSubmitted = false;
+  actSubmitted = false;
+
+  explainMissingContact(kind: 'phone' | 'email'): void {
+    this.toast.info(this.transloco.translate(kind === 'phone' ? 'crm.leadDetail.missingContact.phone' : 'crm.leadDetail.missingContact.email'));
+  }
+
+  explainNoPermission(): void {
+    this.toast.info(this.transloco.translate('crm.leadDetail.edit.noPermission'));
+  }
   saveError = '';
   readonly amountError = amountError;
 
@@ -2597,7 +2642,12 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   sendSmsToConv(conv: SmsConversation): void {
     const state = this.getSmsConvState(conv.number);
-    if (!this.lead || !state.replyMessage.trim() || state.sending) return;
+    if (!this.lead || state.sending) return;
+    if (!this.canEdit || !state.replyMessage.trim()) {
+      state.error = this.transloco.translate(this.canEdit ? 'crm.fieldErrors.message' : 'crm.leadDetail.edit.noPermission');
+      this.cdr.markForCheck();
+      return;
+    }
     state.sending = true;
     state.error = null;
     this.cdr.markForCheck();
@@ -2723,7 +2773,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   sendWhatsappConvReply(phone: string): void {
     if (!this.lead) return;
     const s = this.getWhatsappConvState(phone);
-    if (!s.replyMessage.trim()) return;
+    if (!s.replyMessage.trim()) {
+      s.replyError = this.transloco.translate('crm.fieldErrors.message');
+      this.cdr.markForCheck();
+      return;
+    }
     s.replySending = true;
     s.replyError   = null;
     this.cdr.markForCheck();
@@ -3078,9 +3132,19 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.whatsappToPhone = formatPhoneDisplay(this.whatsappToPhone);
   }
 
+  whatsappErrorCount(): number {
+    return (this.whatsappToPhone.trim() && !this.whatsappToPhoneMissingCountryCode ? 0 : 1) + (this.canSendWhatsappContent ? 0 : 1);
+  }
+
   sendWhatsapp(): void {
-    if (!this.lead || !this.whatsappToPhone.trim() || !this.canSendWhatsappContent) return;
-    if (this.whatsappToPhoneMissingCountryCode) return;
+    if (!this.lead) return;
+    if (!this.canEdit) { this.explainNoPermission(); return; }
+    if (this.whatsappErrorCount() > 0) {
+      this.whatsappSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.whatsappSubmitted = false;
     this.whatsappSending = true;
     this.whatsappError   = null;
     this.whatsappSuccess = false;
@@ -3128,6 +3192,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   openEmailCompose(prefillThreadId?: string): void {
+    this.emailSubmitted = false;
     const training_mode = this.settings.settings().crm_training_mode;
     if (!this.emailConnected && !training_mode) {
       if (!this.emailProviderKey) {
@@ -3414,10 +3479,20 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  emailErrorCount(): number {
+    return (this.emailForm.recipientList?.length ? 0 : 1) + (this.emailForm.subject?.trim() ? 0 : 1);
+  }
+
   sendEmail(): void {
     this.addRecipient();
     this.addCc();
-    if (!this.lead || !this.emailForm.recipientList?.length || !this.emailForm.subject) return;
+    if (!this.lead) return;
+    if (this.emailErrorCount() > 0) {
+      this.emailSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.emailSubmitted = false;
     this.sendingEmail = true;
     this.emailError   = '';
 
@@ -3659,6 +3734,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   startInlineReply(a: any): void {
     if (!this.lead) return;
+    this.inlineReplySubmitted = false;
     const activeEmail = this.emailAddress;
 
     // Determine recipient and inReplyTo from last thread message if available
@@ -3747,10 +3823,23 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  inlineReplyErrorCount(): number {
+    const form = this.inlineReplyForm;
+    return (form.recipientList?.length ? 0 : 1) + (form.subject?.trim() ? 0 : 1) + (form.body?.trim() ? 0 : 1);
+  }
+
   sendInlineReply(): void {
     this.addInlineReplyRecipient();
     this.addInlineReplyCc();
-    if (!this.lead || !this.inlineReplyForm.recipientList?.length || !this.inlineReplyForm.subject || !this.inlineReplyForm.body?.trim()) return;
+    if (!this.lead) return;
+    if (this.inlineReplyErrorCount() > 0) {
+      this.inlineReplySubmitted = true;
+      // Recipient and subject sit in the collapsed details — open them so their errors are visible.
+      if (!this.inlineReplyForm.recipientList?.length || !this.inlineReplyForm.subject?.trim()) this.showReplyDetails = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.inlineReplySubmitted = false;
     this.inlineReplySending = true;
     this.inlineReplyError   = '';
     this.cdr.markForCheck();
@@ -3832,6 +3921,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   startMsgReply(): void {
     const m = this.msgModalMsg;
     if (!m) return;
+    this.msgReplySubmitted = false;
     const activeEmail = this.emailAddress;
     const fromAddrs   = this.parseAddressList(m.from);
     const toAddrs     = this.parseAddressList(m.to);
@@ -3870,6 +3960,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  msgReplyErrorCount(): number {
+    return (this.msgModalForm.recipientList?.length ? 0 : 1) + (this.msgModalForm.subject?.trim() ? 0 : 1);
+  }
+
   sendMsgReply(): void {
     // flush raw inputs
     const rq = this.msgModalRecipientQuery.trim();
@@ -3880,7 +3974,13 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (cq && cq.includes('@') && !this.msgModalForm.ccList.includes(cq)) {
       this.msgModalForm.ccList.push(cq); this.msgModalCcQuery = '';
     }
-    if (!this.lead || !this.msgModalForm.recipientList?.length || !this.msgModalForm.subject) return;
+    if (!this.lead) return;
+    if (this.msgReplyErrorCount() > 0) {
+      this.msgReplySubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.msgReplySubmitted = false;
     this.msgModalSending = true;
     this.msgModalError   = '';
 
@@ -4144,7 +4244,12 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   runDetailEnrich() {
     const domain = (this.editForm.website || '').trim();
-    if (!domain) return;
+    if (!domain) {
+      this.enrichSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.enrichSubmitted = false;
     this.detailEnriching  = true;
     this.editNipError = '';
     this.detailEnrichDone = false;
@@ -4182,7 +4287,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   // ── Modal aktywności ────────────────────────────────────────────────────────
   actTypeName(type: string): string {
-    const known = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity'];
+    const known = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity', 'marketing_email'];
     return known.includes(type) ? this.transloco.translate('crm.labels.activityTypes.' + type) : type;
   }
 
@@ -4271,7 +4376,13 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   saveEditActivityModal(): void {
     const a = this.selectedAct;
-    if (!this.actEditForm.title || !a || !this.lead) return;
+    if (!a || !this.lead) return;
+    if (!this.actEditForm.title?.trim()) {
+      this.actEditSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.actEditSubmitted = false;
     this.savingActivity = true;
     const payload: any = {
       type:        this.actEditForm.type,
@@ -4477,6 +4588,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       });
     }
     this.showNewActivity = true;
+    this.actSubmitted = false;
   }
 
   /** Files picked in the new-activity form are uploaded once the activity exists. */
@@ -4497,7 +4609,13 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   addActivity() {
-    if (!this.actForm.title?.trim() || !this.lead) return;
+    if (!this.lead) return;
+    if (!this.actForm.title?.trim()) {
+      this.actSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.actSubmitted = false;
     this.savingActivity = true;
     const payload: any = {
       type:        this.actForm.type,
@@ -4814,7 +4932,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   stageLabel(s: string): string { return this.stages.label(s); }
   actIcon(type: string) {
-    return { task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄' }[type] || '💬';
+    return { task:'check-circle', call:'phone', email:'mail', meeting:'handshake', note:'note', doc_sent:'file', marketing_email:'mail' }[type] || 'message';
   }
 
   // ── Konto testowe ────────────────────────────────────────────────────────────

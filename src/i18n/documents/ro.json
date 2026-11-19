@@ -102,6 +102,9 @@
     },
     "signus": {
       "emailsPlaceholder": "anna@firma.com, partner@example.com",
+      "errors": {
+        "emails": "Introduceți adresele de e-mail ale semnatarilor, separate prin virgulă, de ex. ion@firma.ro, ana@firma.ro"
+      },
       "info": "Documentul va fi trimis către API-ul Signus. Fiecare semnatar va primi un e-mail. Versiunile semnate sunt arhivate automat.",
       "modalTitle": "Inițiere semnare electronică",
       "sectionTitle": "Semnătură electronică (Signus)",
@@ -143,6 +146,9 @@
       "assigned": "Sarcină atribuită — notificarea prin e-mail a fost trimisă",
       "cancelled": "Sarcină anulată",
       "dueDate": "Termen",
+      "errors": {
+        "assignTo": "Căutați o persoană și faceți clic pe ea în listă"
+      },
       "message": "Mesaj",
       "messagePlaceholder": "Mesaj opțional pentru persoana desemnată…",
       "selected": "Selectat: {name}",
@@ -343,6 +349,17 @@
     "chooseType": "— Alegeți tipul —",
     "create": "Creare document",
     "createFailed": "Documentul nu a putut fi creat",
+    "errors": {
+      "buyer": "Introduceți cumpărătorul de pe factură",
+      "contractSubject": "Alegeți obiectul contractului",
+      "country": "Alegeți țara partenerului",
+      "docType": "Alegeți tipul documentului",
+      "entity1": "Introduceți prima parte a contractului, de ex. CRMtree SRL",
+      "gdprType": "Alegeți clasificarea GDPR",
+      "group": "Alegeți grupul care va vedea documentul",
+      "name": "Introduceți numele documentului, de ex. Contract de parteneriat — ABC SRL",
+      "nip": "Introduceți codul fiscal al partenerului, de ex. 1234567890"
+    },
     "file": {
       "dropHint": "Plasați fișierul aici sau faceți clic pentru a-l alege",
       "formats": "PDF, DOCX — max. 50 MB",

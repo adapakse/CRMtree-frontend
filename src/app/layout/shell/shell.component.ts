@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, linkedSignal, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, inject, signal, computed, linkedSignal, OnInit } from '@angular/core';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
@@ -17,10 +17,12 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
   imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, CdkDropList, CdkDrag, SoftphoneOverlayComponent, TranslocoDirective],
   providers: [provideTranslocoScope('shell')],
   template: `
-    <div class="app-wrap" *transloco="let t; prefix: 'shell'">
+    <div class="app-wrap" [class.nav-open]="isNavOpen()" *transloco="let t; prefix: 'shell'">
+
+      <div class="nav-backdrop" (click)="closeNav()" aria-hidden="true"></div>
 
       <!-- SIDEBAR -->
-      <nav id="sidebar" [class.collapsed]="collapsed">
+      <nav id="sidebar" [class.collapsed]="collapsed && !isNarrow()" [class.open]="isNavOpen()" (click)="onSidebarClick($event)">
 
         <div class="s-head">
           <button class="s-mark-btn" type="button" [disabled]="!collapsed" (click)="toggleSidebar()" [attr.title]="collapsed ? t('sidebar.expand') : null">
@@ -35,7 +37,8 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
             }
           </button>
-          <button class="toggle-btn" type="button" (click)="toggleSidebar()" [attr.title]="t('sidebar.collapse')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="9" y1="4" x2="9" y2="20"/></svg></button>
+          <button class="toggle-btn wide-only" type="button" (click)="toggleSidebar()" [attr.title]="t('sidebar.collapse')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="9" y1="4" x2="9" y2="20"/></svg></button>
+          <button class="toggle-btn narrow-only" type="button" (click)="closeNav()" [attr.aria-label]="t('sidebar.closeMenu')" [attr.title]="t('sidebar.closeMenu')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
         </div>
 
         <div class="s-scroll" [class.editing]="isEditingNav()">
@@ -101,6 +104,12 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
 
       <!-- MAIN AREA -->
       <main id="main">
+        <div class="mobile-bar">
+          <button #menuButton class="menu-btn" type="button" aria-controls="sidebar" [attr.aria-expanded]="isNavOpen()"
+                  [attr.aria-label]="t('sidebar.openMenu')" [attr.title]="t('sidebar.openMenu')" (click)="openNav()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          </button>
+        </div>
         <router-outlet />
       </main>
     </div>
@@ -120,6 +129,7 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
         @case ('prospects') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg> }
         @case ('prospectsDashboard') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><circle cx="18" cy="8" r="2"/><circle cx="12" cy="2" r="2"/><circle cx="6" cy="12" r="2"/></svg> }
         @case ('callAnalysis') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> }
+        @case ('emailCampaigns') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg> }
         @case ('onboarding') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> }
         @case ('seoBot') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> }
         @case ('partnerRegistry') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> }
@@ -360,6 +370,44 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
       border-left: 1px solid var(--divider);
       box-shadow: 0 1px 3px rgba(16,24,40,.06);
     }
+
+    /* ── Narrow screens: the menu is a slide-in panel over the content ── */
+    .mobile-bar, .nav-backdrop, .narrow-only { display: none; }
+    .menu-btn {
+      width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+      border: none; background: none; border-radius: 10px; cursor: pointer; color: var(--ink-strong);
+      transition: background .15s;
+    }
+    .menu-btn:hover { background: var(--hover-overlay); }
+    .menu-btn:focus { outline: none; }
+    .menu-btn:focus-visible { box-shadow: 0 0 0 2px rgba(59,170,93,.45); }
+    .menu-btn svg { width: 20px; height: 20px; }
+
+    @media (max-width: 1023.98px) {
+      .mobile-bar {
+        display: flex; align-items: center; flex-shrink: 0; position: sticky; top: 0; z-index: 2;
+        height: 56px; padding: 0 16px; background: var(--page-bg);
+      }
+      .narrow-only { display: flex; }
+      .wide-only { display: none; }
+      #main { border-radius: 0; border-left: none; }
+      #sidebar {
+        position: fixed; top: var(--test-banner-height, 0px); bottom: 0; left: 0; z-index: 1000;
+        width: 248px; max-width: 85vw; background: var(--surface);
+        transform: translateX(-100%); visibility: hidden;
+        transition: transform .2s ease, visibility 0s linear .2s;
+      }
+      #sidebar.open { transform: none; visibility: visible; box-shadow: var(--shadow-lg); transition: transform .2s ease, visibility 0s; }
+      .nav-backdrop {
+        display: block; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,.32);
+        opacity: 0; pointer-events: none; transition: opacity .2s ease;
+      }
+      .nav-open .nav-backdrop { opacity: 1; pointer-events: auto; }
+      .nav-open #main { overflow: hidden; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #sidebar, #sidebar.open, .nav-backdrop { transition: none; }
+    }
   `],
 })
 export class ShellComponent implements OnInit {
@@ -374,6 +422,11 @@ export class ShellComponent implements OnInit {
   taskBadge = signal(0);
   docBadge  = signal(0);
   collapsed = false;
+
+  private readonly narrowQuery = window.matchMedia('(max-width: 1023.98px)');
+  isNarrow = signal(this.narrowQuery.matches);
+  isNavOpen = signal(false);
+  @ViewChild('menuButton') private menuButton?: ElementRef<HTMLButtonElement>;
 
   currentUrl = signal(this.router.url);
   // /crm/partners/analytics has its own nav item — exclude it so both links
@@ -420,6 +473,7 @@ export class ShellComponent implements OnInit {
       { id: 'prospectsDashboard', route: '/crm/prospects-dashboard', labelKey: 'nav.prospectsDashboard',
         isVisible: () => this.auth.hasFeature('prospects') && (this.isSalesManager() || this.auth.isAdmin()) },
       { id: 'callAnalysis', route: '/admin/call-analysis', labelKey: 'nav.callAnalysis', isVisible: () => this.auth.hasFeature('call_analysis') },
+      { id: 'emailCampaigns', route: '/crm/email-campaigns', labelKey: 'nav.emailCampaigns', isVisible: () => this.auth.hasFeature('email_campaigns') },
     ] },
     { id: 'partners', labelKey: 'sections.partners',
       isVisible: () => this.hasCrmAccess() && (this.auth.hasFeature('partner_registry') || this.auth.hasFeature('onboarding') || this.auth.hasFeature('performance')),
@@ -500,6 +554,10 @@ export class ShellComponent implements OnInit {
 
   ngOnInit(): void {
     this.collapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+    this.narrowQuery.addEventListener('change', e => {
+      this.isNarrow.set(e.matches);
+      if (!e.matches) this.isNavOpen.set(false);
+    });
     this.refreshTaskBadge();
     if (this.auth.hasFeature('pbx')) void this.pbx.autoConnect();
     this.router.events.pipe(
@@ -507,7 +565,27 @@ export class ShellComponent implements OnInit {
     ).subscribe(() => {
       this.refreshTaskBadge();
       this.currentUrl.set(this.router.url);
+      this.closeNav(false);
     });
+  }
+
+  openNav(): void {
+    this.isNavOpen.set(true);
+  }
+
+  closeNav(shouldRestoreFocus = true): void {
+    if (!this.isNavOpen()) return;
+    this.isNavOpen.set(false);
+    if (shouldRestoreFocus) this.menuButton?.nativeElement.focus();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeNav();
+  }
+
+  onSidebarClick(event: Event): void {
+    if ((event.target as HTMLElement).closest('a.nav-item')) this.closeNav();
   }
 
   toggleSidebar(): void {

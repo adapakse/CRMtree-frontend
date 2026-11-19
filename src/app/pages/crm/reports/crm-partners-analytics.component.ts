@@ -38,7 +38,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 </div>
 
 <!-- CONTENT -->
-<div style="flex:1;overflow-y:auto;padding:20px 24px 24px">
+<div class="page-body" style="flex:1;overflow-y:auto;padding:20px 24px 24px">
 
   <!-- Filtry -->
   <div class="toolbar">
@@ -98,7 +98,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#86efac);border-radius:2px;margin-bottom:16px"></div>
 
   <div *ngIf="!loading && !data" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--gray-400)">
-    <div style="font-size:48px;margin-bottom:12px">📊</div>
+    <div class="ico-tile ico-tile--lg" style="margin:0 auto 12px"><i class="ei ei-chart"></i></div>
     <div style="font-size:16px;font-weight:600">{{ t('reports.partnerAnalytics.emptyPeriod') }}</div>
   </div>
 
@@ -274,7 +274,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
   <!-- ROW 4: Partnerzy — filtry + tabela + paginacja -->
   <div class="card" style="padding:18px 20px">
 
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <div class="filter-fields" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
       <div class="card-title" style="margin-bottom:0;flex:1;min-width:200px">
         {{ t('reports.partnerAnalytics.partners.title') }}
         <span class="card-subtitle">{{labelA}}{{data.b ? ' vs ' + labelB : ''}}</span>
@@ -855,7 +855,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
     products.forEach((p) => {
       const pctA  = Math.round(+p.gross_turnover_pln / maxVal * 100);
       const bRow  = this.data!.b?.by_product.find(b => b.product_type === p.product_type);
-      const icon  = (PRODUCT_TYPE_ICONS as any)[p.product_type] || '📦';
+      const icon  = (PRODUCT_TYPE_ICONS as any)[p.product_type] || 'package';
       const label = p.product_type in PRODUCT_TYPE_ICONS ? this.transloco.translate('crm.labels.productTypes.' + p.product_type) : p.product_type;
       const row = document.createElement('div');
       row.style.marginBottom = '8px';
@@ -865,7 +865,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
         : '';
       row.innerHTML = `
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-size:12px;color:var(--gray-600)">${icon} ${label}</span>
+          <span style="font-size:12px;color:var(--gray-600)"><i class="ei ei-${icon}"></i> ${label}</span>
           <span style="display:flex;align-items:center;font-size:12px;font-weight:600;color:var(--gray-700)">
             ${(+p.gross_turnover_pln/1000).toFixed(0)}k${deltaHtml}
           </span>

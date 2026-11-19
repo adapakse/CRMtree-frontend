@@ -21,6 +21,10 @@
       "title": "Izgled"
     },
     "delete": "Izbriši",
+    "errors": {
+      "pbxToken": "Zalijepite svoj Personal Access Token (PAT) iz centrale",
+      "templateName": "Upišite naziv predloška, npr. Standardna ponuda"
+    },
     "manual": {
       "hint": "Interaktivni priručnik za CRMtree sa snimkama zaslona. Otvara se u novoj kartici.",
       "open": "Otvori priručnik",

@@ -21,6 +21,10 @@
       "title": "Apparence"
     },
     "delete": "Supprimer",
+    "errors": {
+      "pbxToken": "Collez votre Personal Access Token (PAT) du standard",
+      "templateName": "Saisissez le nom du modèle, par ex. Offre standard"
+    },
     "manual": {
       "hint": "Guide interactif de CRMtree avec captures d’écran. S’ouvre dans un nouvel onglet.",
       "open": "Ouvrir le guide",

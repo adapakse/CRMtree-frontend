@@ -27,6 +27,13 @@
       "subtitle": "Trwałe usunięcie dokumentu, leada lub partnera wraz ze wszystkimi powiązanymi danymi i logami.",
       "title": "Kasowanie rekordów"
     },
+    "errors": {
+      "confirmPhrase": "Wpisz dokładnie „{phrase}”, aby potwierdzić",
+      "selectDoc": "Wyszukaj dokument i kliknij go na liście",
+      "selectFile": "Wybierz plik JSON z wyeksportowanymi ustawieniami",
+      "selectLead": "Wyszukaj leada i kliknij go na liście",
+      "selectPartner": "Wyszukaj partnera i kliknij go na liście"
+    },
     "purge": {
       "confirm": "Potwierdź",
       "docs": {
@@ -705,6 +712,9 @@
       "body": "Czy na pewno usunąć token PBX dla {name}? Użytkownik nie będzie mógł korzystać z softphone.",
       "title": "Usuń token PBX"
     },
+    "errors": {
+      "token": "Wklej Personal Access Token (PAT) z centrali"
+    },
     "loadError": "Błąd ładowania danych.",
     "loading": "Ładowanie…",
     "modal": {
@@ -758,6 +768,9 @@
       "detected": "Rozpoznano: {provider}",
       "detectedShort": "rozpoznano z klucza",
       "detecting": "Rozpoznaję dostawcę…",
+      "errors": {
+        "key": "Wklej klucz API dostawcy (np. sk-…) albo wybierz zapisany klucz"
+      },
       "intro": "Każda funkcja ma własnego dostawcę, klucz i model — enrichment może iść u jednego, a analizator rozmów u innego. Wklej klucz, a dostawcę rozpoznamy sami. Zapis sprawdza konfigurację u dostawcy; klucz jest szyfrowany i nigdy nie jest pokazywany ponownie.",
       "loading": "Wczytywanie konfiguracji AI…",
       "model": "Model",
@@ -1193,6 +1206,9 @@
       "deleteConfirm": "Usunąć pole „{name}”?",
       "deleteTooltip": "Usuń pole — możliwe tylko, gdy nikt nic w nim nie zapisał",
       "empty": "Brak pól dodatkowych na tej formatce.",
+      "errors": {
+        "name": "Podaj nazwę pola, np. Numer klienta"
+      },
       "hint": "Pola, które sam definiujesz dla tej formatki. Typu pola nie da się później zmienić — żeby go zmienić, wyłącz pole i dodaj nowe. Wyłączone pole znika z formatki, ale wpisane wcześniej wartości zostają.",
       "newNamePlaceholder": "Nazwa nowego pola",
       "optionsPlaceholder": "Wartości po przecinku",
@@ -1291,6 +1307,10 @@
       "displayNamePlaceholder": "np. Obsługa Klienta",
       "documentCount": "{count, plural, one {# dokument} few {# dokumenty} many {# dokumentów} other {# dokumentu}}",
       "empty": "Brak grup. Dodaj pierwszą grupę powyżej lub uruchom migrację 0127.",
+      "errors": {
+        "displayName": "Podaj nazwę wyświetlaną, np. Dział sprzedaży",
+        "technicalName": "Podaj nazwę techniczną, np. sales_team"
+      },
       "inactive": "Nieaktywna",
       "intro": "— zarządzaj grupami do których można przypisywać użytkowników. Grupy kontrolują dostęp do dokumentów. Nie można usunąć grupy z przypisanymi użytkownikami lub dokumentami.",
       "memberCount": "{count, plural, one {# użytkownik} few {# użytkowników} many {# użytkowników} other {# użytkownika}}",
@@ -1332,6 +1352,10 @@
         "definitionHint": "Na podstawie tego opisu system ocenia, czy firma spełnia dany sygnał.",
         "definitionPlaceholder": "Opisz, po czym poznać, że firma spełnia ten warunek — konkretne słowa/frazy na stronie, sekcje, stanowiska.",
         "editTitle": "Edytuj sygnał",
+        "errors": {
+          "definition": "Opisz, po czym AI ma rozpoznać ten sygnał",
+          "name": "Podaj nazwę sygnału, np. Firma zatrudnia ponad 50 osób"
+        },
         "name": "Nazwa sygnału",
         "namePlaceholder": "np. Własna flota transportowa",
         "newTitle": "Nowy sygnał",
@@ -1456,6 +1480,9 @@
       "codeWrittenHint": "To nie krok lejka, a stan ustawiany przez aplikację (archiwizacja leada, konwersja na partnera), więc nie da się go usunąć. Nazwę możesz zmienić.",
       "confirmDelete": "Usunąć etap „{name}”?",
       "confirmDeleteWithLeads": "Usunąć etap „{name}”?\n\nLeady na tym etapie ({count}) przejdą na etap „{target}”.",
+      "errors": {
+        "name": "Wpisz nazwę nowego etapu, np. Negocjacje"
+      },
       "intro": "Własne nazwy etapów lejka — zmień istniejące, dodaj nowy krok albo usuń niepotrzebny. Kod etapu zostaje bez zmian, więc nowa nazwa pojawia się w całej aplikacji, a raporty i dane leadów są nietknięte. Pusta nazwa wraca do nazwy wbudowanej.",
       "kinds": {
         "archived": "archiwum",
@@ -1633,6 +1660,9 @@
       "saved": "Zaktualizowano grupę",
       "title": "Edycja grupy"
     },
+    "errors": {
+      "internalName": "Podaj nazwę wewnętrzną, np. dzial-sprzedazy"
+    },
     "fields": {
       "description": "Opis",
       "displayName": "Nazwa wyświetlana",
@@ -1724,11 +1754,18 @@
       "updated": "Użytkownik zaktualizowany"
     },
     "empty": "Nie znaleziono użytkowników",
+    "errors": {
+      "chooseGroup": "Wybierz grupę z listy"
+    },
     "featureAccess": {
       "callAnalysis": "Analizator rozmów",
       "callAnalysisDisabled": "Dostęp do Analizatora rozmów wyłączony",
       "callAnalysisEnabled": "Dostęp do Analizatora rozmów włączony",
       "callAnalysisHint": "Analiza notatek z rozmów telefonicznych (AI), ocena i follow-up",
+      "emailCampaigns": "Kampanie e-mail",
+      "emailCampaignsDisabled": "Dostęp do Kampanii e-mail wyłączony",
+      "emailCampaignsEnabled": "Dostęp do Kampanii e-mail włączony",
+      "emailCampaignsHint": "Kampanie mailowe do partnerów i leadów przez SendGrid",
       "prospects": "Prospekty",
       "prospectsDisabled": "Dostęp do Prospektów wyłączony",
       "prospectsEnabled": "Dostęp do Prospektów włączony",

@@ -25,7 +25,7 @@ const INVALID_VARIABLE_RE = /[\n\t]| {5,}/;
       @if (isLoading()) {
         <div class="hint">{{ t('whatsapp.template.loading') }}</div>
       } @else if (hasLoadError()) {
-        <div class="error">⚠️ {{ isTokenInvalid() ? t('whatsapp.tokenInvalid') : t('whatsapp.template.loadFailed') }}
+        <div class="error"><i class="ei ei-warn"></i> {{ isTokenInvalid() ? t('whatsapp.tokenInvalid') : t('whatsapp.template.loadFailed') }}
           <button type="button" class="link" (click)="load()">{{ t('whatsapp.template.retry') }}</button>
         </div>
       } @else if (supportedTemplates().length === 0) {

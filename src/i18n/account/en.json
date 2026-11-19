@@ -21,6 +21,10 @@
       "title": "Appearance"
     },
     "delete": "Delete",
+    "errors": {
+      "pbxToken": "Paste your Personal Access Token (PAT) from the PBX",
+      "templateName": "Enter the template name, e.g. Standard offer"
+    },
     "manual": {
       "hint": "Interactive CRMtree manual with screenshots. Opens in a new tab.",
       "open": "Open manual",

@@ -102,6 +102,9 @@
     },
     "signus": {
       "emailsPlaceholder": "ana@tvrtka.hr, partner@example.com",
+      "errors": {
+        "emails": "Upišite e-mail adrese potpisnika odvojene zarezama, npr. ivan@tvrtka.hr, ana@tvrtka.hr"
+      },
       "info": "Dokument će biti poslan u Signus API. Svaki potpisnik dobit će e-poruku. Potpisane verzije automatski se arhiviraju.",
       "modalTitle": "Pokreni elektroničko potpisivanje",
       "sectionTitle": "Elektronički potpis (Signus)",
@@ -143,6 +146,9 @@
       "assigned": "Zadatak dodijeljen — obavijest poslana e-poštom",
       "cancelled": "Zadatak otkazan",
       "dueDate": "Rok",
+      "errors": {
+        "assignTo": "Potražite osobu i kliknite je na popisu"
+      },
       "message": "Poruka",
       "messagePlaceholder": "Neobavezna poruka za dodijeljenu osobu…",
       "selected": "Odabrano: {name}",
@@ -343,6 +349,17 @@
     "chooseType": "— Odaberite vrstu —",
     "create": "Izradi dokument",
     "createFailed": "Izrada dokumenta nije uspjela",
+    "errors": {
+      "buyer": "Upišite kupca s računa",
+      "contractSubject": "Odaberite predmet ugovora",
+      "country": "Odaberite državu druge strane",
+      "docType": "Odaberite vrstu dokumenta",
+      "entity1": "Upišite prvu ugovornu stranu, npr. CRMtree d.o.o.",
+      "gdprType": "Odaberite GDPR klasifikaciju",
+      "group": "Odaberite grupu koja će vidjeti dokument",
+      "name": "Upišite naziv dokumenta, npr. Partnerski ugovor — ABC d.o.o.",
+      "nip": "Upišite porezni broj druge strane, npr. 1234567890"
+    },
     "file": {
       "dropHint": "Ispustite datoteku ovdje ili kliknite za odabir",
       "formats": "PDF, DOCX — najviše 50 MB",

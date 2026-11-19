@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateChildFn, CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { map, of, catchError } from 'rxjs';
+import { CrmFeature } from '../models/models';
 
 export const authGuard: CanActivateFn = (_route, state) => {
   const auth   = inject(AuthService);
@@ -101,4 +102,13 @@ export const externalUserGuard: CanActivateChildFn = (_route, state) => {
     path => state.url === path || state.url.startsWith(path + '/') || state.url.startsWith(path + '?'),
   );
   return isAllowed ? true : router.createUrlTree(['/projects']);
+};
+
+/** A CRM user of a tenant that has the given module switched on. */
+export const crmFeatureGuard = (feature: CrmFeature): CanActivateFn => () => {
+  const auth   = inject(AuthService);
+  const router = inject(Router);
+  if (auth.isCrmUser() && auth.hasFeature(feature)) return true;
+  router.navigate(['/dashboard']);
+  return false;
 };

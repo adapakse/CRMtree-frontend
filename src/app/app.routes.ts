@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { withI18nScopes } from './core/i18n/i18n-scope.guard';
-import { authGuard, adminGuard, crmGuard, adminOrSalesManagerGuard, superAdminGuard, publicRootGuard, externalUserGuard } from './core/auth/guards';
+import { authGuard, adminGuard, crmGuard, crmFeatureGuard, adminOrSalesManagerGuard, superAdminGuard, publicRootGuard, externalUserGuard } from './core/auth/guards';
 
 export const routes: Routes = withI18nScopes([
   // ── Public, SSR-rendered marketing surface (Faza 0 — SEO fundament) ──────
@@ -216,6 +216,16 @@ export const routes: Routes = withI18nScopes([
         path: 'crm/prospects-dashboard',
         canActivate: [adminOrSalesManagerGuard],
         loadComponent: () => import('./pages/crm/dashboard/crm-prospects-dashboard.component').then(m => m.CrmProspectsDashboardComponent),
+      },
+      {
+        path: 'crm/email-campaigns',
+        canActivate: [crmFeatureGuard('email_campaigns')],
+        loadComponent: () => import('./pages/crm/email-campaigns/crm-email-campaigns.component').then(m => m.CrmEmailCampaignsComponent),
+      },
+      {
+        path: 'crm/email-campaigns/:id',
+        canActivate: [crmFeatureGuard('email_campaigns')],
+        loadComponent: () => import('./pages/crm/email-campaigns/crm-email-campaign-editor.component').then(m => m.CrmEmailCampaignEditorComponent),
       },
       // ─────────────────────────────────────────────────────────────────────
 

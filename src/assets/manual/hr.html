@@ -232,6 +232,10 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a class="sub" href="#p1-calls-followup">Follow-upovi i CRM zadaci</a>
 <a class="sub" href="#p1-calls-example">Primjeri</a>
 <a class="sub" href="#p1-calls-faq">Pitanja i odgovori</a>
+<a href="#p1-campaigns">E-mail kampanje</a>
+<a class="sub" href="#p1-campaigns-new">Nova kampanja</a>
+<a class="sub" href="#p1-campaigns-results">Rezultati kampanja</a>
+<a class="sub" href="#p1-campaigns-consents">Privole po osobi na kartici</a>
 <div class="part">2. dio · Administrator</div>
 <a href="#p2-start">Kako to radi</a>
 <a class="sub" href="#p2-access">Gdje pronaći postavke</a>
@@ -265,6 +269,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a href="#p2-projects">Postavke projekata</a>
 <a class="sub" href="#p2-ksef">KSeF – ulazni računi</a>
 <a href="#p2-pbx">Telefonija i analizator poziva</a>
+<a href="#p2-sendgrid">E-mail kampanje: SendGrid račun</a>
 <a href="#p2-import">Uvoz i izvoz CSV-a</a>
 <a href="#p2-data">Upravljanje podacima</a>
 <a href="#p2-logs">Revizijski zapisi</a>
@@ -436,9 +441,9 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="webfig"><img loading="lazy" src="img/en_w04_leads_timeline.jpg?v=20261113" width="1440" height="900" alt="Ploča vremenske crte"><figcaption>Ploča „Kalendar aktivnosti”: Piotrov plan za 2. studenoga.</figcaption></figure>
 
 <h4 id="p1-leads-mobile"><span class="tag mob">MOBILE</span>Leadovi na telefonu</h4>
-<p>Kartica <b>„Leadovi”</b> ima okvir <b>„Traži tvrtku, osobu, telefon…”</b> i čipove za <b>„Vrući”</b> i svaku fazu (<b>„Novi”</b>, <b>„Kvalifikacija”</b>, <b>„Prezentacija”</b> i tako dalje). Nedavno ažurirani leadovi dolaze prvi. Svaka pločica prikazuje sljedeću aktivnost, na primjer <b>„Dospjelo: …”</b> crvenom bojom, a zatim kontakt, vrijednost i vjerojatnost. Ikona lijevka u gornjem desnom kutu otvara <b>„Filtri”</b>: <b>„Faza”</b> (uključujući arhivirane), <b>„Izvor”</b>, prekidače za <b>„Vrući”</b>, <b>„Samo na čekanju”</b> i <b>„Samo moji”</b>, a za menadžere i <b>„Prodavač”</b>. Završite s <b>„Očisti”</b> ili <b>„Primijeni”</b>.</p>
+<p>Kartica <b>„Leadovi”</b> ima okvir <b>„Traži tvrtku, osobu, telefon…”</b> i čipove za <b>„Vrući”</b> i svaku fazu (<b>„Novi”</b>, <b>„Kvalifikacija”</b>, <b>„Prezentacija”</b> i tako dalje). Nedavno ažurirani leadovi dolaze prvi. Prvi redak pločice prikazuje tvrtku i vrijednost (na primjer <b>„250 tis. zł”</b>), drugi kontakt s vjerojatnošću, a desno fazu. Treći redak pojavljuje se samo uz aktivnost s rokom: zakašnjela kao crvena oznaka <b>„Zakašnjelo · 10. stu · …”</b>, sljedeća planirana sivo. Plamen uz naziv označava vrući lead. Ikona lijevka u gornjem desnom kutu otvara <b>„Filtri”</b>: <b>„Faza”</b> (uključujući arhivirane), <b>„Izvor”</b>, prekidače za <b>„Vrući”</b>, <b>„Samo na čekanju”</b> i <b>„Samo moji”</b>, a za menadžere i <b>„Prodavač”</b>. Završite s <b>„Očisti”</b> ili <b>„Primijeni”</b>.</p>
 <div class="phones">
-<figure class="phone"><img loading="lazy" src="img/en_t13_leads_list.jpg?v=20261113" width="540" height="1083" alt="Popis leadova na telefonu"><figcaption>„Leadovi”: pretraživanje, čipovi faza i pločice leadova.</figcaption></figure>
+<figure class="phone"><img loading="lazy" src="img/en_t13_leads_list.jpg?v=20261116d" width="540" height="1083" alt="Popis leadova na telefonu"><figcaption>„Leadovi”: pretraživanje, čipovi faza i pločice leadova.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t14_leads_filters.jpg?v=20261113" width="540" height="1083" alt="Filtri leadova"><figcaption>„Filtri”: faza, izvor, vrući, na čekanju, samo moji.</figcaption></figure>
 </div>
 </section>
@@ -736,7 +741,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„Vremenska crta”</b> i <b>„Kalendar”</b>: isti zadaci na vremenskoj crti i u kalendaru.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_w10_onboarding.jpg?v=20261113" width="1440" height="900" alt="Ploča onboardinga partnera"><figcaption>Fala Media Demo na koraku „Potpisivanje ugovora” (Korak 1/4), još bez zadataka, „Pokreni” je dostupno.</figcaption></figure>
-<p>Gumb <b>„Pokreni”</b> postaje dostupan kad su svi zadaci partnera gotovi (ili kad ih nema). Do tada prikazuje lokot i broj dovršenih zadataka. Nakon potvrde partner postaje „Aktivan” i prelazi u registar partnera; poveznica „Profil partnera” otvara njegovu karticu.</p>
+<p>Gumb <b>„Pokreni”</b> postaje dostupan kad su svi zadaci partnera gotovi (ili kad ih nema). Do tada prikazuje lokot, a klik pokazuje koliko je zadataka preostalo. Nakon potvrde partner postaje „Aktivan” i prelazi u registar partnera; poveznica „Profil partnera” otvara njegovu karticu.</p>
+<p><b>Povlačenje u pipeline.</b> Voditelj prodaje ili administrator može povući partnera iz onboardinga kad je krenuo prerano ili je tvrtka odustala: gumb <b>„🔄 Povuci”</b> na ploči (ili <b>„Povuci iz onboardinga u pipeline”</b> na kartici partnera), odabir <b>„Faza pipelinea”</b> i <b>„Potvrdi povlačenje”</b>. Partner i njegovi zadaci onboardinga brišu se; lead se vraća u odabranu fazu i kasnije ga možete ponovno predati u onboarding.</p>
 
 <h4 id="p1-onboarding-card">Onboarding na kartici partnera</h4>
 <p>Partner koji se uvodi ima ploču s četiri koraka pri vrhu kartice, a svaki prikazuje koliko je njegovih zadataka gotovo. Kliknite korak da vidite njegove zadatke. Zadatak označite krugom uz njega; CRMtree bilježi tko ga je dovršio i kada. Zadaci kojima je istekao rok dobivaju crvenu oznaku „Rok istekao”.</p>
@@ -1419,6 +1425,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>Dodajte sve neobavezne stupce koje imate: <code>www</code>, <code>krs</code>, naziv, djelatnost, broj zaposlenih, grad, regija, PKD šifra i podaci o donositelju odluke (ime, položaj, odjel, telefon, e-pošta). Stupac <code>www</code> ubrzava i pojeftinjuje pronalaženje web-stranice.</li>
 <li>Kliknite <b>„Odaberite CSV datoteku”</b>, zatim <b>„Uvezi”</b>.</li>
 <li>Provjerite sažetak: „Dodano”, „Preskočeno (duplikati)”, „Pogreške”, „Redova ukupno”. Retci s neispravnim poreznim brojem (mora imati 10 znamenki) preskaču se i navode pod „Detalji pogrešaka”.</li>
+<li>Tvrtke koje su u CRM-u već kao Lead ili Partner (isti NIP) preskaču se: vide se pod <b>„Preskočeno (već u CRM-u)”</b> s poveznicom na njihovu karticu.</li>
 </ol>
 <div class="callout"><b>Duplikati</b>Tvrtka s istim poreznim brojem nikad se ne stvara dvaput. Uvoz umjesto toga ažurira postojeći zapis: popunjene ćelije prepisuju stare vrijednosti, a prazne ćelije ih ostavljaju kakve jesu. Datoteka može biti UTF-8 ili Windows-1250, odvojena točkom i zarezom ili zarezima, do 10 MB.</div>
 
@@ -1619,6 +1626,28 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p><b>Uvezao/uvezla sam bilješke, ali se ništa nije dogodilo.</b> Nakon uvoza kliknite „Analiziraj (N)”. Sam uvoz ne pokreće analizu.</p>
 <p><b>Redak prikazuje „Pogreška”.</b> Proširite ga da vidite zašto. Ako je razlog u postavkama AI-ja, javite administratoru, a zatim upotrijebite „Ponovno analiziraj”.</p>
 <p><b>Je li analizator u mobilnoj aplikaciji?</b> Ne. Zadaci „Follow-up telefoniczny” prikazuju se na vašem telefonu zajedno s drugim zadacima.</p>
+</section>
+
+<section class="ch" id="p1-campaigns">
+<h3>E-mail kampanje</h3>
+<p>Modul šalje e-mailove kontakt osobama partnera i leadova koje su dale potrebnu privolu. Slanje ide putem SendGrid računa vaše tvrtke, a predlošci se oblikuju u SendGridu (Dynamic Templates). Izbornik CRM → <b>„E-mail kampanje”</b> vidite kad vam je administrator dao pristup <b>„E-mail kampanje”</b>.</p>
+<p>Zaslon ima kartice <b>„Kampanje”</b>, <b>„Predlošci”</b> i <b>„Rezultati”</b> (administrator vidi i <b>„Postavke SendGrida”</b>). Popis kampanja ima filtre, sortiranje, status kao gumbe (<b>„Nacrti”</b>, <b>„Poslane”</b>…) i radnje <b>„Dupliciraj”</b>, <b>„Arhiviraj”</b>, <b>„Vrati”</b>. Ako SendGrid nije postavljen, iznad popisa piše <b>„SendGrid nije postavljen”</b>.</p>
+
+<h4 id="p1-campaigns-new">Nova kampanja</h4>
+<ol class="steps">
+<li>Kliknite <b>„Nova kampanja”</b> i unesite naziv.</li>
+<li><b>„Koji e-mail šaljemo?”</b> — odaberite SendGrid predložak. <b>„Pogledaj kako izgleda e-mail”</b> prikazuje pregled.</li>
+<li><b>„Tko ga treba primiti?”</b> — odaberite grupe (npr. <b>„Svi s privolom”</b>) ili učitajte <b>„Popis iz CSV datoteke”</b>. <b>„Suzi popis”</b> dodaje filtre: status partnera, faza leada, prodavač, djelatnost, oznake, zadnji kontakt.</li>
+<li>U <b>„Postavke slanja”</b> postavite razmak između e-mailova istoj tvrtki i naručitelja.</li>
+<li>Desno uživo vidite koliko osoba prima e-mail i zašto su neke izostavljene (nema privole, odjava, odbijena adresa…).</li>
+<li><b>„Spremi nacrt”</b>, zatim <b>„Pošalji test sebi”</b>. Tek nakon testa radi <b>„Pošalji putem SendGrida”</b>.</li>
+</ol>
+
+<h4 id="p1-campaigns-results">Rezultati kampanja</h4>
+<p>Kartica <b>„Rezultati”</b> prikazuje isporuke, otvaranja, klikove, odjave i probleme s adresom — brojke dolaze iz SendGrida. Tablica <b>„Tvrtke koje su kliknule”</b> vodi na karticu leada ili partnera. Na kartici se slanje vidi kao aktivnost <b>„E-mail kampanja”</b>. Izvješće preuzimate gumbom <b>„Preuzmi izvješće (.xlsx)”</b>.</p>
+
+<h4 id="p1-campaigns-consents">Privole po osobi na kartici</h4>
+<p>U odjeljku <b>„Marketinške privole”</b> na kartici leada i partnera svaka kontakt osoba s e-mail adresom ima vlastitu privolu: <b>„Slaže se”</b>, <b>„Ne slaže se”</b> ili <b>„Nepoznato”</b>. Uz „Slaže se” treba upisati kako je privola dobivena. Kampanje koriste samo te privole. Odjava iz e-maila ili prijava spama u SendGridu automatski povlači privolu. Ispod ostaje <b>„Privola tvrtke (stara)”</b> — kampanje je ne koriste.</p>
 </section>
 
 <h2 class="part-title" id="p2"><span class="num">2</span> Administrator</h2>
@@ -1985,6 +2014,19 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="example"><span class="lbl">PRIMJER · NOVI PRODAVAČ</span>
 <p>Pridružuje se novi prodavač i administrator stvara račun s ulogom „Prodavač”.</p>
 <p class="res">Nova osoba nema stavku izbornika „Analiza poziva” dok administrator na njezinoj kartici ne označi „Analizator poziva”. U demo podacima Anna, Piotr i Ewa imaju pristup, a Tomasz nema.</p></div>
+</section>
+
+<section class="ch" id="p2-sendgrid">
+<h3>E-mail kampanje: SendGrid račun</h3>
+<p>Svaka organizacija šalje sa svog SendGrid računa. CRMtree uključuje modul za vašu organizaciju, a administrator daje pristup osobama: kartica korisnika → <b>„Pristup funkcijama”</b> → <b>„E-mail kampanje”</b>. Administrator uvijek ima pristup.</p>
+<ol class="steps">
+<li>Otvorite <b>„E-mail kampanje”</b> → <b>„Postavke SendGrida”</b>.</li>
+<li>Zalijepite <b>„API ključ”</b> iz SendGrida (Settings → API Keys). Nakon spremanja vidi se samo „spremljen, završava na ••••1234” te <b>„Promijeni”</b> i <b>„Ukloni”</b>.</li>
+<li>Ispunite <b>„Adresa pošiljatelja”</b> (potvrđena u SendGridu), <b>„Ime pošiljatelja”</b>, po želji <b>„Reply-to”</b>, i <b>„ID grupe za odjavu (ASM)”</b>.</li>
+<li>U <b>„Privola potrebna za kampanje”</b> odaberite vrstu privole ili ostavite „Automatski”.</li>
+<li>Kopirajte <b>„Adresa webhooka”</b>, dodajte je u SendGrid → Settings → Mail Settings → Event Webhook, označite događaje i uključite Signed Event Webhook. Zalijepite <b>„Javni ključ webhooka”</b>.</li>
+<li>Kliknite <b>„Spremi”</b>, zatim <b>„Provjeri vezu”</b> — vidjet ćete broj predložaka u SendGridu.</li>
+</ol>
 </section>
 
 <section class="ch" id="p2-import">

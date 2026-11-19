@@ -4,6 +4,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 import { ToastService } from '../../../core/services/toast.service';
 import { KsefApiService, KsefCompany, KsefCompanyUpdatePayload } from '../../../core/services/ksef-api.service';
 import { PROJECTS_SHARED_STYLES } from '../../projects/projects-shared.styles';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 
 const NIP_LENGTH = 10;
 
@@ -40,7 +41,7 @@ export function describeKsefAdminError(err: ApiError, transloco: TranslocoServic
 @Component({
   selector: 'wt-project-ksef-company-form',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -53,7 +54,8 @@ export function describeKsefAdminError(err: ApiError, transloco: TranslocoServic
         <div class="mob">
           <div class="fg">
             <label class="fl">{{ t('ksef.nip') }} @if (!company()) { <span class="req">*</span> }</label>
-            <input class="fi" [(ngModel)]="nip" [disabled]="company() !== null" maxlength="13" inputmode="numeric" autocomplete="off">
+            <input class="fi" [(ngModel)]="nip" [disabled]="company() !== null" maxlength="13" inputmode="numeric" autocomplete="off" [class.fi-err]="submitted && isNipInvalid()">
+            @if (submitted && isNipInvalid()) { <span class="ferr">{{ t('ksef.settings.companyForm.errors.nip') }}</span> }
           </div>
           <div class="fg">
             <label class="fl">{{ t('ksef.settings.companyForm.name') }}</label>
@@ -61,7 +63,8 @@ export function describeKsefAdminError(err: ApiError, transloco: TranslocoServic
           </div>
           <div class="fg">
             <label class="fl">{{ t('ksef.settings.companyForm.token') }} @if (!company()) { <span class="req">*</span> }</label>
-            <input class="fi" type="password" [(ngModel)]="token" autocomplete="new-password">
+            <input class="fi" type="password" [(ngModel)]="token" autocomplete="new-password" [class.fi-err]="submitted && isTokenMissing()">
+            @if (submitted && isTokenMissing()) { <span class="ferr">{{ t('ksef.settings.companyForm.errors.token') }}</span> }
             <div class="hint">
               {{ company()
                 ? t('ksef.settings.companyForm.tokenHintEdit', { hint: '••••' + company()!.token_hint })
@@ -70,8 +73,9 @@ export function describeKsefAdminError(err: ApiError, transloco: TranslocoServic
           </div>
         </div>
         <div class="mof">
+          @if (submitted) { <wt-form-error-summary [count]="(isNipInvalid() ? 1 : 0) + (isTokenMissing() ? 1 : 0)" /> }
           <button class="btn btn-g" (click)="closed.emit()">{{ 'actions.cancel' | transloco }}</button>
-          <button class="btn btn-p" [disabled]="!isValid() || isSaving()" (click)="save()">
+          <button class="btn btn-p" [disabled]="isSaving()" (click)="save()">
             {{ isSaving() ? t('ksef.settings.companyForm.verifying') : ('actions.save' | transloco) }}
           </button>
         </div>
@@ -107,12 +111,16 @@ export class ProjectKsefCompanyFormComponent implements OnInit {
     this.name = company.name ?? '';
   }
 
-  isValid(): boolean {
-    if (this.company()) return true;
-    return this.nipDigits().length === NIP_LENGTH && this.token.trim() !== '';
-  }
+  submitted = false;
+
+  isNipInvalid(): boolean { return !this.company() && this.nipDigits().length !== NIP_LENGTH; }
+  isTokenMissing(): boolean { return !this.company() && this.token.trim() === ''; }
 
   save(): void {
+    if (this.isNipInvalid() || this.isTokenMissing()) {
+      this.submitted = true;
+      return;
+    }
     const company = this.company();
     const name = this.name.trim() || null;
     const token = this.token.trim();

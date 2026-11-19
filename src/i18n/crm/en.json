@@ -94,6 +94,9 @@
     "tasks": {
       "bulk": {
         "closeSelected": "Close selected tasks",
+        "errors": {
+          "noneSelected": "Select at least one task in the list"
+        },
         "selectOverdue": "Select all overdue tasks",
         "selectedCount": "{count, plural, one {# selected} other {# selected}}"
       },
@@ -531,24 +534,39 @@
     "writeNew": "Write a new email"
   },
   "fieldErrors": {
+    "caption": "Enter a caption for the screenshot, e.g. Sales report dashboard",
     "closeDate": "Choose the expected close date",
     "company": "Enter the company name",
+    "competitorUrl": "Enter the competitor's website, e.g. competitor.com",
     "contactName": "Enter the contact person's full name",
     "contactTitle": "Choose the contact person's role",
     "email": "Enter an email address, e.g. john@company.com",
+    "featureTag": "Enter the feature the screenshot shows, e.g. Reports",
     "firstContact": "Choose the first contact date",
+    "fullName": "Enter the full name, e.g. Anna Smith",
+    "groupName": "Enter the group name, e.g. Hotel chains",
+    "imageFile": "Choose an image file (PNG, JPG or WEBP)",
     "industry": "Choose an industry",
     "lostReason": "Choose the reason for losing",
+    "message": "Enter the message text",
     "onlinePct": "Choose the online sales share",
     "phone": "Enter a phone number, e.g. +48 600 000 000",
+    "pillarName": "Enter the pillar name, e.g. Business travel",
     "probability": "Choose the chance of winning",
+    "recipients": "Add at least one recipient, e.g. john.smith@company.com",
     "salesperson": "Assign a salesperson",
     "saveFailed": "Couldn't save. Please try again — if it keeps failing, report it to your administrator.",
     "source": "Choose where the lead came from",
+    "subject": "Enter the message subject",
+    "title": "Enter a title, e.g. Meeting about the offer",
     "value": "Enter an amount — if you don't know it, enter 0",
     "valueNegative": "The amount cannot be negative",
     "valueTooLarge": "Amount too large — the maximum is 999,999,999,999",
-    "website": "Enter the company website, e.g. company.com"
+    "website": "Enter the company website, e.g. company.com",
+    "whatsappTemplate": "Choose a template and fill in all its fields",
+    "wordpressAppPassword": "Paste the application password from your WordPress profile (e.g. abcd efgh ijkl mnop)",
+    "wordpressUrl": "Enter the WordPress site address, e.g. https://blog.company.com",
+    "wordpressUser": "Enter the WordPress user name"
   },
   "history": {
     "activityAdded": "Activity added: {title}",
@@ -622,6 +640,7 @@
       "call": "Call",
       "doc_sent": "Document",
       "email": "Email",
+      "marketing_email": "Email campaign",
       "meeting": "Meeting",
       "note": "Note",
       "opportunity": "Opportunity",
@@ -795,6 +814,10 @@
       "title": "Information"
     },
     "loadError": "Couldn't load the lead.",
+    "missingContact": {
+      "email": "This lead has no e-mail address — add it in “Edit details”",
+      "phone": "This lead has no phone number — add it in “Edit details”"
+    },
     "nip": {
       "countryCodeRequired": "Start with the country code (2 letters), e.g. PL",
       "duplicate": "This tax ID is already assigned to another company in the CRM",
@@ -1142,11 +1165,13 @@
       "newTask": "New task",
       "note": "Note",
       "notePlaceholder": "Additional information…",
+      "partnerRequired": "Choose a partner at the top of the page to add a task",
       "step": "Process step",
       "time": "Time",
       "timeHint": "(optional, default 09:00)",
       "title": "Task title",
-      "titlePlaceholder": "Task name"
+      "titlePlaceholder": "Task name",
+      "titleRequired": "Enter a task title, e.g. “Sign the framework agreement”"
     },
     "taskTypes": {
       "call": "Call"
@@ -1170,6 +1195,26 @@
       "calendar": "Calendar",
       "partners": "Partners",
       "timeline": "Timeline"
+    },
+    "withdraw": {
+      "action": "Withdraw",
+      "confirm": "Confirm withdrawal",
+      "confirmPrompt": "Withdraw \"{company}\" from onboarding to the \"{stage}\" stage? The partner and its onboarding tasks will be deleted and the lead returns to the sales funnel.",
+      "detailButton": "Withdraw from onboarding to the funnel",
+      "detailHint": "Deletes this partner and its onboarding tasks — the lead returns to the selected funnel stage.",
+      "detailStagePrompt": "Return the lead to stage:",
+      "failed": "Could not withdraw from onboarding",
+      "hint": "Withdraw from onboarding to a funnel stage",
+      "inProgress": "Withdrawing…",
+      "intro": "{company} will be removed from onboarding (together with its onboarding tasks) and returns to the sales funnel at the selected stage.",
+      "invalidStage": "This stage is no longer in the funnel — refresh the page and choose another one",
+      "noPermission": "Only a sales manager or an administrator can withdraw from onboarding",
+      "notFound": "Partner not found — it may have been withdrawn or launched already",
+      "stageLabel": "Funnel stage",
+      "stagePlaceholder": "— select a stage —",
+      "stageRequired": "Select the funnel stage the company returns to",
+      "success": "\"{company}\" is back in the sales funnel",
+      "title": "Withdraw from onboarding"
     }
   },
   "partnerDetail": {
@@ -1563,6 +1608,32 @@
       "previousQuarter": "Previous quarter",
       "previousWeek": "Previous week",
       "previousYear": "Previous year ({year})"
+    }
+  },
+  "personConsents": {
+    "cancel": "Cancel",
+    "companyHint": "Email campaigns do not use it — the person's consent above is what counts.",
+    "companyTitle": "Company consent (old)",
+    "deniedPlaceholder": "e.g. refused by phone",
+    "errors": {
+      "note": "Describe how the consent was obtained (at least 3 characters), e.g. trade fair form 12.10"
+    },
+    "grantedPlaceholder": "e.g. verbally at the meeting on 12 Nov, form at a trade fair",
+    "loadFailed": "Could not load consents.",
+    "loading": "Loading…",
+    "mainContact": "main contact",
+    "noPeople": "No people with an email address. Add a contact person with an email to record their consent.",
+    "noteOptional": "Note (optional)",
+    "noteRequired": "How was it obtained? (required)",
+    "save": "Save",
+    "sources": {
+      "sendgrid_spam": "reported an email as spam",
+      "sendgrid_unsubscribe": "unsubscribed from an email"
+    },
+    "values": {
+      "denied": "Does not agree",
+      "granted": "Agrees",
+      "no_data": "Unknown"
     }
   },
   "reports": {

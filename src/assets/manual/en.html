@@ -232,6 +232,10 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a class="sub" href="#p1-calls-followup">Follow-ups and CRM tasks</a>
 <a class="sub" href="#p1-calls-example">Examples</a>
 <a class="sub" href="#p1-calls-faq">Questions and answers</a>
+<a href="#p1-campaigns">Email campaigns</a>
+<a class="sub" href="#p1-campaigns-new">New campaign</a>
+<a class="sub" href="#p1-campaigns-results">Campaign results</a>
+<a class="sub" href="#p1-campaigns-consents">Per-person consents on the card</a>
 <div class="part">Part 2 · Administrator</div>
 <a href="#p2-start">How it works</a>
 <a class="sub" href="#p2-access">Where to find the settings</a>
@@ -265,6 +269,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <a href="#p2-projects">Project settings</a>
 <a class="sub" href="#p2-ksef">KSeF – cost invoices</a>
 <a href="#p2-pbx">Telephony and call analyser</a>
+<a href="#p2-sendgrid">Email campaigns: SendGrid account</a>
 <a href="#p2-import">CSV import and export</a>
 <a href="#p2-data">Data management</a>
 <a href="#p2-logs">Audit logs</a>
@@ -436,9 +441,9 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="webfig"><img loading="lazy" src="img/en_w04_leads_timeline.jpg?v=20261113" width="1440" height="900" alt="Timeline panel"><figcaption>The “Activity calendar” panel: Piotr's plan for 2 November.</figcaption></figure>
 
 <h4 id="p1-leads-mobile"><span class="tag mob">MOBILE</span>Leads on the phone</h4>
-<p>The <b>“Leads”</b> tab has a <b>“Search company, person, phone…”</b> box and chips for <b>“Hot”</b> and each stage (<b>“New”</b>, <b>“Qualification”</b>, <b>“Presentation”</b> and so on). Recently updated leads come first. Each tile shows the next activity, for example <b>“Overdue: …”</b> in red, followed by the contact, value and probability. The funnel icon in the top-right corner opens <b>“Filters”</b>: <b>“Stage”</b> (including Archived), <b>“Source”</b>, switches for <b>“Hot”</b>, <b>“On hold only”</b> and <b>“Mine only”</b>, and for managers <b>“Salesperson”</b>. Finish with <b>“Clear”</b> or <b>“Apply”</b>.</p>
+<p>The <b>“Leads”</b> tab has a <b>“Search company, person, phone…”</b> box and chips for <b>“Hot”</b> and each stage (<b>“New”</b>, <b>“Qualification”</b>, <b>“Presentation”</b> and so on). Recently updated leads come first. The first line of a tile shows the company and the value (for example <b>“250K zł”</b>), the second the contact with the probability, and the stage on the right. A third line appears only for a dated activity: an overdue one as a red label <b>“Overdue · 10 Nov · …”</b>, the next planned one in grey. A flame next to the name marks a hot lead. The funnel icon in the top-right corner opens <b>“Filters”</b>: <b>“Stage”</b> (including Archived), <b>“Source”</b>, switches for <b>“Hot”</b>, <b>“On hold only”</b> and <b>“Mine only”</b>, and for managers <b>“Salesperson”</b>. Finish with <b>“Clear”</b> or <b>“Apply”</b>.</p>
 <div class="phones">
-<figure class="phone"><img loading="lazy" src="img/en_t13_leads_list.jpg?v=20261113" width="540" height="1083" alt="Lead list on the phone"><figcaption>“Leads”: search, stage chips and lead tiles.</figcaption></figure>
+<figure class="phone"><img loading="lazy" src="img/en_t13_leads_list.jpg?v=20261116d" width="540" height="1083" alt="Lead list on the phone"><figcaption>“Leads”: search, stage chips and lead tiles.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t14_leads_filters.jpg?v=20261113" width="540" height="1083" alt="Lead filters"><figcaption>“Filters”: stage, source, hot, on hold, mine only.</figcaption></figure>
 </div>
 </section>
@@ -736,7 +741,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>“Timeline”</b> and <b>“Calendar”</b>: the same tasks on a timeline and in a calendar.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_w10_onboarding.jpg?v=20261113" width="1440" height="900" alt="Partner onboarding board"><figcaption>Fala Media Demo at “Contract signing” (Step 1/4), no tasks yet, “Launch” available.</figcaption></figure>
-<p>The <b>“Launch”</b> button becomes available once all the partner’s tasks are done (or when there are none). Until then it shows a padlock and the number of completed tasks. After you confirm, the partner becomes “Active” and moves into the partner registry; the “Partner profile” link opens its card.</p>
+<p>The <b>“Launch”</b> button becomes available once all the partner’s tasks are done (or when there are none). Until then it shows a padlock, and clicking it tells you how many tasks are left. After you confirm, the partner becomes “Active” and moves into the partner registry; the “Partner profile” link opens its card.</p>
+<p><b>Withdrawing to the funnel.</b> A sales manager or an administrator can take a partner back out of onboarding when it started too early or the company backed out: the <b>“🔄 Withdraw”</b> button on the board (or <b>“Withdraw from onboarding to the funnel”</b> on the partner card), pick the <b>“Funnel stage”</b> and click <b>“Confirm withdrawal”</b>. The partner and its onboarding tasks are deleted; the lead returns to the chosen stage and can be sent to onboarding again later.</p>
 
 <h4 id="p1-onboarding-card">Onboarding on the partner card</h4>
 <p>A partner in onboarding has a panel with the four steps at the top of its card, each showing how many of its tasks are done. Click a step to see its tasks. Tick a task off with the circle next to it; CRMtree records who completed it and when. Late tasks get a red “Overdue” tag.</p>
@@ -1419,6 +1425,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>Add any optional columns you have: <code>www</code>, <code>krs</code>, name, industry, headcount, city, region, PKD code and decision-maker details (name, position, department, phone, email). A <code>www</code> column makes finding the website faster and cheaper.</li>
 <li>Click <b>“Choose a CSV file”</b>, then <b>“Import”</b>.</li>
 <li>Check the summary: “Added”, “Skipped (duplicates)”, “Errors”, “Rows in total”. Rows with an invalid tax ID (it must have 10 digits) are skipped and listed under “Error details”.</li>
+<li>Companies that are already a Lead or a Partner in CRM (same NIP) are skipped: they appear under <b>“Skipped (already in CRM)”</b> with a link to their card.</li>
 </ol>
 <div class="callout"><b>Duplicates</b>A company with the same tax ID is never created twice. The import updates the existing record instead: filled-in cells overwrite the old values and empty cells leave them as they are. The file can be UTF-8 or Windows-1250, separated by semicolons or commas, up to 10 MB.</div>
 
@@ -1619,6 +1626,28 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p><b>I imported notes but nothing happened.</b> Click “Analyze (N)” after the import. Importing alone does not start the analysis.</p>
 <p><b>A row shows “Error”.</b> Expand it to see why. If the reason is the AI setup, tell the administrator, then use “Re-analyze”.</p>
 <p><b>Is the analyser in the mobile app?</b> No. The “Follow-up telefoniczny” tasks do show on your phone together with your other tasks.</p>
+</section>
+
+<section class="ch" id="p1-campaigns">
+<h3>Email campaigns</h3>
+<p>The module sends emails to contact people of partners and leads who gave the required consent. Emails go out through your company's SendGrid account, and the email templates are designed in SendGrid (Dynamic Templates). You see CRM → <b>“Email campaigns”</b> in the menu when an administrator has given you the <b>“Email campaigns”</b> access.</p>
+<p>The screen has the tabs <b>“Campaigns”</b>, <b>“Templates”</b> and <b>“Results”</b> (an administrator also sees <b>“SendGrid settings”</b>). The campaign list has filters, sorting, the status as buttons (<b>“Drafts”</b>, <b>“Sent”</b>…) and the actions <b>“Duplicate”</b>, <b>“Archive”</b>, <b>“Restore”</b>. When SendGrid is not configured, the message <b>“SendGrid is not configured”</b> appears above the list.</p>
+
+<h4 id="p1-campaigns-new">New campaign</h4>
+<ol class="steps">
+<li>Click <b>“New campaign”</b> and enter a name.</li>
+<li><b>“Which email do we send?”</b> — pick a SendGrid template. <b>“See what the email looks like”</b> shows a preview.</li>
+<li><b>“Who should get it?”</b> — pick groups (e.g. <b>“Everyone with consent”</b>) or upload a <b>“List from a CSV file”</b>. <b>“Narrow the list”</b> adds filters: partner status, lead stage, salesperson, industry, tags, last contact.</li>
+<li>In <b>“Sending settings”</b> set the gap between emails to the same company and who requested the campaign.</li>
+<li>On the right you see live how many people get the email and why some are skipped (no consent, unsubscribed, bounced address…).</li>
+<li><b>“Save draft”</b>, then <b>“Send a test to myself”</b>. Only after the test does <b>“Send via SendGrid”</b> work.</li>
+</ol>
+
+<h4 id="p1-campaigns-results">Campaign results</h4>
+<p>The <b>“Results”</b> tab shows deliveries, opens, clicks, unsubscribes and address problems — the numbers come from SendGrid. The table <b>“Companies that clicked”</b> leads to the lead or partner card. On the card, the sending shows as an <b>“Email campaign”</b> activity. Download the report with <b>“Download report (.xlsx)”</b>.</p>
+
+<h4 id="p1-campaigns-consents">Per-person consents on the card</h4>
+<p>In the <b>“Marketing consents”</b> section of the lead and partner card, every contact person with an email address has their own consent: <b>“Agrees”</b>, <b>“Does not agree”</b> or <b>“Unknown”</b>. “Agrees” requires a note on how the consent was obtained. Campaigns use only these consents. Unsubscribing from an email or a spam report in SendGrid withdraws the consent automatically. Below stays <b>“Company consent (old)”</b> — campaigns do not use it.</p>
 </section>
 
 <h2 class="part-title" id="p2"><span class="num">2</span> Administrator</h2>
@@ -1985,6 +2014,19 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="example"><span class="lbl">EXAMPLE · NEW SALESPERSON</span>
 <p>A new salesperson joins and the administrator creates an account with the “Salesperson” role.</p>
 <p class="res">The new person has no “Call analysis” menu item until the administrator ticks “Call analyser” on their card. In the demo data Anna, Piotr and Ewa have access, Tomasz doesn’t.</p></div>
+</section>
+
+<section class="ch" id="p2-sendgrid">
+<h3>Email campaigns: SendGrid account</h3>
+<p>Every organization sends from its own SendGrid account. CRMtree turns the module on for your organization, and the administrator gives people access: user card → <b>“Feature access”</b> → <b>“Email campaigns”</b>. An administrator always has access.</p>
+<ol class="steps">
+<li>Open <b>“Email campaigns”</b> → <b>“SendGrid settings”</b>.</li>
+<li>Paste the <b>“API key”</b> from SendGrid (Settings → API Keys). Once saved, you see only “saved, ends with ••••1234” and <b>“Change”</b> and <b>“Remove”</b>.</li>
+<li>Fill in the <b>“Sender address”</b> (verified in SendGrid), <b>“Sender name”</b>, optionally <b>“Reply-to”</b>, and the <b>“Unsubscribe group ID (ASM)”</b>.</li>
+<li>In <b>“Consent required for campaigns”</b> pick a consent type or keep “Automatic”.</li>
+<li>Copy the <b>“Webhook address”</b>, add it in SendGrid → Settings → Mail Settings → Event Webhook, tick the events and turn on Signed Event Webhook. Paste the <b>“Webhook public key”</b>.</li>
+<li>Click <b>“Save”</b>, then <b>“Check connection”</b> — you see the number of templates in SendGrid.</li>
+</ol>
 </section>
 
 <section class="ch" id="p2-import">

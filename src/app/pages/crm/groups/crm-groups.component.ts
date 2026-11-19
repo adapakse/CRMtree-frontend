@@ -7,11 +7,12 @@ import { CrmApiService, PartnerGroup } from '../../../core/services/crm-api.serv
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 
 @Component({
   selector: 'wt-crm-groups',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -28,7 +29,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
          [class.highlighted]="g.id === highlightedId"
          (click)="viewGroup(g)">
       <div class="gc-header">
-        <div class="gc-icon">🏢</div>
+        <div class="ico-tile"><i class="ei ei-building"></i></div>
         <div class="gc-title">
           <div class="gc-name">{{g.name}}
             <span *ngIf="g.source==='dwh'" class="dwh-tag">DWH</span>
@@ -36,14 +37,14 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
           <div class="gc-industry" *ngIf="g.industry">{{g.industry}}</div>
         </div>
         <div class="gc-actions" *ngIf="isManager && g.source !== 'dwh'" (click)="$event.stopPropagation()">
-          <button class="icon-btn" (click)="editGroup(g)">✏️</button>
+          <button class="icon-btn" (click)="editGroup(g)"><i class="ei ei-pencil"></i></button>
         </div>
       </div>
       <div class="gc-stats">
         <span class="gc-stat"><strong>{{g.partner_count}}</strong> {{ t('partnerGroups.card.partnersNoun', { count: g.partner_count }) }}</span>
         <span class="gc-stat accent"><strong>{{(g.total_arr || 0) | number:'1.0-0'}} PLN</strong> ARR</span>
       </div>
-      <div class="gc-mgr" *ngIf="g.manager_name">👤 {{g.manager_name}}</div>
+      <div class="gc-mgr" *ngIf="g.manager_name"><i class="ei ei-user"></i> {{g.manager_name}}</div>
       <div class="gc-desc" *ngIf="g.description">{{g.description}}</div>
       <div class="gc-partners">
         <span class="partner-chip" *ngFor="let p of g.partners.slice(0,4)">
@@ -60,12 +61,12 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     <div class="side-panel-inner view-panel" (click)="$event.stopPropagation()">
       <div class="vp-header">
         <div>
-          <div class="vp-title">🏢 {{viewingGroup.name}}</div>
+          <div class="vp-title"><i class="ei ei-building"></i> {{viewingGroup.name}}</div>
           <div class="vp-sub" *ngIf="viewingGroup.industry">{{viewingGroup.industry}}</div>
         </div>
         <div class="vp-header-actions">
           <span *ngIf="viewingGroup.source==='dwh'" class="dwh-tag">DWH</span>
-          <button class="icon-btn" *ngIf="isManager && viewingGroup.source !== 'dwh'" (click)="editGroup(viewingGroup)">✏️</button>
+          <button class="icon-btn" *ngIf="isManager && viewingGroup.source !== 'dwh'" (click)="editGroup(viewingGroup)"><i class="ei ei-pencil"></i></button>
           <button class="close-btn" (click)="closeViewPanel()">✕</button>
         </div>
       </div>
@@ -81,7 +82,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
         </div>
       </div>
 
-      <div *ngIf="viewingGroup.manager_name" class="vp-mgr">👤 {{ t('partnerGroups.details.manager') }} <strong>{{viewingGroup.manager_name}}</strong></div>
+      <div *ngIf="viewingGroup.manager_name" class="vp-mgr"><i class="ei ei-user"></i> {{ t('partnerGroups.details.manager') }} <strong>{{viewingGroup.manager_name}}</strong></div>
       <div *ngIf="viewingGroup.description" class="vp-desc">{{viewingGroup.description}}</div>
 
       <div class="vp-partners-section">
@@ -101,12 +102,15 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
   <div class="side-panel" *ngIf="showCreate || editingGroup" (click)="closePanel()">
     <div class="side-panel-inner" (click)="$event.stopPropagation()">
       <h3>{{editingGroup ? t('partnerGroups.form.editTitle') : t('partnerGroups.newGroup')}}</h3>
-      <label>{{ t('partnerGroups.form.name') }} *<input class="fi" [(ngModel)]="form.name" [placeholder]="t('partnerGroups.form.namePlaceholder')"></label>
+      <label>{{ t('partnerGroups.form.name') }} <span class="req">*</span><input class="fi" [(ngModel)]="form.name" [placeholder]="t('partnerGroups.form.namePlaceholder')" [class.fi-err]="submitted && !form.name.trim()">
+        @if (submitted && !form.name.trim()) { <span class="ferr">{{ t('fieldErrors.groupName') }}</span> }
+      </label>
       <label>{{ t('partnerGroups.form.industry') }}<input class="fi" [(ngModel)]="form.industry"></label>
       <label>{{ t('partnerGroups.form.description') }}<textarea class="fta" [(ngModel)]="form.description" rows="3"></textarea></label>
       <div class="panel-actions">
         <button class="btn btn-g" (click)="closePanel()">{{ 'actions.cancel' | transloco }}</button>
-        <button class="btn btn-p" (click)="saveGroup()" [disabled]="!form.name || saving">
+        @if (submitted) { <wt-form-error-summary [count]="form.name.trim() ? 0 : 1" /> }
+        <button class="btn btn-p" (click)="saveGroup()" [disabled]="saving">
           {{saving ? '…' : (editingGroup ? ('actions.save' | transloco) : t('partnerGroups.form.create'))}}
         </button>
         <button class="btn btn-d" *ngIf="editingGroup" (click)="deleteGroup()" [disabled]="saving">{{ t('partnerGroups.form.delete') }}</button>
@@ -123,6 +127,9 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .dwh-tag { font-size:10px; font-weight:700; background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:middle; }
     .loading { padding:40px; text-align:center; color:var(--gray-400); }
     .groups-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; padding:20px 24px 24px; align-content:start; }
+    @media (max-width: 767px) {
+      .groups-grid { grid-template-columns:minmax(0, 1fr); padding:16px; }
+    }
     .group-card { background:var(--surface); border-radius:12px; padding:16px; cursor:pointer; box-shadow:var(--shadow-sm); transition:box-shadow .15s, transform .15s; }
     .group-card:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
     .group-card.highlighted { box-shadow:0 0 0 2px var(--orange), var(--shadow-sm); }
@@ -147,6 +154,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     /* Side panels */
     .side-panel { position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:100; display:flex; justify-content:flex-end; }
     .side-panel-inner { background:var(--surface); width:380px; height:100%; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-lg); }
+    @media (max-width: 479px) { .side-panel-inner { width:100%; box-sizing:border-box; padding:16px; } }
     .side-panel-inner h3 { margin:0; font-size:16px; font-weight:700; }
     .side-panel-inner label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; }
     .panel-actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
@@ -193,6 +201,7 @@ export class CrmGroupsComponent implements OnInit {
   highlightedId: number | null = null;
   saving = false;
   form: { name: string; industry: string; description: string } = { name: '', industry: '', description: '' };
+  submitted = false;
 
   get isManager() {
     const u = this.auth.user();
@@ -255,10 +264,13 @@ export class CrmGroupsComponent implements OnInit {
     this.form = { name: g.name, industry: g.industry || '', description: g.description || '' };
   }
 
-  closePanel() { this.showCreate = false; this.editingGroup = null; this.form = { name: '', industry: '', description: '' }; }
+  closePanel() { this.showCreate = false; this.editingGroup = null; this.submitted = false; this.form = { name: '', industry: '', description: '' }; }
 
   saveGroup() {
-    if (!this.form.name) return;
+    if (!this.form.name.trim()) {
+      this.submitted = true;
+      return;
+    }
     this.saving = true;
     const data = { name: this.form.name, industry: this.form.industry || null, description: this.form.description || null };
     const obs = this.editingGroup

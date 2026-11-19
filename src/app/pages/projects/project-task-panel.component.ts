@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
@@ -17,6 +17,8 @@ import { ProjectTaskCostsComponent } from './project-task-costs.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { EntityAttachmentsComponent } from '../../shared/components/entity-attachments/entity-attachments.component';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
+import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
+import { scrollToFirstError } from '../../shared/forms/form-errors';
 
 const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF', 'CZK'];
 const DEFAULT_CURRENCY = 'PLN';
@@ -74,7 +76,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
   standalone: true,
   imports: [
     FormsModule, DatePipe, ProjectChatComponent, ProjectTaskCostsComponent, AddToCalendarComponent, TranslocoDirective, TranslocoPipe,
-    ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent, EntityAttachmentsComponent,
+    ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent, EntityAttachmentsComponent, FormErrorSummaryComponent,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -105,7 +107,8 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
             <div class="panel-body">
               <div class="fg">
                 <label class="fl">{{ t('panel.fields.name') }} <span class="req">*</span></label>
-                <input class="fi" [(ngModel)]="form.name" maxlength="300" [disabled]="!permissions().can_edit_content">
+                <input class="fi" [(ngModel)]="form.name" maxlength="300" [disabled]="!permissions().can_edit_content" [class.fi-err]="isSaveSubmitted && !form.name.trim()">
+                @if (isSaveSubmitted && !form.name.trim()) { <span class="ferr">{{ t('panel.errors.name') }}</span> }
               </div>
               <div class="fg">
                 <label class="fl">{{ t('panel.fields.description') }}</label>
@@ -243,14 +246,15 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
               @if (canAddFields()) {
                 @if (availableFieldDefinitions().length > 0) {
                   <div class="add-field">
-                    <select class="fsel" [(ngModel)]="newFieldId">
+                    <select class="fsel" [(ngModel)]="newFieldId" [class.fi-err]="isFieldSubmitted && !newFieldId">
                       <option [ngValue]="null">{{ t('panel.customFields.selectField') }}</option>
                       @for (definition of availableFieldDefinitions(); track definition.id) {
                         <option [ngValue]="definition.id">{{ definition.name }}</option>
                       }
                     </select>
-                    <button class="btn btn-g btn-sm" [disabled]="!newFieldId" (click)="addField()">{{ t('panel.customFields.addButton') }}</button>
+                    <button class="btn btn-g btn-sm" (click)="addField()">{{ t('panel.customFields.addButton') }}</button>
                   </div>
+                  @if (isFieldSubmitted && !newFieldId) { <span class="ferr" role="alert">{{ t('card.errors.field') }}</span> }
                   <div class="field-hint">{{ t('panel.customFields.addHint') }}</div>
                 } @else {
                   <div class="field-hint">
@@ -299,7 +303,8 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
               <span class="foot-spacer"></span>
               <button class="btn btn-g" (click)="closed.emit()">{{ 'actions.close' | transloco }}</button>
               @if (canSave()) {
-                <button class="btn btn-p" [disabled]="!form.name.trim() || isSaving()" (click)="save()">
+                @if (isSaveSubmitted) { <wt-form-error-summary [count]="form.name.trim() ? 0 : 1" /> }
+                <button class="btn btn-p" [disabled]="isSaving()" (click)="save()">
                   {{ isSaving() ? t('panel.saving') : (isCreating() ? t('panel.createTask') : ('actions.save' | transloco)) }}
                 </button>
               }
@@ -423,6 +428,9 @@ export class ProjectTaskPanelComponent implements OnInit {
 
   form: TaskForm = this.emptyForm();
   newFieldId: string | null = null;
+  isSaveSubmitted = false;
+  isFieldSubmitted = false;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   endDateChangeReason = '';
 
   ngOnInit(): void {
@@ -462,7 +470,11 @@ export class ProjectTaskPanelComponent implements OnInit {
 
   addField(): void {
     const fieldId = this.newFieldId;
-    if (!fieldId) return;
+    if (!fieldId) {
+      this.isFieldSubmitted = true;
+      return;
+    }
+    this.isFieldSubmitted = false;
     const fields = [
       ...this.fields().map(field => ({ field_definition_id: field.field_definition_id, is_required: field.is_required })),
       { field_definition_id: fieldId, is_required: false },
@@ -498,6 +510,12 @@ export class ProjectTaskPanelComponent implements OnInit {
   }
 
   save(): void {
+    if (!this.form.name.trim()) {
+      this.isSaveSubmitted = true;
+      scrollToFirstError(this.host.nativeElement);
+      return;
+    }
+    this.isSaveSubmitted = false;
     const taskId = this.taskId();
     const payload = this.buildPayload();
     const request = taskId === null

@@ -6,14 +6,14 @@ import { AuditLog } from '../../core/models/models';
 import { TranslocoDirective, TranslocoPipe, provideTranslocoScope } from '@jsverse/transloco';
 
 const ACTION_ICONS: Record<string, string> = {
-  document_created:   '📄', document_viewed:    '👁', document_downloaded: '⬇',
-  document_deleted:   '🗑', metadata_updated:   '✏', status_changed:     '🔄',
-  version_uploaded:   '📎', tag_added:          '🏷', tag_removed:        '🏷',
-  workflow_task_created: '📋', workflow_task_completed: '✅', workflow_task_cancelled: '❌',
-  signing_initiated:  '✍', signing_completed:  '🔏',
-  user_login:         '🔑', user_logout:        '🚪',
-  role_assigned:      '👥', role_removed:       '👥',
-  group_created:      '🏢', group_updated:      '🏢',
+  document_created:   'file', document_viewed:    'eye', document_downloaded: 'download',
+  document_deleted:   'trash', metadata_updated:   'pencil', status_changed:     'refresh',
+  version_uploaded:   'paperclip', tag_added:          'tag', tag_removed:        'tag',
+  workflow_task_created: 'clipboard', workflow_task_completed: 'check-circle', workflow_task_cancelled: 'x-circle',
+  signing_initiated:  'pencil', signing_completed:  'lock',
+  user_login:         'key', user_logout:        'log-out',
+  role_assigned:      'users', role_removed:       'users',
+  group_created:      'building', group_updated:      'building',
 };
 
 @Component({
@@ -56,7 +56,7 @@ const ACTION_ICONS: Record<string, string> = {
           <input class="fi" type="text" [(ngModel)]="filters.user_email" (blur)="load()" [placeholder]="t('logs.filters.userEmailPlaceholder')">
         </div>
         <div style="margin-top:auto">
-          <button class="btn btn-g btn-sm" (click)="clearFilters()">{{ t('logs.filters.clear') }}</button>
+          <button type="button" class="btn-reset" (click)="clearFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>{{ 'list.clearFilters' | transloco }}</button>
         </div>
         <span style="flex:1"></span>
         <span style="font-size:12px;color:var(--gray-400);margin-top:auto">{{ t('logs.count', { count: total() }) }}</span>
@@ -82,7 +82,7 @@ const ACTION_ICONS: Record<string, string> = {
               {{ log.created_at | date:'dd.MM.yy HH:mm:ss' }}
             </div>
             <div class="td">
-              <span style="font-size:14px">{{ actionIcon(log.action) }}</span>
+              <span style="font-size:14px"><i class="ei ei-{{ actionIcon(log.action) }}"></i></span>
               <span style="font-size:10px;font-weight:600;color:var(--gray-600);margin-left:4px">
                 {{ formatAction(log.action) }}
               </span>
@@ -101,7 +101,7 @@ const ACTION_ICONS: Record<string, string> = {
         }
         @empty {
           @if (!loading()) {
-            <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">{{ t('logs.empty') }}</div></div>
+            <div class="empty-state"><div class="empty-icon"><i class="ei ei-clipboard"></i></div><div class="empty-title">{{ t('logs.empty') }}</div></div>
           }
         }
       </div>
@@ -121,7 +121,7 @@ const ACTION_ICONS: Record<string, string> = {
       <div class="mol open" (click)="selectedLog.set(null)">
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
-            <div class="moico" style="background:var(--gray-100);font-size:20px">{{ actionIcon(selectedLog()!.action) }}</div>
+            <div class="moico" style="background:var(--gray-100);font-size:20px"><i class="ei ei-{{ actionIcon(selectedLog()!.action) }}"></i></div>
             <div>
               <div class="mot">{{ formatAction(selectedLog()!.action) }}</div>
               <div class="mos">{{ selectedLog()!.created_at | date:'dd.MM.yyyy HH:mm:ss' }} · {{ selectedLog()!.user_email }}</div>
@@ -220,7 +220,7 @@ export class LogsComponent implements OnInit {
 
   openLog(log: AuditLog): void { this.selectedLog.set(log); }
 
-  actionIcon(action: string): string { return ACTION_ICONS[action] ?? '📌'; }
+  actionIcon(action: string): string { return ACTION_ICONS[action] ?? 'pin'; }
 
   formatAction(action: string): string {
     return action.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());

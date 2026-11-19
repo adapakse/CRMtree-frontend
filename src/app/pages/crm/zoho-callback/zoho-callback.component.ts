@@ -16,7 +16,7 @@ import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 
     <!-- Success -->
     <ng-container *ngIf="status === 'connected'">
-      <div style="font-size:48px;margin-bottom:16px">✅</div>
+      <div class="ico-tile ico-tile--lg" style="margin:0 auto 16px"><i class="ei ei-check-circle"></i></div>
       <div style="font-size:20px;font-weight:800;color:var(--gray-800);margin-bottom:8px">{{ t('mailCallback.connectedTitle', { provider: provider }) }}</div>
       <div style="font-size:14px;color:var(--gray-500);margin-bottom:28px;line-height:1.6">
         {{ t('mailCallback.connectedBody', { provider: provider }) }}<br>
@@ -30,7 +30,7 @@ import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 
     <!-- Error -->
     <ng-container *ngIf="status === 'error'">
-      <div style="font-size:48px;margin-bottom:16px">❌</div>
+      <div class="ico-tile ico-tile--lg ico-tile--danger" style="margin:0 auto 16px"><i class="ei ei-x-circle"></i></div>
       <div style="font-size:20px;font-weight:800;color:var(--gray-800);margin-bottom:8px">{{ t('mailCallback.errorTitle') }}</div>
       <div style="font-size:14px;color:var(--gray-500);margin-bottom:8px;line-height:1.6">
         {{ t('mailCallback.errorBody', { provider: provider }) }}
@@ -46,7 +46,7 @@ import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 
     <!-- Loading / unknown state -->
     <ng-container *ngIf="status !== 'connected' && status !== 'error'">
-      <div style="font-size:48px;margin-bottom:16px">⏳</div>
+      <div class="ico-tile ico-tile--lg" style="margin:0 auto 16px"><i class="ei ei-hourglass"></i></div>
       <div style="font-size:14px;color:var(--gray-500)">{{ t('mailCallback.processing') }}</div>
     </ng-container>
 

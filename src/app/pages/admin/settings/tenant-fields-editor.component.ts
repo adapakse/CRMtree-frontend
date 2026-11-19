@@ -66,7 +66,7 @@ function parseOptions(text: string): string[] {
 
       <div class="row add">
         <input class="fi name" [(ngModel)]="newName" maxlength="120" [disabled]="saving"
-               [placeholder]="t('settings.customFields.newNamePlaceholder')">
+               [placeholder]="t('settings.customFields.newNamePlaceholder')" [class.fi-err]="isAddSubmitted && !newName.trim()">
         <select class="fsel type-select" [(ngModel)]="newType" [disabled]="saving">
           @for (option of typeOptions; track option.value) {
             <option [ngValue]="option.value">{{ t('settings.customFields.types.' + option.labelKey) }}</option>
@@ -74,14 +74,16 @@ function parseOptions(text: string): string[] {
         </select>
         @if (newType === 'list') {
           <input class="fi options" [(ngModel)]="newOptions" [disabled]="saving"
-                 [placeholder]="t('settings.customFields.optionsPlaceholder')">
+                 [placeholder]="t('settings.customFields.optionsPlaceholder')" [class.fi-err]="isAddSubmitted && isOptionsMissing()">
         } @else {
           <span class="options"></span>
         }
-        <button class="btn btn-p btn-add" [disabled]="saving || !canAdd()" (click)="add()">
+        <button class="btn btn-p btn-add" [disabled]="saving" (click)="add()">
           {{ t('settings.customFields.addButton') }}
         </button>
       </div>
+      @if (isAddSubmitted && !newName.trim()) { <span class="ferr" role="alert">{{ t('settings.customFields.errors.name') }}</span> }
+      @if (isAddSubmitted && isOptionsMissing()) { <span class="ferr" role="alert">{{ t('settings.customFields.optionsRequired') }}</span> }
     </div>
   `,
   styles: [`
@@ -144,9 +146,14 @@ export class TenantFieldsEditorComponent {
     return this.transloco.translate(`admin.${key}`, params);
   }
 
+  isAddSubmitted = false;
+
+  isOptionsMissing(): boolean {
+    return this.newType === 'list' && parseOptions(this.newOptions).length === 0;
+  }
+
   canAdd(): boolean {
-    if (!this.newName.trim()) return false;
-    return this.newType !== 'list' || parseOptions(this.newOptions).length > 0;
+    return !!this.newName.trim() && !this.isOptionsMissing();
   }
 
   rename(definition: TenantFieldDefinition, event: Event): void {
@@ -186,6 +193,8 @@ export class TenantFieldsEditorComponent {
   }
 
   add(): void {
+    this.isAddSubmitted = !this.canAdd();
+    if (this.isAddSubmitted) return;
     this.save(this.api.create({
       entity: this.entity(),
       name: this.newName.trim(),

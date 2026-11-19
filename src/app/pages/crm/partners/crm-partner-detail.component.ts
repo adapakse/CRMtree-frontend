@@ -30,9 +30,13 @@ import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-pr
 import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
 import { PbxService } from '../../../core/services/pbx.service';
 import { QuillModule } from 'ngx-quill';
+import { PersonConsentsComponent } from '../../../shared/components/person-consents/person-consents.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
+import { withdrawOnboardingErrorMessage } from '../onboarding/withdraw-onboarding-error.util';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
 // number. Numbers are never merged into each other's history.
@@ -66,34 +70,34 @@ function getMonthRange(preset: string): { from: string; to: string } {
   selector: 'wt-crm-partner-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, PhoneInputComponent, ActivityCountBadgeComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe],
+            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent, PersonConsentsComponent],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
-<div class="detail-page" *ngIf="partner">
-  <div class="detail-header">
+<div class="detail-page card-page" *ngIf="partner">
+  <div class="detail-header card-hdr">
     <button type="button" class="back-link" routerLink="/crm/partners"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>{{ t('partnerDetail.header.backToPartners') }}</button>
     <h1>{{(partner.dwh_partner_id ? (partner.dwh_company_name || partner.company) : partner.company)}}</h1>
     <span *ngIf="partner.switched_to_prod_at" style="font-size:12px;color:var(--gray-500);margin-left:8px;align-self:center">
       {{ t('partnerDetail.header.activeSince', { date: (partner.switched_to_prod_at | date:'dd.MM.yyyy') }) }}
     </span>
     <span class="pbadge pbadge-{{partner.status}}">{{statusLabel(partner.status)}}</span>
-    <span class="group-badge" *ngIf="partner.group_name">🏢 {{partner.group_name}}</span>
+    <span class="group-badge" *ngIf="partner.group_name"><i class="ei ei-building"></i> {{partner.group_name}}</span>
     <span *ngIf="partner.churn_risk && partner.churn_risk !== 'none'"
           class="churn-hdr-badge churn-hdr-{{partner.churn_risk}}"
           [title]="churnBadgeTitle(partner)">
-      🔥 {{ t('partnerDetail.header.churn', { level: churnLabel(partner.churn_risk) }) }}
+      <i class="ei ei-flame"></i> {{ t('partnerDetail.header.churn', { level: churnLabel(partner.churn_risk) }) }}
     </span>
     <button class="btn btn-quiet btn-sm" *ngIf="partner.phone || partner.billing_phone || partner.agent_phone"
             (click)="makePartnerCall()" [title]="t('calls.call')" [attr.aria-label]="t('calls.call')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></button>
-    <button class="btn btn-quiet btn-sm" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? t('partnerDetail.edit.title') : t('partnerDetail.header.noEditPermission')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>{{ t('partnerDetail.header.edit') }}</button>
+    <button class="btn btn-quiet btn-sm" (click)="canEdit ? openEdit() : explainNoPermission()" [title]="canEdit ? t('partnerDetail.edit.title') : t('partnerDetail.header.noEditPermission')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>{{ t('partnerDetail.header.edit') }}</button>
   </div>
 
   <!-- Onboarding stepper + zadania -->
   <div class="onboarding-panel" *ngIf="partner.status === 'onboarding'">
 
     <!-- Pasek etapów -->
-    <div class="onboarding-steps">
+    <div class="onboarding-steps stepper-scroll">
       <div *ngFor="let s of onboardingSteps; let i = index"
            class="step" [class.done]="partner.onboarding_step > i"
            [class.current]="activeStep === i"
@@ -109,10 +113,30 @@ function getMonthRange(preset: string): { from: string; to: string } {
       </div>
     </div>
 
+    <!-- Withdraw from onboarding back to a funnel stage (managers only) -->
+    <div *ngIf="isManager && partner.lead_id" style="margin:10px 16px">
+      <button class="btn btn-sm btn-d" *ngIf="!showWithdrawForm" (click)="showWithdrawForm = true">
+        🔄 {{ t('onboardingBoard.withdraw.detailButton') }}
+      </button>
+      <div *ngIf="showWithdrawForm" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--gray-400)">{{ t('onboardingBoard.withdraw.detailStagePrompt') }}</span>
+        <select [(ngModel)]="withdrawTargetStage" class="tf-sel" [class.fi-err]="withdrawSubmitted && !withdrawTargetStage">
+          <option value="">{{ t('onboardingBoard.withdraw.stagePlaceholder') }}</option>
+          <option *ngFor="let s of leadStages.selectable()" [value]="s.key">{{ leadStages.label(s.key) }}</option>
+        </select>
+        <button class="btn btn-sm btn-d" [disabled]="withdrawingOnboarding" (click)="withdrawOnboarding()">
+          {{ withdrawingOnboarding ? t('onboardingBoard.withdraw.inProgress') : t('onboardingBoard.withdraw.confirm') }}
+        </button>
+        <button class="btn btn-sm btn-g" (click)="cancelWithdrawForm()">{{ 'actions.cancel' | transloco }}</button>
+        <span *ngIf="withdrawSubmitted && !withdrawTargetStage" class="ferr" style="flex-basis:100%">{{ t('onboardingBoard.withdraw.stageRequired') }}</span>
+        <div style="flex-basis:100%;font-size:11px;color:var(--gray-400)">{{ t('onboardingBoard.withdraw.detailHint') }}</div>
+      </div>
+    </div>
+
     <!-- Panel zadań aktywnego etapu -->
     <div class="step-tasks-panel">
       <div class="step-tasks-header">
-        <span class="step-tasks-title">📋 {{ t('partnerDetail.onboarding.tasksFor') }} <strong>{{ t(onboardingSteps[activeStep]) }}</strong></span>
+        <span class="step-tasks-title"><i class="ei ei-clipboard"></i> {{ t('partnerDetail.onboarding.tasksFor') }} <strong>{{ t(onboardingSteps[activeStep]) }}</strong></span>
         <button class="btn-sm" *ngIf="canEdit" (click)="openAddTask()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('partnerDetail.onboarding.addTask') }}</button>
         <button class="btn-sm primary"
                 *ngIf="partner.onboarding_step === activeStep && isManager && allTasksDone(activeStep) && activeStep < 3"
@@ -130,15 +154,17 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <div class="task-form" *ngIf="showTaskForm && activeStep === taskFormStep">
         <div class="task-form-row">
           <select [(ngModel)]="taskForm.type" class="tf-sel">
-            <option value="task">✅ {{ t('labels.activityTypes.task') }}</option>
-            <option value="call">📞 {{ t('labels.activityTypes.call') }}</option>
-            <option value="email">📧 {{ t('labels.activityTypes.email') }}</option>
-            <option value="meeting">🤝 {{ t('labels.activityTypes.meeting') }}</option>
-            <option value="doc_sent">📄 {{ t('labels.activityTypes.doc_sent') }}</option>
-            <option value="training">🎓 {{ t('labels.activityTypes.training') }}</option>
+            <option value="task">{{ t('labels.activityTypes.task') }}</option>
+            <option value="call">{{ t('labels.activityTypes.call') }}</option>
+            <option value="email">{{ t('labels.activityTypes.email') }}</option>
+            <option value="meeting">{{ t('labels.activityTypes.meeting') }}</option>
+            <option value="doc_sent">{{ t('labels.activityTypes.doc_sent') }}</option>
+            <option value="training">{{ t('labels.activityTypes.training') }}</option>
           </select>
-          <input [(ngModel)]="taskForm.title" [placeholder]="t('partnerDetail.onboarding.taskTitlePlaceholder')" class="tf-input" style="flex:1">
+          <input [(ngModel)]="taskForm.title" [placeholder]="t('partnerDetail.onboarding.taskTitlePlaceholder')" class="tf-input" style="flex:1"
+                 [class.fi-err]="taskSubmitted && !taskForm.title?.trim()">
         </div>
+        @if (taskSubmitted && !taskForm.title?.trim()) { <span class="ferr">{{ t('fieldErrors.title') }}</span> }
         <div class="task-form-row">
           <select [(ngModel)]="taskForm.assigned_to" class="tf-sel" style="flex:1">
             <option value="">{{ t('partnerDetail.onboarding.responsiblePerson') }}</option>
@@ -150,8 +176,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
         <textarea [(ngModel)]="taskForm.body" [placeholder]="t('partnerDetail.onboarding.descriptionOptionalPlaceholder')" rows="2" class="tf-input tf-textarea"></textarea>
         <div class="task-form-actions">
+          @if (taskSubmitted) { <wt-form-error-summary [count]="taskForm.title?.trim() ? 0 : 1" /> }
           <button class="btn-sm" (click)="cancelTaskForm()">{{ 'actions.cancel' | transloco }}</button>
-          <button class="btn-sm primary" (click)="saveTask()" [disabled]="!taskForm.title || savingTask">
+          <button class="btn-sm primary" (click)="saveTask()" [disabled]="savingTask">
             {{savingTask ? '…' : ('actions.save' | transloco)}}
           </button>
         </div>
@@ -163,12 +190,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <button class="task-check" (click)="toggleTask(task)">{{task.done ? '✓' : '○'}}</button>
           <div class="task-body" *ngIf="editingTaskId !== task.id">
             <div class="task-title">
-              <span class="task-type-icon">{{taskIcon(task.type)}}</span> {{task.title}}
+              <span class="task-type-icon"><i class="ei ei-{{ taskIcon(task.type) }}"></i></span> {{task.title}}
             </div>
             <div class="task-meta">
-              <span *ngIf="task.assigned_to_name">👤 {{task.assigned_to_name}}</span>
+              <span *ngIf="task.assigned_to_name"><i class="ei ei-user"></i> {{task.assigned_to_name}}</span>
               <span *ngIf="task.due_date" [class.overdue]="isOverdue(task)">
-                📅 {{task.due_date | date:'dd.MM.yyyy'}}
+                <i class="ei ei-calendar"></i> {{task.due_date | date:'dd.MM.yyyy'}}
                 <span *ngIf="isOverdue(task)" class="overdue-badge">{{ t('partnerDetail.onboarding.overdue') }}</span>
               </span>
               <span *ngIf="task.done && task.done_by_name" style="color:oklch(from #22c55e max(l, var(--text-min-l)) c h)">✓ {{task.done_by_name}}</span>
@@ -178,12 +205,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div class="task-body task-edit" *ngIf="editingTaskId === task.id">
             <div class="task-form-row">
               <select [(ngModel)]="taskEditForm.type" class="tf-sel">
-                <option value="task">✅ {{ t('labels.activityTypes.task') }}</option>
-                <option value="call">📞 {{ t('labels.activityTypes.call') }}</option>
-                <option value="email">📧 {{ t('labels.activityTypes.email') }}</option>
-                <option value="meeting">🤝 {{ t('labels.activityTypes.meeting') }}</option>
-                <option value="doc_sent">📄 {{ t('labels.activityTypes.doc_sent') }}</option>
-                <option value="training">🎓 {{ t('labels.activityTypes.training') }}</option>
+                <option value="task">{{ t('labels.activityTypes.task') }}</option>
+                <option value="call">{{ t('labels.activityTypes.call') }}</option>
+                <option value="email">{{ t('labels.activityTypes.email') }}</option>
+                <option value="meeting">{{ t('labels.activityTypes.meeting') }}</option>
+                <option value="doc_sent">{{ t('labels.activityTypes.doc_sent') }}</option>
+                <option value="training">{{ t('labels.activityTypes.training') }}</option>
               </select>
               <input [(ngModel)]="taskEditForm.title" class="tf-input" style="flex:1">
             </div>
@@ -201,8 +228,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
           </div>
           <div class="task-actions" *ngIf="editingTaskId !== task.id">
-            <button class="task-act-btn" (click)="startEditTask(task)">✏️</button>
-            <button class="task-act-btn del" (click)="deleteTask(task)">🗑️</button>
+            <button class="task-act-btn" (click)="startEditTask(task)"><i class="ei ei-pencil"></i></button>
+            <button class="task-act-btn del" (click)="deleteTask(task)"><i class="ei ei-trash"></i></button>
           </div>
         </div>
       </div>
@@ -212,8 +239,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
   </div>
 
-  <div class="detail-body" [class.left-collapsed]="leftCollapsed">
-    <div class="info-card" [class.is-collapsed]="leftCollapsed">
+  <div class="detail-body card-body" [class.left-collapsed]="leftCollapsed">
+    <div class="info-card card-col-left" [class.is-collapsed]="leftCollapsed">
       <div class="left-panel-hdr">
         <h3 *ngIf="!leftCollapsed" style="margin:0;font-size:14px;font-weight:700;color:var(--gray-700)">{{ t('partnerDetail.info.title') }}</h3>
         <button class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed ? t('partnerDetail.info.expandPanel') : t('partnerDetail.info.collapsePanel')">{{leftCollapsed?'›':'‹'}}</button>
@@ -254,7 +281,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Partner Admin -->
       <div class="info-subsection" *ngIf="partner.admin_first_name || partner.admin_last_name || partner.admin_email || partner.dwh_partner_id">
         <div class="info-subsection-title">
-          👤 {{ t('partnerDetail.sections.partnerAdmin') }}
+          <i class="ei ei-user"></i> {{ t('partnerDetail.sections.partnerAdmin') }}
           <span class="dwh-badge" *ngIf="partner.admin_first_name_from_dwh || partner.admin_last_name_from_dwh || partner.admin_email_from_dwh">DWH</span>
         </div>
         <div class="info-grid kv-list">
@@ -292,7 +319,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Billing Address -->
       <div class="info-subsection" *ngIf="partner.billing_address || partner.billing_zip || partner.billing_city || partner.billing_country || partner.billing_email_address || partner.dwh_partner_id">
         <div class="info-subsection-title">
-          📍 {{ t('partnerDetail.sections.billingAddress') }}
+          <i class="ei ei-map-pin"></i> {{ t('partnerDetail.sections.billingAddress') }}
           <span class="dwh-badge" *ngIf="partner.billing_address_from_dwh || partner.billing_zip_from_dwh || partner.billing_city_from_dwh || partner.billing_country_from_dwh || partner.billing_email_address_from_dwh">DWH</span>
         </div>
         <div class="info-grid kv-list">
@@ -359,7 +386,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
       <!-- Dane dodatkowe — CRM + DWH -->
       <div class="info-subsection">
-        <div class="info-subsection-title">⚙️ {{ t('partnerDetail.sections.additionalData') }}</div>
+        <div class="info-subsection-title"><i class="ei ei-settings"></i> {{ t('partnerDetail.sections.additionalData') }}</div>
         <div class="info-grid kv-list">
           <span class="lbl">{{ t('partnerDetail.fields.onlinePct') }}</span><span>{{partner.online_pct != null ? partner.online_pct + '%' : '—'}}</span>
           <ng-container *ngIf="partner.subdomain || partner.dwh_partner_id">
@@ -392,7 +419,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Agent -->
       <div *ngIf="partner.agent_name || partner.agent_email || partner.agent_phone"
            class="info-subsection">
-        <div class="info-subsection-title">🤝 {{ t('partnerDetail.sections.agent') }}</div>
+        <div class="info-subsection-title"><i class="ei ei-handshake"></i> {{ t('partnerDetail.sections.agent') }}</div>
         <div class="info-grid kv-list">
           <span class="lbl">{{ t('partnerDetail.fields.fullName') }}</span><span>{{partner.agent_name || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.email') }}</span><span>{{partner.agent_email || '—'}}</span>
@@ -403,14 +430,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Powiązane dokumenty -->
       <div class="info-subsection">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div class="info-subsection-title" style="margin-bottom:0">📎 {{ t('documents.titleWithCount', { count: linkedDocs.length }) }}</div>
+          <div class="info-subsection-title" style="margin-bottom:0"><i class="ei ei-paperclip"></i> {{ t('documents.titleWithCount', { count: linkedDocs.length }) }}</div>
           <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker = true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('documents.add') }}</button>
         </div>
         <div *ngIf="linkedDocs.length === 0" style="font-size:12px;color:var(--gray-400);text-align:center;padding:8px">{{ t('partnerDetail.documents.empty') }}</div>
         <div *ngFor="let d of linkedDocs"
              style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--gray-50);cursor:pointer"
              (click)="openDocument(d)" [title]="t('partnerDetail.documents.goTo')">
-          <span style="font-size:14px">📄</span>
+          <span style="font-size:14px"><i class="ei ei-file"></i></span>
           <div style="flex:1;min-width:0">
             <div style="font-size:12px;font-weight:600;color:var(--gray-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
               {{d.document_title || d.doc_number || t('partnerDetail.documents.fallbackTitle', { id: d.document_id })}}
@@ -437,7 +464,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       </ng-container>
     </div>
 
-    <div class="activities-card">
+    <div class="activities-card card-col-mid">
       <!-- Pasek tabów -->
       <div class="mid-tabs one-line">
         <button class="tab-btn" [class.active]="midTab==='all'" (click)="midTab='all'">
@@ -471,10 +498,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div class="new-activity-form" *ngIf="showNewActivity">
           <!-- Typ (ustalany kontekstem zakładki, nie wybierany ręcznie — jak w crm-lead-detail.component.ts) -->
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">
-            {{actIcon(actForm.type)}} {{actTypeName(actForm.type)}}
+            <i class="ei ei-{{ actIcon(actForm.type) }}"></i> {{actTypeName(actForm.type)}}
           </div>
           <!-- Edytowalny tytuł tylko dla Spotkania i Maila (Mail ma osobny formularz w zakładce „Maile") -->
-          <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" [placeholder]="t('partnerDetail.activity.meetingSubjectPlaceholder')" class="act-input">
+          <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" [placeholder]="t('partnerDetail.activity.meetingSubjectPlaceholder')" class="act-input"
+                 [class.fi-err]="actSubmitted && !actForm.title?.trim()">
+          @if (actSubmitted && !actForm.title?.trim()) { <span class="ferr">{{ t('fieldErrors.title') }}</span> }
           <!-- Termin + przypomnienie + przypisz + priorytet — layout matches crm-lead-detail.component.ts 1:1 -->
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px;align-items:start">
             <label style="font-size:12px;color:var(--gray-400);font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.dueDate') }}
@@ -500,12 +529,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
                        [style.background]="actDueDatePreset==='custom' ? 'color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface))' : 'var(--surface)'"
                        [style.color]="actDueDatePreset==='custom' ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-700)'"
                        [style.fontWeight]="actDueDatePreset==='custom' ? '600' : '400'"
-                       (mousedown)="selectDueDatePreset('custom')">📅 {{ t('activity.customDate') }}</div>
+                       (mousedown)="selectDueDatePreset('custom')"><i class="ei ei-calendar"></i> {{ t('activity.customDate') }}</div>
                 </div>
               </div>
               <div *ngIf="actDueDatePreset && actDueDatePreset!=='custom' && actForm.type!=='task'" style="display:flex;align-items:center;gap:4px;margin-top:2px">
                 <input type="time" [(ngModel)]="actDueDateHour" (change)="setActDueDateHour(actDueDateHour)" class="act-input" style="width:90px;font-size:12px;padding:4px 6px">
-                <button type="button" (click)="clearDueDate()" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px;padding:0">🗑</button>
+                <button type="button" (click)="clearDueDate()" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px;padding:0"><i class="ei ei-trash"></i></button>
               </div>
               <input *ngIf="actDueDatePreset==='custom'" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:12px;margin-top:2px">
             </label>
@@ -571,8 +600,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
                         style="background:var(--surface)" [placeholder]="t('partnerDetail.activity.bodyPlaceholder')"></quill-editor>
           <wt-pending-attachments *ngIf="actForm.type==='task' || actForm.type==='note'" [(files)]="pendingActivityFiles"></wt-pending-attachments>
           <div class="act-actions">
+            @if (actSubmitted) { <wt-form-error-summary [count]="actForm.title?.trim() ? 0 : 1" /> }
             <button class="btn-sm" (click)="showNewActivity = false; pendingActivityFiles = []">{{ 'actions.cancel' | transloco }}</button>
-            <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title || savingActivity">
+            <button class="btn-sm primary" (click)="addActivity()" [disabled]="savingActivity">
               {{savingActivity ? '…' : ('actions.save' | transloco)}}
             </button>
           </div>
@@ -586,18 +616,18 @@ function getMonthRange(preset: string): { from: string; to: string } {
              (click)="canEdit && inlineEditActId!==a.id && startInlineEdit(a)">
           <ng-container *ngIf="inlineEditActId!==a.id">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-              <span style="font-size:16px">{{actIcon(a.type)}}</span>
+              <span style="font-size:16px"><i class="ei ei-{{ actIcon(a.type) }}"></i></span>
               <span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.4px">{{actTypeName(a.type)}}</span>
               <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:var(--gray-400);margin-left:auto;white-space:nowrap">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
               <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:var(--gray-400);margin-left:auto;white-space:nowrap">{{ t('activity.card.createdAt', { date: (a.created_at|date:'dd.MM.yyyy HH:mm') }) }}</span>
-              <wt-add-to-calendar *ngIf="a.activity_at && a.type !== 'email' && a.type !== 'note'"
+              <wt-add-to-calendar *ngIf="a.activity_at && a.type !== 'email' && a.type !== 'marketing_email' && a.type !== 'note'"
                                   [entry]="calendarEntryOf(a)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
             </div>
             <div class="act-card-title">{{a.title}}</div>
             <div class="act-meta">
-              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+              <span *ngIf="a.assigned_to_name"><i class="ei ei-user"></i> {{a.assigned_to_name}}</span>
               <span *ngIf="!a.assigned_to_name && a.created_by_name">{{a.created_by_name}}</span>
             </div>
             <div *ngIf="a.body" class="act-card-body">
@@ -612,12 +642,15 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ {{ t('activity.card.reopen') }}</button>
             </div>
             <div class="act-card-controls">
-              <button *ngIf="canEdit" class="act-ctrl-btn del" (click)="$event.stopPropagation(); deleteActivity(a)" [title]="t('activity.card.delete')">🗑️</button>
+              <button *ngIf="canEdit" class="act-ctrl-btn del" (click)="$event.stopPropagation(); deleteActivity(a)" [title]="t('activity.card.delete')"><i class="ei ei-trash"></i></button>
             </div>
           </ng-container>
           <!-- Inline edit — layout matches crm-lead-detail.component.ts's inline edit 1:1 -->
           <div *ngIf="inlineEditActId===a.id" style="margin-top:10px;display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
-            <input *ngIf="a.type==='meeting'" [(ngModel)]="inlineEditForm.title" class="act-input" [placeholder]="t('partnerDetail.activity.meetingSubjectPlaceholder')">
+            <input *ngIf="a.type==='meeting' || a.type==='email'" [(ngModel)]="inlineEditForm.title" class="act-input"
+                   [placeholder]="a.type==='email' ? t('email.placeholders.subject') : t('partnerDetail.activity.meetingSubjectPlaceholder')"
+                   [class.fi-err]="inlineEditSubmitted && !inlineEditForm.title?.trim()">
+            @if (inlineEditSubmitted && !inlineEditForm.title?.trim()) { <span class="ferr">{{ t(a.type==='email' ? 'fieldErrors.subject' : 'fieldErrors.title') }}</span> }
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px">
               <label style="font-size:12px;color:var(--gray-500);display:flex;flex-direction:column;gap:2px;font-weight:600">
                 {{ t('activity.form.dateTime') }}
@@ -670,8 +703,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <quill-editor [(ngModel)]="inlineEditForm.body" [modules]="quillModules" style="background:var(--surface)" [placeholder]="t('activity.form.bodyShortPlaceholder')"></quill-editor>
             <wt-entity-attachments *ngIf="a.type==='task' || a.type==='note'" sourceType="partner-activity" [sourceId]="a.id" [compact]="true" [attachmentCount]="a.attachment_count ?? null" [canUpload]="canEdit" (fileCountChange)="a.attachment_count = $event"></wt-entity-attachments>
             <div style="display:flex;gap:6px;justify-content:flex-end">
+              @if (inlineEditSubmitted) { <wt-form-error-summary [count]="inlineEditForm.title?.trim() ? 0 : 1" /> }
               <button class="btn-sm" (click)="cancelInlineEdit()">{{ 'actions.cancel' | transloco }}</button>
-              <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="!inlineEditForm.title||savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
+              <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
             </div>
           </div>
         </div>
@@ -681,13 +715,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- ── Tab: Maile ──────────────────────────────────────────────────── -->
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
-          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ ' + t('email.connecting') : '+ ' + t('email.new')}}</button>
+          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">@if (connectingEmail) { {{ t('email.connecting') }} } @else { + {{ t('email.new') }} }</button>
         </div>
 
         <!-- INLINE COMPOSE -->
         <div *ngIf="showEmailCompose" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">✉️ {{ t('email.new') }}</div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)"><i class="ei ei-mail"></i> {{ t('email.new') }}</div>
             <button style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:14px" (click)="showEmailCompose=false">✕</button>
           </div>
           <!-- Provider row — always visible when compose is open. Every user connects
@@ -704,9 +738,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
                       [title]="emailAddress">{{ t('email.from') }} <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
                 <button type="button" (click)="disconnectEmail()" style="background:none;border:none;cursor:pointer;color:var(--gray-500);font-size:10px;text-decoration:underline;flex-shrink:0;padding:0">{{ t('email.disconnect') }}</button>
               </div>
-              <div *ngIf="!emailProviderKey && !settings.settings().crm_training_mode" style="font-size:12px;color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px">⚠️ {{ t('email.notConfigured') }}</div>
+              <div *ngIf="!emailProviderKey && !settings.settings().crm_training_mode" style="font-size:12px;color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px"><i class="ei ei-warn"></i> {{ t('email.notConfigured') }}</div>
             </div>
-            <div *ngIf="settings.settings().crm_training_mode" style="font-size:12px;color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px">🎓 {{ t('email.trainingMode') }}</div>
+            <div *ngIf="settings.settings().crm_training_mode" style="font-size:12px;color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px"><i class="ei ei-graduation"></i> {{ t('email.trainingMode') }}</div>
           </div>
           <!-- Email form — shown when connected or training mode -->
           <ng-container *ngIf="emailConnected || settings.settings().crm_training_mode">
@@ -718,13 +752,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </select>
             </div>
             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.to') }}
-              <div class="participant-chips">
+              <div class="participant-chips" [class.fi-err]="emailSubmitted && !emailForm.recipientList?.length">
                 <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button></span>
                 <input class="participant-input" [(ngModel)]="recipientQuery" (input)="onRecipientInput()" (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()" (blur)="showRecipientSug=false" [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
                 <div *ngIf="showRecipientSug" class="suggest-dropdown">
                   <div *ngFor="let s of recipientSuggestions" class="suggest-item" (mousedown)="pickRecipientSug(s)"><span style="font-weight:600">{{s.name||s.email}}</span><span style="color:var(--gray-400);font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span></div>
                 </div>
               </div>
+              @if (emailSubmitted && !emailForm.recipientList?.length) { <span class="ferr">{{ t('fieldErrors.recipients') }}</span> }
             </label>
             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.cc') }}
               <div class="participant-chips">
@@ -736,23 +771,25 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </div>
             </label>
             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.subject') }}
-              <input class="act-input" [(ngModel)]="emailForm.subject" [placeholder]="t('email.placeholders.subject')">
+              <input class="act-input" [(ngModel)]="emailForm.subject" [placeholder]="t('email.placeholders.subject')" [class.fi-err]="emailSubmitted && !emailForm.subject?.trim()">
+              @if (emailSubmitted && !emailForm.subject?.trim()) { <span class="ferr">{{ t('fieldErrors.subject') }}</span> }
             </label>
             <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.body')" style="display:block" theme="snow"></quill-editor>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:var(--gray-500);flex:1;min-width:0">
-              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:12px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:color-mix(in srgb, #eef2ff var(--tint-mix), var(--surface));color:oklch(from #4338ca max(l, var(--text-min-l)) c h);cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 ' + t('email.fromGoogleDrive')}}</button>
+              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:12px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:color-mix(in srgb, #eef2ff var(--tint-mix), var(--surface));color:oklch(from #4338ca max(l, var(--text-min-l)) c h);cursor:pointer">@if (drivePickerLoading) { … } @else { <i class="ei ei-folder"></i> {{ t('email.fromGoogleDrive') }} }</button>
             </div>
             <div *ngIf="driveNeedsReauth" style="font-size:12px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px">
-              ⚠️ {{ t('email.driveReauthRequired') }}
+              <i class="ei ei-warn"></i> {{ t('email.driveReauthRequired') }}
             </div>
             <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-              <span *ngFor="let f of emailAttachments; let i=index" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button></span>
+              <span *ngFor="let f of emailAttachments; let i=index" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px"><i class="ei ei-paperclip"></i> {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button></span>
             </div>
-            <div *ngIf="emailError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
+            <div *ngIf="emailError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px"><i class="ei ei-warn"></i> {{emailError}}</div>
             <div style="display:flex;gap:6px;justify-content:flex-end">
+              @if (emailSubmitted) { <wt-form-error-summary [count]="emailErrorCount()" /> }
               <button class="btn-sm" (click)="showEmailCompose=false">{{ 'actions.cancel' | transloco }}</button>
-              <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ ' + t('email.sending') : '📤 ' + t('email.sendAction')}}</button>
+              <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail">@if (sendingEmail) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.sendAction') }} }</button>
             </div>
           </ng-container>
         </div>
@@ -765,7 +802,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
                [style.background]="expandedEmailId===a.id ? 'color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))' : hasUnreadInActivity(a) ? 'var(--gray-50)' : 'var(--surface)'"
                (click)="toggleEmailExpand(a)">
-            <span style="font-size:16px;flex-shrink:0">📧</span>
+            <span style="font-size:16px;flex-shrink:0"><i class="ei ei-mail"></i></span>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px">
                 <strong style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{a.title}}</strong>
@@ -837,23 +874,26 @@ function getMonthRange(preset: string): { from: string; to: string } {
                   <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
                 </label>
               </ng-container>
-              <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.replyBody')" style="display:block" theme="snow"></quill-editor>
+              <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.replyBody')" style="display:block" theme="snow"
+                            [class.fi-err]="inlineReplySubmitted && !inlineReplyForm.body?.trim()"></quill-editor>
+              @if (inlineReplySubmitted && !inlineReplyForm.body?.trim()) { <span class="ferr">{{ t('fieldErrors.message') }}</span> }
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:12px;color:var(--gray-500);flex:1;min-width:0">
               </div>
               <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-                <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button></span>
+                <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px"><i class="ei ei-paperclip"></i> {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button></span>
               </div>
-              <div *ngIf="inlineReplyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px">⚠️ {{inlineReplyError}}</div>
+              <div *ngIf="inlineReplyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px"><i class="ei ei-warn"></i> {{inlineReplyError}}</div>
               <div style="display:flex;gap:6px;justify-content:flex-end">
+                @if (inlineReplySubmitted) { <wt-form-error-summary [count]="inlineReplyForm.body?.trim() ? 0 : 1" /> }
                 <button class="btn-sm" (click)="cancelInlineReply()">{{ 'actions.cancel' | transloco }}</button>
-                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}</button>
+                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending">@if (inlineReplySending) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.reply.send') }} }</button>
               </div>
             </div>
             <div *ngIf="!showReplyInline" style="display:flex;gap:6px">
               <button *ngIf="a.gmail_thread_id && canEdit && canReplyToActivity(a)" class="btn-sm" (click)="startInlineReply(a)"
                       [title]="threadCanReply ? '' : t('email.thread.ownedByTooltip', { owner: threadOwnerEmail || t('email.thread.anotherUser') })">
-                {{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}
+                @if (threadCanReply) { ↩ {{ t('email.reply.action') }} } @else { <i class="ei ei-mail"></i> {{ t('email.writeNew') }} }
               </button>
             </div>
           </div>
@@ -867,13 +907,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
         <!-- "Brak numeru" tylko gdy naprawdę nie ma też żadnej historii do pokazania. -->
         <div *ngIf="whatsappConfigured===false && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-          <div style="font-size:32px">💬</div>
+          <div class="ico-tile ico-tile--lg" style="margin:0 auto 0px"><i class="ei ei-message"></i></div>
           <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800)">WhatsApp</div>
           <div style="font-size:14px;color:var(--gray-400);text-align:center">{{ t('whatsapp.notConfigured') }}</div>
         </div>
 
         <div *ngIf="whatsappConfigured===true" id="wa-new-message" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">💬 {{ t('whatsapp.newMessage') }}</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)"><i class="ei ei-message"></i> {{ t('whatsapp.newMessage') }}</div>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border-radius:6px;overflow:hidden">
@@ -883,30 +923,33 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
           <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('whatsapp.toField') }}
             <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
-                   placeholder="+48 123 123 123">
+                   placeholder="+48 123 123 123" [class.fi-err]="whatsappSubmitted && (!whatsappToPhone.trim() || whatsappToPhoneMissingCountryCode)">
+            @if (whatsappSubmitted && !whatsappToPhone.trim()) { <span class="ferr">{{ t('fieldErrors.phone') }}</span> }
           </label>
           <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:12px;color:oklch(from #b45309 max(l, var(--text-min-l)) c h)">{{ t('whatsapp.missingCountryCode') }}</div>
 
           <div class="wa-mode-switch">
-            <button type="button" [class.active]="whatsappMode==='template'" [disabled]="whatsappSending" (click)="whatsappMode='template'">📋 {{ t('whatsapp.mode.template') }}</button>
-            <button type="button" [class.active]="whatsappMode==='text'" [disabled]="whatsappSending" (click)="whatsappMode='text'">✏️ {{ t('whatsapp.mode.text') }}</button>
+            <button type="button" [class.active]="whatsappMode==='template'" [disabled]="whatsappSending" (click)="whatsappMode='template'"><i class="ei ei-clipboard"></i> {{ t('whatsapp.mode.template') }}</button>
+            <button type="button" [class.active]="whatsappMode==='text'" [disabled]="whatsappSending" (click)="whatsappMode='text'"><i class="ei ei-pencil"></i> {{ t('whatsapp.mode.text') }}</button>
           </div>
           <div *ngIf="whatsappMode==='text' && whatsappToPhone.trim() && !whatsappToPhoneMissingCountryCode && !isWhatsappWindowOpen(whatsappToPhone)" class="wa-window-hint">
-            🕒 {{ t('whatsapp.window.closedHint') }}
+            <i class="ei ei-clock"></i> {{ t('whatsapp.window.closedHint') }}
           </div>
 
           <label *ngIf="whatsappMode==='text'" style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('whatsapp.messageBody') }}
             <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
-                      [placeholder]="t('whatsapp.messagePlaceholder')"></textarea>
+                      [placeholder]="t('whatsapp.messagePlaceholder')" [class.fi-err]="whatsappSubmitted && !canSendWhatsappContent"></textarea>
           </label>
           <wt-whatsapp-template-picker *ngIf="whatsappMode==='template'" [disabled]="!canEdit || whatsappSending"
                                        (selectionChange)="whatsappTemplateSelection=$event" />
+          @if (whatsappSubmitted && !canSendWhatsappContent) { <span class="ferr">{{ t(whatsappMode === 'text' ? 'fieldErrors.message' : 'fieldErrors.whatsappTemplate') }}</span> }
 
-          <div *ngIf="whatsappError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
-          <div *ngIf="whatsappSuccess" style="color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px">✅ {{ t('whatsapp.sent') }}</div>
+          <div *ngIf="whatsappError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px"><i class="ei ei-warn"></i> {{whatsappError}}</div>
+          <div *ngIf="whatsappSuccess" style="color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px"><i class="ei ei-check-circle"></i> {{ t('whatsapp.sent') }}</div>
 
           <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !canSendWhatsappContent || whatsappToPhoneMissingCountryCode || whatsappSending"
+            @if (whatsappSubmitted) { <wt-form-error-summary [count]="whatsappErrorCount()" /> }
+            <button class="btn-sm primary" [disabled]="whatsappSending"
                     (click)="sendWhatsapp()">
               {{ whatsappSending ? t('whatsapp.sending') : t('whatsapp.send') }}
             </button>
@@ -924,7 +967,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
                  [style.background]="getWhatsappConvState(conv.phone).expanded ? 'color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))' : 'var(--surface)'"
                  (click)="toggleWhatsappConvExpanded(conv.phone)">
-              <span style="font-size:16px;flex-shrink:0">💬</span>
+              <span style="font-size:16px;flex-shrink:0"><i class="ei ei-message"></i></span>
               <div style="flex:1;min-width:0">
                 <div style="display:flex;align-items:center;gap:6px">
                   <strong style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t('whatsapp.conversation') }}</strong>
@@ -947,7 +990,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                     <span style="font-weight:600">{{formatWhatsappHistoryPhone(h.direction==='outgoing' ? h.to_phone : h.from_phone)}}</span>
                   </span>
                   <span style="display:flex;align-items:center;gap:6px">
-                    <span *ngIf="h.direction==='outgoing' && h.status==='failed'" class="wa-failed" [title]="t('whatsapp.status.failedHint')">⚠️ {{ t('whatsapp.status.failed') }}</span>
+                    <span *ngIf="h.direction==='outgoing' && h.status==='failed'" class="wa-failed" [title]="t('whatsapp.status.failedHint')"><i class="ei ei-warn"></i> {{ t('whatsapp.status.failed') }}</span>
                     <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
                   </span>
                 </div>
@@ -962,8 +1005,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <div *ngIf="!getWhatsappConvState(conv.phone).replyOpen" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
                 <button *ngIf="isWhatsappWindowOpen(conv.phone)" class="btn-sm" (click)="startWhatsappConvReply(conv.phone)">↩ {{ t('whatsapp.reply.action') }}</button>
                 <ng-container *ngIf="!isWhatsappWindowOpen(conv.phone)">
-                  <button class="btn-sm" (click)="startWhatsappTemplateTo(conv.phone)">📋 {{ t('whatsapp.window.sendTemplate') }}</button>
-                  <span class="wa-window-note">🕒 {{ t('whatsapp.window.closedShort') }}</span>
+                  <button class="btn-sm" (click)="startWhatsappTemplateTo(conv.phone)"><i class="ei ei-clipboard"></i> {{ t('whatsapp.window.sendTemplate') }}</button>
+                  <span class="wa-window-note"><i class="ei ei-clock"></i> {{ t('whatsapp.window.closedShort') }}</span>
                 </ng-container>
               </div>
 
@@ -973,12 +1016,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 <textarea class="act-input" [ngModel]="getWhatsappConvState(conv.phone).replyMessage"
                           (ngModelChange)="setWhatsappConvReplyMessage(conv.phone, $event)"
                           [disabled]="getWhatsappConvState(conv.phone).replySending" rows="3"
-                          [placeholder]="t('whatsapp.reply.placeholder')"></textarea>
-                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
+                          [placeholder]="t('whatsapp.reply.placeholder')"
+                          [class.fi-err]="!!getWhatsappConvState(conv.phone).replyError && !getWhatsappConvState(conv.phone).replyMessage.trim()"></textarea>
+                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px"><i class="ei ei-warn"></i> {{getWhatsappConvState(conv.phone).replyError}}</div>
                 <div style="display:flex;gap:6px;justify-content:flex-end">
                   <button class="btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">{{ 'actions.cancel' | transloco }}</button>
-                  <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
-                    {{ getWhatsappConvState(conv.phone).replySending ? '⏳ ' + t('whatsapp.reply.sending') : '📤 ' + t('whatsapp.reply.send') }}
+                  <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending" (click)="sendWhatsappConvReply(conv.phone)">
+                    @if (getWhatsappConvState(conv.phone).replySending) { {{ t('whatsapp.reply.sending') }} } @else { <i class="ei ei-send"></i> {{ t('whatsapp.reply.send') }} }
                   </button>
                 </div>
               </div>
@@ -991,7 +1035,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <div *ngIf="midTab==='sms'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:12px">
 
         <div *ngIf="smsThreadError" style="font-size:14px;color:oklch(from #854d0e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fefce8 var(--tint-mix), var(--surface));border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
-          ⚠️ {{smsThreadError}}
+          <i class="ei ei-warn"></i> {{smsThreadError}}
         </div>
 
         <div *ngIf="smsLoading && smsConversations.length===0" style="font-size:12px;color:var(--gray-400);padding:4px 0">{{ 'states.loading' | transloco }}</div>
@@ -1003,7 +1047,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                [style.background]="getSmsConvState(conv.number).expanded ? 'color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))' : 'var(--surface)'"
                (click)="toggleSmsConvExpanded(conv.number)">
             <div style="display:flex;flex-direction:column;gap:2px;overflow:hidden">
-              <strong style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 {{conv.label}}</strong>
+              <strong style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="ei ei-message"></i> {{conv.label}}</strong>
               <span style="font-size:12px;color:var(--gray-400)" *ngIf="conv.messages.length">
                 {{ t('sms.last') }} {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
               </span>
@@ -1031,13 +1075,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <textarea [ngModel]="getSmsConvState(conv.number).replyMessage"
                         (ngModelChange)="setSmsConvReplyMessage(conv.number, $event)"
                         rows="1" style="flex:1;resize:none;border:1px solid var(--gray-300);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit"
-                        [placeholder]="t('sms.messagePlaceholder')" [disabled]="!canEdit || getSmsConvState(conv.number).sending"></textarea>
-              <button class="btn-sm primary" [disabled]="!canEdit || getSmsConvState(conv.number).sending || !getSmsConvState(conv.number).replyMessage.trim()"
+                        [placeholder]="t('sms.messagePlaceholder')" [disabled]="!canEdit || getSmsConvState(conv.number).sending"
+                        [class.fi-err]="!!getSmsConvState(conv.number).error && !getSmsConvState(conv.number).replyMessage.trim()"></textarea>
+              <button class="btn-sm primary" [disabled]="getSmsConvState(conv.number).sending"
                       (click)="sendSmsToConv(conv)">
-                {{ getSmsConvState(conv.number).sending ? '⏳' : t('sms.send') }}
+                @if (getSmsConvState(conv.number).sending) { … } @else { {{ t('sms.send') }} }
               </button>
             </div>
-            <div *ngIf="getSmsConvState(conv.number).error" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;padding:0 10px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
+            <div *ngIf="getSmsConvState(conv.number).error" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;padding:0 10px 8px"><i class="ei ei-warn"></i> {{getSmsConvState(conv.number).error}}</div>
           </div>
         </div>
       </div>
@@ -1045,7 +1090,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
 
     <!-- Right panel: DWH sales / email thread / products / docs -->
-    <div class="right-panel shadow-room">
+    <div class="right-panel shadow-room card-col-right">
 
       <!-- DWH: dane sprzedazowe -->
       <div *ngIf="partner.dwh_partner_id" class="dwh-box">
@@ -1116,7 +1161,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Historia zmian mini-widget -->
       <div style="background:var(--surface);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;padding:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400)">🕐 {{ t('history.title') }}</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400)"><i class="ei ei-clock"></i> {{ t('history.title') }}</div>
           <button *ngIf="history.length" class="btn-sm" (click)="showHistoryModal=true">{{ t('history.showAll') }}</button>
         </div>
         <div *ngIf="historyLoading" style="text-align:center;color:var(--gray-400);font-size:12px;padding:6px">{{ 'states.loading' | transloco }}</div>
@@ -1142,7 +1187,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
         <div *ngIf="linkedDocs.length===0 && partner.crm_uuid"
              style="display:flex;align-items:center;gap:6px;background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface));border:1px solid #a7d7b5;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
-          <span style="font-size:14px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">⚠️</span>
+          <span style="font-size:14px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)"><i class="ei ei-warn"></i></span>
           <span><strong>{{ t('partnerDetail.documents.noContractTitle') }}</strong> {{ t('partnerDetail.documents.noContractHint') }}</span>
         </div>
         <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:var(--gray-400);text-align:center;padding:8px 0">{{ t('partnerDetail.documents.empty') }}</div>
@@ -1162,8 +1207,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Zgody marketingowe -->
       <div class="docs-box" style="margin-top:0">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400)">✅ {{ t('consents.title') }}</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400)"><i class="ei ei-check-circle"></i> {{ t('consents.title') }}</div>
         </div>
+        <!-- Per-person consents: e-mail campaigns use only these -->
+        <wt-person-consents kind="partners" [entityId]="partner.crm_uuid || partner.id" [canEdit]="canEdit"
+                            [reloadKey]="(partner.email || '') + (partner.extra_contacts | json)"></wt-person-consents>
+        <div style="font-size:12px;font-weight:600;color:var(--gray-500);margin:14px 0 8px;padding-top:10px;border-top:1px solid var(--gray-100)">{{ t('personConsents.companyTitle') }}</div>
+        <div style="font-size:12px;color:var(--gray-400);line-height:1.5;margin:-4px 0 8px">{{ t('personConsents.companyHint') }}</div>
         <div *ngIf="consentLoading" style="text-align:center;color:var(--gray-400);font-size:12px;padding:8px 0">{{ 'states.loading' | transloco }}</div>
         <div *ngFor="let ct of consents" style="margin-bottom:12px">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:4px">
@@ -1195,11 +1245,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
         <button *ngIf="canEdit && consents.length" (click)="saveConsents()"
                 [disabled]="savingConsents || !consentsDirty"
+                [title]="consentsDirty ? '' : ('form.noChanges' | transloco)"
                 style="width:100%;margin-top:2px;font-size:12px;padding:8px;border-radius:8px;font-weight:600;border:none;transition:background .15s"
                 [style.background]="consentsDirty ? '#3BAA5D' : 'var(--gray-100)'"
                 [style.color]="consentsDirty ? 'white' : 'var(--gray-400)'"
                 [style.cursor]="consentsDirty ? 'pointer' : 'default'">
-          {{savingConsents ? t('consents.saving') : consentsDirty ? '💾 ' + t('consents.save') : '✓ ' + t('consents.saved')}}
+          @if (savingConsents) { {{ t('consents.saving') }} } @else { @if (consentsDirty) { <i class="ei ei-save"></i> {{ t('consents.save') }} } @else { ✓ {{ t('consents.saved') }} } }
         </button>
       </div>
 
@@ -1210,7 +1261,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
   <div *ngIf="showHistoryModal" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px" (click)="showHistoryModal=false">
     <div style="background:var(--surface);border-radius:14px;width:min(560px,100%);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 11px 29px rgba(0,0,0,0.135)" (click)="$event.stopPropagation()">
       <div style="padding:16px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--surface);z-index:1">
-        <span style="font-size:14px;font-weight:700;color:var(--gray-800)">🕐 {{ t('history.title') }}</span>
+        <span style="font-size:14px;font-weight:700;color:var(--gray-800)"><i class="ei ei-clock"></i> {{ t('history.title') }}</span>
         <input type="search" [(ngModel)]="historySearch" [placeholder]="t('partnerDetail.history.searchPlaceholder')">
         <button (click)="showHistoryModal=false" style="background:none;border:none;font-size:18px;color:var(--gray-400);cursor:pointer">✕</button>
       </div>
@@ -1236,7 +1287,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
   <div class="modal-overlay" *ngIf="showDocPicker" (click)="showDocPicker = false">
     <div class="modal-wide" (click)="$event.stopPropagation()" style="width:min(640px,100%);background:var(--surface);border-radius:14px">
       <div class="modal-header">
-        <h3>📎 {{ t('documents.picker.title') }}</h3>
+        <h3><i class="ei ei-paperclip"></i> {{ t('documents.picker.title') }}</h3>
         <button class="close-btn" (click)="showDocPicker = false">✕</button>
       </div>
       <div class="modal-body" style="gap:10px">
@@ -1256,7 +1307,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                [title]="doc._access==='read' ? t('documents.picker.readOnlyTooltip') : ''"
                [style.background]="isLinked(doc.id) ? 'color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface))' : 'var(--surface)'"
                (click)="toggleLinkDoc(doc)">
-            <span style="font-size:16px">📄</span>
+            <span style="font-size:16px"><i class="ei ei-file"></i></span>
             <div style="flex:1;min-width:0">
               <div style="font-size:12px;font-weight:600;color:var(--gray-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{doc.name}}</div>
               <div style="font-size:10px;color:var(--gray-400)">
@@ -1264,13 +1315,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 <span>{{doc.doc_type}}</span>
               </div>
             </div>
-            <span *ngIf="doc._access==='read'" style="font-size:12px;color:var(--gray-400)">🔒 {{ t('documents.picker.readOnly') }}</span>
+            <span *ngIf="doc._access==='read'" style="font-size:12px;color:var(--gray-400)"><i class="ei ei-lock"></i> {{ t('documents.picker.readOnly') }}</span>
             <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:12px;font-weight:700;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">✓ {{ t('documents.picker.added') }}</span>
             <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:12px;color:var(--gray-400)">{{ t('documents.add') }}</span>
           </div>
         </div>
         <div *ngIf="linkDocError" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface));border-radius:6px;padding:8px 12px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">
-          ⚠ {{linkDocError}}
+          <i class="ei ei-warn"></i> {{linkDocError}}
         </div>
       </div>
       <div class="modal-footer">
@@ -1290,16 +1341,16 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div class="edit-section">
           <div class="edit-section-title">{{ t('partnerDetail.edit.sections.basic') }}</div>
           <div class="edit-row">
-            <label>{{ t('partnerDetail.fields.companyName') }} *<input [(ngModel)]="editForm.company" [placeholder]="t('partnerDetail.fields.companyName')" required></label>
+            <label>{{ t('partnerDetail.fields.companyName') }} <span class="req">*</span><input [(ngModel)]="editForm.company" [placeholder]="t('partnerDetail.fields.companyName')" required></label>
             <label>{{ t('partnerDetail.fields.status') }}
               <select [(ngModel)]="editForm.status">
                 <option *ngFor="let s of dictStatuses" [value]="s"
                         [disabled]="s==='active' && hasOpenTasks && partner?.status==='onboarding'">
-                  {{statusLabelStr(s)}} {{s==='active' && hasOpenTasks && partner?.status==='onboarding' ? '🔒' : ''}}
+                  {{statusLabelStr(s)}}
                 </option>
               </select>
               <div *ngIf="hasOpenTasks && partner?.status === 'onboarding'" class="validation-msg" style="color:oklch(from #f59e0b max(l, var(--text-min-l)) c h);margin-top:4px">
-                ⚠ {{ t('partnerDetail.edit.openTasksWarning', { count: openTasksCount }) }}
+                <i class="ei ei-warn"></i> {{ t('partnerDetail.edit.openTasksWarning', { count: openTasksCount }) }}
               </div>
             </label>
           </div>
@@ -1314,7 +1365,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </label>
             <!-- NIP: edytowalny tylko dla partnerów bez DWH -->
             <label *ngIf="!partner?.dwh_partner_id">
-              {{ t('partnerDetail.fields.nip') }} <span style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span>
+              {{ t('partnerDetail.fields.nip') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
                      (ngModelChange)="validatePartnerNip()"
                      [style.border-color]="partnerNipEditError ? '#ef4444' : ''">
@@ -1331,7 +1382,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
         <!-- Partner Admin -->
         <div class="edit-section">
-          <div class="edit-section-title">👤 {{ t('partnerDetail.sections.partnerAdmin') }}</div>
+          <div class="edit-section-title"><i class="ei ei-user"></i> {{ t('partnerDetail.sections.partnerAdmin') }}</div>
           <div class="edit-row">
             <!-- admin_first_name -->
             <ng-container *ngIf="!isDwhFieldReadOnly('admin_first_name')">
@@ -1368,33 +1419,33 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </div>
           <div *ngIf="isDwhFieldReadOnly('admin_first_name') || isDwhFieldReadOnly('admin_last_name') || isDwhFieldReadOnly('admin_email')"
                style="font-size:12px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);margin-top:4px">
-            🔒 {{ t('partnerDetail.edit.dwhLockedHint') }}
+            <i class="ei ei-lock"></i> {{ t('partnerDetail.edit.dwhLockedHint') }}
           </div>
         </div>
 
         <div class="edit-section">
-          <div class="edit-section-title">{{ t('partnerDetail.sections.contractContact') }} *</div>
+          <div class="edit-section-title">{{ t('partnerDetail.sections.contractContact') }} <span class="req">*</span></div>
           <div class="edit-row">
-            <label>{{ t('partnerDetail.fields.fullName') }} *
+            <label>{{ t('partnerDetail.fields.fullName') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.contact_name" [placeholder]="t('partnerDetail.edit.placeholders.fullName')"
                      [class.input-warn]="submitAttempted && !editForm.contact_name">
             </label>
-            <label>{{ t('partnerDetail.fields.contactTitle') }} *
+            <label>{{ t('partnerDetail.fields.contactTitle') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.contact_title" placeholder="CEO"
                      [class.input-warn]="submitAttempted && !editForm.contact_title">
             </label>
           </div>
           <div class="edit-row">
-            <label>{{ t('partnerDetail.fields.email') }} *
+            <label>{{ t('partnerDetail.fields.email') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.email" type="email" [placeholder]="t('partnerDetail.edit.placeholders.email')"
                      [class.input-warn]="submitAttempted && !editForm.email">
             </label>
-            <label>{{ t('partnerDetail.fields.phone') }} *
+            <label>{{ t('partnerDetail.fields.phone') }} <span class="req">*</span>
               <wt-phone-input [(ngModel)]="editForm.phone" [invalid]="submitAttempted && !editForm.phone" />
             </label>
           </div>
           <div class="validation-msg" *ngIf="submitAttempted && (!editForm.contact_name || !editForm.contact_title || !editForm.email || !editForm.phone)" style="color:oklch(from #f59e0b max(l, var(--text-min-l)) c h)">
-            ⚠ {{ t('partnerDetail.edit.contractContactIncomplete') }}
+            <i class="ei ei-warn"></i> {{ t('partnerDetail.edit.contractContactIncomplete') }}
           </div>
         </div>
 
@@ -1418,34 +1469,34 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
 
         <div class="edit-section">
-          <div class="edit-section-title">{{ t('partnerDetail.sections.billingContact') }} *</div>
+          <div class="edit-section-title">{{ t('partnerDetail.sections.billingContact') }} <span class="req">*</span></div>
           <div class="edit-row">
-            <label>{{ t('partnerDetail.fields.fullName') }} *
+            <label>{{ t('partnerDetail.fields.fullName') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.billing_contact_name" [placeholder]="t('partnerDetail.edit.placeholders.billingFullName')"
                      [class.input-warn]="submitAttempted && !editForm.billing_contact_name">
             </label>
-            <label>{{ t('partnerDetail.fields.contactTitle') }} *
+            <label>{{ t('partnerDetail.fields.contactTitle') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.billing_contact_title" [placeholder]="t('partnerDetail.edit.placeholders.billingContactTitle')"
                      [class.input-warn]="submitAttempted && !editForm.billing_contact_title">
             </label>
           </div>
           <div class="edit-row">
-            <label>{{ t('partnerDetail.fields.email') }} *
+            <label>{{ t('partnerDetail.fields.email') }} <span class="req">*</span>
               <input [(ngModel)]="editForm.billing_email" type="email" [placeholder]="t('partnerDetail.edit.placeholders.billingContactEmail')"
                      [class.input-warn]="submitAttempted && !editForm.billing_email">
             </label>
-            <label>{{ t('partnerDetail.fields.phone') }} *
+            <label>{{ t('partnerDetail.fields.phone') }} <span class="req">*</span>
               <wt-phone-input [(ngModel)]="editForm.billing_phone" [invalid]="submitAttempted && !editForm.billing_phone" />
             </label>
           </div>
           <div class="validation-msg" *ngIf="submitAttempted && (!editForm.billing_contact_name || !editForm.billing_contact_title || !editForm.billing_email || !editForm.billing_phone)" style="color:oklch(from #f59e0b max(l, var(--text-min-l)) c h)">
-            ⚠ {{ t('partnerDetail.edit.billingContactIncomplete') }}
+            <i class="ei ei-warn"></i> {{ t('partnerDetail.edit.billingContactIncomplete') }}
           </div>
         </div>
 
         <!-- Billing Address -->
         <div class="edit-section">
-          <div class="edit-section-title">📍 {{ t('partnerDetail.sections.billingAddress') }}</div>
+          <div class="edit-section-title"><i class="ei ei-map-pin"></i> {{ t('partnerDetail.sections.billingAddress') }}</div>
           <div class="edit-row">
             <!-- billing_address -->
             <ng-container *ngIf="!isDwhFieldReadOnly('billing_address')">
@@ -1504,7 +1555,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </div>
           <div *ngIf="isDwhFieldReadOnly('billing_address') || isDwhFieldReadOnly('billing_zip') || isDwhFieldReadOnly('billing_city') || isDwhFieldReadOnly('billing_country') || isDwhFieldReadOnly('billing_email_address')"
                style="font-size:12px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);margin-top:4px">
-            🔒 {{ t('partnerDetail.edit.dwhLockedHint') }}
+            <i class="ei ei-lock"></i> {{ t('partnerDetail.edit.dwhLockedHint') }}
           </div>
         </div>
 
@@ -1574,7 +1625,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
 
         <div class="edit-section">
-          <div class="edit-section-title">🔍 {{ t('partnerDetail.edit.sections.salesAndSource') }}</div>
+          <div class="edit-section-title"><i class="ei ei-search"></i> {{ t('partnerDetail.edit.sections.salesAndSource') }}</div>
           <div class="edit-row">
             <label>{{ t('partnerDetail.fields.source') }}
               <input [(ngModel)]="editForm.source" [placeholder]="t('partnerDetail.edit.placeholders.source')">
@@ -1615,7 +1666,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
         <!-- Dane dodatkowe — % Online + DWH-fillable: subdomain, language, partner_currency, country -->
         <div class="edit-section">
-          <div class="edit-section-title">⚙️ {{ t('partnerDetail.sections.additionalData') }}</div>
+          <div class="edit-section-title"><i class="ei ei-settings"></i> {{ t('partnerDetail.sections.additionalData') }}</div>
           <div class="edit-row">
             <label>{{ t('partnerDetail.fields.onlinePct') }}
               <select [(ngModel)]="editForm.online_pct">
@@ -1685,7 +1736,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </div>
           <div *ngIf="isDwhFieldReadOnly('subdomain') || isDwhFieldReadOnly('language') || isDwhFieldReadOnly('partner_currency') || isDwhFieldReadOnly('country')"
                style="font-size:12px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);margin-top:4px">
-            🔒 {{ t('partnerDetail.edit.dwhLockedHint') }}
+            <i class="ei ei-lock"></i> {{ t('partnerDetail.edit.dwhLockedHint') }}
           </div>
         </div>
 
@@ -1721,7 +1772,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
 <div class="modal-overlay" *ngIf="showMsgModal" (click)="closeMsgModal()">
   <div class="modal-wide" (click)="$event.stopPropagation()" style="width:min(620px,100%);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column">
     <div class="modal-header">
-      <h3>📧 {{msgModalMsg?.subject || t('email.messageFallbackTitle')}}</h3>
+      <h3><i class="ei ei-mail"></i> {{msgModalMsg?.subject || t('email.messageFallbackTitle')}}</h3>
       <button class="close-btn" (click)="closeMsgModal()">✕</button>
     </div>
     <div class="modal-body" style="gap:10px" *ngIf="msgModalMsg && !msgModalReply">
@@ -1738,14 +1789,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
            style="display:flex;flex-wrap:wrap;gap:4px">
         <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);font-size:12px;padding:4px 10px">
-          📎 {{att.filename}}
+          <i class="ei ei-paperclip"></i> {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
             <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
           </span>
         </span>
         <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);font-size:12px;padding:4px 10px">
-          📎 {{att.filename}}
+          <i class="ei ei-paperclip"></i> {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
             <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
@@ -1756,7 +1807,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     <!-- Reply form -->
     <div class="modal-body" style="gap:10px" *ngIf="msgModalReply">
       <div style="font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:4px">{{ t('email.replyHeading') }}</div>
-      <div class="participant-chips" style="position:relative">
+      <div class="participant-chips" style="position:relative" [class.fi-err]="msgReplySubmitted && !msgModalForm.recipientList?.length">
         <span *ngFor="let r of msgModalForm.recipientList; let i=index" class="participant-chip">
           {{r}}<button (click)="msgModalForm.recipientList.splice(i,1)" type="button">✕</button>
         </span>
@@ -1764,6 +1815,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                (keydown.enter)="pushMsgRecipient()"
                [placeholder]="t('email.placeholders.toShort')" autocomplete="off">
       </div>
+      @if (msgReplySubmitted && !msgModalForm.recipientList?.length) { <span class="ferr">{{ t('fieldErrors.recipients') }}</span> }
       <div class="participant-chips" style="position:relative">
         <span *ngFor="let r of msgModalForm.ccList; let i=index" class="participant-chip">
           {{r}}<button (click)="msgModalForm.ccList.splice(i,1)" type="button">✕</button>
@@ -1772,7 +1824,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
                (keydown.enter)="pushMsgCc()"
                [placeholder]="t('email.placeholders.ccShort')" autocomplete="off">
       </div>
-      <input class="act-input" [(ngModel)]="msgModalForm.subject" [placeholder]="t('email.fields.subject')">
+      <input class="act-input" [(ngModel)]="msgModalForm.subject" [placeholder]="t('email.fields.subject')" [class.fi-err]="msgReplySubmitted && !msgModalForm.subject?.trim()">
+      @if (msgReplySubmitted && !msgModalForm.subject?.trim()) { <span class="ferr">{{ t('fieldErrors.subject') }}</span> }
       <textarea class="act-input" id="partner-msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="7" [placeholder]="t('activity.form.bodyShortPlaceholder')"></textarea>
       <!-- Załączniki w odpowiedzi -->
       <div style="display:flex;flex-direction:column;gap:4px">
@@ -1782,26 +1835,27 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth"
                   (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
                   style="flex-shrink:0;font-size:12px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:color-mix(in srgb, #eef2ff var(--tint-mix), var(--surface));color:oklch(from #4338ca max(l, var(--text-min-l)) c h);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
-            <span *ngIf="!drivePickerLoading">📁 {{ t('email.fromGoogleDrive') }}</span>
-            <span *ngIf="drivePickerLoading">⏳ {{ 'states.loading' | transloco }}</span>
+            <span *ngIf="!drivePickerLoading"><i class="ei ei-folder"></i> {{ t('email.fromGoogleDrive') }}</span>
+            <span *ngIf="drivePickerLoading"><i class="ei ei-hourglass"></i> {{ 'states.loading' | transloco }}</span>
           </button>
         </div>
         <div *ngIf="msgModalAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
           <span *ngFor="let f of msgModalAttachments; let i=index"
                 style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">
-            📎 {{f.name}}
+            <i class="ei ei-paperclip"></i> {{f.name}}
             <button (click)="removeMsgReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button>
           </span>
         </div>
       </div>
-      <div *ngIf="msgModalError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px">⚠️ {{msgModalError}}</div>
+      <div *ngIf="msgModalError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px"><i class="ei ei-warn"></i> {{msgModalError}}</div>
     </div>
     <div class="modal-footer">
       <button class="btn-outline" (click)="closeMsgModal()">{{ 'actions.close' | transloco }}</button>
-      <button *ngIf="!msgModalReply" class="btn-primary" (click)="startMsgReply()">{{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}</button>
+      <button *ngIf="!msgModalReply" class="btn-primary" (click)="startMsgReply()">@if (threadCanReply) { ↩ {{ t('email.reply.action') }} } @else { <i class="ei ei-mail"></i> {{ t('email.writeNew') }} }</button>
+      @if (msgModalReply && msgReplySubmitted) { <wt-form-error-summary [count]="msgReplyErrorCount()" /> }
       <button *ngIf="msgModalReply" class="btn-primary" (click)="sendMsgReply()"
-              [disabled]="msgModalSending||!msgModalForm.recipientList?.length||!msgModalForm.subject">
-        {{msgModalSending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}
+              [disabled]="msgModalSending">
+        @if (msgModalSending) { {{ t('email.sending') }} } @else { <i class="ei ei-send"></i> {{ t('email.reply.send') }} }
       </button>
     </div>
   </div>
@@ -1874,8 +1928,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     /* Body */
     .detail-body { display:grid; grid-template-columns:260px 1fr 260px; gap:16px; flex:1; overflow:hidden; min-height:0; }
     .detail-body.left-collapsed { grid-template-columns:32px 1fr 260px; }
-    @media(max-width:900px) { .detail-body{grid-template-columns:260px 1fr;} .detail-body.left-collapsed{grid-template-columns:32px 1fr;} .right-panel{display:none} }
-    @media(max-width:700px) { .detail-body{grid-template-columns:1fr;} }
+    @media (max-width:1279px) { :host { overflow-y:auto; overflow-x:hidden; } }
     /* Left panel collapse */
     .left-panel-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink:0; }
     .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); background:var(--surface); cursor:pointer; font-size:16px; line-height:1; color:var(--gray-400); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }
@@ -2026,7 +2079,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .edit-textarea { width:100%; border:1px solid var(--gray-300); border-radius:6px; padding:8px 10px; font-size:14px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
     .edit-textarea:focus { border-color:#3BAA5D; }
     .info-subsection { margin-top:14px; padding-top:12px; border-top:1px solid var(--gray-100); }
-    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); margin-bottom:8px; margin-top:12px; padding-top:12px; border-top:1px solid var(--gray-100); }
+    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); margin-bottom:8px; }
     .link { color: var(--orange-text); text-decoration:none; }
     .link:hover { text-decoration:underline; }
     .dwh-badge { display:inline-block; background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color:oklch(from #7c3aed max(l, var(--text-min-l)) c h); font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
@@ -2087,6 +2140,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   private transloco = inject(TranslocoService);
   private attachmentsApi = inject(EntityAttachmentsApiService);
   private toast = inject(ToastService);
+  readonly leadStages = inject(LeadStagesService);
   pendingActivityFiles: File[] = [];
   private locale = inject(LocaleService);
 
@@ -2259,9 +2313,19 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.whatsappToPhone = formatPhoneDisplay(this.whatsappToPhone);
   }
 
+  whatsappErrorCount(): number {
+    return (this.whatsappToPhone.trim() && !this.whatsappToPhoneMissingCountryCode ? 0 : 1) + (this.canSendWhatsappContent ? 0 : 1);
+  }
+
   sendWhatsapp(): void {
-    if (!this.partner || !this.whatsappToPhone.trim() || !this.canSendWhatsappContent) return;
-    if (this.whatsappToPhoneMissingCountryCode) return;
+    if (!this.partner) return;
+    if (!this.canEdit) { this.explainNoPermission(); return; }
+    if (this.whatsappErrorCount() > 0) {
+      this.whatsappSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.whatsappSubmitted = false;
     this.whatsappSending = true;
     this.whatsappError   = null;
     this.whatsappSuccess = false;
@@ -2388,7 +2452,12 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   sendSmsToConv(conv: SmsConversation): void {
     const state = this.getSmsConvState(conv.number);
-    if (!this.partner || !state.replyMessage.trim() || state.sending) return;
+    if (!this.partner || state.sending) return;
+    if (!this.canEdit || !state.replyMessage.trim()) {
+      state.error = this.transloco.translate(this.canEdit ? 'crm.fieldErrors.message' : 'crm.partnerDetail.header.noEditPermission');
+      this.cdr.markForCheck();
+      return;
+    }
     const partnerId = this.partner.id ?? this.partner.crm_id ?? undefined;
     if (partnerId == null) return;
     state.sending = true;
@@ -2515,7 +2584,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   sendWhatsappConvReply(phone: string): void {
     if (!this.partner) return;
     const s = this.getWhatsappConvState(phone);
-    if (!s.replyMessage.trim()) return;
+    if (!s.replyMessage.trim()) {
+      s.replyError = this.transloco.translate('crm.fieldErrors.message');
+      this.cdr.markForCheck();
+      return;
+    }
     s.replySending = true;
     s.replyError   = null;
     this.cdr.markForCheck();
@@ -2801,6 +2874,17 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   showTaskForm = false;
   taskFormStep = 0;
   savingTask   = false;
+  taskSubmitted = false;
+  actSubmitted = false;
+  inlineEditSubmitted = false;
+  emailSubmitted = false;
+  inlineReplySubmitted = false;
+  msgReplySubmitted = false;
+  whatsappSubmitted = false;
+
+  explainNoPermission(): void {
+    this.toast.info(this.transloco.translate('crm.partnerDetail.header.noEditPermission'));
+  }
   editingTaskId: number | null = null;
   taskForm: any = { type: 'task', title: '', body: '', assigned_to: '', due_date: '' };
   taskEditForm: any = { type: 'task', title: '', body: '', assigned_to: '', due_date: '' };
@@ -2960,6 +3044,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   startInlineEdit(a: any): void {
+    this.inlineEditSubmitted = false;
     this.inlineEditActId = a.id;
     this.inlineEditForm  = {
       title:         a.title         || '',
@@ -2985,7 +3070,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   cancelInlineEdit(): void { this.inlineEditActId = null; this.cdr.markForCheck(); }
 
   saveInlineEdit(a: any): void {
-    if (!this.inlineEditForm.title || !this.partner) return;
+    if (!this.partner) return;
+    if (!this.inlineEditForm.title?.trim()) {
+      this.inlineEditSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.inlineEditSubmitted = false;
     this.savingActivity = true;
     const payload: any = {
       title:         this.inlineEditForm.title,
@@ -3505,13 +3596,14 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   taskIcon(type: string): string {
-    return { task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄', training:'🎓' }[type] || '✅';
+    return { task:'check-circle', call:'phone', email:'mail', meeting:'handshake', note:'note', doc_sent:'file', training:'graduation' }[type] || 'check-circle';
   }
 
   openAddTask(): void {
     this.taskFormStep  = this.activeStep;
     this.taskForm      = { type: 'task', title: '', body: '', assigned_to: '', due_date: '' };
     this.showTaskForm  = true;
+    this.taskSubmitted = false;
     this.editingTaskId = null;
     if (!this.crmUsers.length && this.partner) {
       this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
@@ -3522,7 +3614,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   cancelTaskForm(): void { this.showTaskForm = false; this.cdr.markForCheck(); }
 
   saveTask(): void {
-    if (!this.taskForm.title || !this.partner) return;
+    if (!this.partner) return;
+    if (!this.taskForm.title?.trim()) {
+      this.taskSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.taskSubmitted = false;
     this.savingTask = true;
     const payload = {
       step:        this.activeStep,
@@ -3683,8 +3781,48 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ── Withdraw from onboarding back to a funnel stage ──────────────────────
+  showWithdrawForm      = false;
+  withdrawTargetStage   = '';
+  withdrawSubmitted     = false;
+  withdrawingOnboarding = false;
+
+  cancelWithdrawForm(): void {
+    this.showWithdrawForm = false;
+    this.withdrawTargetStage = '';
+    this.withdrawSubmitted = false;
+  }
+
+  withdrawOnboarding(): void {
+    if (!this.partner) return;
+    if (!this.withdrawTargetStage) {
+      this.withdrawSubmitted = true;
+      return;
+    }
+    const stage = this.leadStages.label(this.withdrawTargetStage);
+    if (!confirm(this.transloco.translate('crm.onboardingBoard.withdraw.confirmPrompt', { company: this.partner.company, stage }))) return;
+    this.withdrawingOnboarding = true;
+    this.api.withdrawPartnerOnboarding(this.pid, this.withdrawTargetStage).subscribe({
+      next: r => this.zone.run(() => {
+        this.toast.success(this.transloco.translate('crm.onboardingBoard.withdraw.success', { company: this.partner?.company }));
+        this.router.navigate(['/crm/leads', r.lead_id]);
+      }),
+      error: (err: unknown) => this.zone.run(() => {
+        this.withdrawingOnboarding = false;
+        this.toast.error(withdrawOnboardingErrorMessage(err, this.transloco));
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
   addActivity() {
-    if (!this.actForm.title || !this.partner) return;
+    if (!this.partner) return;
+    if (!this.actForm.title?.trim()) {
+      this.actSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.actSubmitted = false;
     this.savingActivity = true;
     const payload: any = {
       type:  this.actForm.type,
@@ -3779,6 +3917,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       });
     }
     this.showNewActivity = true;
+    this.actSubmitted = false;
   }
 
   debugProcessEmail(): void {
@@ -3800,6 +3939,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   openEmailCompose(prefillThreadId?: string): void {
+    this.emailSubmitted = false;
     const training_mode = this.settings.settings().crm_training_mode;
     if (!this.emailConnected && !training_mode) {
       if (!this.emailProviderKey) {
@@ -4084,10 +4224,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  emailErrorCount(): number {
+    return (this.emailForm.recipientList?.length ? 0 : 1) + (this.emailForm.subject?.trim() ? 0 : 1);
+  }
+
   sendEmail(): void {
     this.addRecipient();
     this.addCc();
-    if (!this.partner || !this.emailForm.recipientList?.length || !this.emailForm.subject) return;
+    if (!this.partner) return;
+    if (this.emailErrorCount() > 0) {
+      this.emailSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.emailSubmitted = false;
     this.sendingEmail = true;
     this.emailError   = '';
 
@@ -4285,6 +4435,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   startInlineReply(a: any): void {
+    this.inlineReplySubmitted = false;
     if (!this.partner) return;
     const activeEmail = this.emailAddress;
     const lastMsg     = this.threadMessages.length > 0 ? this.threadMessages[this.threadMessages.length - 1] : null;
@@ -4372,7 +4523,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   sendInlineReply(): void {
     this.addInlineReplyRecipient();
     this.addInlineReplyCc();
-    if (!this.partner || !this.inlineReplyForm.body?.trim()) return;
+    if (!this.partner) return;
+    if (!this.inlineReplyForm.body?.trim()) {
+      this.inlineReplySubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.inlineReplySubmitted = false;
     this.inlineReplySending = true;
     this.inlineReplyError   = '';
     this.cdr.markForCheck();
@@ -4595,6 +4752,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   startMsgReply(): void {
+    this.msgReplySubmitted = false;
     const m = this.msgModalMsg;
     if (!m) return;
     const activeEmail = this.emailAddress;
@@ -4635,10 +4793,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  msgReplyErrorCount(): number {
+    return (this.msgModalForm.recipientList?.length ? 0 : 1) + (this.msgModalForm.subject?.trim() ? 0 : 1);
+  }
+
   sendMsgReply(): void {
     this.pushMsgRecipient();
     this.pushMsgCc();
-    if (!this.partner || !this.msgModalForm.recipientList?.length || !this.msgModalForm.subject) return;
+    if (!this.partner) return;
+    if (this.msgReplyErrorCount() > 0) {
+      this.msgReplySubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.msgReplySubmitted = false;
     this.msgModalSending = true;
     this.msgModalError   = '';
 
@@ -4759,7 +4927,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return parts.join(' · ');
   }
   actIcon(type: string) {
-    return { task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';
+    return { task:'check-circle', call:'phone', email:'mail', meeting:'handshake', note:'note', training:'graduation', qbr:'chart', doc_sent:'file', opportunity:'bulb', marketing_email:'mail' }[type] || 'message';
   }
   commissionBasisLabel(basis: string | null): string {
     const keys: Record<string, string> = {
@@ -4778,7 +4946,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   actTypeName(type: string): string {
-    const known = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity'];
+    const known = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity', 'marketing_email'];
     return known.includes(type) ? this.transloco.translate('crm.labels.activityTypes.' + type) : type;
   }
 

@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} firm…",
     "errors": {
       "aiNoCredit": "Brak środków na koncie AI",
+      "nip": "NIP musi mieć 10 cyfr, np. 1234567890",
       "searchFailedWithReason": "Błąd wyszukiwania: {reason}",
+      "seedName": "Podaj nazwę firmy wzorcowej, np. ABC Sp. z o.o.",
+      "selectCompanies": "Zaznacz co najmniej jedną firmę na liście",
       "taxIdConflict": "Konflikt NIP — inny rekord ma już ten numer."
     },
     "exportCsv": "Eksport CSV",
@@ -120,10 +123,14 @@
       "fatalError": "Błąd importu:",
       "heading": "Import firm z CSV",
       "importing": "Importuję…",
+      "inCrmLead": "Lead",
+      "inCrmPartner": "Partner",
+      "inCrmTitle": "Pominięte, bo są już w CRM:",
       "optionalColumns": "www, krs, company_name/nazwa, branża, profil, zatrudnienie, obrot, rok, miasto, województwo, PKD-ID, PKD-opis, Osoba Decyzyjna, Stanowisko, Komórka, Telefon, Email",
       "optionalLabel": "Wykrywane automatycznie:",
       "requiredLabel": "Wymagane kolumny:",
       "skipped": "Pominięto (duplikaty):",
+      "skippedInCrm": "Pominięto (już w CRM):",
       "submit": "Importuj",
       "totalRows": "Razem wierszy:",
       "wwwHint": "Podanie kolumny www pozwala pominąć autodiscovery (tańsze, szybsze)."

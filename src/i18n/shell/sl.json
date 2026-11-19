@@ -12,6 +12,7 @@
     "dashboard": "Nadzorna plošča",
     "dataManagement": "Upravljanje podatkov",
     "documents": "Dokumenti",
+    "emailCampaigns": "E-poštne kampanje",
     "groupsAndRoles": "Skupine in vloge",
     "leads": "Leadi",
     "mySettings": "Moje nastavitve",
@@ -41,11 +42,13 @@
     "superAdmin": "Super Admin"
   },
   "sidebar": {
+    "closeMenu": "Zapri meni",
     "collapse": "Strni meni",
     "doneEditing": "Končano",
     "editMenu": "Uredi meni",
     "expand": "Razširi meni",
     "hideItem": "Skrij",
+    "openMenu": "Odpri meni",
     "showItem": "Prikaži"
   },
   "user": {

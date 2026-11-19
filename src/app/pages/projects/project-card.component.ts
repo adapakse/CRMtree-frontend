@@ -1,3 +1,4 @@
+import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -22,7 +23,7 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
 @Component({
   selector: 'wt-project-card',
   standalone: true,
-  imports: [FormsModule, ProjectCrmLinkComponent, ProjectDelayBadgeComponent, TypeaheadComponent, TranslocoDirective, TranslocoPipe],
+  imports: [FormsModule, ProjectCrmLinkComponent, ProjectDelayBadgeComponent, TypeaheadComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -43,7 +44,8 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
       @if (isEditing()) {
         <div class="fg">
           <label class="fl">{{ t('card.name') }} <span class="req">*</span></label>
-          <input class="fi" [(ngModel)]="editedName" maxlength="200">
+          <input class="fi" [(ngModel)]="editedName" maxlength="200" [class.fi-err]="editSubmitted && !editedName.trim()">
+          @if (editSubmitted && !editedName.trim()) { <span class="ferr">{{ t('card.errors.name') }}</span> }
         </div>
         <div class="fg">
           <label class="fl">{{ t('card.description') }}</label>
@@ -56,14 +58,15 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
           </div>
           <div class="fg">
             <label class="fl">{{ t('card.endDate') }}</label>
-            <input class="fi" type="date" [(ngModel)]="editedEndDate" [min]="editedStartDate">
+            <input class="fi" type="date" [(ngModel)]="editedEndDate" [min]="editedStartDate" [class.fi-err]="hasInvalidDates()">
           </div>
         </div>
         @if (hasInvalidDates()) { <p class="date-error">{{ t('card.errors.endBeforeStart') }}</p> }
         <p class="muted hint">{{ t('card.datesHint') }}</p>
         <div class="actions">
+          @if (editSubmitted) { <wt-form-error-summary [count]="(editedName.trim() ? 0 : 1) + (hasInvalidDates() ? 1 : 0)" /> }
           <button class="btn btn-g btn-sm" (click)="isEditing.set(false)">{{ 'actions.cancel' | transloco }}</button>
-          <button class="btn btn-p btn-sm" [disabled]="!editedName.trim() || hasInvalidDates()" (click)="saveProject()">{{ 'actions.save' | transloco }}</button>
+          <button class="btn btn-p btn-sm" (click)="saveProject()">{{ 'actions.save' | transloco }}</button>
         </div>
       } @else {
         <div class="project-name">
@@ -143,8 +146,9 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
             <option ngValue="full">{{ t('labels.accessLevels.full') }}</option>
             <option ngValue="read">{{ t('labels.accessLevels.read') }}</option>
           </select>
-          <button class="btn btn-p btn-sm" [disabled]="!newMember()" (click)="addMember()">{{ t('card.members.add') }}</button>
+          <button class="btn btn-p btn-sm" (click)="addMember()">{{ t('card.members.add') }}</button>
         </div>
+        @if (memberSubmitted && !newMember()) { <span class="ferr" role="alert">{{ t('card.errors.member') }}</span> }
       }
     </section>
 
@@ -177,15 +181,16 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
         }
         @if (canEditMembers() && availableFieldDefinitions().length > 0) {
           <div class="add-row fields">
-            <select class="fsel" [(ngModel)]="newFieldId">
+            <select class="fsel" [(ngModel)]="newFieldId" [class.fi-err]="fieldSubmitted && !newFieldId">
               <option [ngValue]="null">{{ t('card.fields.selectPlaceholder') }}</option>
               @for (definition of availableFieldDefinitions(); track definition.id) {
                 <option [ngValue]="definition.id">{{ definition.name }} ({{ t('labels.fieldTypes.' + definition.field_type) }})</option>
               }
             </select>
             <label class="required-toggle"><input type="checkbox" [(ngModel)]="isNewFieldRequired"> {{ t('card.fields.requiredToggle') }}</label>
-            <button class="btn btn-p btn-sm" [disabled]="!newFieldId" (click)="addField()">{{ t('card.fields.add') }}</button>
+            <button class="btn btn-p btn-sm" (click)="addField()">{{ t('card.fields.add') }}</button>
           </div>
+          @if (fieldSubmitted && !newFieldId) { <span class="ferr" role="alert">{{ t('card.errors.field') }}</span> }
         } @else if (canEditMembers()) {
           <p class="muted">
             {{ t('card.fields.noneAvailable') }}
@@ -248,6 +253,9 @@ export class ProjectCardComponent {
   newMemberRole: ProjectRole = 'internal_participant';
   newMemberAccessLevel: ProjectAccessLevel = 'full';
   newFieldId: string | null = null;
+  editSubmitted = false;
+  memberSubmitted = false;
+  fieldSubmitted = false;
   isNewFieldRequired = false;
 
   private get projectId(): string {
@@ -263,6 +271,7 @@ export class ProjectCardComponent {
   }
 
   startEditing(): void {
+    this.editSubmitted = false;
     this.editedName = this.detail().project.name;
     this.editedDescription = this.detail().project.description ?? '';
     this.editedStartDate = this.detail().project.start_date ?? '';
@@ -275,6 +284,10 @@ export class ProjectCardComponent {
   }
 
   saveProject(): void {
+    if (!this.editedName.trim() || this.hasInvalidDates()) {
+      this.editSubmitted = true;
+      return;
+    }
     const payload = {
       name: this.editedName.trim(),
       description: this.editedDescription.trim() || null,
@@ -320,7 +333,11 @@ export class ProjectCardComponent {
 
   addMember(): void {
     const member = this.newMember();
-    if (!member) return;
+    if (!member) {
+      this.memberSubmitted = true;
+      return;
+    }
+    this.memberSubmitted = false;
     const payload = { user_id: member.id, role: this.newMemberRole, access_level: this.newMemberAccessLevel };
     this.api.addMember(this.projectId, payload).subscribe({
       next: () => {
@@ -356,7 +373,11 @@ export class ProjectCardComponent {
   }
 
   addField(): void {
-    if (!this.newFieldId) return;
+    if (!this.newFieldId) {
+      this.fieldSubmitted = true;
+      return;
+    }
+    this.fieldSubmitted = false;
     const fields = [...this.currentFieldPayload(), { field_definition_id: this.newFieldId, is_required: this.isNewFieldRequired }];
     this.newFieldId = null;
     this.isNewFieldRequired = false;

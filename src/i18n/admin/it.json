@@ -27,6 +27,13 @@
       "subtitle": "Eliminazione definitiva di un documento, lead o partner con tutti i dati e i log collegati.",
       "title": "Eliminazione di record"
     },
+    "errors": {
+      "confirmPhrase": "Digita esattamente “{phrase}” per confermare",
+      "selectDoc": "Cerca un documento e fai clic su di esso nell'elenco",
+      "selectFile": "Scegli il file JSON con le impostazioni esportate",
+      "selectLead": "Cerca un lead e fai clic su di esso nell'elenco",
+      "selectPartner": "Cerca un partner e fai clic su di esso nell'elenco"
+    },
     "purge": {
       "confirm": "Conferma",
       "docs": {
@@ -705,6 +712,9 @@
       "body": "Eliminare davvero il token PBX di {name}? L'utente non potrà più usare il softphone.",
       "title": "Elimina token PBX"
     },
+    "errors": {
+      "token": "Incolla il Personal Access Token (PAT) del centralino"
+    },
     "loadError": "Errore nel caricamento dei dati.",
     "loading": "Caricamento…",
     "modal": {
@@ -758,6 +768,9 @@
       "detected": "Riconosciuto: {provider}",
       "detectedShort": "riconosciuto dalla chiave",
       "detecting": "Riconoscimento del fornitore…",
+      "errors": {
+        "key": "Incolla la chiave API del fornitore (ad es. sk-…) o scegli una chiave salvata"
+      },
       "intro": "Ogni funzione ha il proprio fornitore, chiave e modello: l'enrichment può girare presso un fornitore e l'analisi delle chiamate presso un altro. Incolla una chiave e riconosceremo il fornitore da soli. Il salvataggio verifica la configurazione presso il fornitore; la chiave è cifrata e non viene mai più mostrata.",
       "loading": "Caricamento della configurazione AI…",
       "model": "Modello",
@@ -1193,6 +1206,9 @@
       "deleteConfirm": "Eliminare il campo “{name}”?",
       "deleteTooltip": "Elimina il campo — possibile solo se nessun record ha un valore",
       "empty": "Nessun campo aggiuntivo in questo modulo.",
+      "errors": {
+        "name": "Inserisci il nome del campo, ad es. Numero cliente"
+      },
       "hint": "Campi che definisci tu per questo modulo. Il tipo di campo non è modificabile in seguito: per cambiarlo, disattiva il campo e creane uno nuovo. Un campo disattivato scompare dal modulo, ma i valori già inseriti restano.",
       "newNamePlaceholder": "Nome del nuovo campo",
       "optionsPlaceholder": "Valori separati da virgola",
@@ -1291,6 +1307,10 @@
       "displayNamePlaceholder": "es. Assistenza clienti",
       "documentCount": "{count, plural, one {# documento} other {# documenti}}",
       "empty": "Nessun gruppo. Aggiungi il primo gruppo qui sopra o esegui la migrazione 0127.",
+      "errors": {
+        "displayName": "Inserisci il nome visualizzato, ad es. Team vendite",
+        "technicalName": "Inserisci il nome tecnico, ad es. sales_team"
+      },
       "inactive": "Inattivo",
       "intro": "— gestisci i gruppi a cui è possibile assegnare gli utenti. I gruppi controllano l’accesso ai documenti. Non è possibile eliminare un gruppo con utenti o documenti assegnati.",
       "memberCount": "{count, plural, one {# utente} other {# utenti}}",
@@ -1332,6 +1352,10 @@
         "definitionHint": "In base a questa descrizione il sistema valuta se l’azienda soddisfa il segnale.",
         "definitionPlaceholder": "Descrivi da cosa si capisce che l’azienda soddisfa questa condizione — parole/frasi specifiche sul sito, sezioni, ruoli.",
         "editTitle": "Modifica segnale",
+        "errors": {
+          "definition": "Descrivi come l'IA deve riconoscere questo segnale",
+          "name": "Inserisci il nome del segnale, ad es. L'azienda ha più di 50 dipendenti"
+        },
         "name": "Nome del segnale",
         "namePlaceholder": "es. Flotta di trasporto propria",
         "newTitle": "Nuovo segnale",
@@ -1456,6 +1480,9 @@
       "codeWrittenHint": "Non è un passo dell'imbuto ma uno stato impostato dall'applicazione (archiviazione del lead, conversione in partner), quindi non si può eliminare. Si può rinominare.",
       "confirmDelete": "Rimuovere la fase \"{name}\"?",
       "confirmDeleteWithLeads": "Eliminare la fase \"{name}\"?\n\nI {count} lead presenti passeranno a \"{target}\".",
+      "errors": {
+        "name": "Inserisci il nome della nuova fase, ad es. Trattativa"
+      },
       "intro": "Nomi propri per le fasi dell'imbuto: rinomina quelle esistenti, aggiungi un passo o eliminane uno che non serve. Il codice della fase resta invariato, quindi il nuovo nome compare in tutta l'applicazione mentre report e dati dei lead non vengono toccati. Un nome vuoto torna a quello predefinito.",
       "kinds": {
         "archived": "archivio",
@@ -1633,6 +1660,9 @@
       "saved": "Gruppo aggiornato",
       "title": "Modifica gruppo"
     },
+    "errors": {
+      "internalName": "Inserisci il nome interno, ad es. team-vendite"
+    },
     "fields": {
       "description": "Descrizione",
       "displayName": "Nome visualizzato",
@@ -1724,11 +1754,18 @@
       "updated": "Utente aggiornato"
     },
     "empty": "Nessun utente trovato",
+    "errors": {
+      "chooseGroup": "Scegli un gruppo dall'elenco"
+    },
     "featureAccess": {
       "callAnalysis": "Analizzatore chiamate",
       "callAnalysisDisabled": "Accesso all Analizzatore chiamate disabilitato",
       "callAnalysisEnabled": "Accesso all Analizzatore chiamate abilitato",
       "callAnalysisHint": "Analisi AI delle note delle chiamate, punteggio e follow-up",
+      "emailCampaigns": "Campagne e-mail",
+      "emailCampaignsDisabled": "Accesso alle Campagne e-mail disattivato",
+      "emailCampaignsEnabled": "Accesso alle Campagne e-mail attivato",
+      "emailCampaignsHint": "Campagne e-mail a partner e lead tramite SendGrid",
       "prospects": "Prospect",
       "prospectsDisabled": "Accesso a Prospect disattivato",
       "prospectsEnabled": "Accesso a Prospect attivato",

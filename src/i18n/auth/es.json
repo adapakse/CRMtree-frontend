@@ -16,6 +16,10 @@
   "login": {
     "email": "Correo electrónico",
     "emailPlaceholder": "juan@empresa.es",
+    "errors": {
+      "email": "Escribe tu correo electrónico, p. ej. juan.garcia@empresa.es",
+      "password": "Escribe tu contraseña"
+    },
     "failed": "Error al iniciar sesión",
     "hidePassword": "Ocultar",
     "or": "o",

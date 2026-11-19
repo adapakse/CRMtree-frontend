@@ -17,6 +17,8 @@ import { CalendarEntry, dueDateCalendarEntry } from '../../../shared/utils/calen
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
+import { withdrawOnboardingErrorMessage } from './withdraw-onboarding-error.util';
 
 // Translation keys relative to the `crm` scope.
 const STEP_LABELS = [
@@ -132,21 +134,25 @@ const TYPE_LABELS: Record<string, string> = {
               <span class="pc-task-text">{{ p.task_count === 0 ? t('onboardingBoard.tasks.empty') : t('onboardingBoard.partners.taskProgress', { done: p.done_count, total: p.task_count }) }}</span>
             </div>
             @if (p.manager_name) { <div class="pc-mgr">👤 {{ p.manager_name }}</div> }
-            <div style="margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:flex-end">
+            <div class="pc-actions">
               @if (p.lead_id) {
-                <a [routerLink]="['/crm/leads', p.lead_id]" (click)="$event.stopPropagation()"
-                   style="font-size:12px;color:oklch(from #3b82f6 max(l, var(--text-min-l)) c h);font-weight:600;text-decoration:none;border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:6px;padding:4px 8px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))">
+                <a class="btn btn-sm btn-g" style="text-decoration:none" [routerLink]="['/crm/leads', p.lead_id]" (click)="$event.stopPropagation()">
                   🎯 {{ t('onboardingBoard.partners.leadData') }}
                 </a>
               }
+              @if (isManager && p.lead_id) {
+                <button class="btn btn-sm btn-d" (click)="openWithdraw(p, $event)" [title]="t('onboardingBoard.withdraw.hint')">
+                  🔄 {{ t('onboardingBoard.withdraw.action') }}
+                </button>
+              }
               <button class="btn btn-sm"
                       [class.btn-p]="p.done_count >= p.task_count" [class.btn-g]="p.done_count < p.task_count"
-                      [disabled]="p.done_count < p.task_count || launching() === p.id"
+                      [disabled]="launching() === p.id"
                       (click)="$event.stopPropagation(); launchPartner(p)"
                       [title]="p.done_count < p.task_count ? t('onboardingBoard.launch.remainingTasks', { count: p.task_count - p.done_count }) : t('onboardingBoard.launch.moveToRegistry')">
                 @if (launching() === p.id) { ⏳ {{ t('onboardingBoard.launch.inProgress') }}
                 } @else if (p.done_count >= p.task_count) { 🚀 {{ t('onboardingBoard.launch.action') }}
-                } @else { 🔒 {{ t('onboardingBoard.launch.action') }} ({{ p.done_count }}/{{ p.task_count }}) }
+                } @else { 🔒 {{ t('onboardingBoard.launch.action') }} }   <!-- liczba zadań jest przy pasku postępu; ile zostało — w dymku -->
               </button>
             </div>
           </div>
@@ -189,15 +195,21 @@ const TYPE_LABELS: Record<string, string> = {
             <!-- Dodano -->
             <div class="pt-td pt-date">{{ p.created_at | date:'dd.MM.yy' }}</div>
             <!-- Akcja -->
-            <div class="pt-td" (click)="$event.stopPropagation()">
+            <div class="pt-td pt-act" (click)="$event.stopPropagation()">
+              @if (p.lead_id) {
+                <a class="btn btn-sm btn-g" style="text-decoration:none" [routerLink]="['/crm/leads', p.lead_id]" [title]="t('onboardingBoard.partners.leadData')">🎯</a>
+              }
+              @if (isManager && p.lead_id) {
+                <button class="btn btn-sm btn-d" (click)="openWithdraw(p)" [title]="t('onboardingBoard.withdraw.hint')">🔄</button>
+              }
               <button class="btn btn-sm"
                       [class.btn-p]="p.done_count >= p.task_count" [class.btn-g]="p.done_count < p.task_count"
-                      [disabled]="p.done_count < p.task_count || launching() === p.id"
+                      [disabled]="launching() === p.id"
                       (click)="launchPartner(p)"
                       [title]="p.done_count < p.task_count ? t('onboardingBoard.launch.remainingTasks', { count: p.task_count - p.done_count }) : t('onboardingBoard.launch.moveToRegistry')">
                 @if (launching() === p.id) { ⏳
                 } @else if (p.done_count >= p.task_count) { 🚀 {{ t('onboardingBoard.launch.actionShort') }}
-                } @else { 🔒 ({{ p.done_count }}/{{ p.task_count }}) }
+                } @else { 🔒 }
               </button>
             </div>
           </div>
@@ -357,8 +369,10 @@ const TYPE_LABELS: Record<string, string> = {
         <div class="fgrid2">
           <!-- Tytuł -->
           <div class="fg full">
-            <label class="fl">{{ t('onboardingBoard.taskForm.title') }}</label>
-            <input class="fi" [(ngModel)]="taskForm.title" [placeholder]="t('onboardingBoard.taskForm.titlePlaceholder')">
+            <label class="fl">{{ t('onboardingBoard.taskForm.title') }} <span class="req">*</span></label>
+            <input class="fi" [(ngModel)]="taskForm.title" [placeholder]="t('onboardingBoard.taskForm.titlePlaceholder')"
+                   [class.fi-err]="taskSubmitted && !taskForm.title?.trim()">
+            @if (taskSubmitted && !taskForm.title?.trim()) { <span class="ferr">{{ t('onboardingBoard.taskForm.titleRequired') }}</span> }
           </div>
           <!-- Typ -->
           <div class="fg">
@@ -389,7 +403,7 @@ const TYPE_LABELS: Record<string, string> = {
           </div>
           <!-- Przypisany -->
           <div class="fg full">
-            <label class="fl">{{ t('onboardingBoard.taskForm.assignedTo') }} <span style="color: var(--orange-text)">*</span></label>
+            <label class="fl">{{ t('onboardingBoard.taskForm.assignedTo') }}</label>
             <select class="fsel" [(ngModel)]="taskForm.assigned_to">
               <option value="">{{ t('onboardingBoard.taskForm.choosePerson') }}</option>
               @for (u of crmUsers; track u.id) {
@@ -418,9 +432,43 @@ const TYPE_LABELS: Record<string, string> = {
         @if (editingTask) {
           <button class="btn btn-d btn-sm" (click)="deleteTask()">🗑 {{ t('activity.card.delete') }}</button>
         }
-        <button class="btn btn-p" [disabled]="!taskForm.title || saving()"
+        <!-- Zawsze aktywny: przy brakach pokazuje przy polu, co uzupełnić -->
+        <button class="btn btn-p" [disabled]="saving()"
                 (click)="saveTask()">
           {{ saving() ? t('leadsList.saving') : (editingTask ? t('activity.modal.saveChanges') : t('onboardingBoard.taskForm.create')) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ════ WITHDRAW FROM ONBOARDING BACK TO THE FUNNEL ════ -->
+@if (withdrawTarget) {
+  <div class="overlay" (click)="closeWithdraw()">
+    <div class="modal" (click)="$event.stopPropagation()" style="max-width:420px">
+      <div class="modal-head">
+        <div class="modal-title">🔄 {{ t('onboardingBoard.withdraw.title') }}</div>
+        <button class="dp-close" (click)="closeWithdraw()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="font-size:13px;color:var(--gray-600);margin-bottom:12px">
+          {{ t('onboardingBoard.withdraw.intro', { company: withdrawTarget.company }) }}
+        </div>
+        <div class="fg full">
+          <label class="fl">{{ t('onboardingBoard.withdraw.stageLabel') }} <span class="req">*</span></label>
+          <select class="fsel" [(ngModel)]="withdrawTargetStage" [class.fi-err]="withdrawSubmitted && !withdrawTargetStage">
+            <option value="">{{ t('onboardingBoard.withdraw.stagePlaceholder') }}</option>
+            @for (s of leadStages.selectable(); track s.key) {
+              <option [value]="s.key">{{ leadStages.label(s.key) }}</option>
+            }
+          </select>
+          @if (withdrawSubmitted && !withdrawTargetStage) { <span class="ferr">{{ t('onboardingBoard.withdraw.stageRequired') }}</span> }
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-g" (click)="closeWithdraw()">{{ 'actions.cancel' | transloco }}</button>
+        <button class="btn btn-d" [disabled]="withdrawing()" (click)="confirmWithdraw()">
+          {{ withdrawing() ? t('onboardingBoard.withdraw.inProgress') : t('onboardingBoard.withdraw.confirm') }}
         </button>
       </div>
     </div>
@@ -430,8 +478,12 @@ const TYPE_LABELS: Record<string, string> = {
   `,
   styles: [`
     #topbar { display:flex;align-items:center;gap:12px;height:60px;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--gray-200);flex-shrink:0 }
-    .page-title { font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-900);white-space:nowrap;display:inline-flex;align-items:center;gap:8px }
+    .page-title { font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-900);white-space:nowrap;display:inline-flex;align-items:center;gap:8px;flex-shrink:0 }
     .tsp { flex:1 }
+    /* Jeden wiersz: przy braku miejsca zwężają się wyszukiwarka i listy (długa nazwa partnera kończy się „…”),
+       a przełącznik widoków zostaje cały. Na wąskich ekranach pasek zawija się globalnie (global.scss). */
+    #topbar .srch { flex:0 1 240px;min-width:120px }
+    #topbar select { flex:0 1 220px;min-width:100px;text-overflow:ellipsis }
 
     #content { flex:1;overflow:auto;padding:20px 24px 24px }
     .loading-state { display:flex;align-items:center;gap:10px;padding:40px;color:var(--gray-400);justify-content:center }
@@ -439,7 +491,7 @@ const TYPE_LABELS: Record<string, string> = {
 
     /* Partners Grid */
     .partners-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px }
-    .partner-card { background:var(--surface);border-radius:var(--radius);padding:16px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .15s }
+    .partner-card { background:var(--surface);border-radius:var(--radius);padding:16px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .15s;display:flex;flex-direction:column }
     .partner-card:hover { box-shadow:var(--shadow) }
     .pc-header { display:flex;align-items:flex-start;gap:10px;margin-bottom:12px }
     .pc-icon { display:inline-flex;color: var(--orange-text) } .pc-icon svg { width:24px;height:24px }
@@ -456,19 +508,23 @@ const TYPE_LABELS: Record<string, string> = {
     .pc-task-fill { height:100%;background:#22c55e;border-radius:3px;transition:width .3s }
     .pc-task-text { font-size:12px;color:var(--gray-500);white-space:nowrap }
     .pc-mgr { font-size:12px;color:var(--gray-400) }
+    /* margin-top:auto keeps the buttons at the bottom of every card in a row, whatever is above them */
+    .pc-actions { margin-top:auto;padding-top:10px;display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap }
+    .pc-actions .btn { height:30px;padding:0 10px;font-size:12px;line-height:1 }
 
     /* Partners sub-toolbar */
-    .view-pills { display:flex;gap:8px;margin-left:auto }
+    .view-pills { display:flex;gap:8px;margin-left:auto;flex-wrap:nowrap;flex-shrink:0 }
+    @media (max-width: 767px) { .view-pills { margin-left:0; flex:1 1 100%; max-width:100%; overflow-x:auto; scrollbar-width:none; } }
     .partners-toolbar { display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px }
 
     /* Partners table */
     .pt-wrap { background:var(--surface);border:1px solid var(--gray-200);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm) }
-    .pt-head { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 150px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:0 12px }
+    .pt-head { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 190px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:0 12px }
     .pt-th { padding:8px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-400);display:flex;align-items:center;gap:4px }
     .pt-th.sortable { cursor:pointer;user-select:none }
     .pt-th.sortable:hover { color:var(--gray-700) }
     .si { font-size:10px;color:var(--gray-300) }
-    .pt-row { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 150px;padding:0 12px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s }
+    .pt-row { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 190px;padding:0 12px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s }
     .pt-row:last-child { border-bottom:none }
     .pt-row:hover { background:var(--gray-50) }
     .pt-td { padding:10px 10px;font-size:14px;color:var(--gray-700);display:flex;flex-direction:column;justify-content:center;gap:2px }
@@ -481,6 +537,8 @@ const TYPE_LABELS: Record<string, string> = {
     .pt-fill { height:100%;background:#22c55e;border-radius:3px;transition:width .3s }
     .pt-prog-txt { font-size:12px;color:var(--gray-500);white-space:nowrap }
     .pt-date { font-size:12px;color:var(--gray-500) }
+    .pt-act { flex-direction:row;align-items:center;justify-content:flex-start;gap:6px;flex-wrap:wrap }
+    .pt-act .btn { height:28px;min-width:32px;padding:0 8px;justify-content:center;font-size:13px;line-height:1 }
 
     /* Kanban */
     .kanban-wrap { display:flex;gap:16px;height:calc(100vh - 140px);overflow-x:auto }
@@ -568,6 +626,7 @@ export class CrmOnboardingComponent implements OnInit {
   private route    = inject(ActivatedRoute);
   private transloco = inject(TranslocoService);
   private locale   = inject(LocaleService);
+  readonly leadStages = inject(LeadStagesService);
 
   readonly STEP_LABELS = STEP_LABELS;
   readonly STEP_ICONS  = STEP_ICONS;
@@ -606,6 +665,14 @@ export class CrmOnboardingComponent implements OnInit {
   editingTask: OnboardingTask | null = null;
   newTaskStep  = 0;
   taskForm: any = {};
+
+  // Withdraw from onboarding back to a funnel stage
+  withdrawTarget: OnboardingPartner | null = null;
+  withdrawTargetStage = '';
+  withdrawSubmitted = false;
+  /** true po kliknięciu „Utwórz/Zapisz” bez tytułu — pokazuje błąd przy polu */
+  taskSubmitted = false;
+  withdrawing = signal(false);
 
   readonly taskTypes = Object.entries(TYPE_LABELS).map(([value, label]) => ({
     value, label, icon: TYPE_ICONS[value],
@@ -866,13 +933,15 @@ export class CrmOnboardingComponent implements OnInit {
   }
 
   closeTaskModal(): void {
+    this.taskSubmitted = false;
     this.showTaskModal = false;
     this.editingTask   = null;
     this.cdr.markForCheck();
   }
 
   saveTask(): void {
-    if (!this.taskForm.title || this.saving()) return;
+    if (this.saving()) return;
+    if (!this.taskForm.title?.trim()) { this.taskSubmitted = true; this.cdr.markForCheck(); return; }
     this.saving.set(true);
 
     const payload: Partial<OnboardingTask> = {
@@ -887,7 +956,11 @@ export class CrmOnboardingComponent implements OnInit {
     };
 
     const partnerId = this.editingTask?.partner_id || this.filterPartner();
-    if (!partnerId) { this.saving.set(false); return; }
+    if (!partnerId) {
+      this.saving.set(false);
+      this.toast.error(this.transloco.translate('crm.onboardingBoard.taskForm.partnerRequired'));
+      return;
+    }
 
     const obs = this.editingTask
       ? this.api.updateOnboardingTask(partnerId, this.editingTask.id, payload)
@@ -901,9 +974,9 @@ export class CrmOnboardingComponent implements OnInit {
         this.loadPartners();
         this.toast.success(this.transloco.translate(this.editingTask ? 'crm.onboardingBoard.toasts.taskUpdated' : 'crm.onboardingBoard.toasts.taskAdded'));
       }),
-      error: () => this.zone.run(() => {
+      error: (err: any) => this.zone.run(() => {
         this.saving.set(false);
-        this.toast.error(this.transloco.translate('crm.onboardingBoard.toasts.taskSaveFailed'));
+        this.toast.error(err?.error?.error || this.transloco.translate('crm.onboardingBoard.toasts.taskSaveFailed'));
         this.cdr.markForCheck();
       }),
     });
@@ -915,7 +988,10 @@ export class CrmOnboardingComponent implements OnInit {
   }
 
   launchPartner(p: OnboardingPartner): void {
-    if (p.done_count < p.task_count) return;
+    if (p.done_count < p.task_count) {
+      this.toast.error(this.transloco.translate('crm.onboardingBoard.launch.remainingTasks', { count: p.task_count - p.done_count }));
+      return;
+    }
     if (!confirm(this.transloco.translate('crm.onboardingBoard.launch.confirm', { company: p.company }))) return;
     this.launching.set(p.id);
     this.api.updatePartner(p.id, { status: 'active' } as any).subscribe({
@@ -928,6 +1004,48 @@ export class CrmOnboardingComponent implements OnInit {
       error: (err: any) => this.zone.run(() => {
         this.launching.set(null);
         this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('crm.onboardingBoard.launch.failed'));
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  openWithdraw(p: OnboardingPartner, event?: Event): void {
+    event?.stopPropagation();
+    this.withdrawTarget = p;
+    this.withdrawTargetStage = '';
+    this.withdrawSubmitted = false;
+    this.cdr.markForCheck();
+  }
+
+  closeWithdraw(): void {
+    this.withdrawTarget = null;
+    this.withdrawTargetStage = '';
+    this.withdrawSubmitted = false;
+    this.cdr.markForCheck();
+  }
+
+  confirmWithdraw(): void {
+    const p = this.withdrawTarget;
+    if (!p) return;
+    if (!this.withdrawTargetStage) {
+      this.withdrawSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    const stage = this.leadStages.label(this.withdrawTargetStage);
+    if (!confirm(this.transloco.translate('crm.onboardingBoard.withdraw.confirmPrompt', { company: p.company, stage }))) return;
+    this.withdrawing.set(true);
+    this.api.withdrawPartnerOnboarding(p.id, this.withdrawTargetStage).subscribe({
+      next: () => this.zone.run(() => {
+        this.withdrawing.set(false);
+        this.closeWithdraw();
+        this.toast.success(this.transloco.translate('crm.onboardingBoard.withdraw.success', { company: p.company }));
+        this.loadPartners();
+        this.loadTasks();
+      }),
+      error: (err: unknown) => this.zone.run(() => {
+        this.withdrawing.set(false);
+        this.toast.error(withdrawOnboardingErrorMessage(err, this.transloco));
         this.cdr.markForCheck();
       }),
     });

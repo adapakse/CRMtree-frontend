@@ -78,14 +78,14 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
   <!-- ── Toolbar ── -->
   <div *ngIf="reportFilterLabel" style="display:flex;align-items:center;gap:8px;padding:6px 0 0 0;margin-bottom:-4px">
     <span style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:6px">
-      📊 {{ t('leadsList.filters.reportFilter', { label: reportFilterLabel }) }}
+      <i class="ei ei-chart"></i> {{ t('leadsList.filters.reportFilter', { label: reportFilterLabel }) }}
       <span style="cursor:pointer;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);line-height:1" (click)="clearReportFilter()">×</span>
     </span>
   </div>
   <!-- Persistent rep filter chip -->
   <div *ngIf="persistRepName" style="display:flex;align-items:center;gap:8px;padding:4px 0 0 0;margin-bottom:-4px">
     <span style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:6px">
-      👤 {{ t('leadsList.filters.repChip', { name: persistRepName }) }}
+      <i class="ei ei-user"></i> {{ t('leadsList.filters.repChip', { name: persistRepName }) }}
       <span style="cursor:pointer;font-size:14px;line-height:1" (click)="clearPersistRepFilter()">×</span>
     </span>
   </div>
@@ -200,9 +200,9 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
             </div>
             <div style="display:flex;align-items:center;gap:4px;margin-top:2px;flex-wrap:wrap">
               <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
-              <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">💬 {{lead.unread_sms_count}}</span>
+              <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px"><i class="ei ei-message"></i> {{lead.unread_sms_count}}</span>
               <span *ngIf="hasWhatsappFeature && (lead.unread_whatsapp_count ?? 0) > 0" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{lead.unread_whatsapp_count}}</span>
-              <span *ngIf="hasUnreadReply(lead)" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
+              <span *ngIf="hasUnreadReply(lead)" style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px"><i class="ei ei-mail"></i> {{unreadReplyCount(lead)}}</span>
               <span *ngIf="lead.created_at" class="lead-added">{{ t('leadsList.fields.addedOn') }} {{ lead.created_at | date:'dd.MM.yy' }}</span>
             </div>
           </div>
@@ -253,8 +253,8 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           </div>
         </div>
         <div class="dp-actions">
-          <button class="btn btn-g btn-sm" *ngIf="selected.phone" (click)="callPhone(selected.phone)">📞</button>
-          <button class="btn btn-g btn-sm" *ngIf="selected.email" (click)="mailTo(selected.email)">✉</button>
+          <button class="btn btn-g btn-sm" *ngIf="selected.phone" (click)="callPhone(selected.phone)"><i class="ei ei-phone"></i></button>
+          <button class="btn btn-g btn-sm" *ngIf="selected.email" (click)="mailTo(selected.email)"><i class="ei ei-mail"></i></button>
           <button class="btn btn-p btn-sm" [routerLink]="['/crm/leads',selected.id]" style="flex:1">{{ t('leadsList.detail.openDetails') }} →</button>
         </div>
       </div>
@@ -383,11 +383,11 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
             <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0"
                   style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
             <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0"
-                  style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">💬 {{lead.unread_sms_count}}</span>
+                  style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px"><i class="ei ei-message"></i> {{lead.unread_sms_count}}</span>
             <span *ngIf="hasWhatsappFeature && (lead.unread_whatsapp_count ?? 0) > 0"
                   style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{lead.unread_whatsapp_count}}</span>
             <span *ngIf="hasUnreadReply(lead)"
-                  style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
+                  style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px"><i class="ei ei-mail"></i> {{unreadReplyCount(lead)}}</span>
           </div>
           <div style="font-size:12px;color:var(--gray-400)">{{ lead.contact_name }}</div>
           <div *ngIf="lead.converted_at" style="font-size:10px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);font-weight:600;margin-top:2px">
@@ -414,7 +414,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       </div>
     </div>
     <div *ngIf="allLeads.length===0" class="empty-state">
-      <div style="font-size:32px">📋</div>{{ t('leadsList.table.empty') }}
+      <div class="ico-tile ico-tile--lg" style="margin:0 auto 0px"><i class="ei ei-clipboard"></i></div>{{ t('leadsList.table.empty') }}
     </div>
     <div *ngIf="totalPages>1" class="pagination">
       <button class="btn btn-g btn-sm" [disabled]="page===1" (click)="setPage(page-1)">← {{ t('leadsList.table.previous') }}</button>
@@ -442,7 +442,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <div class="fgrid2">
         <!-- WWW field + hot checkbox -->
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">{{ t('leadsList.fields.website') }} @if (newFormRequiresFull) { <span style="color: var(--orange-text)">*</span> } @else { <span style="font-size:10px;color:var(--gray-400)">{{ t('leadsList.newLead.optional') }}</span> }</label>
+          <label class="fl">{{ t('leadsList.fields.website') }} @if (newFormRequiresFull) { <span class="req">*</span> } @else { <span style="font-size:10px;color:var(--gray-400)">{{ t('leadsList.newLead.optional') }}</span> }</label>
           <div class="www-row">
             <div style="position:relative;flex:1;min-width:0">
               <input class="fi" [(ngModel)]="newFormWebsite"
@@ -450,7 +450,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                      (ngModelChange)="onWebsiteChange()"
                      [class.fi-err]="newMissing('website')"
                      style="padding-right:36px">
-              <span *ngIf="enriching" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400)">⏳</span>
+              <span *ngIf="enriching" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400)"><i class="ei ei-hourglass"></i></span>
             </div>
             <button type="button" class="fchip hot-chip" [class.on]="newForm.hot" [attr.aria-pressed]="!!newForm.hot"
                     [title]="t('leadsList.newLead.hotHint')" (click)="newForm.hot = !newForm.hot">🔥 {{ t('leadsList.newLead.hot') }}</button>
@@ -461,7 +461,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           <div>
           <!-- Enrich prompt banner -->
           <div *ngIf="enrichPrompt&&!enriching" style="margin-top:6px;background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
-            <span>🔍 {{ t('leadsList.newLead.enrichPrompt') }}</span>
+            <span><i class="ei ei-search"></i> {{ t('leadsList.newLead.enrichPrompt') }}</span>
             <button style="background:var(--orange-strong);color:white;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-weight:600" (click)="runEnrich()">{{ t('leadsList.newLead.enrichConfirm') }}</button>
             <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:12px" (click)="enrichPrompt=false">{{ t('leadsList.newLead.enrichDecline') }}</button>
           </div>
@@ -473,19 +473,19 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
         </div>
 
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">{{ t('leadsList.newLead.companyName') }} <span style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.newLead.companyName') }} <span class="req">*</span></label>
           <input class="fi" [(ngModel)]="newForm.company" [placeholder]="t('leadsList.newLead.companyPlaceholder')"
                  [class.fi-err]="submitted&&!newForm.company">
           @if (submitted&&!newForm.company) { <span class="ferr">{{ t('fieldErrors.company') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.newLead.contactName') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.newLead.contactName') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <input class="fi" [(ngModel)]="newForm.contact_name" [placeholder]="t('leadsList.newLead.namePlaceholder')"
                  [class.fi-err]="newMissing('contactName')">
           @if (newMissing('contactName')) { <span class="ferr">{{ t('fieldErrors.contactName') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.fields.companyRole') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.fields.companyRole') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <select class="fi" [(ngModel)]="newForm.contact_title"
                   [class.fi-err]="newMissing('contactTitle')">
             <option value="">{{ t('leadsList.newLead.select') }}</option>
@@ -494,12 +494,12 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           @if (newMissing('contactTitle')) { <span class="ferr">{{ t('fieldErrors.contactTitle') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.email') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.fields.email') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <input class="fi" type="email" [(ngModel)]="newForm.email" [placeholder]="t('leadsList.newLead.emailPlaceholder')" [class.fi-err]="newMissing('email')">
           @if (newMissing('email')) { <span class="ferr">{{ t('fieldErrors.email') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.phone') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.fields.phone') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <wt-phone-input [(ngModel)]="newForm.phone" [invalid]="newMissing('phone')" />
           @if (newMissing('phone')) { <span class="ferr">{{ t('fieldErrors.phone') }}</span> }
         </div>
@@ -531,7 +531,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           }
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.newLead.taxId') }} <span style="color: var(--orange-text)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.newLead.taxId') }} <span class="req">*</span></label>
           <input class="fi" [(ngModel)]="newForm.nip"
                  placeholder="PL1234567890"
                  maxlength="14"
@@ -540,13 +540,13 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           @if (nipError) { <span class="ferr">{{ nipError }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.newLead.value') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.newLead.value') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <input class="fi" type="number" [(ngModel)]="newForm.value_pln" placeholder="0" min="0" [class.fi-err]="newMissing('value') || !!amountError(newForm.value_pln)">
           @if (amountError(newForm.value_pln); as amountKey) { <span class="ferr">{{ t('fieldErrors.' + amountKey) }}</span> }
           @if (newMissing('value')) { <span class="ferr">{{ t('fieldErrors.value') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.source') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.fields.source') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <select class="fsel" [(ngModel)]="newForm.source" [class.fi-err]="newMissing('source')">
             <option value="">{{ t('leadsList.newLead.select') }}</option>
             @for (s of sourcesWithoutGroup(); track s.value) {
@@ -563,7 +563,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           @if (newMissing('source')) { <span class="ferr">{{ t('fieldErrors.source') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.firstContact') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.fields.firstContact') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <input class="fi" type="date" [(ngModel)]="newForm.first_contact_date" [class.fi-err]="newMissing('firstContact')">
           @if (newMissing('firstContact')) { <span class="ferr">{{ t('fieldErrors.firstContact') }}</span> }
         </div>
@@ -576,7 +576,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           </select>
         </div>
         <div class="fg" *ngIf="isManager">
-          <label class="fl">{{ t('leadsList.fields.salesRep') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.fields.salesRep') }} <span *ngIf="newFormRequiresFull" class="req">*</span></label>
           <select class="fsel" [(ngModel)]="newForm.assigned_to" [class.fi-err]="newMissing('salesperson')">
             <option value="">{{ t('leadsList.newLead.unassigned') }}</option>
             <option *ngFor="let u of crmUsers" [value]="u.id"><span class="opt-ini">{{ initials(u.display_name) }}</span>{{ u.display_name }}</option>
@@ -647,7 +647,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
 
       <!-- Empty -->
       <div *ngIf="!timelineLoading && timelineMeetings.length===0" class="tl-empty">
-        <div style="font-size:36px;margin-bottom:10px">📭</div>
+        <div class="ico-tile ico-tile--lg" style="margin:0 auto 10px"><i class="ei ei-inbox"></i></div>
         <div style="font-weight:600;color:var(--gray-700)">{{ t('leadsList.timeline.empty') }}</div>
         <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ t('leadsList.timeline.emptyHint') }}</div>
       </div>
@@ -745,7 +745,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <div style="flex:1;min-width:0">
         <div class="modal-title">{{ meetingEditMode ? t('leadsList.meeting.editTitle') : t('leadsList.meeting.detailTitle') }}</div>
         <div style="font-size:12px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-          {{ selectedMeeting.source_type === 'lead' ? '📋 ' + t('labels.sourceTypes.lead') : '🤝 ' + t('labels.sourceTypes.partner') }} · {{ selectedMeeting.source_name }}
+          @if (selectedMeeting.source_type === 'lead') { <i class="ei ei-clipboard"></i> {{ t('labels.sourceTypes.lead') }} } @else { <i class="ei ei-handshake"></i> {{ t('labels.sourceTypes.partner') }} } · {{ selectedMeeting.source_name }}
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -784,11 +784,11 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           <div class="meet-field-val">{{ t('leadsList.meeting.durationValue', { count: selectedMeeting.duration_min }) }}</div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.meeting_location">
-          <div class="meet-field-label">📍 {{ t('leadsList.meeting.location') }}</div>
+          <div class="meet-field-label"><i class="ei ei-map-pin"></i> {{ t('leadsList.meeting.location') }}</div>
           <div class="meet-field-val">{{ selectedMeeting.meeting_location }}</div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.participants">
-          <div class="meet-field-label">👥 {{ t('leadsList.meeting.participants') }}</div>
+          <div class="meet-field-label"><i class="ei ei-users"></i> {{ t('leadsList.meeting.participants') }}</div>
           <div class="meet-field-val" style="white-space:pre-line">{{ selectedMeeting.participants }}</div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.assigned_to_name">
@@ -811,7 +811,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     <div *ngIf="meetingEditMode" class="modal-body">
       <div class="fgrid2">
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">{{ t('leadsList.meeting.meetingTitle') }} <span style="color: var(--orange-text)">*</span></label>
+          <label class="fl">{{ t('leadsList.meeting.meetingTitle') }} <span class="req">*</span></label>
           <input class="fi" [(ngModel)]="meetingForm.title" [placeholder]="t('leadsList.meeting.titlePlaceholder')">
         </div>
         <div class="fg">
@@ -888,6 +888,8 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     /* Kanban */
     /* Side padding (cancelled by the negative margin) keeps the card shadows from being clipped by the scroll box. */
     .kanban-wrap { display:flex; flex:1; overflow-y:auto; min-height:0; gap:0; padding:0 16px; margin:0 -16px; }
+    /* the box bleeds 16px past both page edges, so it must not be capped at the page width */
+    @media (max-width: 1279px) { .kanban-wrap { max-width:none; } }
     .kanban { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; flex:1; align-items:start; padding-bottom:16px; min-width:900px; }
     .kol { min-width:0; }
     .kol-head { display:flex; align-items:center; gap:6px; margin-bottom:10px; }
@@ -1994,7 +1996,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     return ACTIVITY_TYPES_WITH_LABEL.includes(type) ? this.transloco.translate('crm.labels.activityTypes.' + type) : type;
   }
   tlTypeIcon(type: string): string {
-    return { call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';
+    return { call:'phone', email:'mail', meeting:'handshake', note:'note', training:'graduation', qbr:'chart', doc_sent:'file', opportunity:'bulb' }[type] || 'message';
   }
   trackById(_: number, l: Lead){ return l.id; }
   callPhone(p: string)         { window.location.href = `tel:${p}`; }
@@ -2014,6 +2016,6 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
 
 
   actIcon(type: string) {
-    return { call:'📞', email:'✉', meeting:'🤝', note:'📝', doc_sent:'📄' }[type] ?? '💬';
+    return { call:'phone', email:'mail', meeting:'handshake', note:'note', doc_sent:'file' }[type] ?? 'message';
   }
 }

@@ -52,7 +52,8 @@ const DEFAULT_COLOR = '#6B7280';
 
       <div class="row add">
         @if (hasColor()) { <input type="color" class="color" [(ngModel)]="newColor"> }
-        <input class="fi name" [(ngModel)]="newName" maxlength="80" [placeholder]="t('settings.dictionary.newItemPlaceholder')" (keyup.enter)="add()">
+        <input class="fi name" [(ngModel)]="newName" maxlength="80" [placeholder]="t('settings.dictionary.newItemPlaceholder')" (keyup.enter)="add()"
+               [class.fi-err]="isAddSubmitted && !newName.trim()">
         @if (hasCategory()) {
           <select class="fsel category" [(ngModel)]="newCategory">
             @for (category of categories; track category) {
@@ -60,8 +61,9 @@ const DEFAULT_COLOR = '#6B7280';
             }
           </select>
         }
-        <button class="btn btn-p btn-sm" [disabled]="!newName.trim()" (click)="add()">{{ t('settings.dictionary.addButton') }}</button>
+        <button class="btn btn-p btn-sm" (click)="add()">{{ t('settings.dictionary.addButton') }}</button>
       </div>
+      @if (isAddSubmitted && !newName.trim()) { <span class="ferr" role="alert">{{ t('settings.dictionary.errors.name') }}</span> }
     </ng-container>
   `,
   styles: [`
@@ -93,6 +95,7 @@ export class ProjectDictionaryEditorComponent {
   readonly hasColor = computed(() => this.dictionary() !== 'cost-categories');
 
   newName = '';
+  isAddSubmitted = false;
   newColor = DEFAULT_COLOR;
   newCategory: TaskStatusCategory = 'todo';
 
@@ -130,6 +133,7 @@ export class ProjectDictionaryEditorComponent {
 
   add(): void {
     const name = this.newName.trim();
+    this.isAddSubmitted = !name;
     if (!name) return;
     const payload = {
       name,

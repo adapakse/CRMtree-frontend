@@ -12,6 +12,7 @@
     "dashboard": "Dashboard",
     "dataManagement": "Zarządzanie danymi",
     "documents": "Dokumenty",
+    "emailCampaigns": "Kampanie e-mail",
     "groupsAndRoles": "Grupy i role",
     "leads": "Leady",
     "mySettings": "Moje ustawienia",
@@ -41,11 +42,13 @@
     "superAdmin": "Super Admin"
   },
   "sidebar": {
+    "closeMenu": "Zamknij menu",
     "collapse": "Zwiń menu",
     "doneEditing": "Gotowe",
     "editMenu": "Edytuj menu",
     "expand": "Rozwiń menu",
     "hideItem": "Ukryj",
+    "openMenu": "Otwórz menu",
     "showItem": "Pokaż"
   },
   "user": {

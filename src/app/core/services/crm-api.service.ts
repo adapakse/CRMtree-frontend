@@ -588,6 +588,15 @@ export interface ConsentValue {
   updated_at: string | null;
 }
 
+/** One contact person of a company with their own consents (per e-mail address). */
+export interface PersonConsents {
+  name: string | null;
+  title: string | null;
+  email: string;
+  is_main: boolean;
+  consents: (ConsentValue & { source: string | null; note: string | null })[];
+}
+
 export interface SalesSummaryRow {
   period: string;
   gross_turnover_pln: number;
@@ -903,16 +912,16 @@ export const PRODUCT_TYPE_LABELS: Record<ProductType, string> = {
 };
 
 export const PRODUCT_TYPE_ICONS: Record<ProductType, string> = {
-  hotel:             '🏨',
-  transport_flight:  '✈️',
-  transport_train:   '🚂',
-  transport_bus:     '🚌',
-  transport_ferry:   '⛴️',
-  car_rental:        '🚗',
-  transfer:          '🚕',
-  travel_insurance:  '🛡️',
-  visa:              '🪪',
-  other:             '📦',
+  hotel:             'building',
+  transport_flight:  'plane',
+  transport_train:   'truck',
+  transport_bus:     'truck',
+  transport_ferry:   'truck',
+  car_rental:        'truck',
+  transfer:          'truck',
+  travel_insurance:  'shield',
+  visa:              'id-card',
+  other:             'package',
 };
 
 /** Źródła leadów — spójne z importem CSV (pole source/zrodlo) */
@@ -1149,6 +1158,9 @@ export class CrmApiService {
   deletePartner(id: number): Observable<void> {
     return this.http.delete<void>(`${BASE}/partners/${id}`);
   }
+  withdrawPartnerOnboarding(partnerId: number | string, targetStage: string): Observable<{ lead_id: number; stage: string }> {
+    return this.http.post<{ lead_id: number; stage: string }>(`${BASE}/partners/${partnerId}/withdraw-onboarding`, { target_stage: targetStage });
+  }
   getPartnerActivities(partnerId: number): Observable<PartnerActivity[]> {
     return this.http.get<PartnerActivity[]>(`${BASE}/partners/${partnerId}/activities`);
   }
@@ -1325,6 +1337,15 @@ export class CrmApiService {
   }
   savePartnerConsents(partnerId: string, items: { key: string; value: string }[]): Observable<ConsentValue[]> {
     return this.http.put<ConsentValue[]>(`${BASE}/consents/partners/${partnerId}`, items);
+  }
+  /** Per-person consents: the company's contact people (by e-mail) with their consents. */
+  getPersonConsents(kind: 'leads' | 'partners', id: string | number): Observable<PersonConsents[]> {
+    return this.http.get<PersonConsents[]>(`${BASE}/consents/people/${kind}/${id}`);
+  }
+  savePersonConsent(kind: 'leads' | 'partners', id: string | number,
+                    body: { email: string; key: string; value: string; note?: string | null }): Observable<PersonConsents[]> {
+    return this.http.put<PersonConsents[]>(`${BASE}/consents/people/${kind}/${id}`, body,
+      { context: new HttpContext().set(SHOWS_OWN_ERROR, true) });
   }
 
   // ── Słownik Źródeł (z app_settings) ─────────────────────────

@@ -50,6 +50,14 @@
     "uploadFailed": "No se pudo subir el archivo: {name}.",
     "uploading": "Subiendo…"
   },
+  "form": {
+    "errors": {
+      "closeComment": "Escribe un comentario sobre lo que se hizo, p. ej. «Oferta enviada»",
+      "title": "Escribe un título"
+    },
+    "fixErrors": "Corrige los campos marcados en rojo ({count})",
+    "noChanges": "No hay cambios que guardar"
+  },
   "httpErrors": {
     "badRequest": "Algunos datos no son válidos. Revisa los campos e inténtalo de nuevo.",
     "badRequestDetails": "Datos no válidos: {details}",

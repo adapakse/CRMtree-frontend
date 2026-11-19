@@ -94,6 +94,9 @@
     "tasks": {
       "bulk": {
         "closeSelected": "Ausgewählte Aufgaben schließen",
+        "errors": {
+          "noneSelected": "Markieren Sie mindestens eine Aufgabe in der Liste"
+        },
         "selectOverdue": "Alle überfälligen Aufgaben auswählen",
         "selectedCount": "{count, plural, one {# ausgewählt} other {# ausgewählt}}"
       },
@@ -531,24 +534,39 @@
     "writeNew": "Neue E-Mail schreiben"
   },
   "fieldErrors": {
+    "caption": "Geben Sie eine Bildunterschrift ein, z. B. Dashboard der Verkaufsberichte",
     "closeDate": "Wählen Sie das voraussichtliche Abschlussdatum",
     "company": "Geben Sie den Firmennamen ein",
+    "competitorUrl": "Geben Sie die Website des Wettbewerbers ein, z. B. wettbewerber.de",
     "contactName": "Geben Sie den Vor- und Nachnamen der Kontaktperson ein",
     "contactTitle": "Wählen Sie die Position der Kontaktperson",
     "email": "Geben Sie eine E-Mail-Adresse ein, z. B. jan@firma.de",
+    "featureTag": "Geben Sie die gezeigte Funktion ein, z. B. Berichte",
     "firstContact": "Wählen Sie das Datum des Erstkontakts",
+    "fullName": "Geben Sie den vollständigen Namen ein, z. B. Anna Müller",
+    "groupName": "Geben Sie den Gruppennamen ein, z. B. Hotelketten",
+    "imageFile": "Wählen Sie eine Bilddatei (PNG, JPG oder WEBP)",
     "industry": "Wählen Sie eine Branche",
     "lostReason": "Wählen Sie den Verlustgrund",
+    "message": "Geben Sie den Nachrichtentext ein",
     "onlinePct": "Wählen Sie den Online-Umsatzanteil",
     "phone": "Geben Sie eine Telefonnummer ein, z. B. +48 600 000 000",
+    "pillarName": "Geben Sie den Namen der Säule ein, z. B. Geschäftsreisen",
     "probability": "Wählen Sie die Gewinnchance",
+    "recipients": "Fügen Sie mindestens einen Empfänger hinzu, z. B. max.muster@firma.de",
     "salesperson": "Weisen Sie einen Vertriebsmitarbeiter zu",
     "saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen – wenn der Fehler bleibt, melden Sie ihn Ihrem Administrator.",
     "source": "Wählen Sie, woher der Lead kommt",
+    "subject": "Geben Sie den Betreff ein",
+    "title": "Geben Sie einen Titel ein, z. B. Termin zum Angebot",
     "value": "Geben Sie einen Betrag ein – wenn unbekannt, geben Sie 0 ein",
     "valueNegative": "Der Betrag darf nicht negativ sein",
     "valueTooLarge": "Betrag zu hoch – maximal 999.999.999.999",
-    "website": "Geben Sie die Website der Firma ein, z. B. firma.de"
+    "website": "Geben Sie die Website der Firma ein, z. B. firma.de",
+    "whatsappTemplate": "Wählen Sie eine Vorlage und füllen Sie alle ihre Felder aus",
+    "wordpressAppPassword": "Fügen Sie das Anwendungspasswort aus Ihrem WordPress-Profil ein (z. B. abcd efgh ijkl mnop)",
+    "wordpressUrl": "Geben Sie die Adresse der WordPress-Website ein, z. B. https://blog.firma.de",
+    "wordpressUser": "Geben Sie den WordPress-Benutzernamen ein"
   },
   "history": {
     "activityAdded": "Aktivität hinzugefügt: {title}",
@@ -622,6 +640,7 @@
       "call": "Anruf",
       "doc_sent": "Dokument",
       "email": "E-Mail",
+      "marketing_email": "E-Mail-Kampagne",
       "meeting": "Meeting",
       "note": "Notiz",
       "opportunity": "Verkaufschance",
@@ -795,6 +814,10 @@
       "title": "Informationen"
     },
     "loadError": "Fehler beim Laden des Leads.",
+    "missingContact": {
+      "email": "Dieser Lead hat keine E-Mail-Adresse — fügen Sie sie unter „Daten bearbeiten“ hinzu",
+      "phone": "Dieser Lead hat keine Telefonnummer — fügen Sie sie unter „Daten bearbeiten“ hinzu"
+    },
     "nip": {
       "countryCodeRequired": "Beginnen Sie mit dem Ländercode (2 Buchstaben), z. B. PL",
       "duplicate": "Diese Steuernummer ist im CRM bereits einer anderen Firma zugeordnet",
@@ -1142,11 +1165,13 @@
       "newTask": "Neue Aufgabe",
       "note": "Notiz",
       "notePlaceholder": "Zusätzliche Informationen…",
+      "partnerRequired": "Wähle oben auf der Seite einen Partner, um eine Aufgabe hinzuzufügen",
       "step": "Prozessschritt",
       "time": "Uhrzeit",
       "timeHint": "(optional, Standard 09:00)",
       "title": "Titel der Aufgabe",
-      "titlePlaceholder": "Name der Aufgabe"
+      "titlePlaceholder": "Name der Aufgabe",
+      "titleRequired": "Gib einen Aufgabentitel ein, z. B. „Rahmenvertrag unterzeichnen“"
     },
     "taskTypes": {
       "call": "Anruf"
@@ -1170,6 +1195,26 @@
       "calendar": "Kalender",
       "partners": "Partner",
       "timeline": "Zeitachse"
+    },
+    "withdraw": {
+      "action": "Rückzug",
+      "confirm": "Zurückziehen bestätigen",
+      "confirmPrompt": "„{company}“ aus dem Onboarding in die Phase „{stage}“ zurückziehen? Der Partner und seine Onboarding-Aufgaben werden gelöscht, der Lead kehrt in den Vertriebs-Pipeline zurück.",
+      "detailButton": "Aus dem Onboarding in die Pipeline zurückziehen",
+      "detailHint": "Löscht diesen Partner und seine Onboarding-Aufgaben — der Lead kehrt in die gewählte Pipeline-Phase zurück.",
+      "detailStagePrompt": "Lead zurück in Phase:",
+      "failed": "Zurückziehen aus dem Onboarding fehlgeschlagen",
+      "hint": "Aus dem Onboarding in eine Pipeline-Phase zurückziehen",
+      "inProgress": "Wird zurückgezogen…",
+      "intro": "{company} wird aus dem Onboarding entfernt (zusammen mit den Onboarding-Aufgaben) und kehrt in der gewählten Phase in den Vertriebs-Pipeline zurück.",
+      "invalidStage": "Diese Phase gibt es in der Pipeline nicht mehr — laden Sie die Seite neu und wählen Sie eine andere",
+      "noPermission": "Nur ein Vertriebsleiter oder Administrator kann aus dem Onboarding zurückziehen",
+      "notFound": "Partner nicht gefunden — er wurde möglicherweise bereits zurückgezogen oder freigeschaltet",
+      "stageLabel": "Pipeline-Phase",
+      "stagePlaceholder": "— Phase wählen —",
+      "stageRequired": "Wählen Sie die Pipeline-Phase, in die das Unternehmen zurückkehrt",
+      "success": "„{company}“ ist wieder im Vertriebs-Pipeline",
+      "title": "Aus dem Onboarding zurückziehen"
     }
   },
   "partnerDetail": {
@@ -1565,6 +1610,32 @@
       "previousYear": "Vorheriges Jahr ({year})"
     }
   },
+  "personConsents": {
+    "cancel": "Abbrechen",
+    "companyHint": "E-Mail-Kampagnen verwenden sie nicht — maßgeblich ist die Einwilligung der Person oben.",
+    "companyTitle": "Firmeneinwilligung (alt)",
+    "deniedPlaceholder": "z. B. telefonisch abgelehnt",
+    "errors": {
+      "note": "Beschreiben Sie, wie die Einwilligung eingeholt wurde (mindestens 3 Zeichen), z. B. Messeformular 12.10."
+    },
+    "grantedPlaceholder": "z. B. mündlich beim Termin am 12.11., Formular auf der Messe",
+    "loadFailed": "Einwilligungen konnten nicht geladen werden.",
+    "loading": "Wird geladen…",
+    "mainContact": "Hauptkontakt",
+    "noPeople": "Keine Personen mit E-Mail-Adresse. Fügen Sie eine Kontaktperson mit E-Mail hinzu, um ihre Einwilligung zu erfassen.",
+    "noteOptional": "Notiz (optional)",
+    "noteRequired": "Wie wurde sie eingeholt? (Pflichtfeld)",
+    "save": "Speichern",
+    "sources": {
+      "sendgrid_spam": "hat eine E-Mail als Spam gemeldet",
+      "sendgrid_unsubscribe": "hat sich von einer E-Mail abgemeldet"
+    },
+    "values": {
+      "denied": "Stimmt nicht zu",
+      "granted": "Stimmt zu",
+      "no_data": "Unbekannt"
+    }
+  },
   "reports": {
     "common": {
       "columns": {
@@ -1572,7 +1643,7 @@
         "pipeline": "Pipeline",
         "progress": "Fortschritt",
         "winRatePct": "Quote %",
-        "won": "Won"
+        "won": "Gewonnen"
       },
       "days": "{count, plural, one {# Tag} other {# Tage}}",
       "exportPdf": "PDF-Export",

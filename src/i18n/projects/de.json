@@ -19,6 +19,9 @@
       "changeRoleFailed": "Rolle konnte nicht geändert werden",
       "closeProjectFailed": "Projekt konnte nicht geschlossen werden",
       "endBeforeStart": "Das Fälligkeitsdatum des Projekts darf nicht vor dem Projektbeginn liegen.",
+      "field": "Wählen Sie ein Feld aus der Liste",
+      "member": "Suchen Sie eine Person und klicken Sie sie in der Liste an",
+      "name": "Geben Sie den Projektnamen ein, z. B. CRM-Einführung — ABC",
       "removeMemberFailed": "Person konnte nicht entfernt werden",
       "reopenProjectFailed": "Projekt konnte nicht wieder geöffnet werden",
       "saveFieldsFailed": "Felder konnten nicht gespeichert werden",
@@ -61,6 +64,9 @@
   "chat": {
     "deletedUser": "Gelöschter Benutzer",
     "empty": "Keine Nachrichten.",
+    "errors": {
+      "empty": "Geben Sie den Nachrichtentext ein"
+    },
     "hint": "Enter sendet die Nachricht, Shift+Enter fügt eine neue Zeile ein.",
     "placeholder": "Nachricht schreiben…",
     "send": "Senden",
@@ -276,6 +282,11 @@
       "openTitle": "Rechnungsdokument — im Modul Dokumente öffnen"
     },
     "edit": "Bearbeiten",
+    "errors": {
+      "amount": "Geben Sie einen Betrag größer als null ein, z. B. 1250.00",
+      "category": "Wählen Sie eine Kostenkategorie",
+      "date": "Wählen Sie ein Datum"
+    },
     "loadFailed": "Projektfinanzen konnten nicht geladen werden",
     "plan": {
       "currency": "Projektwährung",
@@ -540,6 +551,10 @@
         "addTitle": "Neue Firma in KSeF",
         "added": "Firma hinzugefügt. Die Rechnungen werden bei der nächsten Synchronisierung abgerufen.",
         "editTitle": "Firma in KSeF",
+        "errors": {
+          "nip": "Die NIP muss 10 Ziffern haben, z. B. 1234567890",
+          "token": "Fügen Sie das in der KSeF-Anwendung erzeugte KSeF-Token ein"
+        },
         "name": "Name (optional)",
         "saveFailed": "Firma konnte nicht gespeichert werden",
         "saved": "Firma gespeichert",
@@ -558,6 +573,7 @@
         "duplicateNip": "Eine Firma mit dieser Steuernummer wurde bereits hinzugefügt.",
         "invalidNip": "Ungültige Steuernummer.",
         "notConfigured": "Die KSeF-Integration ist auf dem Server nicht konfiguriert.",
+        "syncDays": "Geben Sie eine Anzahl von Tagen von {min} bis {max} ein",
         "tokenRejected": "KSeF hat das Token für diese Steuernummer abgelehnt. Prüfen Sie, ob das Token gültig ist und für diese Firma ausgestellt wurde.",
         "unknownGroup": "Diese Gruppe existiert nicht oder ist inaktiv. Aktualisieren Sie die Seite und wählen Sie eine andere.",
         "unreachable": "Die Verbindung zu KSeF zur Prüfung des Tokens ist fehlgeschlagen. Versuchen Sie es später erneut."
@@ -588,6 +604,7 @@
     "sync": {
       "failedForCompany": "Die Synchronisierung ist für mindestens eine Firma fehlgeschlagen. Details sieht der Administrator unter Einstellungen → Projekte → KSeF.",
       "finished": "Synchronisierung abgeschlossen",
+      "notConfigured": "KSeF ist nicht eingerichtet — ein Administrator fügt das Unternehmen unter Einstellungen → Projekte → KSeF hinzu",
       "now": "Jetzt synchronisieren",
       "running": "Synchronisierung…",
       "startFailed": "Synchronisierung konnte nicht gestartet werden",
@@ -709,6 +726,9 @@
       "placeholder": "z. B. verspätete Lieferung des Kunden",
       "reason": "Grund für die Änderung des Fälligkeitsdatums"
     },
+    "errors": {
+      "name": "Geben Sie den Aufgabennamen ein, z. B. Angebot vorbereiten"
+    },
     "fields": {
       "assignees": "Zugewiesene Personen",
       "description": "Zusätzliche Beschreibung",
@@ -794,6 +814,9 @@
     "dictionary": {
       "active": "aktiv",
       "addButton": "Hinzufügen",
+      "errors": {
+        "name": "Geben Sie den Namen des neuen Eintrags ein"
+      },
       "moveDown": "Nach unten",
       "moveUp": "Nach oben",
       "newItemPlaceholder": "Neuer Eintrag…",
@@ -803,6 +826,9 @@
       "active": "aktiv",
       "addButton": "Feld hinzufügen",
       "empty": "Keine Felder definiert.",
+      "errors": {
+        "name": "Geben Sie den Feldnamen ein, z. B. Bestellnummer"
+      },
       "hint": "Die hier definierten Felder kann der PM seinem Projekt hinzufügen (Projektkarte → Zusatzfelder für Aufgaben) und festlegen, ob sie erforderlich sind. Der Feldtyp kann nach dem Erstellen nicht mehr geändert werden.",
       "newNamePlaceholder": "Name des neuen Feldes…",
       "optionsPlaceholder": "Werte, durch Kommas getrennt",

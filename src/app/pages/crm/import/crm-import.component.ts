@@ -26,27 +26,27 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
   <div class="import-cards">
     <!-- Leads -->
     <div class="import-card">
-      <div class="card-icon">👤</div>
+      <div class="ico-tile"><i class="ei ei-user"></i></div>
       <h2>{{ t('csvImport.cards.leads.title') }}</h2>
       <div class="field-list">
         <span class="required">company*</span>
         <span>contact_name</span><span>contact_title</span>
         <span>email</span><span>phone</span>
-        <span title="strona_www|polecenie|cold_call|linkedin|targi|partner|agent|kampania|inbound|inne" class="hint">source 🔤</span>
-        <span [title]="stageCodesHint" class="hint">stage 🔤</span>
+        <span title="strona_www|polecenie|cold_call|linkedin|targi|partner|agent|kampania|inbound|inne" class="hint">source <i class="ei ei-type"></i></span>
+        <span [title]="stageCodesHint" class="hint">stage <i class="ei ei-type"></i></span>
         <span>value_pln</span>
-        <span title="PLN|EUR|USD|GBP|CHF" class="hint">annual_turnover_currency 🔤</span>
+        <span title="PLN|EUR|USD|GBP|CHF" class="hint">annual_turnover_currency <i class="ei ei-type"></i></span>
         <span>probability</span><span>close_date</span>
         <span>industry</span><span>assigned_to_email</span>
         <span>notes</span><span>hot</span><span>tags</span>
         <span>agent_name</span><span>agent_email</span><span>agent_phone</span>
         <span>online_pct</span>
       </div>
-      <div class="field-hint">🔤 = {{ t('csvImport.hints.dictionaryValuesTooltip') }} · <strong>agent_*</strong>: {{ t('csvImport.hints.agentFields') }}</div>
+      <div class="field-hint"><i class="ei ei-type"></i> = {{ t('csvImport.hints.dictionaryValuesTooltip') }} · <strong>agent_*</strong>: {{ t('csvImport.hints.agentFields') }}</div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-g btn-sm" (click)="downloadTemplate('leads')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
+        <button class="btn btn-g btn-sm" (click)="downloadTemplate('leads')"><i class="ei ei-download"></i> {{ t('csvImport.actions.downloadTemplate') }}</button>
         <button class="btn btn-g btn-sm" (click)="exportData('leads')" [disabled]="exportingType==='leads'">
-          {{ exportingType==='leads' ? '⏳…' : '📤 ' + t('csvImport.actions.exportData') }}
+          @if (exportingType==='leads') { … } @else { <i class="ei ei-send"></i> {{ t('csvImport.actions.exportData') }} }
         </button>
       </div>
       <div class="drop-zone"
@@ -57,8 +57,8 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
            (drop)="onDrop($event, 'leads')"
            (click)="leadsInput.click()">
         <input #leadsInput type="file" accept=".csv,.txt" hidden (change)="onFileChange($event, 'leads')">
-        <span *ngIf="!uploadingLeads">📂 {{ t('csvImport.dropZone.prompt') }}</span>
-        <span *ngIf="uploadingLeads">⏳ {{ t('csvImport.dropZone.importing') }}</span>
+        <span *ngIf="!uploadingLeads"><span aria-hidden="true">📄</span> {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="uploadingLeads"><i class="ei ei-hourglass"></i> {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="leadsResult" class="result-panel">
         <div class="result-stats">
@@ -81,7 +81,7 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
 
     <!-- Partners -->
     <div class="import-card">
-      <div class="card-icon">🤝</div>
+      <div class="ico-tile"><i class="ei ei-handshake"></i></div>
       <h2>{{ t('csvImport.cards.partners.title') }}</h2>
       <div class="field-list">
         <span class="required">company*</span>
@@ -91,22 +91,22 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
         <span>billing_contact_name</span><span>billing_contact_title</span><span>billing_email</span><span>billing_phone</span>
         <span>industry</span><span>group_name</span><span>manager_email</span>
         <span>contract_signed</span><span>contract_expires</span><span>contract_value</span>
-        <span title="onboarding|active|inactive|churned" class="hint">status 🔤</span>
+        <span title="onboarding|active|inactive|churned" class="hint">status <i class="ei ei-type"></i></span>
         <span>notes</span>
-        <span title="PLN|EUR|USD|GBP|CHF" class="hint">annual_turnover_currency 🔤</span>
+        <span title="PLN|EUR|USD|GBP|CHF" class="hint">annual_turnover_currency <i class="ei ei-type"></i></span>
         <span>online_pct</span><span>tags</span>
         <span>credit_limit_value</span>
-        <span title="PLN|EUR|USD|GBP" class="hint">credit_limit_currency 🔤</span>
+        <span title="PLN|EUR|USD|GBP" class="hint">credit_limit_currency <i class="ei ei-type"></i></span>
         <span>deposit_value</span><span>deposit_currency</span><span>deposit_date_in</span><span>deposit_date_out</span>
         <span>commission_value</span>
-        <span title="nie_dotyczy|segmenty|rezerwacje|progi_obrotowe" class="hint">commission_basis 🔤</span>
+        <span title="nie_dotyczy|segmenty|rezerwacje|progi_obrotowe" class="hint">commission_basis <i class="ei ei-type"></i></span>
         <span>agent_name</span><span>agent_email</span><span>agent_phone</span>
       </div>
-      <div class="field-hint">🔤 = {{ t('csvImport.hints.dictionaryValuesHover') }} · <strong>partner_number</strong>: {{ t('csvImport.hints.partnerNumber') }} · <strong>tags</strong>: {{ t('csvImport.hints.tagsSeparator') }} <code>|</code></div>
+      <div class="field-hint"><i class="ei ei-type"></i> = {{ t('csvImport.hints.dictionaryValuesHover') }} · <strong>partner_number</strong>: {{ t('csvImport.hints.partnerNumber') }} · <strong>tags</strong>: {{ t('csvImport.hints.tagsSeparator') }} <code>|</code></div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-g btn-sm" (click)="downloadTemplate('partners')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
+        <button class="btn btn-g btn-sm" (click)="downloadTemplate('partners')"><i class="ei ei-download"></i> {{ t('csvImport.actions.downloadTemplate') }}</button>
         <button class="btn btn-g btn-sm" (click)="exportData('partners')" [disabled]="exportingType==='partners'">
-          {{ exportingType==='partners' ? '⏳…' : '📤 ' + t('csvImport.actions.exportData') }}
+          @if (exportingType==='partners') { … } @else { <i class="ei ei-send"></i> {{ t('csvImport.actions.exportData') }} }
         </button>
       </div>
       <div class="drop-zone"
@@ -117,8 +117,8 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
            (drop)="onDrop($event, 'partners')"
            (click)="partnersInput.click()">
         <input #partnersInput type="file" accept=".csv,.txt" hidden (change)="onFileChange($event, 'partners')">
-        <span *ngIf="!uploadingPartners">📂 {{ t('csvImport.dropZone.prompt') }}</span>
-        <span *ngIf="uploadingPartners">⏳ {{ t('csvImport.dropZone.importing') }}</span>
+        <span *ngIf="!uploadingPartners"><span aria-hidden="true">📄</span> {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="uploadingPartners"><i class="ei ei-hourglass"></i> {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="partnersResult" class="result-panel">
         <div class="result-stats">
@@ -141,23 +141,23 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
 
     <!-- Dokumenty -->
     <div class="import-card">
-      <div class="card-icon">📄</div>
+      <div class="ico-tile"><i class="ei ei-file"></i></div>
       <h2>{{ t('csvImport.cards.documents.title') }}</h2>
       <p class="card-desc">{{ t('csvImport.cards.documents.description') }}</p>
       <div class="field-list">
         <span class="required">name*</span>
-        <span title="partner_agreement|nda|it_supplier_agreement|employee_agreement" class="hint">doc_type 🔤</span>
-        <span title="no_gdpr|data_processing_entrustment|data_administration" class="hint">gdpr_type 🔤</span>
-        <span title="new|being_edited|being_approved|being_signed|signed|completed|rejected" class="hint">status 🔤</span>
-        <span [title]="t('csvImport.dictionaries.documentGroups')" class="hint">group_name 🔤</span>
+        <span title="partner_agreement|nda|it_supplier_agreement|employee_agreement" class="hint">doc_type <i class="ei ei-type"></i></span>
+        <span title="no_gdpr|data_processing_entrustment|data_administration" class="hint">gdpr_type <i class="ei ei-type"></i></span>
+        <span title="new|being_edited|being_approved|being_signed|signed|completed|rejected" class="hint">status <i class="ei ei-type"></i></span>
+        <span [title]="t('csvImport.dictionaries.documentGroups')" class="hint">group_name <i class="ei ei-type"></i></span>
         <span>entity_1</span><span>entity_2</span>
         <span>creation_date</span><span>signing_date</span><span>expiration_date</span>
       </div>
-      <div class="field-hint">🔤 = {{ t('csvImport.hints.dictionaryValues') }} · <strong>entities</strong>: {{ t('csvImport.hints.entitiesSeparator') }} <code>|</code> ({{ t('csvImport.hints.example') }} "{{ t('csvImport.hints.entitiesExample') }}") · <strong>group_name</strong>: {{ t('csvImport.hints.documentGroupName') }}</div>
+      <div class="field-hint"><i class="ei ei-type"></i> = {{ t('csvImport.hints.dictionaryValues') }} · <strong>entities</strong>: {{ t('csvImport.hints.entitiesSeparator') }} <code>|</code> ({{ t('csvImport.hints.example') }} "{{ t('csvImport.hints.entitiesExample') }}") · <strong>group_name</strong>: {{ t('csvImport.hints.documentGroupName') }}</div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-g btn-sm" (click)="downloadTemplate('documents')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
+        <button class="btn btn-g btn-sm" (click)="downloadTemplate('documents')"><i class="ei ei-download"></i> {{ t('csvImport.actions.downloadTemplate') }}</button>
         <button class="btn btn-g btn-sm" (click)="exportData('documents')" [disabled]="exportingType==='documents'">
-          {{ exportingType==='documents' ? '⏳…' : '📤 ' + t('csvImport.actions.exportData') }}
+          @if (exportingType==='documents') { … } @else { <i class="ei ei-send"></i> {{ t('csvImport.actions.exportData') }} }
         </button>
       </div>
       <div class="drop-zone"
@@ -168,8 +168,8 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
            (drop)="onDrop($event, 'documents')"
            (click)="docsInput.click()">
         <input #docsInput type="file" accept=".csv,.txt" hidden (change)="onFileChange($event, 'documents')">
-        <span *ngIf="!uploadingDocs">📂 {{ t('csvImport.dropZone.prompt') }}</span>
-        <span *ngIf="uploadingDocs">⏳ {{ t('csvImport.dropZone.importing') }}</span>
+        <span *ngIf="!uploadingDocs"><span aria-hidden="true">📄</span> {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="uploadingDocs"><i class="ei ei-hourglass"></i> {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="docsResult" class="result-panel">
         <div class="result-stats">
@@ -192,7 +192,7 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
 
     <!-- Dane sprzedażowe -->
     <div class="import-card">
-      <div class="card-icon">📊</div>
+      <div class="ico-tile"><i class="ei ei-chart"></i></div>
       <h2>{{ t('csvImport.cards.sales.title') }}</h2>
       <p class="card-desc">{{ t('csvImport.cards.sales.description') }}</p>
       <div class="field-list">
@@ -212,7 +212,7 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
         <strong>numer_partnera</strong>: {{ t('csvImport.hints.salesPartnerNumber') }} ({{ t('csvImport.hints.example') }} <code>P-0001</code>) &nbsp;·&nbsp;
         <strong>produkt</strong>: hotel | transport_flight | car_rental | transfer | visa | {{ t('csvImport.hints.otherProducts') }}
       </div>
-      <button class="btn btn-g btn-sm" (click)="downloadSalesTemplate()">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
+      <button class="btn btn-g btn-sm" (click)="downloadSalesTemplate()"><i class="ei ei-download"></i> {{ t('csvImport.actions.downloadTemplate') }}</button>
       <div class="drop-zone"
            [class.drag-over]="isDraggingSales"
            [class.uploading]="uploadingSales"
@@ -221,8 +221,8 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
            (drop)="onDropSales($event)"
            (click)="salesInput.click()">
         <input #salesInput type="file" accept=".csv,.txt" hidden (change)="onSalesFileChange($event)">
-        <span *ngIf="!uploadingSales">📂 {{ t('csvImport.dropZone.prompt') }}</span>
-        <span *ngIf="uploadingSales">⏳ {{ t('csvImport.dropZone.importing') }}</span>
+        <span *ngIf="!uploadingSales"><span aria-hidden="true">📄</span> {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="uploadingSales"><i class="ei ei-hourglass"></i> {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="salesResult" class="result-panel">
         <div class="result-stats">

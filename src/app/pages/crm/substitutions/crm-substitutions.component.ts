@@ -41,7 +41,7 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
 <div class="card">
-  <h2 class="card-title">🔄 {{ t('substitutions.title') }}</h2>
+  <h2 class="card-title"><i class="ei ei-refresh"></i> {{ t('substitutions.title') }}</h2>
   <p class="card-hint">
     {{ t('substitutions.hint') }}
   </p>

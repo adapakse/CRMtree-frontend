@@ -98,7 +98,7 @@ function maxOf(rows: BarRow[]): number {
 </div>
 
 <!-- CONTENT -->
-<div style="flex:1;overflow-y:auto;padding:20px 24px 24px;min-width:0">
+<div class="page-body" style="flex:1;overflow-y:auto;padding:20px 24px 24px;min-width:0">
 <div class="pd-content">
 
   <!-- ══════════════════════════════════════════════════════
@@ -418,7 +418,7 @@ function maxOf(rows: BarRow[]): number {
     /* ── Panel ─────────────────────────────────────────────────── */
     .pd-panel {
       box-sizing: border-box; width: 100%;
-      background: var(--var(--surface), var(--surface));
+      background: var(--surface);
       border-radius: 12px; box-shadow: var(--shadow-sm);
       padding: 20px;
       margin-bottom: 20px;
@@ -436,6 +436,13 @@ function maxOf(rows: BarRow[]): number {
       flex: 1; min-width: 120px; margin: 0; line-height: 1.5;
     }
     .pd-filters { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; flex-shrink: 0; }
+    @media (max-width: 1279px) { .pd-filters { flex-shrink: 1; min-width: 0; } }
+    @media (max-width: 767px) {
+      .pd-filters { flex: 1 1 100%; }
+      /* every field in the bar on its own full row, checkboxes stay their own size */
+      .pd-filters > select.pd-sel, .pd-filters > .pd-ms-wrap, .pd-filters > .pd-search-wrap, .pd-filters > input:not([type=checkbox]) { flex: 1 1 100%; max-width: 100%; min-width: 0; }
+      .pd-filters > .pd-ms-wrap .pd-ms-trigger, .pd-filters > .pd-search-wrap .pd-search-input { width: 100%; max-width: 100%; }
+    }
 
     /* ── Selects / inputs ──────────────────────────────────────── */
     .pd-sel { height: 36px; box-sizing: border-box; }
@@ -448,18 +455,18 @@ function maxOf(rows: BarRow[]): number {
       display: flex; align-items: center; gap: 8px; box-sizing: border-box;
       height: 36px; font-size: 12px; font-weight: 500; font-family: inherit; padding: 0 14px; border-radius: 12px;
       border: 1px solid var(--gray-200, color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))); box-shadow: 0 1px 2px rgba(0,0,0,.05);
-      background: var(--var(--surface), var(--surface)); cursor: pointer;
+      background: var(--surface); cursor: pointer;
       color: var(--gray-800, var(--gray-800)); max-width: 200px;
     }
     .pd-ms-trigger span {
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; text-align: left;
     }
     .pd-ms-trigger:hover { border-color: var(--orange, #3BAA5D); }
     .pd-ms-trigger svg { flex-shrink: 0; color: var(--gray-500, var(--gray-500)); }
     /* Otwiera się w LEWĄ stronę — nie wychodzi poza prawą krawędź */
     .pd-ms-dropdown {
       position: absolute; top: calc(100% + 4px); right: 0; z-index: 20;
-      background: var(--var(--surface), var(--surface));
+      background: var(--surface);
       width: 240px; padding: 8px 0;
     }
     .pd-ms-search {
@@ -467,7 +474,7 @@ function maxOf(rows: BarRow[]): number {
       width: calc(100% - 16px); margin: 0 8px 6px;
       height: 32px; font-size: 12px; padding: 0 12px; border-radius: 10px;
       border: 1px solid var(--gray-200, color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)));
-      background: var(--var(--surface), var(--surface)); color: var(--gray-700, var(--gray-700)); outline: none;
+      background: var(--surface); color: var(--gray-700, var(--gray-700)); outline: none;
     }
     .pd-ms-search:focus { border-color: var(--orange, #3BAA5D); }
     .pd-ms-actions {
@@ -559,7 +566,7 @@ function maxOf(rows: BarRow[]): number {
       box-sizing: border-box; height: 36px; font-size: 12px; font-family: inherit;
       padding: 0 32px 0 34px; border-radius: 12px;
       border: 1px solid var(--gray-200, color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))); box-shadow: 0 5px 16px rgba(0,0,0,0.099);
-      background: var(--var(--surface), var(--surface)); color: var(--gray-800, var(--gray-800));
+      background: var(--surface); color: var(--gray-800, var(--gray-800));
       width: 220px; outline: none;
     }
     .pd-search-input:focus { border-color: var(--orange, #3BAA5D); box-shadow: 0 5px 16px rgba(0,0,0,0.099), 0 0 2px 4px rgba(59,170,93,.2); }

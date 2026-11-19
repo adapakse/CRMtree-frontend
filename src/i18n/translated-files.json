@@ -125,5 +125,15 @@
   "src/app/pages/crm/dashboard/crm-prospects-dashboard.component.ts",
   "src/app/layout/public-layout/public-layout.component.ts",
   "src/app/pages/public/cookie-consent/cookie-consent.component.ts",
-  "src/app/pages/public/home/home.component.ts"
+  "src/app/pages/public/home/home.component.ts",
+  "src/app/shared/components/person-consents/person-consents.component.ts",
+  "src/app/pages/crm/email-campaigns/campaign-period.ts",
+  "src/app/pages/crm/email-campaigns/crm-email-campaign-audience.component.ts",
+  "src/app/pages/crm/email-campaigns/crm-email-campaign-editor.component.ts",
+  "src/app/pages/crm/email-campaigns/crm-email-campaign-list.component.ts",
+  "src/app/pages/crm/email-campaigns/crm-email-campaign-results.component.ts",
+  "src/app/pages/crm/email-campaigns/crm-email-campaign-settings.component.ts",
+  "src/app/pages/crm/email-campaigns/crm-email-campaign-templates.component.ts",
+  "src/app/pages/crm/email-campaigns/crm-email-campaigns.component.ts",
+  "src/app/pages/crm/email-campaigns/email-campaigns.styles.ts"
 ]

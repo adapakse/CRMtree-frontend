@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmSeoService, SocialAccount, SocialPlatform } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 
 const PLATFORM_LABELS: Record<SocialPlatform, string> = {
   linkedin: 'LinkedIn',
@@ -16,7 +17,7 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideTranslocoScope('crm')],
-  imports: [FormsModule, TranslocoDirective],
+  imports: [FormsModule, TranslocoDirective, FormErrorSummaryComponent],
   template: `
     <ng-container *transloco="let t; prefix: 'crm'">
     <div class="channels-box">
@@ -62,12 +63,16 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
         @if (!isConnected('wordpress')) {
           <div class="wp-form">
             <label class="field-label">{{ t('seo.socialChannels.wordpress.siteUrl') }}</label>
-            <input class="field-input" [(ngModel)]="wpSiteUrl" [placeholder]="t('seo.socialChannels.wordpress.siteUrlPlaceholder')">
+            <input class="field-input" [(ngModel)]="wpSiteUrl" [placeholder]="t('seo.socialChannels.wordpress.siteUrlPlaceholder')" [class.fi-err]="wpSubmitted && !wpSiteUrl.trim()">
+            @if (wpSubmitted && !wpSiteUrl.trim()) { <span class="ferr">{{ t('fieldErrors.wordpressUrl') }}</span> }
             <label class="field-label">{{ t('seo.socialChannels.wordpress.username') }}</label>
-            <input class="field-input" [(ngModel)]="wpUsername" [placeholder]="t('seo.socialChannels.wordpress.usernamePlaceholder')">
+            <input class="field-input" [(ngModel)]="wpUsername" [placeholder]="t('seo.socialChannels.wordpress.usernamePlaceholder')" [class.fi-err]="wpSubmitted && !wpUsername.trim()">
+            @if (wpSubmitted && !wpUsername.trim()) { <span class="ferr">{{ t('fieldErrors.wordpressUser') }}</span> }
             <label class="field-label">{{ t('seo.socialChannels.wordpress.appPassword') }}</label>
-            <input class="field-input" type="password" [(ngModel)]="wpAppPassword" [placeholder]="t('seo.socialChannels.wordpress.appPasswordPlaceholder')">
-            <button type="button" class="btn btn-g btn-sm" (click)="connectWordpress()" [disabled]="connectingWp() || !wpSiteUrl || !wpUsername || !wpAppPassword">
+            <input class="field-input" type="password" [(ngModel)]="wpAppPassword" [placeholder]="t('seo.socialChannels.wordpress.appPasswordPlaceholder')" [class.fi-err]="wpSubmitted && !wpAppPassword">
+            @if (wpSubmitted && !wpAppPassword) { <span class="ferr">{{ t('fieldErrors.wordpressAppPassword') }}</span> }
+            @if (wpSubmitted) { <wt-form-error-summary [count]="wpErrorCount()" /> }
+            <button type="button" class="btn btn-g btn-sm" (click)="connectWordpress()" [disabled]="connectingWp()">
               @if (connectingWp()) { {{ t('seo.socialChannels.wordpress.connecting') }} } @else { {{ t('seo.socialChannels.wordpress.connect') }} }
             </button>
           </div>
@@ -106,6 +111,7 @@ export class SeoSocialChannelsComponent implements OnInit {
   readonly connectingWp = signal(false);
 
   wpSiteUrl = '';
+  wpSubmitted = false;
   wpUsername = '';
   wpAppPassword = '';
 
@@ -140,7 +146,16 @@ export class SeoSocialChannelsComponent implements OnInit {
     });
   }
 
+  wpErrorCount(): number {
+    return (this.wpSiteUrl.trim() ? 0 : 1) + (this.wpUsername.trim() ? 0 : 1) + (this.wpAppPassword ? 0 : 1);
+  }
+
   connectWordpress(): void {
+    if (this.wpErrorCount() > 0) {
+      this.wpSubmitted = true;
+      return;
+    }
+    this.wpSubmitted = false;
     this.connectingWp.set(true);
     this.seoService.connectWordpress(this.wpSiteUrl, this.wpUsername, this.wpAppPassword).subscribe({
       next: () => {

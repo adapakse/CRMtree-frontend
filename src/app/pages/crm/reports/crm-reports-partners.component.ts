@@ -69,7 +69,7 @@ function healthColor(engagement: number): string {
 </div>
 
 <!-- CONTENT -->
-<div style="flex:1;overflow-y:auto;padding:20px 24px 24px;display:flex;flex-direction:column;gap:20px">
+<div class="page-body" style="flex:1;overflow-y:auto;padding:20px 24px 24px;display:flex;flex-direction:column;gap:20px">
 
   <!-- Filtry -->
   <div class="toolbar">
@@ -107,7 +107,7 @@ function healthColor(engagement: number): string {
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#4DC671);border-radius:2px"></div>
 
   <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--gray-400)">
-    <div style="font-size:48px;margin-bottom:12px">📈</div>
+    <div class="ico-tile ico-tile--lg" style="margin:0 auto 12px"><i class="ei ei-trending-up"></i></div>
     <div style="font-size:16px;font-weight:600">{{ t('partnerDetail.sales.noData') }}</div>
     <div style="font-size:14px;margin-top:4px">{{ t('reports.partners.emptyHint') }}</div>
   </div>
@@ -221,7 +221,7 @@ function healthColor(engagement: number): string {
       <div style="padding:14px;display:flex;flex-direction:column;gap:10px;flex:1">
         <div *ngFor="let p of byProduct; let i = index">
           <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
-            <span style="color:var(--gray-700)">{{ productIcon(p.product_type) }} {{ productLabel(p.product_type) }}</span>
+            <span style="color:var(--gray-700)"><i class="ei ei-{{ productIcon(p.product_type) }}"></i> {{ productLabel(p.product_type) }}</span>
             <span style="font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">{{ (p.gross_turnover_pln/1000).toFixed(0) }}k PLN</span>
           </div>
           <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
@@ -632,7 +632,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     return this.transloco.translate('crm.reports.partners.health.' + healthKey);
   }
   productLabel(pt: string): string { return pt in PRODUCT_TYPE_ICONS ? this.transloco.translate('crm.labels.productTypes.' + pt) : pt; }
-  productIcon(pt: string): string  { return (PRODUCT_TYPE_ICONS as Record<string,string>)[pt] || '📦'; }
+  productIcon(pt: string): string  { return (PRODUCT_TYPE_ICONS as Record<string,string>)[pt] || 'package'; }
   deltaLabel(a: number, b: number): string { if (!b) return '—'; return (Math.abs((a-b)/b*100)).toFixed(0) + '%'; }
   initials(name: string): string { return (name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase(); }
   avatarColor(name: string): string { if (!name) return '#94A3B8'; let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h},55%,48%)`; }

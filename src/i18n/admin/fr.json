@@ -27,6 +27,13 @@
       "subtitle": "Suppression définitive d’un document, d’un lead ou d’un partenaire avec toutes les données et tous les journaux associés.",
       "title": "Suppression d’enregistrements"
     },
+    "errors": {
+      "confirmPhrase": "Saisissez exactement « {phrase} » pour confirmer",
+      "selectDoc": "Recherchez un document et cliquez dessus dans la liste",
+      "selectFile": "Choisissez le fichier JSON contenant les paramètres exportés",
+      "selectLead": "Recherchez un lead et cliquez dessus dans la liste",
+      "selectPartner": "Recherchez un partenaire et cliquez dessus dans la liste"
+    },
     "purge": {
       "confirm": "Confirmer",
       "docs": {
@@ -705,6 +712,9 @@
       "body": "Voulez-vous vraiment supprimer le token PBX de {name} ? L'utilisateur ne pourra plus utiliser le softphone.",
       "title": "Supprimer le token PBX"
     },
+    "errors": {
+      "token": "Collez le Personal Access Token (PAT) du standard"
+    },
     "loadError": "Erreur lors du chargement des données.",
     "loading": "Chargement…",
     "modal": {
@@ -758,6 +768,9 @@
       "detected": "Reconnu : {provider}",
       "detectedShort": "reconnu à la clé",
       "detecting": "Reconnaissance du fournisseur…",
+      "errors": {
+        "key": "Collez la clé API du fournisseur (par ex. sk-…) ou choisissez une clé enregistrée"
+      },
       "intro": "Chaque fonction a son propre fournisseur, sa clé et son modèle : l'enrichissement peut tourner chez un fournisseur et l'analyse des appels chez un autre. Collez une clé, nous reconnaissons le fournisseur nous-mêmes. L'enregistrement vérifie la configuration auprès du fournisseur ; la clé est chiffrée et n'est plus jamais affichée.",
       "loading": "Chargement de la configuration IA…",
       "model": "Modèle",
@@ -1193,6 +1206,9 @@
       "deleteConfirm": "Supprimer le champ « {name} » ?",
       "deleteTooltip": "Supprimer le champ — possible uniquement si aucun enregistrement n’a de valeur",
       "empty": "Aucun champ supplémentaire dans ce formulaire.",
+      "errors": {
+        "name": "Saisissez le nom du champ, par ex. Numéro client"
+      },
       "hint": "Champs que vous définissez vous-même pour ce formulaire. Le type d'un champ ne peut plus être modifié ensuite : pour le changer, désactivez le champ et créez-en un nouveau. Un champ désactivé disparaît du formulaire, mais les valeurs déjà saisies sont conservées.",
       "newNamePlaceholder": "Nom du nouveau champ",
       "optionsPlaceholder": "Valeurs séparées par des virgules",
@@ -1291,6 +1307,10 @@
       "displayNamePlaceholder": "ex. Service client",
       "documentCount": "{count, plural, one {# document} other {# documents}}",
       "empty": "Aucun groupe. Ajoutez le premier groupe ci-dessus ou exécutez la migration 0127.",
+      "errors": {
+        "displayName": "Saisissez le nom affiché, par ex. Équipe commerciale",
+        "technicalName": "Saisissez le nom technique, par ex. sales_team"
+      },
       "inactive": "Inactif",
       "intro": "— gérez les groupes auxquels les utilisateurs peuvent être rattachés. Les groupes contrôlent l’accès aux documents. Un groupe auquel des utilisateurs ou des documents sont rattachés ne peut pas être supprimé.",
       "memberCount": "{count, plural, one {# utilisateur} other {# utilisateurs}}",
@@ -1332,6 +1352,10 @@
         "definitionHint": "Le système s’appuie sur cette description pour évaluer si une entreprise présente ce signal.",
         "definitionPlaceholder": "Décrivez à quoi l’on reconnaît qu’une entreprise remplit cette condition — mots/expressions précis sur le site, rubriques, postes.",
         "editTitle": "Modifier le signal",
+        "errors": {
+          "definition": "Décrivez comment l'IA doit reconnaître ce signal",
+          "name": "Saisissez le nom du signal, par ex. L'entreprise compte plus de 50 salariés"
+        },
         "name": "Nom du signal",
         "namePlaceholder": "ex. Flotte de transport en propre",
         "newTitle": "Nouveau signal",
@@ -1456,6 +1480,9 @@
       "codeWrittenHint": "Ce n'est pas une étape de l'entonnoir mais un état que l'application définit elle-même (archivage du lead, conversion en partenaire), il ne peut donc pas être supprimé. Le renommer est possible.",
       "confirmDelete": "Supprimer l'étape « {name} » ?",
       "confirmDeleteWithLeads": "Supprimer l'étape « {name} » ?\n\nLes {count} lead(s) présents passeront à « {target} ».",
+      "errors": {
+        "name": "Saisissez le nom de la nouvelle étape, par ex. Négociation"
+      },
       "intro": "Vos propres noms pour les étapes de l'entonnoir : renommez les existantes, ajoutez une étape ou supprimez celle dont vous n'avez pas besoin. Le code de l'étape ne change pas : le nouveau nom apparaît dans toute l'application, tandis que les rapports et les données des leads restent intacts. Un nom vide revient au nom intégré.",
       "kinds": {
         "archived": "archives",
@@ -1633,6 +1660,9 @@
       "saved": "Groupe mis à jour",
       "title": "Modification du groupe"
     },
+    "errors": {
+      "internalName": "Saisissez le nom interne, par ex. equipe-ventes"
+    },
     "fields": {
       "description": "Description",
       "displayName": "Nom affiché",
@@ -1724,11 +1754,18 @@
       "updated": "Utilisateur mis à jour"
     },
     "empty": "Aucun utilisateur trouvé",
+    "errors": {
+      "chooseGroup": "Choisissez un groupe dans la liste"
+    },
     "featureAccess": {
       "callAnalysis": "Analyseur d appels",
       "callAnalysisDisabled": "Accès à l Analyseur d appels désactivé",
       "callAnalysisEnabled": "Accès à l Analyseur d appels activé",
       "callAnalysisHint": "Analyse IA des notes d appels, score et relance",
+      "emailCampaigns": "Campagnes e-mail",
+      "emailCampaignsDisabled": "Accès aux Campagnes e-mail désactivé",
+      "emailCampaignsEnabled": "Accès aux Campagnes e-mail activé",
+      "emailCampaignsHint": "Campagnes e-mail vers les partenaires et les leads via SendGrid",
       "prospects": "Prospects",
       "prospectsDisabled": "Accès aux Prospects désactivé",
       "prospectsEnabled": "Accès aux Prospects activé",

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { AppSettingsService, AppSettingsMeta, LeadStageConfig } from '../../../core/services/app-settings.service';
 import { LeadStagesService } from '../../../core/services/lead-stages.service';
@@ -241,7 +242,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 @Component({
   selector: 'wt-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, TenantFieldsEditorComponent, AiPurposeRowComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, TenantFieldsEditorComponent, AiPurposeRowComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   // Zakres `crm` obok `admin`: zakładka „Etapy leada" pokazuje wbudowane nazwy
   // etapów (crm.labels.stages.*) jako podpowiedź w polu nazwy — bez tego
   // placeholder pokazywałby surowy kod etapu.
@@ -256,10 +257,10 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           ● {{ t('settings.topbar.unsavedChanges') }}
         </span>
       }
-      <button class="btn btn-p" [disabled]="saving() || !dirty()" (click)="saveAll()">
+      <button class="btn btn-p" [disabled]="saving() || !dirty()" [title]="dirty() ? '' : ('form.noChanges' | transloco)" (click)="saveAll()">
         @if (saving()) { {{ t('settings.actions.saving') }} } @else { 💾 {{ t('settings.actions.saveChanges') }} }
       </button>
-      <button class="btn btn-g" [disabled]="!dirty()" (click)="resetDrafts()">
+      <button class="btn btn-g" [disabled]="!dirty()" [title]="dirty() ? '' : ('form.noChanges' | transloco)" (click)="resetDrafts()">
         {{ t('settings.actions.discard') }}
       </button>
     </div>
@@ -564,11 +565,13 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                           <input class="stage-name-input" [(ngModel)]="newStageLabel"
                                  [placeholder]="t('settings.leadStages.newStagePlaceholder')"
                                  [disabled]="stagesSaving() || !canAddStage()"
+                                 [class.fi-err]="isStageSubmitted && canAddStage() && !newStageLabel.trim()"
                                  (keyup.enter)="addStage()">
                           <span class="stage-row-spacer"></span>
-                          <button class="stage-add" [disabled]="stagesSaving() || !newStageLabel.trim() || !canAddStage()"
+                          <button class="stage-add" [disabled]="stagesSaving()"
                                   (click)="addStage()">+ {{ t('settings.leadStages.addStage') }}</button>
                         </div>
+                        @if (isStageSubmitted && canAddStage() && !newStageLabel.trim()) { <span class="ferr" role="alert">{{ t('settings.leadStages.errors.name') }}</span> }
                       }
                     }
                   </div>
@@ -838,18 +841,20 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">➕ {{ t('settings.groups.addTitle') }}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
               <div>
-                <label class="field-label">{{ t('settings.groups.technicalName') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
+                <label class="field-label">{{ t('settings.groups.technicalName') }} <span class="req">*</span></label>
                 <div class="field-desc">{{ t('settings.groups.technicalNameHint') }}</div>
                 <input class="fi" style="width:100%;box-sizing:border-box;margin-top:8px"
                        [placeholder]="t('settings.groups.technicalNamePlaceholder')"
-                       [(ngModel)]="newGroup.name">
+                       [(ngModel)]="newGroup.name" [class.fi-err]="isGroupSubmitted && !newGroup.name.trim()">
+                @if (isGroupSubmitted && !newGroup.name.trim()) { <span class="ferr">{{ t('settings.groups.errors.technicalName') }}</span> }
               </div>
               <div>
-                <label class="field-label">{{ t('settings.groups.displayName') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
+                <label class="field-label">{{ t('settings.groups.displayName') }} <span class="req">*</span></label>
                 <div class="field-desc">{{ t('settings.groups.displayNameHint') }}</div>
                 <input class="fi" style="width:100%;box-sizing:border-box;margin-top:8px"
                        [placeholder]="t('settings.groups.displayNamePlaceholder')"
-                       [(ngModel)]="newGroup.display_name">
+                       [(ngModel)]="newGroup.display_name" [class.fi-err]="isGroupSubmitted && !newGroup.display_name.trim()">
+                @if (isGroupSubmitted && !newGroup.display_name.trim()) { <span class="ferr">{{ t('settings.groups.errors.displayName') }}</span> }
               </div>
               <div>
                 <label class="field-label">{{ t('settings.groups.description') }}</label>
@@ -869,11 +874,14 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                 ⚠️ {{ groupError() }}
               </div>
             }
-            <button class="btn btn-p"
-                    [disabled]="!newGroup.name.trim() || !newGroup.display_name.trim() || groupSaving()"
-                    (click)="addGroup()">
-              @if (groupSaving()) { {{ t('settings.groups.adding') }} } @else { ➕ {{ t('settings.groups.addGroup') }} }
-            </button>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <button class="btn btn-p"
+                      [disabled]="groupSaving()"
+                      (click)="addGroup()">
+                @if (groupSaving()) { {{ t('settings.groups.adding') }} } @else { ➕ {{ t('settings.groups.addGroup') }} }
+              </button>
+              @if (isGroupSubmitted) { <wt-form-error-summary [count]="(newGroup.name.trim() ? 0 : 1) + (newGroup.display_name.trim() ? 0 : 1)" /> }
+            </div>
           </div>
 
           <!-- Lista istniejących grup -->
@@ -908,7 +916,6 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                     }
                   </div>
                   <button class="btn btn-d btn-sm"
-                          [disabled]="g.member_count > 0 || g.document_count > 0"
                           [title]="g.member_count > 0 || g.document_count > 0 ? t('settings.groups.cannotDelete') : t('settings.groups.deleteGroup')"
                           (click)="deleteGroup(g)">
                     🗑 {{ t('settings.actions.delete') }}
@@ -1023,22 +1030,22 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                               <select style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 6px;font-size:12px"
                                       [ngModel]="tpl.type"
                                       (ngModelChange)="updateTemplate(field, idx, 'type', $event)">
-                                <option value="task">✅ {{ t('settings.onboarding.taskTypes.task') }}</option>
-                                <option value="call">📞 {{ t('settings.onboarding.taskTypes.call') }}</option>
-                                <option value="email">📧 {{ t('settings.onboarding.taskTypes.email') }}</option>
-                                <option value="meeting">🤝 {{ t('settings.onboarding.taskTypes.meeting') }}</option>
-                                <option value="doc_sent">📄 {{ t('settings.onboarding.taskTypes.doc_sent') }}</option>
-                                <option value="training">🎓 {{ t('settings.onboarding.taskTypes.training') }}</option>
+                                <option value="task">{{ t('settings.onboarding.taskTypes.task') }}</option>
+                                <option value="call">{{ t('settings.onboarding.taskTypes.call') }}</option>
+                                <option value="email">{{ t('settings.onboarding.taskTypes.email') }}</option>
+                                <option value="meeting">{{ t('settings.onboarding.taskTypes.meeting') }}</option>
+                                <option value="doc_sent">{{ t('settings.onboarding.taskTypes.doc_sent') }}</option>
+                                <option value="training">{{ t('settings.onboarding.taskTypes.training') }}</option>
                               </select>
                             </td>
                             <td style="padding:6px 10px">
                               <select style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 6px;font-size:12px"
                                       [ngModel]="tpl.step"
                                       (ngModelChange)="updateTemplate(field, idx, 'step', +$event)">
-                                <option [value]="0">📝 {{ t('settings.onboarding.steps.contractSigning') }}</option>
-                                <option [value]="1">⚙️ {{ t('settings.onboarding.steps.configuration') }}</option>
-                                <option [value]="2">🎓 {{ t('settings.onboarding.steps.training') }}</option>
-                                <option [value]="3">🚀 {{ t('settings.onboarding.steps.launch') }}</option>
+                                <option [value]="0">{{ t('settings.onboarding.steps.contractSigning') }}</option>
+                                <option [value]="1">{{ t('settings.onboarding.steps.configuration') }}</option>
+                                <option [value]="2">{{ t('settings.onboarding.steps.training') }}</option>
+                                <option [value]="3">{{ t('settings.onboarding.steps.launch') }}</option>
                               </select>
                             </td>
                             <td style="padding:6px 10px;text-align:center">
@@ -1113,7 +1120,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">+ {{ t('settings.tooltips.add') }}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
               <div>
-                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.screen') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
+                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.screen') }} <span class="req">*</span></label>
                 <select class="fsel" [(ngModel)]="newTipScreen" (ngModelChange)="onNewTipScreenChange()">
                   <option value="">{{ t('settings.tooltips.chooseScreen') }}</option>
                   @for (s of catalogScreens; track s) {
@@ -1122,7 +1129,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                 </select>
               </div>
               <div>
-                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.label') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
+                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.label') }} <span class="req">*</span></label>
                 <select class="fsel" [(ngModel)]="newTipLabelKey" [disabled]="!newTipScreen">
                   <option value="">{{ t('settings.tooltips.chooseLabel') }}</option>
                   @for (e of catalogForScreen; track e.key) {
@@ -1134,7 +1141,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
               </div>
             </div>
             <div style="margin-bottom:20px">
-              <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.content') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
+              <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.content') }} <span class="req">*</span></label>
               <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:72px"
                         [(ngModel)]="newTipValue"
                         [placeholder]="t('settings.tooltips.contentPlaceholder')"></textarea>
@@ -1143,7 +1150,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
               <div style="background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">⚠ {{ tipError() }}</div>
             }
             <button class="btn btn-p"
-                    [disabled]="tipSaving() || !newTipLabelKey || !newTipValue.trim()"
+                    [disabled]="tipSaving()"
                     (click)="addTooltip()">
               {{ tipSaving() ? t('settings.actions.saving') : '+ ' + t('settings.tooltips.add') }}
             </button>
@@ -1179,6 +1186,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                               (ngModelChange)="tipDirty[tip.key] = true"></textarea>
                     <button class="btn btn-p"
                             [disabled]="!tipDirty[tip.key] || tipSaving()"
+                            [title]="tipDirty[tip.key] ? '' : ('form.noChanges' | transloco)"
                             (click)="saveTooltip(tip.key, tipDrafts[tip.key])">
                       💾 {{ 'actions.save' | transloco }}
                     </button>
@@ -1211,6 +1219,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                             (ngModelChange)="tipDirty[tip.key] = true"></textarea>
                   <button class="btn btn-p"
                           [disabled]="!tipDirty[tip.key] || tipSaving()"
+                          [title]="tipDirty[tip.key] ? '' : ('form.noChanges' | transloco)"
                           (click)="saveTooltip(tip.key, tipDrafts[tip.key])">
                     💾 {{ 'actions.save' | transloco }}
                   </button>
@@ -1343,12 +1352,14 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           <div class="modal-body">
             <div class="field">
               <label>{{ t('settings.icp.modal.name') }} <span class="req">*</span></label>
-              <input [(ngModel)]="icpModalDraft.label" [placeholder]="t('settings.icp.modal.namePlaceholder')">
+              <input [(ngModel)]="icpModalDraft.label" [placeholder]="t('settings.icp.modal.namePlaceholder')" [class.fi-err]="isIcpSubmitted && !icpModalDraft.label.trim()">
+              @if (isIcpSubmitted && !icpModalDraft.label.trim()) { <span class="ferr">{{ t('settings.icp.modal.errors.name') }}</span> }
             </div>
             <div class="field">
               <label>{{ t('settings.icp.modal.definition') }} <span class="req">*</span></label>
               <textarea [(ngModel)]="icpModalDraft.ai_definition" rows="8"
-                [placeholder]="t('settings.icp.modal.definitionPlaceholder')"></textarea>
+                [placeholder]="t('settings.icp.modal.definitionPlaceholder')" [class.fi-err]="isIcpSubmitted && !icpModalDraft.ai_definition.trim()"></textarea>
+              @if (isIcpSubmitted && !icpModalDraft.ai_definition.trim()) { <span class="ferr">{{ t('settings.icp.modal.errors.definition') }}</span> }
               <div class="hint">{{ t('settings.icp.modal.definitionHint') }}</div>
             </div>
             <div class="field">
@@ -1370,8 +1381,9 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             </div>
           </div>
           <div class="modal-footer">
+            @if (isIcpSubmitted) { <wt-form-error-summary [count]="(icpModalDraft.label.trim() ? 0 : 1) + (icpModalDraft.ai_definition.trim() ? 0 : 1)" /> }
             <button class="btn-secondary" [disabled]="icpSaving()" (click)="closeIcpEditModal()">{{ 'actions.cancel' | transloco }}</button>
-            <button class="btn-primary" [disabled]="icpSaving() || !icpModalDraft.label.trim() || !icpModalDraft.ai_definition.trim()"
+            <button class="btn-primary" [disabled]="icpSaving()"
                     (click)="saveIcpModalDraft()">
               {{ icpSaving() ? t('settings.icp.modal.saving') : ('actions.save' | transloco) }}
             </button>
@@ -1631,6 +1643,12 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     }
     .survey-link:hover { background: var(--surface); }
     .survey-link-cta { margin-left: auto; font-weight: 600; color: var(--orange-dark); white-space: nowrap; }
+    @media (max-width: 767px) {
+      #topbar .page-title { flex: 1 1 100%; }
+      .survey-link { flex-wrap: wrap; align-items: flex-start; }
+      .survey-link > span:nth-child(2) { flex: 1 1 0; min-width: 0; }
+      .survey-link-cta { flex: 1 1 100%; margin-left: 30px; }
+    }
   `],
 })
 export class SettingsComponent implements OnInit {
@@ -1789,7 +1807,8 @@ export class SettingsComponent implements OnInit {
 
   addGroup(): void {
     const { name, display_name, description, has_owner_restriction } = this.newGroup;
-    if (!name.trim() || !display_name.trim()) return;
+    this.isGroupSubmitted = !name.trim() || !display_name.trim();
+    if (this.isGroupSubmitted) return;
     this.groupSaving.set(true);
     this.groupError.set('');
     this.http.post<any>(`${environment.apiUrl}/admin/settings/groups`, {
@@ -1868,7 +1887,10 @@ export class SettingsComponent implements OnInit {
   }
 
   deleteGroup(g: any): void {
-    if (g.member_count > 0 || g.document_count > 0) return;
+    if (g.member_count > 0 || g.document_count > 0) {
+      this.toast.info(this.transloco.translate('admin.settings.groups.cannotDelete'));
+      return;
+    }
     if (!confirm(this.transloco.translate('admin.settings.groups.deleteConfirm', { name: g.display_name }))) return;
     this.http.delete(`${environment.apiUrl}/admin/settings/groups/${g.id}`).subscribe({
       next: () => {
@@ -2319,7 +2341,12 @@ export class SettingsComponent implements OnInit {
   }
 
   addStage(): void {
+    if (!this.canAddStage()) {
+      this.toast.info(this.transloco.translate('admin.settings.leadStages.limitReached', { max: this.maxOpenStages() }));
+      return;
+    }
     const label = this.newStageLabel.trim();
+    this.isStageSubmitted = !label;
     if (!label) return;
     this.stagesSaving.set(true);
     this.leadStages.create({ label }).subscribe({
@@ -2521,7 +2548,12 @@ export class SettingsComponent implements OnInit {
     });
   }
 
+  isGroupSubmitted = false;
+  isStageSubmitted = false;
+  isIcpSubmitted = false;
+
   openIcpEditModal(signal: IcpSignal | null): void {
+    this.isIcpSubmitted = false;
     this.icpModalTarget.set(signal ?? 'new');
     this.icpModalDraft = signal
       ? { label: signal.label, ai_definition: signal.ai_definition, short_description: signal.short_description ?? '', points: signal.points, active: signal.active }
@@ -2558,6 +2590,8 @@ export class SettingsComponent implements OnInit {
     const cfg = this.icpConfig();
     const target = this.icpModalTarget();
     if (!tenantId || !cfg || target === null) return;
+    this.isIcpSubmitted = !this.icpModalDraft.label.trim() || !this.icpModalDraft.ai_definition.trim();
+    if (this.isIcpSubmitted) return;
 
     this.icpSaving.set(true);
     const body = {

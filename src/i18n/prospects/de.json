@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} Firmen…",
     "errors": {
       "aiNoCredit": "Kein Guthaben auf dem KI-Konto",
+      "nip": "Die NIP muss 10 Ziffern haben, z. B. 1234567890",
       "searchFailedWithReason": "Suche fehlgeschlagen: {reason}",
+      "seedName": "Geben Sie den Namen des Musterunternehmens ein, z. B. ABC GmbH",
+      "selectCompanies": "Markieren Sie mindestens ein Unternehmen in der Liste",
       "taxIdConflict": "Konflikt bei der Steuernummer — ein anderer Datensatz nutzt diese Nummer bereits."
     },
     "exportCsv": "CSV-Export",
@@ -120,10 +123,14 @@
       "fatalError": "Importfehler:",
       "heading": "Firmen aus CSV importieren",
       "importing": "Import läuft…",
+      "inCrmLead": "Lead",
+      "inCrmPartner": "Partner",
+      "inCrmTitle": "Übersprungen, weil bereits im CRM:",
       "optionalColumns": "www, krs, company_name/nazwa, branża, profil, zatrudnienie, obrot, rok, miasto, województwo, PKD-ID, PKD-opis, Osoba Decyzyjna, Stanowisko, Komórka, Telefon, Email",
       "optionalLabel": "Automatisch erkannt:",
       "requiredLabel": "Erforderliche Spalten:",
       "skipped": "Übersprungen (Duplikate):",
+      "skippedInCrm": "Übersprungen (bereits im CRM):",
       "submit": "Importieren",
       "totalRows": "Zeilen insgesamt:",
       "wwwHint": "Mit der Spalte www entfällt die automatische Suche (günstiger und schneller)."

@@ -89,7 +89,10 @@
     "enrichmentProgress": "{done}/{total} firme…",
     "errors": {
       "aiNoCredit": "Nu mai există credit în contul AI",
+      "nip": "NIP-ul trebuie să aibă 10 cifre, de ex. 1234567890",
       "searchFailedWithReason": "Căutarea a eșuat: {reason}",
+      "seedName": "Introduceți numele firmei model, de ex. ABC SRL",
+      "selectCompanies": "Bifați cel puțin o firmă din listă",
       "taxIdConflict": "Conflict de CUI — o altă înregistrare folosește deja acest număr."
     },
     "exportCsv": "Export CSV",
@@ -120,10 +123,14 @@
       "fatalError": "Eroare de import:",
       "heading": "Import firme din CSV",
       "importing": "Se importă…",
+      "inCrmLead": "Lead",
+      "inCrmPartner": "Partener",
+      "inCrmTitle": "Omise pentru că sunt deja în CRM:",
       "optionalColumns": "www, krs, company_name/nazwa, branża, profil, zatrudnienie, obrot, rok, miasto, województwo, PKD-ID, PKD-opis, Osoba Decyzyjna, Stanowisko, Komórka, Telefon, Email",
       "optionalLabel": "Detectate automat:",
       "requiredLabel": "Coloane obligatorii:",
       "skipped": "Omise (duplicate):",
+      "skippedInCrm": "Omise (deja în CRM):",
       "submit": "Importă",
       "totalRows": "Rânduri în total:",
       "wwwHint": "Indicarea coloanei www permite sărirea căutării automate (mai ieftin și mai rapid)."

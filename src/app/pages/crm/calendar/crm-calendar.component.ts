@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
 import { CrmApiService, CalendarMeeting, ActivityTask, CrmUser, CrmGroup } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -16,7 +17,7 @@ import { LocaleService } from '../../../core/i18n/locale.service';
 
 type ViewMode = 'month' | 'week' | 'day' | 'tasks';
 
-const KNOWN_ACTIVITY_TYPES = ['task', 'call', 'email', 'meeting', 'note', 'doc_sent', 'training', 'qbr', 'opportunity'];
+const KNOWN_ACTIVITY_TYPES = ['task', 'call', 'email', 'meeting', 'note', 'doc_sent', 'training', 'qbr', 'opportunity', 'marketing_email'];
 const KNOWN_PRIORITIES = ['asap', 'important', 'medium', 'low'];
 
 interface CalendarDay {
@@ -29,15 +30,15 @@ interface CalendarDay {
 @Component({
   selector: 'wt-crm-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent, EntityAttachmentsComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent, EntityAttachmentsComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;padding:0 20px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('calendar.title') }}</span>
+<div class="cal-topbar" style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;padding:0 20px;flex-shrink:0">
+  <span class="cal-title" style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('calendar.title') }}</span>
   <span style="flex:1"></span>
 
   <!-- Filtr handlowca (manager) -->
@@ -87,7 +88,7 @@ interface CalendarDay {
   <!-- Nawigacja (tylko dla widoków kalendarza) -->
   <ng-container *ngIf="view !== 'tasks'">
     <button class="nav-btn" (click)="prev()">‹</button>
-    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;min-width:200px;text-align:center">{{ periodLabel }}</span>
+    <span class="cal-period" style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;min-width:200px;text-align:center">{{ periodLabel }}</span>
     <button class="nav-btn" (click)="next()">›</button>
     <button class="btn btn-g btn-sm" (click)="today()">{{ t('calendar.nav.today') }}</button>
   </ng-container>
@@ -188,8 +189,8 @@ interface CalendarDay {
             <div class="de-source">{{ m.source_name }}
               <span *ngIf="m.assigned_to_name"> · {{ m.assigned_to_name }}</span>
             </div>
-            <div *ngIf="m.meeting_location" class="de-meta">📍 {{ m.meeting_location }}</div>
-            <div *ngIf="m.participants" class="de-meta">👥 {{ m.participants }}</div>
+            <div *ngIf="m.meeting_location" class="de-meta"><i class="ei ei-map-pin"></i> {{ m.meeting_location }}</div>
+            <div *ngIf="m.participants" class="de-meta"><i class="ei ei-users"></i> {{ m.participants }}</div>
           </div>
           <div class="ds-line"></div>
         </div>
@@ -206,13 +207,14 @@ interface CalendarDay {
       <span style="flex:1"></span>
       <ng-container *ngIf="!bulkSelectMode">
         <button class="btn btn-g btn-sm" (click)="enterBulkSelect()">
-          ☑ {{ t('calendar.tasks.bulk.selectOverdue') }}
+          <i class="ei ei-check"></i> {{ t('calendar.tasks.bulk.selectOverdue') }}
         </button>
       </ng-container>
       <ng-container *ngIf="bulkSelectMode">
         <span style="font-size:12px;color:var(--gray-700);font-weight:600">{{ t('calendar.tasks.bulk.selectedCount', { count: selectedTaskKeys.size }) }}</span>
+        @if (bulkCloseSubmitted && !selectedTaskKeys.size) { <span class="pf-err" role="alert" style="margin-right:0">{{ t('calendar.tasks.bulk.errors.noneSelected') }}</span> }
         <button class="btn btn-p btn-sm"
-                (click)="bulkClose()" [disabled]="!selectedTaskKeys.size || saving">
+                (click)="bulkClose()" [disabled]="saving">
           {{saving ? '…' : t('calendar.tasks.bulk.closeSelected')}}
         </button>
         <button class="btn btn-g btn-sm" (click)="exitBulkSelect()">{{ 'actions.cancel' | transloco }}</button>
@@ -295,8 +297,10 @@ interface CalendarDay {
            (click)="$event.stopPropagation()">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div style="display:flex;flex-direction:column;gap:4px">
-            <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.modal.title') }} *</label>
-            <input [(ngModel)]="inlineEditForm.title" class="ef-input" [placeholder]="t('calendar.tasks.form.titlePlaceholder')">
+            <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.modal.title') }} <span class="req">*</span></label>
+            <input [(ngModel)]="inlineEditForm.title" class="ef-input" [placeholder]="t('calendar.tasks.form.titlePlaceholder')"
+                   [class.fi-err]="inlineEditSubmitted && !inlineEditForm.title?.trim()">
+            @if (inlineEditSubmitted && !inlineEditForm.title?.trim()) { <span class="ferr">{{ 'form.errors.title' | transloco }}</span> }
           </div>
           <div style="display:flex;flex-direction:column;gap:4px">
             <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.form.dateTime') }}</label>
@@ -315,8 +319,9 @@ interface CalendarDay {
           </select>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end">
+          @if (inlineEditSubmitted) { <wt-form-error-summary [count]="inlineEditForm.title?.trim() ? 0 : 1" /> }
           <button class="btn btn-g" (click)="cancelInlineEdit()">{{ 'actions.cancel' | transloco }}</button>
-          <button class="btn btn-p" (click)="saveInlineEdit(task)" [disabled]="!inlineEditForm.title?.trim() || saving">
+          <button class="btn btn-p" (click)="saveInlineEdit(task)" [disabled]="saving">
             {{saving ? '…' : ('actions.save' | transloco)}}
           </button>
         </div>
@@ -330,10 +335,10 @@ interface CalendarDay {
   <div class="detail-panel" (click)="$event.stopPropagation()">
     <div class="dp-header">
       <span class="dp-badge" [class.lead-badge]="selectedMeeting.source_type==='lead'" [class.partner-badge]="selectedMeeting.source_type==='partner'">
-        {{ selectedMeeting.source_type === 'lead' ? '🎯 ' + t('labels.sourceTypes.lead') : '🤝 ' + t('labels.sourceTypes.partner') }}
+        @if (selectedMeeting.source_type === 'lead') { <i class="ei ei-target"></i> {{ t('labels.sourceTypes.lead') }} } @else { <i class="ei ei-handshake"></i> {{ t('labels.sourceTypes.partner') }} }
       </span>
       <span style="flex:1"></span>
-      <button class="btn btn-g btn-sm" (click)="startEdit()" *ngIf="!editMode && canEdit(selectedMeeting)">✏️{{ t('activity.modal.edit') }}</button>
+      <button class="btn btn-g btn-sm" (click)="startEdit()" *ngIf="!editMode && canEdit(selectedMeeting)"><i class="ei ei-pencil"></i> {{ t('activity.modal.edit') }}</button>
       <button class="dp-close" (click)="closeMeeting()">✕</button>
     </div>
 
@@ -344,19 +349,19 @@ interface CalendarDay {
         <a *ngIf="selectedMeeting.source_type === 'lead'"    [routerLink]="['/crm/leads',    selectedMeeting.source_id]" class="dp-link">{{ selectedMeeting.source_name }}</a>
         <a *ngIf="selectedMeeting.source_type === 'partner'" [routerLink]="['/crm/partners', selectedMeeting.source_id]" class="dp-link">{{ selectedMeeting.source_name }}</a>
       </div>
-      <div class="dp-row"><span class="dp-lbl">📅 {{ t('activity.modal.dateTime') }}</span><span>{{ selectedMeeting.activity_at | date:'dd.MM.yyyy HH:mm' }}</span></div>
+      <div class="dp-row"><span class="dp-lbl"><i class="ei ei-calendar"></i> {{ t('activity.modal.dateTime') }}</span><span>{{ selectedMeeting.activity_at | date:'dd.MM.yyyy HH:mm' }}</span></div>
       <div class="dp-row" *ngIf="selectedMeeting.duration_min"><span class="dp-lbl">⏱ {{ t('calendar.meeting.duration') }}</span><span>{{ t('calendar.durationMinutes', { minutes: selectedMeeting.duration_min }) }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.meeting_location"><span class="dp-lbl">📍 {{ t('meetings.location') }}</span><span>{{ selectedMeeting.meeting_location }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.participants"><span class="dp-lbl">👥 {{ t('meetings.participants') }}</span><span style="word-break:break-all">{{ selectedMeeting.participants }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.body"><span class="dp-lbl">📝 {{ t('calendar.meeting.notes') }}</span><span>{{ selectedMeeting.body }}</span></div>
-      <div class="dp-row"><span class="dp-lbl">👤 {{ t('activity.modal.addedBy') }}</span><span>{{ selectedMeeting.created_by_name }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.assigned_to_name"><span class="dp-lbl">🙋 {{ t('calendar.meeting.salesperson') }}</span><span>{{ selectedMeeting.assigned_to_name }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.meeting_location"><span class="dp-lbl"><i class="ei ei-map-pin"></i> {{ t('meetings.location') }}</span><span>{{ selectedMeeting.meeting_location }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.participants"><span class="dp-lbl"><i class="ei ei-users"></i> {{ t('meetings.participants') }}</span><span style="word-break:break-all">{{ selectedMeeting.participants }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.body"><span class="dp-lbl"><i class="ei ei-note"></i> {{ t('calendar.meeting.notes') }}</span><span>{{ selectedMeeting.body }}</span></div>
+      <div class="dp-row"><span class="dp-lbl"><i class="ei ei-user"></i> {{ t('activity.modal.addedBy') }}</span><span>{{ selectedMeeting.created_by_name }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.assigned_to_name"><span class="dp-lbl"><i class="ei ei-user"></i> {{ t('calendar.meeting.salesperson') }}</span><span>{{ selectedMeeting.assigned_to_name }}</span></div>
     </div>
 
     <!-- Tryb edycji -->
     <div *ngIf="editMode" class="dp-body">
       <div class="ef-row">
-        <label class="ef-lbl">{{ t('activity.modal.title') }} *</label>
+        <label class="ef-lbl">{{ t('activity.modal.title') }} <span class="req">*</span></label>
         <input class="ef-input" [(ngModel)]="editForm.title">
       </div>
       <div class="ef-row">
@@ -396,11 +401,17 @@ interface CalendarDay {
     .opt-team { width:16px; height:16px; flex-shrink:0; fill:none; stroke:var(--gray-500); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     .ctl { background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:4px 10px;font-size:12px;outline:none;cursor:pointer;font-family:inherit }
     .ctl:focus { border-color:#3BAA5D }
+    @media (max-width: 767px) {
+      .cal-title { flex: 1 1 100%; }
+      .cal-title + span { display: none; }
+      .cal-period { font-size: 14px !important; flex: 1 1 0 !important; }
+    }
     
     .tasks-badge { display:inline-flex;min-width:16px;height:16px;background:#dc2626;color:white;border-radius:10px;font-size:10px;font-weight:700;align-items:center;justify-content:center;padding:0 4px;line-height:1;margin-left:4px;vertical-align:middle }
 
     /* Month */
-    .month-grid { display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--gray-200);border-top:1px solid var(--gray-200) }
+    /* minmax(0,1fr): long event titles never widen their day column */
+    .month-grid { display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-left:1px solid var(--gray-200);border-top:1px solid var(--gray-200) }
     .month-dayname { padding:6px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-400);text-align:center;border-right:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);background:var(--gray-50) }
     .month-cell { min-height:100px;padding:6px;border-right:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);background:var(--surface);vertical-align:top }
     .month-cell.weekend { background:var(--gray-50) }
@@ -420,7 +431,7 @@ interface CalendarDay {
     .event-more:hover { color:oklch(from #3baa5d max(l, var(--text-min-l)) c h) }
 
     /* Week */
-    .week-grid { display:grid;grid-template-columns:50px repeat(7,1fr);border-left:1px solid var(--gray-200) }
+    .week-grid { display:grid;grid-template-columns:50px repeat(7,minmax(0,1fr));border-left:1px solid var(--gray-200) }
     .wh-time { background:var(--gray-50);border-right:1px solid var(--gray-200);border-bottom:2px solid var(--gray-200) }
     .wh-day { padding:6px;text-align:center;border-right:1px solid var(--gray-200);border-bottom:2px solid var(--gray-200);background:var(--gray-50) }
     .wh-day.today { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface)) }
@@ -537,6 +548,8 @@ export class CrmCalendarComponent implements OnInit {
   // Inline edit
   expandedTaskKey: string | null = null;
   inlineEditForm: any = {};
+  inlineEditSubmitted = false;
+  bulkCloseSubmitted = false;
 
   // Masowe zamykanie
   bulkSelectMode = false;
@@ -571,6 +584,7 @@ export class CrmCalendarComponent implements OnInit {
       this.api.getCrmUsers().subscribe({ next: u => { this.crmUsers = u; this.cdr.markForCheck(); }, error: () => {} });
       this.api.getCrmGroups().subscribe({ next: g => { this.crmGroups = g; this.cdr.markForCheck(); }, error: () => {} });
     }
+    if (typeof window !== 'undefined' && window.innerWidth < 768) this.view = 'day';
     this.loadTaskBadge();
     this.load();
   }
@@ -692,6 +706,7 @@ export class CrmCalendarComponent implements OnInit {
 
     // Otwórz nowe zadanie
     this.expandedTaskKey = key;
+    this.inlineEditSubmitted = false;
     this.inlineEditForm = {
       title:       t.title,
       body:        t.body || '',
@@ -707,7 +722,11 @@ export class CrmCalendarComponent implements OnInit {
   cancelInlineEdit(): void { this.expandedTaskKey = null; this.cdr.markForCheck(); }
 
   saveInlineEdit(t: ActivityTask, silent = false): void {
-    if (!this.inlineEditForm.title?.trim()) return;
+    if (!this.inlineEditForm.title?.trim()) {
+      if (!silent) { this.inlineEditSubmitted = true; this.cdr.markForCheck(); }
+      return;
+    }
+    this.inlineEditSubmitted = false;
     if (!silent) { this.saving = true; this.cdr.markForCheck(); }
     const payload: any = {
       title:       this.inlineEditForm.title.trim(),
@@ -789,6 +808,7 @@ export class CrmCalendarComponent implements OnInit {
 
   exitBulkSelect(): void {
     this.bulkSelectMode = false;
+    this.bulkCloseSubmitted = false;
     this.selectedTaskKeys = new Set();
     this.cdr.markForCheck();
   }
@@ -801,7 +821,12 @@ export class CrmCalendarComponent implements OnInit {
   }
 
   bulkClose(): void {
-    if (!this.selectedTaskKeys.size) return;
+    if (!this.selectedTaskKeys.size) {
+      this.bulkCloseSubmitted = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.bulkCloseSubmitted = false;
     this.saving = true;
     this.cdr.markForCheck();
     const toClose = this.activities.filter(t => this.selectedTaskKeys.has(this.taskKey(t)));

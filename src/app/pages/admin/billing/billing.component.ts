@@ -19,10 +19,12 @@ interface InvoiceListResponse {
   pages: number;
 }
 
+import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
+
 @Component({
   selector: 'app-admin-billing',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormErrorSummaryComponent],
   template: `
     <div class="page">
       <div class="page-header">
@@ -138,7 +140,7 @@ interface InvoiceListResponse {
                   </td>
                   <td>
                     <div class="td-actions">
-                      <button class="btn-icon" [disabled]="!inv.pdf_blob_path" title="Pobierz PDF" (click)="downloadPdf(inv)">
+                      <button class="btn-icon" title="Pobierz PDF" (click)="downloadPdf(inv)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                           <polyline points="7,10 12,15 17,10"/>
@@ -190,13 +192,16 @@ interface InvoiceListResponse {
                 Po anulowaniu okres rozliczeniowy zwolni się i będzie można wygenerować poprawną fakturę.
               </p>
               <div class="field">
-                <label>Powód anulowania (wymagany)</label>
-                <textarea rows="3" [(ngModel)]="voidReason" placeholder="np. błędny plan / błędna kwota / literówka w danych nabywcy"></textarea>
+                <label>Powód anulowania <span class="req">*</span></label>
+                <textarea rows="3" [(ngModel)]="voidReason" placeholder="np. błędny plan / błędna kwota / literówka w danych nabywcy"
+                          [class.fi-err]="isVoidSubmitted && voidReason.trim().length < 3"></textarea>
+                @if (isVoidSubmitted && voidReason.trim().length < 3) { <span class="ferr">Wpisz powód anulowania (co najmniej 3 znaki), np. błędna kwota</span> }
               </div>
             </div>
             <div class="modal-footer">
+              @if (isVoidSubmitted) { <wt-form-error-summary [count]="voidReason.trim().length < 3 ? 1 : 0" /> }
               <button class="btn btn-g" (click)="cancelVoid()">Anuluj</button>
-              <button class="btn btn-d" [disabled]="voidSaving() || voidReason.trim().length < 3" (click)="confirmVoid()">
+              <button class="btn btn-d" [disabled]="voidSaving()" (click)="confirmVoid()">
                 {{ voidSaving() ? 'Anuluję...' : 'Anuluj fakturę' }}
               </button>
             </div>
@@ -315,6 +320,7 @@ export class BillingComponent implements OnInit {
 
   voidTarget = signal<Invoice | null>(null);
   voidReason = '';
+  isVoidSubmitted = false;
   voidSaving = signal(false);
 
   ngOnInit(): void {
@@ -355,12 +361,14 @@ export class BillingComponent implements OnInit {
     });
   }
 
-  openVoidModal(inv: Invoice): void { this.voidReason = ''; this.voidTarget.set(inv); }
+  openVoidModal(inv: Invoice): void { this.voidReason = ''; this.isVoidSubmitted = false; this.voidTarget.set(inv); }
   cancelVoid(): void { this.voidTarget.set(null); }
 
   confirmVoid(): void {
     const inv = this.voidTarget();
-    if (!inv || this.voidReason.trim().length < 3) return;
+    if (!inv) return;
+    this.isVoidSubmitted = this.voidReason.trim().length < 3;
+    if (this.isVoidSubmitted) return;
     this.voidSaving.set(true);
     this.http.put<Invoice>(`${API}/admin/billing/invoices/${inv.id}/void`, { reason: this.voidReason.trim() }).subscribe({
       next: updated => {
@@ -404,6 +412,10 @@ export class BillingComponent implements OnInit {
   }
 
   downloadPdf(inv: Invoice): void {
+    if (!inv.pdf_blob_path) {
+      this.toast.info('Ta faktura nie ma jeszcze pliku PDF.');
+      return;
+    }
     this.http.get(`${API}/admin/billing/invoices/${inv.id}/pdf`, { responseType: 'blob' }).subscribe({
       next: blob => {
         const url = URL.createObjectURL(blob);

@@ -39,7 +39,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                      placeholder="••••••••" autocomplete="new-password">
             </div>
             @if (errorMsg()) { <div class="l-error">{{ errorMsg() }}</div> }
-            <button class="lbtn" type="submit" [disabled]="loading() || !newPass || !confirmPass">
+            <button class="lbtn" type="submit" [disabled]="loading()">
               @if (loading()) { <span class="spinner"></span> {{ t('changePassword.submitting') }} }
               @else { {{ t('changePassword.submit') }} }
             </button>

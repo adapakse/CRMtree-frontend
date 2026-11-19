@@ -134,6 +134,14 @@ const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
     .tab-bar { display:flex; align-items:flex-start; gap:16px; }
     .tabs { width:560px; }
     .tabs.with-finance { width:700px; }
+    /* narrower than the tab row: one line that scrolls sideways, labels never wrap */
+    @media (max-width: 899px) {
+      .tab-bar { flex-wrap:wrap; gap:0 16px; }
+      .tabs, .tabs.with-finance { width:auto; flex:1 1 100%; max-width:100%; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; }
+      .tabs::-webkit-scrollbar { display:none; }
+      .tabs .tab-btn { flex:0 0 auto; white-space:nowrap; }
+      .mine-toggle { padding-top:0; margin-bottom:12px; }
+    }
     .chat-card { padding:18px 20px; max-width:900px; }
     .mine-toggle { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--gray-700); padding-top:8px; cursor:pointer; }
   `],

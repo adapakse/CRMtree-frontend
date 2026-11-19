@@ -94,6 +94,9 @@
     "tasks": {
       "bulk": {
         "closeSelected": "Chiudi le attività selezionate",
+        "errors": {
+          "noneSelected": "Seleziona almeno un'attività nell'elenco"
+        },
         "selectOverdue": "Seleziona tutte le attività scadute",
         "selectedCount": "{count, plural, one {# selezionata} other {# selezionate}}"
       },
@@ -531,24 +534,39 @@
     "writeNew": "Scrivi una nuova e-mail"
   },
   "fieldErrors": {
+    "caption": "Inserisci una didascalia, ad es. Pannello dei report di vendita",
     "closeDate": "Scegli la data di chiusura prevista",
     "company": "Indica il nome dell'azienda",
+    "competitorUrl": "Inserisci il sito del concorrente, ad es. concorrente.it",
     "contactName": "Indica nome e cognome del referente",
     "contactTitle": "Scegli il ruolo del referente",
     "email": "Indica un indirizzo e-mail, es. mario@azienda.it",
+    "featureTag": "Inserisci la funzione mostrata, ad es. Report",
     "firstContact": "Scegli la data del primo contatto",
+    "fullName": "Inserisci nome e cognome, ad es. Anna Rossi",
+    "groupName": "Inserisci il nome del gruppo, ad es. Catene alberghiere",
+    "imageFile": "Scegli un file immagine (PNG, JPG o WEBP)",
     "industry": "Scegli un settore",
     "lostReason": "Scegli il motivo della perdita",
+    "message": "Inserisci il testo del messaggio",
     "onlinePct": "Scegli la quota di vendite online",
     "phone": "Indica un numero di telefono, es. +48 600 000 000",
+    "pillarName": "Inserisci il nome del pilastro, ad es. Viaggi d'affari",
     "probability": "Scegli la probabilità di successo",
+    "recipients": "Aggiungi almeno un destinatario, ad es. mario.rossi@azienda.it",
     "salesperson": "Assegna un commerciale",
     "saveFailed": "Salvataggio non riuscito. Riprova — se l'errore si ripete, segnalalo all'amministratore.",
     "source": "Scegli da dove proviene il lead",
+    "subject": "Inserisci l'oggetto del messaggio",
+    "title": "Inserisci un titolo, ad es. Incontro sull'offerta",
     "value": "Indica un importo — se non lo conosci, inserisci 0",
     "valueNegative": "L'importo non può essere negativo",
     "valueTooLarge": "Importo troppo alto — massimo 999.999.999.999",
-    "website": "Indica il sito web dell'azienda, es. azienda.it"
+    "website": "Indica il sito web dell'azienda, es. azienda.it",
+    "whatsappTemplate": "Scegli un modello e compila tutti i suoi campi",
+    "wordpressAppPassword": "Incolla la password per le applicazioni dal profilo WordPress (ad es. abcd efgh ijkl mnop)",
+    "wordpressUrl": "Inserisci l'indirizzo del sito WordPress, ad es. https://blog.azienda.it",
+    "wordpressUser": "Inserisci il nome utente WordPress"
   },
   "history": {
     "activityAdded": "Azione aggiunta: {title}",
@@ -622,6 +640,7 @@
       "call": "Chiamata",
       "doc_sent": "Documento",
       "email": "E-mail",
+      "marketing_email": "Campagna e-mail",
       "meeting": "Riunione",
       "note": "Nota",
       "opportunity": "Opportunità",
@@ -795,6 +814,10 @@
       "title": "Informazioni"
     },
     "loadError": "Errore durante il caricamento del lead.",
+    "missingContact": {
+      "email": "Questo lead non ha un indirizzo e-mail — aggiungilo in “Modifica dati”",
+      "phone": "Questo lead non ha un numero di telefono — aggiungilo in “Modifica dati”"
+    },
     "nip": {
       "countryCodeRequired": "Inizia con il codice paese (2 lettere), es. PL",
       "duplicate": "Questa partita IVA è già assegnata a un'altra azienda nel CRM",
@@ -1142,11 +1165,13 @@
       "newTask": "Nuova attività",
       "note": "Nota",
       "notePlaceholder": "Informazioni aggiuntive…",
+      "partnerRequired": "Scegli un partner in alto nella pagina per aggiungere un’attività",
       "step": "Passo del processo",
       "time": "Ora",
       "timeHint": "(facoltativa, pred. 09:00)",
       "title": "Titolo dell’attività",
-      "titlePlaceholder": "Nome dell’attività"
+      "titlePlaceholder": "Nome dell’attività",
+      "titleRequired": "Inserisci un titolo per l’attività, ad es. «Firmare il contratto quadro»"
     },
     "taskTypes": {
       "call": "Chiamata"
@@ -1170,6 +1195,26 @@
       "calendar": "Calendario",
       "partners": "Partner",
       "timeline": "Timeline"
+    },
+    "withdraw": {
+      "action": "Ritira",
+      "confirm": "Conferma il ritiro",
+      "confirmPrompt": "Ritirare \"{company}\" dall'onboarding alla fase \"{stage}\"? Il partner e le sue attività di onboarding verranno eliminati e il lead torna nella pipeline di vendita.",
+      "detailButton": "Ritira dall'onboarding nella pipeline",
+      "detailHint": "Elimina questo partner e le sue attività di onboarding — il lead torna alla fase della pipeline selezionata.",
+      "detailStagePrompt": "Riporta il lead alla fase:",
+      "failed": "Impossibile ritirare dall'onboarding",
+      "hint": "Ritira dall'onboarding a una fase della pipeline",
+      "inProgress": "Ritiro in corso…",
+      "intro": "{company} verrà rimossa dall'onboarding (insieme alle attività di onboarding) e torna nella pipeline di vendita nella fase selezionata.",
+      "invalidStage": "Questa fase non esiste più nella pipeline — aggiorna la pagina e scegline un'altra",
+      "noPermission": "Solo un responsabile vendite o un amministratore può ritirare dall'onboarding",
+      "notFound": "Partner non trovato — potrebbe essere già stato ritirato o avviato",
+      "stageLabel": "Fase della pipeline",
+      "stagePlaceholder": "— seleziona una fase —",
+      "stageRequired": "Seleziona la fase della pipeline in cui torna l'azienda",
+      "success": "\"{company}\" è tornata nella pipeline di vendita",
+      "title": "Ritira dall'onboarding"
     }
   },
   "partnerDetail": {
@@ -1413,7 +1458,7 @@
     "sections": {
       "additionalData": "Dati aggiuntivi",
       "agent": "Dati dell’agente",
-      "billingAddress": "Billing Address",
+      "billingAddress": "Indirizzo di fatturazione",
       "billingContact": "Contatto per la fatturazione",
       "contractContact": "Contatto per il contratto",
       "customFields": "Campi aggiuntivi",
@@ -1565,6 +1610,32 @@
       "previousYear": "Anno precedente ({year})"
     }
   },
+  "personConsents": {
+    "cancel": "Annulla",
+    "companyHint": "Le campagne e-mail non lo usano: conta il consenso della persona qui sopra.",
+    "companyTitle": "Consenso aziendale (vecchio)",
+    "deniedPlaceholder": "es. rifiuto al telefono",
+    "errors": {
+      "note": "Descrivi come è stato ottenuto il consenso (almeno 3 caratteri), ad es. modulo in fiera 12.10"
+    },
+    "grantedPlaceholder": "es. a voce all’incontro del 12.11, modulo alla fiera",
+    "loadFailed": "Impossibile caricare i consensi.",
+    "loading": "Caricamento…",
+    "mainContact": "contatto principale",
+    "noPeople": "Nessuna persona con indirizzo e-mail. Aggiungi un referente con e-mail per registrarne il consenso.",
+    "noteOptional": "Nota (facoltativa)",
+    "noteRequired": "Come è stato ottenuto? (obbligatorio)",
+    "save": "Salva",
+    "sources": {
+      "sendgrid_spam": "e-mail segnalata come spam",
+      "sendgrid_unsubscribe": "disiscrizione da un’e-mail"
+    },
+    "values": {
+      "denied": "Non acconsente",
+      "granted": "Acconsente",
+      "no_data": "Non noto"
+    }
+  },
   "reports": {
     "common": {
       "columns": {
@@ -1572,7 +1643,7 @@
         "pipeline": "Pipeline",
         "progress": "Avanzamento",
         "winRatePct": "Successo %",
-        "won": "Won"
+        "won": "Vinti"
       },
       "days": "{count, plural, one {# giorno} other {# giorni}}",
       "exportPdf": "Esporta PDF",

@@ -62,7 +62,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
 
     @if (partnerFilterName) {
       <div style="display:flex;align-items:center;gap:8px;background:var(--orange-pale);border-bottom:1px solid var(--orange-muted);padding:8px 24px;font-size:12px;color:var(--orange-dark)">
-        <span style="font-size:14px">🏢</span>
+        <span style="font-size:14px"><i class="ei ei-building"></i></span>
         <span>{{ t('list.partnerFilter.label') }} <strong>{{partnerFilterName}}</strong></span>
         <button class="btn btn-g btn-sm" (click)="clearPartnerFilter()" style="margin-left:auto">✕ {{ t('list.partnerFilter.clear') }}</button>
       </div>
@@ -122,7 +122,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
               <span class="td-n" [title]="doc.name">{{ doc.name }}</span>
               <span class="td-sub">{{ doc.doc_number }}</span>
               @if (doc.doc_type === 'partner_agreement' && !doc.has_partner) {
-                <span class="no-partner-tri" [title]="t('list.noPartnerWarning')">⚠️</span>
+                <span class="no-partner-tri" [title]="t('list.noPartnerWarning')"><i class="ei ei-warn"></i></span>
               }
             </div>
             <div class="td td-muted"><wt-type-badge [type]="doc.doc_type" /></div>
@@ -165,7 +165,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
 
         @if (displayedDocuments().length === 0 && !loading()) {
           <div class="empty-state">
-            <div class="empty-icon">🔍</div>
+            <div class="empty-icon"><i class="ei ei-search"></i></div>
             <div class="empty-title">{{ t('list.empty.title') }}</div>
             <div>{{ t('list.empty.hint') }}</div>
           </div>

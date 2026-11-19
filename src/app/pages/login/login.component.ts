@@ -31,13 +31,16 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
         <form (ngSubmit)="loginPassword()" #f="ngForm">
           <div class="field">
             <label for="login-email">{{ t('email') }}</label>
-            <input id="login-email" type="email" [(ngModel)]="email" name="email" [placeholder]="t('emailPlaceholder')" autocomplete="email" required>
+            <input id="login-email" type="email" [(ngModel)]="email" name="email" [placeholder]="t('emailPlaceholder')" autocomplete="email" required
+                   [class.fi-err]="submitted() && !email">
+            @if (submitted() && !email) { <span class="ferr">{{ t('errors.email') }}</span> }
           </div>
           <div class="field">
             <label for="login-password">{{ t('password') }}</label>
             <div class="input-wrap">
               <input id="login-password" class="has-toggle" [type]="showPass() ? 'text' : 'password'" [(ngModel)]="password" name="password"
-                     placeholder="••••••••" autocomplete="current-password" required>
+                     placeholder="••••••••" autocomplete="current-password" required
+                     [class.fi-err]="submitted() && !password">
               <button type="button" class="pass-toggle" (click)="showPass.set(!showPass())"
                       [attr.aria-label]="t(showPass() ? 'hidePassword' : 'showPassword')"
                       [title]="t(showPass() ? 'hidePassword' : 'showPassword')">
@@ -48,11 +51,12 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 }
               </button>
             </div>
+            @if (submitted() && !password) { <span class="ferr">{{ t('errors.password') }}</span> }
           </div>
           @if (errorMsg()) {
             <div class="l-error">{{ errorMsg() }}</div>
           }
-          <button class="lbtn" type="submit" [disabled]="loading() || !email || !password">
+          <button class="lbtn" type="submit" [disabled]="loading()">
             @if (loading()) { <span class="spinner"></span> {{ t('submitting') }} }
             @else { {{ t('submit') }} }
           </button>
@@ -196,6 +200,7 @@ export class LoginComponent implements OnInit {
   loading  = signal(false);
   showPass = signal(false);
   errorMsg = signal('');
+  submitted = signal(false);
 
   email    = '';
   password = '';
@@ -214,6 +219,10 @@ export class LoginComponent implements OnInit {
 
   loginPassword(): void {
     this.errorMsg.set('');
+    if (!this.email || !this.password) {
+      this.submitted.set(true);
+      return;
+    }
     this.loading.set(true);
     this.auth.loginWithPassword(this.email, this.password).subscribe({
       next: tokens => {

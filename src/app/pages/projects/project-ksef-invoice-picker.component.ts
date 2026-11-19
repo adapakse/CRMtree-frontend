@@ -97,7 +97,8 @@ interface InvoiceFilters {
                 {{ t('ksef.picker.lastSync', { time: format.dateTime(lastSyncedAt()) }) }}
                 {{ t('ksef.picker.syncHint') }}
               </span>
-              <button class="btn btn-g btn-sm" [disabled]="!canSync() || isSyncing()" (click)="sync()">
+              <button class="btn btn-g btn-sm" [disabled]="isSyncing()" (click)="sync()"
+                      [title]="canSync() ? '' : t('ksef.sync.notConfigured')">
                 {{ isSyncing() ? t('ksef.sync.running') : t('ksef.sync.now') }}
               </button>
             </div>
@@ -264,6 +265,10 @@ export class ProjectKsefInvoicePickerComponent implements OnInit {
   }
 
   sync(): void {
+    if (!this.canSync()) {
+      this.toast.info(this.transloco.translate('projects.ksef.sync.notConfigured'));
+      return;
+    }
     this.isSyncing.set(true);
     this.api.syncAndWait(null).subscribe({
       next: ({ state, isFinished }) => {

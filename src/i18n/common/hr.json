@@ -50,6 +50,14 @@
     "uploadFailed": "Nije moguće prenijeti datoteku: {name}.",
     "uploading": "Učitavanje…"
   },
+  "form": {
+    "errors": {
+      "closeComment": "Upišite komentar o tome što je učinjeno, npr. „Ponuda poslana”",
+      "title": "Upišite naslov"
+    },
+    "fixErrors": "Ispravite polja označena crvenom bojom ({count})",
+    "noChanges": "Nema promjena za spremanje"
+  },
   "httpErrors": {
     "badRequest": "Neki podaci nisu ispravni. Provjerite polja i pokušajte ponovno.",
     "badRequestDetails": "Neispravni podaci: {details}",

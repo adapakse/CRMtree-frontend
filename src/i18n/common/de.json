@@ -50,6 +50,14 @@
     "uploadFailed": "Datei konnte nicht hochgeladen werden: {name}.",
     "uploading": "Wird hochgeladen…"
   },
+  "form": {
+    "errors": {
+      "closeComment": "Geben Sie einen Kommentar ein, was erledigt wurde, z. B. „Angebot gesendet“",
+      "title": "Geben Sie einen Titel ein"
+    },
+    "fixErrors": "Korrigieren Sie die rot markierten Felder ({count})",
+    "noChanges": "Keine Änderungen zum Speichern"
+  },
   "httpErrors": {
     "badRequest": "Einige Angaben sind ungültig. Prüfen Sie die Felder und versuchen Sie es erneut.",
     "badRequestDetails": "Ungültige Angaben: {details}",

@@ -102,6 +102,9 @@
     },
     "signus": {
       "emailsPlaceholder": "anne@entreprise.com, partner@example.com",
+      "errors": {
+        "emails": "Saisissez les adresses e-mail des signataires séparées par des virgules, par ex. jean@societe.fr, anne@societe.fr"
+      },
       "info": "Le document sera envoyé à l’API Signus. Chaque signataire recevra un e-mail. Les versions signées sont archivées automatiquement.",
       "modalTitle": "Lancer la signature électronique",
       "sectionTitle": "Signature électronique (Signus)",
@@ -143,6 +146,9 @@
       "assigned": "Tâche attribuée — notification e-mail envoyée",
       "cancelled": "Tâche annulée",
       "dueDate": "Échéance",
+      "errors": {
+        "assignTo": "Recherchez une personne et cliquez dessus dans la liste"
+      },
       "message": "Message",
       "messagePlaceholder": "Message facultatif pour la personne désignée…",
       "selected": "Sélectionné : {name}",
@@ -343,6 +349,17 @@
     "chooseType": "— Choisir un type —",
     "create": "Créer le document",
     "createFailed": "Impossible de créer le document",
+    "errors": {
+      "buyer": "Saisissez l'acheteur indiqué sur la facture",
+      "contractSubject": "Choisissez l'objet du contrat",
+      "country": "Choisissez le pays du cocontractant",
+      "docType": "Choisissez le type de document",
+      "entity1": "Saisissez la première partie au contrat, par ex. CRMtree SARL",
+      "gdprType": "Choisissez la classification RGPD",
+      "group": "Choisissez le groupe qui verra le document",
+      "name": "Saisissez le nom du document, par ex. Contrat de partenariat — ABC SARL",
+      "nip": "Saisissez le numéro fiscal du cocontractant, par ex. 1234567890"
+    },
     "file": {
       "dropHint": "Déposez un fichier ici ou cliquez pour en choisir un",
       "formats": "PDF, DOCX — 50 Mo max.",
