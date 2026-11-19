@@ -1,11 +1,16 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input, signal } from '@angular/core';
 import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 import { ListFilterControlComponent } from './list-filter-control.component';
+import { LocaleService } from '../../core/i18n/locale.service';
 import { ListFilter, ListQueryState, ListSortOption } from './list-query';
 
 const POPOVER_WIDTH_PX = 250;
 const VIEWPORT_MARGIN_PX = 12;
 const GAP_BELOW_TRIGGER_PX = 4;
+const MULTI_VALUE_SEPARATOR = ',';
+
+/** What a chosen filter shows on its chip: a single value, or the bounds of a range. */
+export type PickedFilterValue = { text: string; from?: never; to?: never } | { text?: never; from: string; to: string };
 
 /**
  * A button that opens filters in a small popover: a funnel icon in a column
@@ -23,10 +28,19 @@ const GAP_BELOW_TRIGGER_PX = 4;
       <button type="button" class="trigger" [class.icon-only]="variant() === 'icon'" [class.active]="isActive()"
               [title]="t('filterBy', { name: label() })" [attr.aria-label]="t('filterBy', { name: label() })"
               [attr.aria-expanded]="isOpen()" (click)="toggle($event)">
-        @if (variant() === 'labelled') { <span>{{ label() }}</span> }
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 5h18l-7 8v6l-4-2v-4L3 5z"/>
-        </svg>
+        @if (variant() === 'labelled') {
+          <span class="name">{{ label() }}</span>
+          @if (pickedValue(); as picked) {
+            <span class="picked">{{ picked.text ?? (picked.from && picked.to ? picked.from + '–' + picked.to : picked.from ? t('from') + ' ' + picked.from : t('to') + ' ' + picked.to) }}</span>
+          }
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 5h18l-7 8v6l-4-2v-4L3 5z"/>
+          </svg>
+        }
       </button>
       @if (isOpen()) {
         <div class="backdrop" (click)="close($event)"></div>
@@ -58,12 +72,19 @@ const GAP_BELOW_TRIGGER_PX = 4;
     </ng-container>
   `,
   styles: [`
-    :host { display:inline-flex; }
-    .trigger { display:inline-flex; align-items:center; gap:6px; height:30px; border:1px solid var(--gray-200); background:var(--surface); border-radius:8px; padding:0 10px; font-size:12px; color:var(--gray-700); box-shadow:var(--shadow-field); cursor:pointer; font-family:inherit; white-space:nowrap; }
+    /* Brand green dark enough for AA text on white and on the pale green; light enough on the dark theme. */
+    :host { display:inline-flex; max-width:100%; min-width:0; --green-text-aa:oklch(from var(--orange) max(min(l, 0.52), var(--text-min-l)) c h); }
+    /* In a filter bar: a white pill with the depth and hover of a secondary button; a chosen filter turns green and shows what was picked. */
+    .trigger { display:inline-flex; align-items:center; gap:2px; height:32px; max-width:100%; min-width:0; border:1px solid var(--control-border); background:var(--control-bg); border-radius:16px; padding:0 8px 0 12px; font-size:12px; font-weight:500; color:var(--gray-700); cursor:pointer; font-family:inherit; white-space:nowrap; box-shadow:0 5px 14px rgba(0,0,0,.081); transition:border-color .15s, box-shadow .15s, color .15s; }
     .trigger svg { width:12px; height:12px; flex-shrink:0; }
-    .trigger:hover { border-color:var(--gray-300); }
-    .trigger.active { border-color:var(--orange); color:var(--orange-dark); background:var(--orange-pale); font-weight:600; }
-    .trigger.icon-only { border:none; background:none; padding:2px 4px; border-radius:5px; color:var(--gray-400); }
+    .trigger:hover { border-color:var(--orange); color:var(--green-text-aa); box-shadow:0 5px 14px rgba(0,0,0,.081), 0 0 0 3px rgba(59,170,93,.12); }
+    .trigger:hover .chevron { color:inherit; }
+    .trigger:focus-visible { outline:none; border-color:var(--orange); box-shadow:0 5px 14px rgba(0,0,0,.081), var(--ring-field); }
+    .trigger.active { border-color:var(--orange); color:var(--gray-900); background:var(--orange-pale); }
+    .trigger.active .name::after { content:':'; }
+    .picked { margin-left:2px; font-weight:600; overflow:hidden; text-overflow:ellipsis; max-width:180px; }
+    .chevron { color:var(--gray-500); }
+    .trigger.icon-only { height:auto; border:none; background:none; box-shadow:none; padding:2px 4px; border-radius:6px; color:var(--gray-400); }
     .trigger.icon-only:hover { color:var(--gray-700); background:var(--gray-200); }
     .trigger.icon-only.active { color:var(--orange-dark); background:var(--orange-pale); }
     .backdrop { position:fixed; inset:0; z-index:340; }
@@ -74,12 +95,15 @@ const GAP_BELOW_TRIGGER_PX = 4;
     .sort-option { display:flex; justify-content:space-between; gap:8px; border:1px solid var(--gray-200); background:var(--surface); border-radius:7px; padding:4px 8px; font-size:12px; color:var(--gray-700); cursor:pointer; font-family:inherit; }
     .sort-option.sorted { border-color:var(--orange); color:var(--orange-dark); background:var(--orange-pale); font-weight:600; }
     .popover-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-    .clear { border:none; background:none; padding:0; font-size:12px; color:var(--accent-blue, oklch(from #3b82f6 max(l, var(--text-min-l)) c h)); cursor:pointer; font-family:inherit; }
+    .clear { border:none; background:none; padding:0; font-size:12px; font-weight:600; color:var(--green-text-aa); cursor:pointer; font-family:inherit; }
     .clear:disabled { color:var(--gray-300); cursor:default; }
   `],
 })
 export class ListFilterMenuComponent {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly dateFormatter = new Intl.DateTimeFormat(inject(LocaleService).activeLocale(), {
+    day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC',
+  });
 
   /** Names the button: the column or the filter it belongs to. */
   readonly label = input.required<string>();
@@ -94,6 +118,29 @@ export class ListFilterMenuComponent {
   readonly position = signal({ top: 0, left: 0 });
   readonly hasActiveFilter = computed(() =>
     this.filters().some(filter => filter.params.some(param => this.query().value(param) !== '')));
+  /** Only a filter bar chip of one filter shows its value; a column header keeps to its icon. */
+  readonly pickedValue = computed<PickedFilterValue | null>(() => {
+    const filters = this.filters();
+    if (this.variant() !== 'labelled' || filters.length !== 1) return null;
+    const filter = filters[0];
+    const [lower, upper] = filter.params.map(param => this.query().value(param));
+    switch (filter.kind) {
+      case 'select':
+        return lower ? { text: this.optionLabel(filter, lower) } : null;
+      case 'multi': {
+        const picked = lower ? lower.split(MULTI_VALUE_SEPARATOR) : [];
+        if (picked.length === 0) return null;
+        const first = this.optionLabel(filter, picked[0]);
+        return { text: picked.length > 1 ? `${first} +${picked.length - 1}` : first };
+      }
+      case 'dateRange':
+        return lower || upper ? { from: this.formatDate(lower), to: this.formatDate(upper) } : null;
+      case 'numberRange':
+        return lower || upper ? { from: lower, to: upper } : null;
+      default:
+        return lower ? { text: lower } : null;
+    }
+  });
   readonly isActive = computed(() =>
     this.hasActiveFilter() || this.sortOptions().some(option => option.key === this.query().sort()));
 
@@ -120,5 +167,15 @@ export class ListFilterMenuComponent {
   clear(): void {
     const params = this.filters().flatMap(filter => filter.params);
     this.query().setValues(Object.fromEntries(params.map(param => [param, ''])));
+  }
+
+  private optionLabel(filter: ListFilter, value: string): string {
+    return filter.options?.find(option => option.value === value)?.label ?? value;
+  }
+
+  private formatDate(isoDate: string): string {
+    if (!isoDate) return '';
+    const date = new Date(`${isoDate}T00:00:00Z`);
+    return Number.isNaN(date.getTime()) ? isoDate : this.dateFormatter.format(date);
   }
 }
