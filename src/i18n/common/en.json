@@ -392,6 +392,110 @@
   "states": {
     "loading": "Loading…"
   },
+  "tenantDefaults": {
+    "consentDescriptions": {
+      "classificationTargeting": "Consent to profiling, classification and targeting based on data about the partner’s activity and purchasing behaviour, to personalise commercial offers and sales activities, in accordance with Art. 6(1)(a) GDPR.",
+      "marketingComm": "Consent to processing the contact’s personal data to send marketing materials, offers and information about products and services by electronic means and by phone, in accordance with Art. 6(1)(a) GDPR."
+    },
+    "consentLabels": {
+      "classificationTargeting": "Consent to processing for classification and targeting",
+      "marketingComm": "Consent to data processing for marketing communication"
+    },
+    "contractSubjects": {
+      "accommodation": "Accommodation",
+      "businessTravel": "Business travel",
+      "conferences": "Conferences/Meetings",
+      "other": "Other",
+      "system": "System"
+    },
+    "countries": {
+      "at": "Austria",
+      "be": "Belgium",
+      "ch": "Switzerland",
+      "cz": "Czechia",
+      "de": "Germany",
+      "dk": "Denmark",
+      "es": "Spain",
+      "fi": "Finland",
+      "fr": "France",
+      "gb": "United Kingdom",
+      "hu": "Hungary",
+      "it": "Italy",
+      "nl": "Netherlands",
+      "no": "Norway",
+      "pl": "Poland",
+      "ro": "Romania",
+      "ru": "Russia",
+      "se": "Sweden",
+      "sk": "Slovakia",
+      "ua": "Ukraine"
+    },
+    "groupDescriptions": {
+      "accounting": "Finance and accounting department",
+      "customerService": "Customer service department",
+      "hr": "Human resources department",
+      "management": "Company management board",
+      "marketing": "Marketing department",
+      "operations": "Operations department",
+      "prospects": "Access to the Prospects module (CSV import, enrichment, conversion to a lead).",
+      "sales": "Sales department",
+      "seo": "Review and approval of SEObot content before publication.",
+      "seoEditorial": "SEObot editors: editing, completing and approving articles before publication."
+    },
+    "groups": {
+      "accounting": "Accounting",
+      "customerService": "Customer service",
+      "hr": "HR",
+      "management": "Management board",
+      "marketing": "Marketing",
+      "operations": "Operations",
+      "prospects": "Prospects",
+      "sales": "Sales",
+      "seoEditorial": "SEO editorial"
+    },
+    "holdReasons": {
+      "businessPause": "Business pause",
+      "internalSituation": "Internal company situation",
+      "noDecisionMakers": "No decision makers"
+    },
+    "languages": {
+      "de": "German",
+      "en": "English",
+      "pl": "Polish",
+      "ro": "Romanian",
+      "ru": "Russian"
+    },
+    "lostReasons": {
+      "highPrice": "High price",
+      "incompleteOffer": "Incomplete offer",
+      "other": "Other"
+    },
+    "projectCostCategories": {
+      "licences": "Licences",
+      "materials": "Materials",
+      "other": "Other",
+      "ownWork": "Own work",
+      "subcontractors": "Subcontractors",
+      "travel": "Travel"
+    },
+    "projectPriorities": {
+      "critical": "Critical",
+      "high": "High",
+      "low": "Low",
+      "medium": "Medium"
+    },
+    "projectStatuses": {
+      "done": "Done",
+      "inProgress": "In progress",
+      "review": "In review",
+      "todo": "To do"
+    },
+    "projectTypes": {
+      "meeting": "Meeting",
+      "milestone": "Milestone",
+      "task": "Task"
+    }
+  },
   "testEnvironmentBanner": {
     "title": "Test version — this is not the production environment"
   },

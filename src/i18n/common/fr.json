@@ -392,6 +392,110 @@
   "states": {
     "loading": "Chargement…"
   },
+  "tenantDefaults": {
+    "consentDescriptions": {
+      "classificationTargeting": "Consentement au profilage, à la classification et au ciblage sur la base des données d’activité et de comportement d’achat du partenaire, afin de personnaliser les offres commerciales et les actions de vente, conformément à l’art. 6, par. 1, point a) du RGPD.",
+      "marketingComm": "Consentement au traitement des données personnelles du contact afin d’envoyer des supports marketing, des offres et des informations sur les produits et services par voie électronique et par téléphone, conformément à l’art. 6, par. 1, point a) du RGPD."
+    },
+    "consentLabels": {
+      "classificationTargeting": "Consentement au traitement à des fins de classification et de ciblage",
+      "marketingComm": "Consentement au traitement des données à des fins de communication marketing"
+    },
+    "contractSubjects": {
+      "accommodation": "Hébergement",
+      "businessTravel": "Voyages d’affaires",
+      "conferences": "Conférences/Réunions",
+      "other": "Autre",
+      "system": "Système"
+    },
+    "countries": {
+      "at": "Autriche",
+      "be": "Belgique",
+      "ch": "Suisse",
+      "cz": "Tchéquie",
+      "de": "Allemagne",
+      "dk": "Danemark",
+      "es": "Espagne",
+      "fi": "Finlande",
+      "fr": "France",
+      "gb": "Royaume-Uni",
+      "hu": "Hongrie",
+      "it": "Italie",
+      "nl": "Pays-Bas",
+      "no": "Norvège",
+      "pl": "Pologne",
+      "ro": "Roumanie",
+      "ru": "Russie",
+      "se": "Suède",
+      "sk": "Slovaquie",
+      "ua": "Ukraine"
+    },
+    "groupDescriptions": {
+      "accounting": "Service des finances et de la comptabilité",
+      "customerService": "Service client",
+      "hr": "Service des ressources humaines",
+      "management": "Direction de l’entreprise",
+      "marketing": "Service marketing",
+      "operations": "Service des opérations",
+      "prospects": "Accès au module Prospects (import CSV, enrichissement, conversion en lead).",
+      "sales": "Service commercial",
+      "seo": "Relecture et validation des contenus SEObot avant publication.",
+      "seoEditorial": "Rédacteurs SEObot : rédaction, complétion et validation des articles avant publication."
+    },
+    "groups": {
+      "accounting": "Comptabilité",
+      "customerService": "Service client",
+      "hr": "Ressources humaines",
+      "management": "Direction",
+      "marketing": "Marketing",
+      "operations": "Opérations",
+      "prospects": "Prospects",
+      "sales": "Ventes",
+      "seoEditorial": "Rédaction SEO"
+    },
+    "holdReasons": {
+      "businessPause": "Pause d'activité",
+      "internalSituation": "Situation interne de l'entreprise",
+      "noDecisionMakers": "Pas de décideurs"
+    },
+    "languages": {
+      "de": "Allemand",
+      "en": "Anglais",
+      "pl": "Polonais",
+      "ro": "Roumain",
+      "ru": "Russe"
+    },
+    "lostReasons": {
+      "highPrice": "Prix élevé",
+      "incompleteOffer": "Offre incomplète",
+      "other": "Autre"
+    },
+    "projectCostCategories": {
+      "licences": "Licences",
+      "materials": "Matériaux",
+      "other": "Autres",
+      "ownWork": "Travail interne",
+      "subcontractors": "Sous-traitants",
+      "travel": "Déplacements"
+    },
+    "projectPriorities": {
+      "critical": "Critique",
+      "high": "Haute",
+      "low": "Faible",
+      "medium": "Moyenne"
+    },
+    "projectStatuses": {
+      "done": "Terminé",
+      "inProgress": "En cours",
+      "review": "À vérifier",
+      "todo": "À faire"
+    },
+    "projectTypes": {
+      "meeting": "Réunion",
+      "milestone": "Jalon",
+      "task": "Tâche"
+    }
+  },
   "testEnvironmentBanner": {
     "title": "Version de test — ce n’est pas l’environnement de production"
   },

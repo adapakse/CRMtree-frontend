@@ -3,6 +3,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 import { ToastService } from '../../../core/services/toast.service';
 import { ProjectConfig, ProjectRole, ProjectsApiService } from '../../../core/services/projects-api.service';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
+import { TenantDefaultLabelPipe } from '../../../core/i18n/tenant-default-label.pipe';
 
 type TransitionRole = Exclude<ProjectRole, 'pm'>;
 
@@ -13,7 +14,7 @@ const transitionKey = (fromStatusId: string, toStatusId: string): string => `${f
 @Component({
   selector: 'wt-project-transitions-editor',
   standalone: true,
-  imports: [TranslocoDirective, TranslocoPipe],
+  imports: [TranslocoDirective, TranslocoPipe, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -31,13 +32,13 @@ const transitionKey = (fromStatusId: string, toStatusId: string): string => `${f
           <thead>
             <tr>
               <th class="corner">{{ t('settings.transitions.matrixCorner') }}</th>
-              @for (status of statuses(); track status.id) { <th>{{ status.name }}</th> }
+              @for (status of statuses(); track status.id) { <th>{{ status.name | tenantLabel:'projectStatuses' }}</th> }
             </tr>
           </thead>
           <tbody>
             @for (from of statuses(); track from.id) {
               <tr>
-                <th class="from">{{ from.name }}</th>
+                <th class="from">{{ from.name | tenantLabel:'projectStatuses' }}</th>
                 @for (to of statuses(); track to.id) {
                   <td>
                     @if (from.id !== to.id) {

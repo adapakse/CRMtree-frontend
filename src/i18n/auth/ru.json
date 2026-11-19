@@ -14,7 +14,7 @@
     "title": "Задайте новый пароль"
   },
   "login": {
-    "email": "Email",
+    "email": "Эл. почта",
     "emailPlaceholder": "ivan@company.com",
     "errors": {
       "email": "Введите адрес e-mail, например ivan.petrov@firma.ru",

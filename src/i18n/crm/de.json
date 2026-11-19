@@ -655,7 +655,7 @@
       "onboarding": "Onboarding"
     },
     "priorities": {
-      "asap": "ASAP",
+      "asap": "Dringend",
       "important": "Wichtig",
       "low": "Niedrig",
       "medium": "Mittel"
@@ -1302,7 +1302,7 @@
         "language": "z. B. de",
         "notes": "Beliebige Notizen…",
         "partnerId": "z. B. 42",
-        "source": "z. B. Messe, Empfehlung, Cold Call",
+        "source": "z. B. Messe, Empfehlung, Kaltakquise",
         "subdomain": "z. B. acme",
         "website": "https://firma.de"
       },
@@ -1450,7 +1450,7 @@
         "last12Months": "Letzte 12 Mon.",
         "last3Months": "Letzte 3 Mon.",
         "last6Months": "Letzte 6 Mon.",
-        "ytd": "YTD {year}"
+        "ytd": "Seit Jahresbeginn {year}"
       },
       "productBreakdown": "Aufteilung nach Produkten",
       "title": "Vertriebsdaten DWH"
@@ -1550,9 +1550,9 @@
       "contractUntil": "Vertrag bis",
       "crmTurnover": "CRM-Umsatz",
       "dwhMargin": "DWH-Marge",
-      "dwhMarginHint": "Marge YTD aus dem DWH",
+      "dwhMarginHint": "Marge seit Jahresbeginn aus dem DWH",
       "dwhTurnover": "DWH-Umsatz",
-      "dwhTurnoverHint": "Bruttoumsatz YTD aus dem DWH"
+      "dwhTurnoverHint": "Bruttoumsatz seit Jahresbeginn aus dem DWH"
     },
     "taxIdErrors": {
       "countryCode": "Beginnen Sie mit dem Ländercode (2 Buchstaben), z. B. PL",
@@ -1602,7 +1602,7 @@
       "currentMonth": "Aktueller Monat",
       "currentQuarter": "Aktuelles Quartal",
       "currentWeek": "Aktuelle Woche",
-      "currentYear": "Aktuelles Jahr (YTD {year})",
+      "currentYear": "Aktuelles Jahr (seit Jahresbeginn {year})",
       "customRange": "Eigener Zeitraum…",
       "previousMonth": "Vorheriger Monat",
       "previousQuarter": "Vorheriges Quartal",
@@ -1661,7 +1661,7 @@
       "leadSources": {
         "title": "Lead-Quellen",
         "totalCaption": "Leads",
-        "winRate": "{value}% Win Rate"
+        "winRate": "{value}% Abschlussquote"
       },
       "leadsShort": "{count} Leads",
       "lostReasons": "Verlustgründe",
@@ -1669,7 +1669,7 @@
       "periods": {
         "currentMonth": "Aktueller Monat",
         "currentQuarter": "Aktuelles Quartal",
-        "currentYear": "Aktuelles Jahr (YTD {year})",
+        "currentYear": "Aktuelles Jahr (seit Jahresbeginn {year})",
         "last3Months": "Letzte 3 Monate",
         "last6Months": "Letzte 6 Monate"
       },
@@ -1720,7 +1720,7 @@
         "topReason": "Top-Grund:"
       },
       "sourceQuality": {
-        "title": "Qualität nach Quelle (Win Rate)"
+        "title": "Qualität nach Quelle (Abschlussquote)"
       },
       "tooltips": {
         "goToOnboarding": "Klicken, um zum Bereich Onboarding zu wechseln",
@@ -1738,7 +1738,7 @@
         "new": "Neu",
         "title": "Monatstrend",
         "won": "Gewonnen",
-        "wonTooltip": "Won: {count}"
+        "wonTooltip": "Gewonnen: {count}"
       },
       "velocity": {
         "scale": "Skala: max. {count, plural, one {# Tag} other {# Tage}}",
@@ -1758,10 +1758,10 @@
         "pipelineTooltip": "Pipeline: {value}k PLN",
         "projectedWeighted": "Prognostizierter Wert (gewichtet):",
         "title": "Monatliche Erlöse",
-        "wonTooltip": "Won: {value}k PLN"
+        "wonTooltip": "Gewonnen: {value}k PLN"
       },
       "external": {
-        "feeRate": "Fee Rate: {value}%",
+        "feeRate": "Gebührenquote: {value}%",
         "feesPln": "Gebühren (PLN)",
         "grossTurnoverPln": "Bruttoumsatz (PLN)",
         "margin": "Marge: {value}%",
@@ -1808,7 +1808,7 @@
       },
       "sources": {
         "campaign": "Kampagne",
-        "coldOutreach": "Cold Outreach",
+        "coldOutreach": "Kalte Kontaktaufnahme",
         "referrals": "Empfehlungen",
         "socialMedia": "Social Media",
         "tradeFairs": "Messen"
@@ -1939,7 +1939,7 @@
       "healthPoints": "{score} Pkt.",
       "kpi": {
         "activePartners": "Aktive Partner",
-        "feeRateShare": "{percent}% Fee Rate",
+        "feeRateShare": "{percent}% Gebührenquote",
         "feesPln": "Gebühren (PLN)",
         "productsCount": "{count} Produkte",
         "revenueMarginPln": "Erlös / Marge (PLN)",
@@ -1969,8 +1969,8 @@
         "title": "Partner-Scorecard"
       },
       "summary": {
-        "feeRate": "Fee Rate",
-        "feesCommissions": "Fees / Provisionen",
+        "feeRate": "Gebührenquote",
+        "feesCommissions": "Gebühren / Provisionen",
         "marginPct": "% Marge",
         "revenueMargin": "Erlös (Marge)",
         "title": "Finanzübersicht"

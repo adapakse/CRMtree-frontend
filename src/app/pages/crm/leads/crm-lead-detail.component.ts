@@ -45,6 +45,7 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
 import { PhoneInputComponent } from '../../../shared/components/phone-input/phone-input.component';
 import { describeHttpError } from '../../../core/services/http-error-message';
 import { amountError, scrollToFirstFieldError } from '../../../shared/utils/field-error.util';
+import { TenantDefaultLabelPipe, TenantDefaultLabels } from '../../../core/i18n/tenant-default-label.pipe';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
 // number. Numbers are never merged into each other's history.
@@ -65,7 +66,7 @@ interface WhatsappConvUiState {
   selector: 'wt-crm-lead-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, PhoneInputComponent, ActTypeIconComponent, ActivityCountBadgeComponent, PhoneCallSimulatorComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent, PersonConsentsComponent],
+            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent, PersonConsentsComponent, TenantDefaultLabelPipe],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -83,7 +84,7 @@ interface WhatsappConvUiState {
           [style.background]="stages.pillBackground(lead.stage)"
           [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span>
     <span *ngIf="lead.hot" style="background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🔥 {{ t('leadDetail.header.hot') }}</span>
-    <span *ngIf="lead.hold_active" style="background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));color:var(--gray-700);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px" title="{{lead.hold_reason}}">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
+    <span *ngIf="lead.hold_active" style="background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));color:var(--gray-700);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px" title="{{lead.hold_reason | tenantLabel:'holdReasons'}}">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
     <div class="card-hdr-actions" style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-quiet btn-sm hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
               [style.background]="lead.hold_active ? 'color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))' : ''"
@@ -134,7 +135,7 @@ interface WhatsappConvUiState {
         <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥 {{ t('leadDetail.fields.hotLead') }}</div>
         <div *ngIf="lead.hold_active" style="display:inline-flex;flex-direction:column;gap:4px;background:var(--gray-100);color:var(--gray-700);font-size:12px;padding:8px 12px;border-radius:10px;font-weight:600;margin-top:4px">
           <span style="display:inline-flex;align-items:center;gap:4px">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
-          <span style="font-weight:400;color:var(--gray-500)">{{lead.hold_reason}}</span>
+          <span style="font-weight:400;color:var(--gray-500)">{{lead.hold_reason | tenantLabel:'holdReasons'}}</span>
         </div>
       </div>
 
@@ -194,7 +195,7 @@ interface WhatsappConvUiState {
             [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span></span></div>
         <div class="info-kv kv-row" *ngIf="stages.isLost(lead.stage) && lead.lost_reason">
           <span class="lbl">{{ t('leadDetail.fields.lostReason') }}</span>
-          <span class="val" style="color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">{{lead.lost_reason}}</span>
+          <span class="val" style="color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">{{lead.lost_reason | tenantLabel:'lostReasons'}}</span>
         </div>
         <div class="info-kv kv-row"><span class="lbl">{{ t('leadDetail.fields.probability') }}</span><span class="val">{{lead.probability||0}}%</span></div>
         <div class="info-kv kv-row" *ngIf="lead.value_pln">
@@ -237,7 +238,7 @@ interface WhatsappConvUiState {
         <div *ngIf="consentLoading" style="text-align:center;color:var(--gray-400);font-size:12px;padding:8px">{{ 'states.loading' | transloco }}</div>
         <div *ngFor="let ct of consents" style="margin-bottom:14px">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:4px">
-            <div style="font-size:12px;font-weight:600;color:var(--gray-700);line-height:1.4;flex:1">{{ct.label}}</div>
+            <div style="font-size:12px;font-weight:600;color:var(--gray-700);line-height:1.4;flex:1">{{ct.label | tenantLabel:'consentLabels'}}</div>
             <button (click)="toggleConsentExpand(ct.consent_key)"
                     style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--gray-400);white-space:nowrap;padding:0;flex-shrink:0;line-height:1.8">
               {{expandedConsent===ct.consent_key ? '▲ ' + t('consents.collapse') : '▾ ' + t('consents.details')}}
@@ -245,7 +246,7 @@ interface WhatsappConvUiState {
           </div>
           <div *ngIf="expandedConsent===ct.consent_key"
                style="font-size:12px;color:var(--gray-500);background:var(--gray-50);border-radius:8px;padding:8px 12px;margin-bottom:8px;line-height:1.55">
-            {{ct.description}}
+            {{ct.description | tenantLabel:'consentDescriptions'}}
             <div *ngIf="ct.updated_at" style="margin-top:4px;font-size:10px;color:var(--gray-400)">
               {{ t('consents.lastChange') }} {{ct.updated_at | date:'dd.MM.yyyy HH:mm'}}
               <span *ngIf="ct.updated_by_name"> · {{ct.updated_by_name}}</span>
@@ -301,7 +302,7 @@ interface WhatsappConvUiState {
         <ng-container *ngIf="stages.isLost(lead.stage)">
           <span style="font-size:16px"><i class="ei ei-ban"></i></span>
           <span style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-weight:700;font-size:14px">{{ stageLabel(lead.stage) }}</span>
-          <span *ngIf="lead.lost_reason" style="font-size:12px;color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">· {{lead.lost_reason}}</span>
+          <span *ngIf="lead.lost_reason" style="font-size:12px;color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">· {{lead.lost_reason | tenantLabel:'lostReasons'}}</span>
           <span style="flex:1"></span>
           <button *ngIf="canEdit" class="btn btn-g btn-sm" style="color:oklch(from #15803d max(l, var(--text-min-l)) c h)" (click)="quickChangeStage(entryStageKey)">↩ {{ t('leadDetail.stage.backToNew') }}</button>
         </ng-container>
@@ -1193,7 +1194,7 @@ interface WhatsappConvUiState {
             <select [(ngModel)]="editForm.lost_reason"
                     [class.fi-err]="editMissing('lostReason')">
               <option value="">{{ t('leadDetail.edit.chooseReason') }}</option>
-              <option *ngFor="let r of lostReasons" [value]="r">{{r}}</option>
+              <option *ngFor="let r of lostReasons" [value]="r">{{r | tenantLabel:'lostReasons'}}</option>
             </select>
             @if (editMissing('lostReason')) { <span class="ferr">{{ t('fieldErrors.lostReason') }}</span> }
           </label>
@@ -1540,7 +1541,7 @@ interface WhatsappConvUiState {
         <select [(ngModel)]="holdForm.reason" class="fsel"
                 [style.border-color]="holdSubmitted && !holdForm.reason ? '#ef4444' : ''">
           <option value="" disabled>{{ t('leadDetail.edit.chooseReason') }}</option>
-          <option *ngFor="let r of holdReasons" [value]="r">{{r}}</option>
+          <option *ngFor="let r of holdReasons" [value]="r">{{r | tenantLabel:'holdReasons'}}</option>
         </select>
         <span *ngIf="holdSubmitted && !holdForm.reason" style="font-size:12px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">{{ t('leadDetail.hold.reasonRequired') }}</span>
       </label>
@@ -1920,6 +1921,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   protected settings = inject(AppSettingsService);
   private pbx = inject(PbxService);
   private transloco = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
   private attachmentsApi = inject(EntityAttachmentsApiService);
   private toast = inject(ToastService);
   pendingActivityFiles: File[] = [];
@@ -4715,7 +4717,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (a === 'crm_lead_hold_set') {
       const date = after.hold_until ? new Date(after.hold_until).toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
       const label = this.transloco.translate('crm.leadDetail.history.holdSet', { date });
-      return after.hold_reason ? `${label} · ${after.hold_reason}` : label;
+      return after.hold_reason ? `${label} · ${this.tenantLabels.label('holdReasons', after.hold_reason)}` : label;
     }
     if (a === 'crm_lead_hold_cancel')  return this.transloco.translate('crm.leadDetail.history.holdCancelled');
     if (a === 'crm_lead_archived')     return this.transloco.translate('crm.leadDetail.history.archived');
@@ -4723,7 +4725,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (a === 'crm_lead_migrated')     return this.transloco.translate('crm.leadDetail.history.migrated');
     if (a === 'crm_lead_consent_update') {
       const m = (h as any).metadata || {};
-      const lbl = m.consent_label || after.consent_key || '';
+      const lbl = this.tenantLabels.label('consentLabels', m.consent_label) || after.consent_key || '';
       return '✅ ' + this.transloco.translate('crm.history.consentChanged', {
         label: lbl, from: before.label || before.value || '—', to: after.label || after.value || '—',
       });
@@ -4782,7 +4784,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     const after = h.after_state || {};
     const before = h.before_state || {};
     if (h.action === 'crm_lead_update' && before.stage && after.stage && before.stage !== after.stage) {
-      if (after.lost_reason) return this.transloco.translate('crm.history.lostReason', { reason: after.lost_reason });
+      if (after.lost_reason) return this.transloco.translate('crm.history.lostReason', { reason: this.tenantLabels.label('lostReasons', after.lost_reason) });
     }
     return '';
   }

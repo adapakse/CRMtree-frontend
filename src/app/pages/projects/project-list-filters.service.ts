@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { ProjectConfig, ProjectDictionaryEntry } from '../../core/services/projects-api.service';
 import { ListFilter, ListFilterOption, ListSortOption } from '../../shared/list/list-query';
+import { TenantDefaultLabels } from '../../core/i18n/tenant-default-label.pipe';
 
 export const UNASSIGNED = 'unassigned';
 
@@ -44,13 +45,14 @@ function toFilterSet<Id extends string>(filters: (ListFilter & { id: Id })[]): F
   return { all: filters, byId };
 }
 
-const dictionaryOptions = (entries: ProjectDictionaryEntry[]): ListFilterOption[] =>
-  entries.map(entry => ({ value: entry.id, label: entry.name }));
+const dictionaryOptions = (entries: ProjectDictionaryEntry[], labelOf: (name: string) => string): ListFilterOption[] =>
+  entries.map(entry => ({ value: entry.id, label: labelOf(entry.name) }));
 
 /** Builds the filter definitions of the Projects module lists; parameter names follow the API's shared convention. */
 @Injectable({ providedIn: 'root' })
 export class ProjectListFiltersService {
   private readonly transloco = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
 
   taskFilters(options: TaskFilterOptions): FilterSet<TaskFilterId> {
     const { config } = options;
@@ -62,15 +64,15 @@ export class ProjectListFiltersService {
       filters.push({ id: 'project', label: this.label('project'), kind: 'multi', params: ['project_ids'], options: options.projects });
     }
     filters.push(
-      { id: 'status', label: this.label('status'), kind: 'multi', params: ['status_ids'], options: dictionaryOptions(config.statuses) },
+      { id: 'status', label: this.label('status'), kind: 'multi', params: ['status_ids'], options: dictionaryOptions(config.statuses, name => this.tenantLabels.label('projectStatuses', name)) },
       {
         id: 'statusCategory', label: this.label('statusCategory'), kind: 'multi', params: ['status_category'],
         options: ['todo', 'in_progress', 'done'].map(category => ({
           value: category, label: this.transloco.translate(`projects.labels.statusCategories.${category}`),
         })),
       },
-      { id: 'priority', label: this.label('priority'), kind: 'multi', params: ['priority_ids'], options: dictionaryOptions(config.priorities) },
-      { id: 'type', label: this.label('type'), kind: 'multi', params: ['type_ids'], options: dictionaryOptions(config.types) },
+      { id: 'priority', label: this.label('priority'), kind: 'multi', params: ['priority_ids'], options: dictionaryOptions(config.priorities, name => this.tenantLabels.label('projectPriorities', name)) },
+      { id: 'type', label: this.label('type'), kind: 'multi', params: ['type_ids'], options: dictionaryOptions(config.types, name => this.tenantLabels.label('projectTypes', name)) },
     );
     if (options.assignees) {
       filters.push({

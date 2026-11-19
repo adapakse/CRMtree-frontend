@@ -154,12 +154,12 @@
       "yes": "Întârziate"
     },
     "endDate": "Sfârșit",
-    "manager": "PM",
+    "manager": "Manager de proiect",
     "myRole": "Rolul meu",
     "myRoleValues": {
       "controller": "Verificator",
       "participant": "Participant",
-      "pm": "PM"
+      "pm": "Manager de proiect"
     },
     "name": "Denumirea sarcinii",
     "number": "Număr",
@@ -180,7 +180,7 @@
       "key": "Cheie",
       "name": "Denumire",
       "overdue": "Sarcini cu termen depășit",
-      "pm": "PM",
+      "pm": "Manager de proiect",
       "progress": "Progres",
       "revenue": "Venit",
       "start_date": "Început",
@@ -634,7 +634,7 @@
       "controller": "Verificator",
       "external_participant": "Participant extern",
       "internal_participant": "Participant intern",
-      "pm": "PM"
+      "pm": "Manager de proiect"
     },
     "statusCategories": {
       "done": "Finalizate",
@@ -722,7 +722,7 @@
       "title": "Câmpuri suplimentare"
     },
     "endDateChange": {
-      "hint": "Opțional. PM va vedea motivul în e-mailul despre modificarea termenului; acesta va fi salvat și în istoricul sarcinii.",
+      "hint": "Opțional. Managerul de proiect va vedea motivul în e-mailul despre modificarea termenului; acesta va fi salvat și în istoricul sarcinii.",
       "placeholder": "de ex. livrare întârziată din partea clientului",
       "reason": "Motivul modificării termenului"
     },
@@ -785,12 +785,12 @@
       "overdue": "Termen depășit",
       "progress": "Progres",
       "project": "Proiect",
-      "projectManagers": "PM",
+      "projectManagers": "Manageri de proiect",
       "revenue": "Venit",
       "startDate": "Început"
     },
     "loadFailed": "Prezentarea proiectelor nu a putut fi deschisă",
-    "noProjects": "Nu sunteți PM sau verificator în niciun proiect deschis.",
+    "noProjects": "Nu sunteți manager de proiect sau verificator în niciun proiect deschis.",
     "noTasks": "Nu există sarcini în proiectele dvs.",
     "tabs": {
       "projects": "Proiecte",
@@ -829,7 +829,7 @@
       "errors": {
         "name": "Introduceți numele câmpului, de ex. Număr comandă"
       },
-      "hint": "Câmpurile definite aici pot fi adăugate de PM în proiectul său (Fișa proiectului → Câmpuri suplimentare ale sarcinilor), iar PM decide dacă sunt obligatorii. Tipul câmpului nu poate fi modificat după creare.",
+      "hint": "Câmpurile definite aici pot fi adăugate de managerul de proiect în proiectul său (Fișa proiectului → Câmpuri suplimentare ale sarcinilor), iar acesta decide dacă sunt obligatorii. Tipul câmpului nu poate fi modificat după creare.",
       "newNamePlaceholder": "Denumirea noului câmp…",
       "optionsPlaceholder": "Valori separate prin virgulă",
       "optionsRequired": "Lista trebuie să conțină cel puțin o valoare",
@@ -838,7 +838,7 @@
     },
     "finance": {
       "disableConfirm": "Dezactivați finanțele proiectelor? Datele vor fi păstrate, dar vor dispărea din vizualizarea tuturor utilizatorilor.",
-      "hint": "După activare, PM și administratorul gestionează în proiect bugetul, costurile și veniturile, iar verificatorul le poate vizualiza. Rezumatul finanțelor proiectului este vizibil și pentru oricine are acces la fișa leadului sau a partenerului asociat.",
+      "hint": "După activare, managerul de proiect și administratorul gestionează în proiect bugetul, costurile și veniturile, iar verificatorul le poate vizualiza. Rezumatul finanțelor proiectului este vizibil și pentru oricine are acces la fișa leadului sau a partenerului asociat.",
       "saveFailed": "Setarea finanțelor nu a putut fi modificată",
       "title": "Finanțele proiectelor",
       "toggle": "Activare finanțe proiecte"
@@ -853,7 +853,7 @@
     },
     "transitions": {
       "discardConfirm": "Există modificări nesalvate ale tranzițiilor. Renunțați la ele?",
-      "hint": "PM poate schimba oricând statusul în oricare altul. Participanții schimbă statusul doar în sarcinile care le sunt atribuite și pentru care au permisiuni complete. Verificatorul schimbă statusul în orice sarcină a proiectului.",
+      "hint": "Managerul de proiect poate schimba oricând statusul în oricare altul. Participanții schimbă statusul doar în sarcinile care le sunt atribuite și pentru care au permisiuni complete. Verificatorul schimbă statusul în orice sarcină a proiectului.",
       "matrixCorner": "Din statusul ↓ / în statusul →",
       "saveButton": "Salvare tranziții",
       "saveFailed": "Tranzițiile nu au putut fi salvate",

@@ -4,6 +4,7 @@ import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@js
 import { EmailCampaignsService, SendgridSettings, SendgridSettingsUpdate } from '../../../core/services/email-campaigns.service';
 import { describeHttpError } from '../../../core/services/http-error-message';
 import { EMAIL_CAMPAIGNS_SHARED_STYLES } from './email-campaigns.styles';
+import { TenantDefaultLabelPipe } from '../../../core/i18n/tenant-default-label.pipe';
 
 /** What happens to a write-only secret on save. The webhook key can only be kept or replaced. */
 type SecretChange = 'keep' | 'replace' | 'remove';
@@ -17,7 +18,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 @Component({
   selector: 'wt-crm-email-campaign-settings',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective],
+  imports: [FormsModule, TranslocoDirective, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('campaigns')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -86,7 +87,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           <label for="ecsConsent">{{ t('consent') }}</label>
           <select id="ecsConsent" name="consent" class="sel ecs-wide" [(ngModel)]="consentKey">
             <option value="">{{ t('consentAuto') }}</option>
-            @for (type of current.consent_types; track type.key) { <option [value]="type.key">{{ type.label }}</option> }
+            @for (type of current.consent_types; track type.key) { <option [value]="type.key">{{ type.label | tenantLabel:'consentLabels' }}</option> }
           </select>
           <span class="ec-muted">{{ t('consentHint') }}</span>
         </div>

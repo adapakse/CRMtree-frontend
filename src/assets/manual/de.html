@@ -544,7 +544,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>Wählen Sie die Registerkarte für die gewünschte Art von Aktivität: <b>„Aufgaben“</b> (oder „Alle“), <b>„Notizen“</b>, <b>„Anrufe“</b> oder <b>„Meetings“</b>.</li>
 <li>Klicken Sie auf <b>„+ Aktivität hinzufügen“</b>. Die Registerkarte bestimmt den Aktivitätstyp.</li>
 <li>Legen Sie das <b>„Datum“</b> fest: „Heute“, „Morgen“, „In 2 Werktagen“, „In 3 Werktagen“, „In einer Woche“, „In 2 Wochen“ oder <b>„Eigenes Datum …“</b>.</li>
-<li>Wählen Sie eine <b>„Erinnerung“</b> (etwa „1 Std. vorher“, „1 Tag vorher“ oder „Am Fälligkeitsdatum der Aufgabe“), den <b>„Verantwortlichen“</b> (standardmäßig Sie) und bei Aufgaben eine <b>„Priorität“</b> (ASAP, Wichtig, Mittel, Niedrig).</li>
+<li>Wählen Sie eine <b>„Erinnerung“</b> (etwa „1 Std. vorher“, „1 Tag vorher“ oder „Am Fälligkeitsdatum der Aufgabe“), den <b>„Verantwortlichen“</b> (standardmäßig Sie) und bei Aufgaben eine <b>„Priorität“</b> (Dringend, Wichtig, Mittel, Niedrig).</li>
 <li>Bei einem Meeting ergänzen Sie den <b>„Titel des Meetings“</b>, die <b>„Dauer (Min.)“</b>, den <b>„Ort“</b> und die <b>„Teilnehmer“</b> (E-Mail-Adressen, mit Vorschlägen).</li>
 <li>Geben Sie die Details ein, hängen Sie bei Bedarf eine Datei an eine Aufgabe oder Notiz an und klicken Sie auf <b>„Speichern“</b>.</li>
 </ol>
@@ -1970,7 +1970,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="webfig"><img loading="lazy" src="img/en_a07_settings_projects.jpg?v=20261113" width="1440" height="900" alt="Projekteinstellungen"><figcaption>„Aufgabenstatus“ mit ihren Kategorien und die Matrix „Übergänge zwischen Status“ für interne Teilnehmer.</figcaption></figure>
 <div class="tbl"><table>
 <tr><th>Abschnitt</th><th>Was Sie festlegen</th></tr>
-<tr><td><b>Aufgabenstatus</b></td><td>Name, Farbe, Reihenfolge (Nach oben / Nach unten) und <b>Kategorie</b>: „Zu erledigen“, „In Arbeit“, „Erledigt“. Die Kategorie sagt dem System, was ein Status bedeutet: Aufgaben in einem Status der Kategorie „Erledigt“ zählen nicht als offen oder überfällig. Das Demo-Unternehmen verwendet polnische Statusnamen: „Do zrobienia“, „W toku“, „Do weryfikacji“ (zur Prüfung), „Zakończone“.</td></tr>
+<tr><td><b>Aufgabenstatus</b></td><td>Name, Farbe, Reihenfolge (Nach oben / Nach unten) und <b>Kategorie</b>: „Zu erledigen“, „In Arbeit“, „Erledigt“. Die Kategorie sagt dem System, was ein Status bedeutet: Aufgaben in einem Status der Kategorie „Erledigt“ zählen nicht als offen oder überfällig. Die Standard-Statusnamen erscheinen in der Sprache des jeweiligen Benutzers – hier „Zu erledigen“, „In Bearbeitung“, „Zur Prüfung“, „Abgeschlossen“; ein vom Administrator geänderter Name erscheint so, wie er eingegeben wurde.</td></tr>
 <tr><td><b>Übergänge zwischen Status</b></td><td>Eine Matrix „Von Status ↓ / zu Status →“, getrennt für „Interner Teilnehmer“, „Externer Teilnehmer“ und „Prüfer“. Speichern mit „Übergänge speichern“.</td></tr>
 <tr><td><b>Aufgabentypen</b>, <b>Prioritäten</b></td><td>Wörterbücher mit Farbe und Reihenfolge.</td></tr>
 <tr><td><b>Zusatzfelder für Aufgaben</b></td><td>Felder (Text, Zahl, Werteliste, Datum, Betrag mit Währung), die ein PM seinem Projekt hinzufügt und für die er festlegt, ob sie erforderlich sind.</td></tr>
@@ -1982,7 +1982,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p>Der PM des Projekts und der Administrator können immer jeden Status setzen. Teilnehmer ändern den Status nur bei Aufgaben, die ihnen zugewiesen sind und bei denen sie Vollzugriff haben. Ein Prüfer ändert den Status bei jeder Aufgabe des Projekts.</p>
 <div class="example"><span class="lbl">BEISPIEL · ÜBERGANGSMATRIX</span>
 <p>Standardeinstellungen. Piotr ist interner Teilnehmer mit Vollzugriff im Projekt „Wdrożenie CRM Atlas“, und Karol ist der Prüfer.</p>
-<p class="res">In seiner eigenen Aufgabe, die „W toku“ (in Arbeit) ist, kann Piotr „Do zrobienia“ oder „Do weryfikacji“ setzen, aber nicht „Zakończone“. Karol führt eine Aufgabe in „Do weryfikacji“ nach „Zakończone“ oder schickt sie zurück nach „W toku“. Kreuzt der Administrator für Prüfer „Do zrobienia → Zakończone“ an, kann Karol auch Aufgaben schließen, die niemand begonnen hat.</p></div>
+<p class="res">In seiner eigenen Aufgabe, die „In Bearbeitung“ ist, kann Piotr „Zu erledigen“ oder „Zur Prüfung“ setzen, aber nicht „Abgeschlossen“. Karol führt eine Aufgabe in „Zur Prüfung“ nach „Abgeschlossen“ oder schickt sie zurück nach „In Bearbeitung“. Kreuzt der Administrator für Prüfer „Zu erledigen → Abgeschlossen“ an, kann Karol auch Aufgaben schließen, die niemand begonnen hat.</p></div>
 
 <h4 id="p2-ksef">KSeF — Eingangsrechnungen</h4>
 <p>KSeF ist das polnische nationale E-Rechnungssystem.</p>

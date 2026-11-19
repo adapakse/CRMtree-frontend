@@ -103,8 +103,8 @@
       "importedFrom": "Uvezeno od",
       "importedTo": "Uvezeno do",
       "reset": "Poništi filtre",
-      "scoreMax": "Score maks",
-      "scoreMin": "Score min",
+      "scoreMax": "Ocjena maks",
+      "scoreMin": "Ocjena min",
       "search": "Traži",
       "searchPlaceholder": "ime, OIB ili baza",
       "showArchived": "Prikaži arhivu",
@@ -255,7 +255,7 @@
       "partner": "Partner",
       "partnerBadgeTooltip": "Partner s ovim OIB-om postoji u CRM-u — kliknite za otvaranje",
       "processing": "Obrada…",
-      "score": "Score",
+      "score": "Ocjena",
       "status": "Status",
       "taxId": "OIB"
     },
@@ -351,7 +351,7 @@
     "this_month": "Ovaj mjesec",
     "this_quarter": "Ovo tromjesečje",
     "this_week": "Ovaj tjedan",
-    "ytd": "Ova godina (YTD)"
+    "ytd": "Od početka godine"
   },
   "prospectStatus": {
     "archive": "Arhiva",

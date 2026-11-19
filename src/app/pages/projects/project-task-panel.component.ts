@@ -19,6 +19,7 @@ import { EntityAttachmentsComponent } from '../../shared/components/entity-attac
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
 import { scrollToFirstError } from '../../shared/forms/form-errors';
+import { TenantDefaultLabelPipe, TenantDefaultLabels } from '../../core/i18n/tenant-default-label.pipe';
 
 const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF', 'CZK'];
 const DEFAULT_CURRENCY = 'PLN';
@@ -77,6 +78,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
   imports: [
     FormsModule, DatePipe, ProjectChatComponent, ProjectTaskCostsComponent, AddToCalendarComponent, TranslocoDirective, TranslocoPipe,
     ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent, EntityAttachmentsComponent, FormErrorSummaryComponent,
+    TenantDefaultLabelPipe,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -120,7 +122,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
                   <label class="fl">{{ t('panel.fields.status') }}</label>
                   <select class="fsel" [(ngModel)]="form.status_id" [disabled]="selectableStatuses().length < 2">
                     @for (status of selectableStatuses(); track status.id) {
-                      <option [ngValue]="status.id">{{ status.name }}</option>
+                      <option [ngValue]="status.id">{{ status.name | tenantLabel:'projectStatuses' }}</option>
                     }
                   </select>
                 </div>
@@ -128,7 +130,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
                   <label class="fl">{{ t('panel.fields.type') }}</label>
                   <select class="fsel" [(ngModel)]="form.type_id" [disabled]="!permissions().can_edit_content">
                     <option [ngValue]="null">—</option>
-                    @for (type of selectableTypes(); track type.id) { <option [ngValue]="type.id">{{ type.name }}</option> }
+                    @for (type of selectableTypes(); track type.id) { <option [ngValue]="type.id">{{ type.name | tenantLabel:'projectTypes' }}</option> }
                   </select>
                 </div>
                 <div class="fg">
@@ -136,7 +138,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
                   <select class="fsel" [(ngModel)]="form.priority_id" [disabled]="!permissions().can_edit_content">
                     <option [ngValue]="null">—</option>
                     @for (priority of selectablePriorities(); track priority.id) {
-                      <option [ngValue]="priority.id">{{ priority.name }}</option>
+                      <option [ngValue]="priority.id">{{ priority.name | tenantLabel:'projectPriorities' }}</option>
                     }
                   </select>
                 </div>
@@ -342,6 +344,7 @@ export class ProjectTaskPanelComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
 
   readonly projectId = input.required<string>();
   readonly projectKey = input.required<string>();
@@ -642,7 +645,10 @@ export class ProjectTaskPanelComponent implements OnInit {
     const fromId = entry.before_state?.['status_id'];
     const toId = entry.after_state?.['status_id'];
     if (typeof fromId !== 'string' || typeof toId !== 'string') return null;
-    const nameOf = (id: string) => this.config().statuses.find(status => status.id === id)?.name ?? '?';
+    const nameOf = (id: string) => {
+      const name = this.config().statuses.find(status => status.id === id)?.name;
+      return name ? this.tenantLabels.label('projectStatuses', name) : '?';
+    };
     return { from: nameOf(fromId), to: nameOf(toId) };
   }
 

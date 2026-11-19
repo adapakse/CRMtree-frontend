@@ -8,11 +8,12 @@ import { GroupProfile } from '../../core/models/models';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { FormErrorSummaryComponent } from '../../shared/forms/form-error-summary.component';
 import { scrollToFirstError } from '../../shared/forms/form-errors';
+import { TenantDefaultLabelPipe, TenantDefaultLabels } from '../../core/i18n/tenant-default-label.pipe';
 
 @Component({
   selector: 'wt-groups',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('admin')],
   template: `
 <ng-container *transloco="let t; prefix: 'admin'">
@@ -35,7 +36,7 @@ import { scrollToFirstError } from '../../shared/forms/form-errors';
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
               <div class="group-tile" aria-hidden="true">{{ groupIcon(g.name) }}</div>
               <div>
-                <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ g.display_name }}</div>
+                <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ g.display_name | tenantLabel:'groups' }}</div>
                 @if (g.has_owner_restriction) {
                   <span style="font-size:10px;font-weight:600;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);padding:1px 8px;border-radius:10px">{{ t('userGroups.ownerRestriction') }}</span>
                 }
@@ -57,7 +58,7 @@ import { scrollToFirstError } from '../../shared/forms/form-errors';
               </div>
             </div>
             @if (g.description) {
-              <div style="font-size:12px;color:var(--gray-400);margin-top:12px">{{ g.description }}</div>
+              <div style="font-size:12px;color:var(--gray-400);margin-top:12px">{{ g.description | tenantLabel:'groupDescriptions' }}</div>
             }
           </div>
         }
@@ -196,6 +197,7 @@ export class GroupsComponent implements OnInit {
   toast            = inject(ToastService);
   auth             = inject(AuthService);
   private transloco = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
 
   loading  = signal(true);
   groups   = signal<GroupProfile[]>([]);
@@ -238,7 +240,7 @@ export class GroupsComponent implements OnInit {
 
   deactivateGroup(): void {
     const g = this.selected();
-    if (!g || !confirm(this.transloco.translate('admin.userGroups.deactivate.confirm', { name: g.display_name }))) return;
+    if (!g || !confirm(this.transloco.translate('admin.userGroups.deactivate.confirm', { name: this.tenantLabels.label('groups', g.display_name) }))) return;
     this.groupSvc.delete(g.id).subscribe(() => {
       this.selected.set(null);
       this.loadGroups();

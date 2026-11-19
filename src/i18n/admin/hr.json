@@ -84,6 +84,95 @@
     "title": "Upravljanje podacima"
   },
   "logs": {
+    "actions": {
+      "attachment_deleted": "Privitak izbrisan",
+      "attachment_uploaded": "Privitak učitan",
+      "attachment_version_uploaded": "Učitana nova verzija privitka",
+      "crm_activity_close": "Aktivnost zatvorena",
+      "crm_activity_create": "Aktivnost stvorena",
+      "crm_activity_update": "Aktivnost izmijenjena",
+      "crm_group_create": "Grupa partnera stvorena",
+      "crm_group_delete": "Grupa partnera izbrisana",
+      "crm_group_update": "Grupa partnera izmijenjena",
+      "crm_import_documents": "Uvoz dokumenata iz CSV-a",
+      "crm_import_leads": "Uvoz leadova iz CSV-a",
+      "crm_import_partners": "Uvoz partnera iz CSV-a",
+      "crm_lead_archived": "Lead arhiviran",
+      "crm_lead_consent_update": "Privola leada izmijenjena",
+      "crm_lead_converted": "Lead pretvoren u partnera",
+      "crm_lead_create": "Lead stvoren",
+      "crm_lead_delete": "Lead izbrisan",
+      "crm_lead_hold_cancel": "Čekanje leada uklonjeno",
+      "crm_lead_hold_set": "Lead stavljen na čekanje",
+      "crm_lead_migrated": "Lead migriran",
+      "crm_lead_test_account": "Stvoren probni račun za lead",
+      "crm_lead_update": "Lead izmijenjen",
+      "crm_partner_consent_update": "Privola partnera izmijenjena",
+      "crm_partner_create": "Partner stvoren",
+      "crm_partner_delete": "Partner izbrisan",
+      "crm_partner_onboarding_withdrawn": "Partner povučen iz onboardinga",
+      "crm_partner_update": "Partner izmijenjen",
+      "crm_substitution_cancel": "Zamjena otkazana",
+      "crm_substitution_create": "Zamjena postavljena",
+      "crm_visibility_grant_create": "Dodijeljen pristup za pregled",
+      "crm_visibility_grant_revoke": "Pristup za pregled oduzet",
+      "device_signed_out": "Uređaj odjavljen",
+      "doc_group_created": "Grupa dokumenata stvorena",
+      "doc_group_deleted": "Grupa dokumenata izbrisana",
+      "doc_group_updated": "Grupa dokumenata izmijenjena",
+      "document_created": "Dokument stvoren",
+      "document_deleted": "Dokument izbrisan",
+      "document_downloaded": "Dokument preuzet",
+      "document_linked": "Dokument povezan",
+      "document_unlinked": "Dokument odspojen",
+      "document_updated": "Dokument izmijenjen",
+      "document_viewed": "Dokument pregledan",
+      "group_created": "Grupa ovlasti stvorena",
+      "group_deleted": "Grupa ovlasti izbrisana",
+      "group_updated": "Grupa ovlasti izmijenjena",
+      "invoice_generated": "Račun izdan",
+      "invoice_voided": "Račun storniran",
+      "metadata_updated": "Podaci dokumenta izmijenjeni",
+      "project_closed": "Projekt zatvoren",
+      "project_config_updated": "Postavke projekata izmijenjene",
+      "project_cost_created": "Trošak projekta dodan",
+      "project_cost_deleted": "Trošak projekta izbrisan",
+      "project_cost_updated": "Trošak projekta izmijenjen",
+      "project_created": "Projekt stvoren",
+      "project_member_added": "Član projekta dodan",
+      "project_member_removed": "Član projekta uklonjen",
+      "project_member_updated": "Član projekta izmijenjen",
+      "project_reopened": "Projekt ponovno otvoren",
+      "project_revenue_created": "Prihod projekta dodan",
+      "project_revenue_deleted": "Prihod projekta izbrisan",
+      "project_revenue_updated": "Prihod projekta izmijenjen",
+      "project_task_created": "Zadatak projekta stvoren",
+      "project_task_updated": "Zadatak projekta izmijenjen",
+      "project_updated": "Projekt izmijenjen",
+      "role_assigned": "Uloga dodijeljena",
+      "role_removed": "Uloga oduzeta",
+      "settings_updated": "Postavke izmijenjene",
+      "signing_completed": "Potpisivanje završeno",
+      "signing_failed": "Potpisivanje nije uspjelo",
+      "signing_initiated": "Poslano na potpis",
+      "status_changed": "Status dokumenta izmijenjen",
+      "tag_added": "Oznaka dodana",
+      "tag_removed": "Oznaka uklonjena",
+      "tag_updated": "Oznaka izmijenjena",
+      "tenant_deleted": "Organizacija izbrisana",
+      "tenant_subscription_cancelled": "Pretplata organizacije otkazana",
+      "tenant_subscription_updated": "Pretplata organizacije izmijenjena",
+      "user_created": "Korisnik stvoren",
+      "user_deleted": "Korisnik izbrisan",
+      "user_login": "Prijava",
+      "user_logout": "Odjava",
+      "user_password_set": "Lozinka postavljena",
+      "user_updated": "Korisnik izmijenjen",
+      "version_uploaded": "Učitana nova verzija dokumenta",
+      "workflow_task_cancelled": "Zadatak workflowa otkazan",
+      "workflow_task_completed": "Zadatak workflowa obavljen",
+      "workflow_task_created": "Zadatak workflowa stvoren"
+    },
     "columns": {
       "action": "Radnja",
       "dateTime": "Datum i vrijeme",
@@ -322,17 +411,17 @@
         }
       },
       "enrichment_api_key": {
-        "label": "Enrichment — vlastiti API ključ"
+        "label": "Obogaćivanje — vlastiti API ključ"
       },
       "enrichment_ideal_customer": {
         "hint": "Djelatnosti, veličina tvrtke, regija, signali koji upućuju na podudarnost te tvrtke koje ne želite pridobiti. Na temelju toga konfigurirat ćemo signale i bodovanje.",
-        "label": "Enrichment — profil idealnog klijenta (ICP)"
+        "label": "Obogaćivanje — profil idealnog klijenta (ICP)"
       },
       "enrichment_licence": {
-        "label": "Enrichment — licenca za model"
+        "label": "Obogaćivanje — licenca za model"
       },
       "enrichment_model": {
-        "label": "Enrichment — preferirani model",
+        "label": "Obogaćivanje — preferirani model",
         "options": {
           "anthropic": {
             "label": "Anthropic Claude (viša kvaliteta, viši trošak)"
@@ -346,7 +435,7 @@
         }
       },
       "enrichment_monthly_volume": {
-        "label": "Enrichment — koliko tvrtki mjesečno planirate analizirati?"
+        "label": "Obogaćivanje — koliko tvrtki mjesečno planirate analizirati?"
       },
       "gmail_apis_enabled": {
         "hint": "API-ji i usluge → Uključeni API-ji → „+ UKLJUČI API-JE I USLUGE\" → potražite → Uključi, za oba. Gmail API je obavezan; Drive API otvara privitke poslane kao poveznice na Disk.",
@@ -401,7 +490,7 @@
       },
       "lead_sources": {
         "label": "Izvori leadova",
-        "placeholder": "Web-stranica, preporuka, cold call, LinkedIn, sajmovi…"
+        "placeholder": "Web-stranica, preporuka, hladni poziv, LinkedIn, sajmovi…"
       },
       "modules": {
         "label": "Koji moduli trebaju biti aktivni?",
@@ -427,7 +516,7 @@
             "label": "Onboarding klijenata"
           },
           "partner_registry": {
-            "hint": "Rad s postojećim klijentima, upsell i cross-sell.",
+            "hint": "Rad s postojećim klijentima, dodatna i unakrsna prodaja.",
             "label": "Registar partnera / klijenata"
           },
           "pbx": {
@@ -435,11 +524,11 @@
             "label": "Telefonija (softphone)"
           },
           "performance": {
-            "hint": "Health score i rizik odlaska klijenta (churn).",
+            "hint": "Stanje partnera i rizik odljeva klijenta.",
             "label": "Rezultati"
           },
           "prospects": {
-            "hint": "Pretraživanje tvrtki i njihova automatska AI ocjena (Enrichment / ICP).",
+            "hint": "Pretraživanje tvrtki i njihova automatska AI ocjena (Obogaćivanje / ICP).",
             "label": "Potencijalni klijenti"
           },
           "sales_reports": {
@@ -649,8 +738,8 @@
     },
     "sections": {
       "ai": {
-        "intro": "Moduli Potencijalni klijenti (Enrichment) i Analiza poziva šalju podatke vanjskim jezičnim modelima. Možete koristiti licencu CRMtree ili vlastitu, namjensku licencu Vaše tvrtke.",
-        "title": "8. AI modeli — Enrichment i Analiza poziva"
+        "intro": "Moduli Potencijalni klijenti (Obogaćivanje) i Analiza poziva šalju podatke vanjskim jezičnim modelima. Možete koristiti licencu CRMtree ili vlastitu, namjensku licencu Vaše tvrtke.",
+        "title": "8. AI modeli — Obogaćivanje i Analiza poziva"
       },
       "billing": {
         "title": "2. Plan i podaci za račun"
@@ -804,67 +893,67 @@
     "catalog": {
       "churn_daily_run_time": {
         "description": "Format HH:MM — u to vrijeme poslužitelj ponovno izračunava scoring i šalje e-mail upozorenja",
-        "label": "Churn: vrijeme dnevnog ponovnog izračuna"
+        "label": "Odljev: vrijeme dnevnog ponovnog izračuna"
       },
       "churn_days_t1_max": {
         "description": "Maks. dana bez narudžbe za prag 1",
-        "label": "Churn: prag 1 dana — maks"
+        "label": "Odljev: prag 1 dana — maks"
       },
       "churn_days_t1_min": {
         "description": "Min. dana bez narudžbe za prag 1",
-        "label": "Churn: prag 1 dana — min"
+        "label": "Odljev: prag 1 dana — min"
       },
       "churn_days_t1_pts": {
         "description": "Točke za 10–20 dana bez narudžbe",
-        "label": "Churn: točke za prag 1 dana"
+        "label": "Odljev: točke za prag 1 dana"
       },
       "churn_days_t2_max": {
         "description": "Maks. dana bez narudžbe za prag 2",
-        "label": "Churn: prag 2 dana — maks"
+        "label": "Odljev: prag 2 dana — maks"
       },
       "churn_days_t2_min": {
         "description": "Min. dana bez narudžbe za prag 2",
-        "label": "Churn: prag 2 dana — min"
+        "label": "Odljev: prag 2 dana — min"
       },
       "churn_days_t2_pts": {
         "description": "Točke za 21–30 dana bez narudžbe",
-        "label": "Churn: točke za prag 2 dana"
+        "label": "Odljev: točke za prag 2 dana"
       },
       "churn_days_t3_pts": {
         "description": "Točke za >30 dana bez narudžbe",
-        "label": "Churn: točke za prag 3 dana"
+        "label": "Odljev: točke za prag 3 dana"
       },
       "churn_risk_critical": {
         "description": "Min. točaka za razinu rizika: Kritično",
-        "label": "Churn: prag kritičnog rizika"
+        "label": "Odljev: prag kritičnog rizika"
       },
       "churn_risk_high": {
         "description": "Min. točaka za razinu rizika: Visoko",
-        "label": "Churn: prag visokog rizika"
+        "label": "Odljev: prag visokog rizika"
       },
       "churn_risk_low": {
         "description": "Min. točaka za razinu rizika: Nisko",
-        "label": "Churn: prag niskog rizika"
+        "label": "Odljev: prag niskog rizika"
       },
       "churn_risk_medium": {
         "description": "Min. točaka za razinu rizika: Srednje",
-        "label": "Churn: prag srednjeg rizika"
+        "label": "Odljev: prag srednjeg rizika"
       },
       "churn_sales_t1_pct": {
         "description": "Min. % pada M-2→M-1 za prag 1",
-        "label": "Churn: pad prodaje prag 1 %"
+        "label": "Odljev: pad prodaje prag 1 %"
       },
       "churn_sales_t1_pts": {
         "description": "Točke za pad prodaje ≥30% M-2→M-1",
-        "label": "Churn: točke za prag 1 prodaje"
+        "label": "Odljev: točke za prag 1 prodaje"
       },
       "churn_sales_t2_pct": {
         "description": "Min. % pada M-2→M-1 za prag 2",
-        "label": "Churn: pad prodaje prag 2 %"
+        "label": "Odljev: pad prodaje prag 2 %"
       },
       "churn_sales_t2_pts": {
         "description": "Točke za pad prodaje ≥51% M-2→M-1",
-        "label": "Churn: točke za prag 2 prodaje"
+        "label": "Odljev: točke za prag 2 prodaje"
       },
       "crm_adoption_target_pct": {
         "description": "Ciljni % aktivnih korisnika kod partnera",
@@ -903,16 +992,16 @@
         "label": "Dugi prodajni ciklus (dani)"
       },
       "crm_dashboard_win_stages": {
-        "description": "Faze leada koje se tretiraju kao dobitak (utječu na Win Rate i brojač „Dobiveni” na nadzornoj ploči). Format: JSON polje.",
+        "description": "Faze leada koje se tretiraju kao dobitak (utječu na stopu uspjeha i brojač „Dobiveni” na nadzornoj ploči). Format: JSON polje.",
         "label": "Faze leada koje se smatraju „dobivenima”"
       },
       "crm_global_read": {
-        "description": "Kada je uključeno, svi korisnici CRM-a mogu pregledavati Lead, Partner, izvještaje o prodaji i Performance bez ograničenja vidljivosti. Prava za uređivanje ostaju nepromijenjena.",
+        "description": "Kada je uključeno, svi korisnici CRM-a mogu pregledavati Lead, Partner, izvještaje o prodaji i Rezultate bez ograničenja vidljivosti. Prava za uređivanje ostaju nepromijenjena.",
         "label": "Globalno čitanje u CRM-u"
       },
       "crm_hold_reasons": {
-        "description": "Popis razloga za Hold. Prikazuje se kao padajući popis u polju „Razlog” kada za lead postavite status Hold.",
-        "label": "Razlozi za Hold leada"
+        "description": "Popis razloga za čekanje. Prikazuje se kao padajući popis u polju „Razlog” kada lead stavite na čekanje.",
+        "label": "Razlozi za stavljanje leada na čekanje"
       },
       "crm_hot_lead_days": {
         "description": "Dani bez kontakta → lead se označava kao hladan",
@@ -1004,79 +1093,79 @@
       },
       "health_act_t1_max_days": {
         "description": "Posljednja narudžba unutar N dana → točke T1",
-        "label": "Health: maks dana za aktivnost T1"
+        "label": "Stanje partnera: maks dana za aktivnost T1"
       },
       "health_act_t1_pts": {
         "description": "Točke za 1 narudžbu do X dana prije",
-        "label": "Health: točke aktivnosti T1"
+        "label": "Stanje partnera: točke aktivnosti T1"
       },
       "health_act_t2_max_days": {
         "description": "Maks. dana prije za prozor T2",
-        "label": "Health: maks dana aktivnosti T2"
+        "label": "Stanje partnera: maks dana aktivnosti T2"
       },
       "health_act_t2_min_days": {
         "description": "Min. dana prije za prozor T2 (5-10 dana)",
-        "label": "Health: min dana aktivnosti T2"
+        "label": "Stanje partnera: min dana aktivnosti T2"
       },
       "health_act_t2_pts": {
         "description": "Točke za 1 narudžbu u prozoru 5-10 dana",
-        "label": "Health: točke aktivnosti T2"
+        "label": "Stanje partnera: točke aktivnosti T2"
       },
       "health_act_t3_min_orders": {
         "description": "Min. narudžbi u 20d za prag T3",
-        "label": "Health: min narudžbi aktivnosti T3"
+        "label": "Stanje partnera: min narudžbi aktivnosti T3"
       },
       "health_act_t3_pts": {
         "description": "Točke za 2–5 narudžbi u 20 dana",
-        "label": "Health: točke aktivnosti T3"
+        "label": "Stanje partnera: točke aktivnosti T3"
       },
       "health_act_t4_min_orders": {
         "description": ">N narudžbi u 20d → T4 (najviša razina)",
-        "label": "Health: min narudžbi aktivnosti T4"
+        "label": "Stanje partnera: min narudžbi aktivnosti T4"
       },
       "health_act_t4_pts": {
         "description": "Točke za >5 narudžbi u 20 dana",
-        "label": "Health: točke aktivnosti T4"
+        "label": "Stanje partnera: točke aktivnosti T4"
       },
       "health_good_min": {
         "description": "Min. točaka za status Zdrav",
-        "label": "Health: prag Zdrav"
+        "label": "Stanje partnera: prag Zdrav"
       },
       "health_rev_t1_pct": {
         "description": "Min. % rasta M-2→M-1 za T1",
-        "label": "Health: rast T1 %"
+        "label": "Stanje partnera: rast T1 %"
       },
       "health_rev_t1_pts": {
         "description": "Točke za rast ≥20%",
-        "label": "Health: točke rasta T1"
+        "label": "Stanje partnera: točke rasta T1"
       },
       "health_rev_t2_pct": {
         "description": "Min. % rasta M-2→M-1 za T2",
-        "label": "Health: rast T2 %"
+        "label": "Stanje partnera: rast T2 %"
       },
       "health_rev_t2_pts": {
         "description": "Točke za rast ≥30%",
-        "label": "Health: točke rasta T2"
+        "label": "Stanje partnera: točke rasta T2"
       },
       "health_rev_t3_pct": {
         "description": "Min. % rasta M-2→M-1 za T3",
-        "label": "Health: rast T3 %"
+        "label": "Stanje partnera: rast T3 %"
       },
       "health_rev_t3_pts": {
         "description": "Točke za rast ≥41%",
-        "label": "Health: točke rasta T3"
+        "label": "Stanje partnera: točke rasta T3"
       },
       "health_rev_t4_pct": {
         "description": "Min. % rasta M-2→M-1 za T4",
-        "label": "Health: rast T4 %"
+        "label": "Stanje partnera: rast T4 %"
       },
       "health_rev_t4_pts": {
         "description": "Točke za rast >50%",
-        "label": "Health: točke rasta T4"
+        "label": "Stanje partnera: točke rasta T4"
       },
       "health_warn_min": {
         "description": "Min. točaka za status Pozor (ispod = Rizik)",
-        "label": "Health: prag Pozor"
+        "label": "Stanje partnera: prag Pozor"
       },
       "kanban_refresh_interval_sec": {
         "description": "Interval u sekundama za automatsko osvježavanje Kanban ploče. Postavite 0 da isključite automatsko osvježavanje.",
@@ -1187,10 +1276,10 @@
       "intro": "— šifrarnici i pragovi koje koristi modul CRM. Popise uređujte dodavanjem / brisanjem stavki. Promjene stupaju na snagu nakon spremanja.",
       "scoring": {
         "activityLast20Days": "Aktivnost (zadnjih 20 dana)",
-        "churnTitle": "Algoritam Churn — parametri bodovanja",
+        "churnTitle": "Algoritam odljeva — parametri bodovanja",
         "description": "Opis",
-        "healthLevelThresholds": "Pragovi Health Level (bodovi)",
-        "healthTitle": "Health Score — parametri bodovanja",
+        "healthLevelThresholds": "Pragovi razina stanja (bodovi)",
+        "healthTitle": "Stanje partnera — parametri bodovanja",
         "noOrdersDays": "Bez narudžbi (dani)",
         "parameter": "Parametar",
         "revenueGrowth": "Rast prihoda (M-2→M-1)",
@@ -1263,32 +1352,6 @@
         "urgent": "dana → crveno (hitno)"
       }
     },
-    "groupProfiles": {
-      "description": {
-        "accounting": "Odjel za financije i računovodstvo",
-        "customerService": "Odjel korisničke podrške",
-        "hr": "Kadrovski odjel",
-        "management": "Uprava društva",
-        "marketing": "Marketinški odjel",
-        "operations": "Operativni odjel",
-        "prospects": "Pristup modulu Prospekti (uvoz CSV, obogaćivanje, pretvorba u lead).",
-        "sales": "Prodajni odjel",
-        "seo": "Pregled i odobrenje sadržaja SEObota prije objave.",
-        "seoEditorial": "Urednici SEObota: uređivanje, dopunjavanje i odobravanje članaka prije objave."
-      },
-      "displayName": {
-        "accounting": "Računovodstvo",
-        "customerService": "Korisnička podrška",
-        "hr": "Kadrovi",
-        "management": "Uprava",
-        "marketing": "Marketing",
-        "operations": "Operacije",
-        "prospects": "Prospekti",
-        "sales": "Prodaja",
-        "seo": "SEO",
-        "seoEditorial": "Uredništvo SEO"
-      }
-    },
     "groups": {
       "addFailed": "Pogreška pri dodavanju grupe",
       "addGroup": "Dodaj grupu",
@@ -1325,7 +1388,7 @@
       "defaultConfig": "Zadana konfiguracija — još nije mijenjana.",
       "deleteConfirm": "Izbrisati signal „{name}”?",
       "disableSignal": "Isključi signal",
-      "draftInvalid": "Radna konfiguracija ima {score} / 100 bodova. Enrichment i dalje koristi zadnju ispravnu verziju.",
+      "draftInvalid": "Radna konfiguracija ima {score} / 100 bodova. Obogaćivanje i dalje koristi zadnju ispravnu verziju.",
       "edit": "Uredi",
       "editing": "Uređujete:",
       "enableSignal": "Uključi signal",
@@ -1412,11 +1475,6 @@
         "data_processing_entrustment": "Povjeravanje obrade",
         "no_gdpr": "Bez GDPR-a"
       },
-      "holdReasons": {
-        "businessPause": "Pauza u poslovanju",
-        "internalSituation": "Interna situacija u poduzeću",
-        "noDecisionMakers": "Nema donositelja odluka"
-      },
       "industries": {
         "Education": "Obrazovanje",
         "Finance": "Financije",
@@ -1430,7 +1488,7 @@
       },
       "leadSources": {
         "agent": "Agent",
-        "cold_call": "Cold call",
+        "cold_call": "Hladni poziv",
         "inbound": "Dolazni upit",
         "inne": "Ostalo",
         "kampania": "Kampanja e-poštom",
@@ -1556,7 +1614,7 @@
       "crm": "Poslovni parametri CRM-a",
       "documents": "Šifrarnici dokumenata",
       "global": "Globalni parametri",
-      "icp": "Enrichment / ICP",
+      "icp": "Obogaćivanje / ICP",
       "onboarding": "Predlošci Onboarding",
       "projects": "Projekti",
       "tooltips": "Savjeti",
@@ -1575,17 +1633,17 @@
         "leadsFunnelTitle": "Prodajni lijevak (naslov)",
         "leadsKpiAvgCycle": "KPI: Prosj. prodajni ciklus",
         "leadsKpiBudget": "KPI: Planirani budžet (PLN)",
-        "leadsKpiPipeline": "KPI: Pipeline (PLN)",
-        "leadsKpiWinRate": "KPI: Win Rate",
+        "leadsKpiPipeline": "KPI: Prodajni lijevak (PLN)",
+        "leadsKpiWinRate": "KPI: Stopa uspjeha",
         "leadsKpiWon": "KPI: Zatvoreno / Won (PLN)",
         "leadsLostTitle": "Razlozi gubitka (naslov)",
         "leadsRepsColLeads": "Prodavači: stupac Leadovi",
-        "leadsRepsColPipeline": "Prodavači: stupac Pipeline",
+        "leadsRepsColPipeline": "Prodavači: stupac Lijevak",
         "leadsRepsColProgress": "Prodavači: stupac Napredak",
         "leadsRepsColWinRate": "Prodavači: stupac Win%",
         "leadsRepsColWon": "Prodavači: stupac Won",
         "leadsRepsTitle": "Rezultati prodavača (naslov)",
-        "leadsSourcesQuality": "Izvori: Kvaliteta po izvoru (win rate)",
+        "leadsSourcesQuality": "Izvori: Kvaliteta po izvoru (stopa uspjeha)",
         "leadsSourcesTitle": "Izvori leadova (naslov)",
         "leadsTrendTitle": "Mjesečni trend (naslov)",
         "leadsVelocityTitle": "Vrijeme u fazi – prosj. dana (naslov)",
@@ -1594,15 +1652,15 @@
         "partnersKpiGrossTurnover": "Bruto promet (PLN)",
         "partnersKpiRevenue": "Prihod / Marža (PLN)",
         "partnersKpiTransactions": "Transakcije",
-        "partnersScorecardHealth": "Scorecard: Health",
+        "partnersScorecardHealth": "Kartica ocjene: Stanje",
         "salesActivity": "Ploča: Zadnja aktivnost",
         "salesChart": "Ploča: Prodajni rezultati (grafikon)",
         "salesKpiNewCompanies": "KPI: Nove tvrtke",
         "salesKpiNewContacts": "KPI: Novi kontakti",
-        "salesKpiNewLeads": "KPI: Nove prilike (aktivni pipeline)",
-        "salesKpiPipelineValue": "KPI: Vrijednost prilika (pipeline)",
+        "salesKpiNewLeads": "KPI: Nove prilike (aktivni prodajni lijevak)",
+        "salesKpiPipelineValue": "KPI: Vrijednost prilika (prodajni lijevak)",
         "salesKpiWon": "KPI: Dobivene prilike",
-        "salesPipeline": "Ploča: Prodajni pipeline",
+        "salesPipeline": "Ploča: Prodajni lijevak",
         "salesRecentLeads": "Ploča: Najnovije prilike (tablica)",
         "salesTasks": "Ploča: Zadaci za danas"
       },
@@ -1627,7 +1685,7 @@
       "screen": "Zaslon",
       "screens": {
         "partnerPerformance": "Uspješnost partnera",
-        "salesDashboard": "Sales Dashboard",
+        "salesDashboard": "Nadzorna ploča prodaje",
         "salesReports": "Izvješća o prodaji"
       }
     },
@@ -1761,7 +1819,7 @@
       "callAnalysis": "Analizator poziva",
       "callAnalysisDisabled": "Pristup Analizatoru poziva onemogućen",
       "callAnalysisEnabled": "Pristup Analizatoru poziva omogućen",
-      "callAnalysisHint": "AI analiza bilješki poziva, ocjena i follow-up",
+      "callAnalysisHint": "AI analiza bilješki poziva, ocjena i sljedeći koraci",
       "emailCampaigns": "E-mail kampanje",
       "emailCampaignsDisabled": "Pristup E-mail kampanjama isključen",
       "emailCampaignsEnabled": "Pristup E-mail kampanjama uključen",

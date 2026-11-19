@@ -84,6 +84,95 @@
     "title": "Datenverwaltung"
   },
   "logs": {
+    "actions": {
+      "attachment_deleted": "Anhang gelöscht",
+      "attachment_uploaded": "Anhang hochgeladen",
+      "attachment_version_uploaded": "Neue Anhangsversion hochgeladen",
+      "crm_activity_close": "Aktivität abgeschlossen",
+      "crm_activity_create": "Aktivität erstellt",
+      "crm_activity_update": "Aktivität geändert",
+      "crm_group_create": "Partnergruppe erstellt",
+      "crm_group_delete": "Partnergruppe gelöscht",
+      "crm_group_update": "Partnergruppe geändert",
+      "crm_import_documents": "Dokumente aus CSV importiert",
+      "crm_import_leads": "Leads aus CSV importiert",
+      "crm_import_partners": "Partner aus CSV importiert",
+      "crm_lead_archived": "Lead archiviert",
+      "crm_lead_consent_update": "Einwilligung des Leads geändert",
+      "crm_lead_converted": "Lead in Partner umgewandelt",
+      "crm_lead_create": "Lead erstellt",
+      "crm_lead_delete": "Lead gelöscht",
+      "crm_lead_hold_cancel": "Zurückstellung des Leads aufgehoben",
+      "crm_lead_hold_set": "Lead zurückgestellt",
+      "crm_lead_migrated": "Lead migriert",
+      "crm_lead_test_account": "Testkonto für Lead angelegt",
+      "crm_lead_update": "Lead geändert",
+      "crm_partner_consent_update": "Einwilligung des Partners geändert",
+      "crm_partner_create": "Partner erstellt",
+      "crm_partner_delete": "Partner gelöscht",
+      "crm_partner_onboarding_withdrawn": "Partner aus dem Onboarding zurückgezogen",
+      "crm_partner_update": "Partner geändert",
+      "crm_substitution_cancel": "Vertretung storniert",
+      "crm_substitution_create": "Vertretung eingerichtet",
+      "crm_visibility_grant_create": "Sichtfreigabe erteilt",
+      "crm_visibility_grant_revoke": "Sichtfreigabe entzogen",
+      "device_signed_out": "Gerät abgemeldet",
+      "doc_group_created": "Dokumentgruppe erstellt",
+      "doc_group_deleted": "Dokumentgruppe gelöscht",
+      "doc_group_updated": "Dokumentgruppe geändert",
+      "document_created": "Dokument erstellt",
+      "document_deleted": "Dokument gelöscht",
+      "document_downloaded": "Dokument heruntergeladen",
+      "document_linked": "Dokument verknüpft",
+      "document_unlinked": "Dokumentverknüpfung aufgehoben",
+      "document_updated": "Dokument geändert",
+      "document_viewed": "Dokument angesehen",
+      "group_created": "Berechtigungsgruppe erstellt",
+      "group_deleted": "Berechtigungsgruppe gelöscht",
+      "group_updated": "Berechtigungsgruppe geändert",
+      "invoice_generated": "Rechnung ausgestellt",
+      "invoice_voided": "Rechnung storniert",
+      "metadata_updated": "Dokumentdaten geändert",
+      "project_closed": "Projekt abgeschlossen",
+      "project_config_updated": "Projekteinstellungen geändert",
+      "project_cost_created": "Projektkosten hinzugefügt",
+      "project_cost_deleted": "Projektkosten gelöscht",
+      "project_cost_updated": "Projektkosten geändert",
+      "project_created": "Projekt erstellt",
+      "project_member_added": "Projektmitglied hinzugefügt",
+      "project_member_removed": "Projektmitglied entfernt",
+      "project_member_updated": "Projektmitglied geändert",
+      "project_reopened": "Projekt wiedereröffnet",
+      "project_revenue_created": "Projekterlös hinzugefügt",
+      "project_revenue_deleted": "Projekterlös gelöscht",
+      "project_revenue_updated": "Projekterlös geändert",
+      "project_task_created": "Projektaufgabe erstellt",
+      "project_task_updated": "Projektaufgabe geändert",
+      "project_updated": "Projekt geändert",
+      "role_assigned": "Rolle zugewiesen",
+      "role_removed": "Rolle entzogen",
+      "settings_updated": "Einstellungen geändert",
+      "signing_completed": "Unterzeichnung abgeschlossen",
+      "signing_failed": "Unterzeichnung fehlgeschlagen",
+      "signing_initiated": "Zur Unterschrift gesendet",
+      "status_changed": "Dokumentstatus geändert",
+      "tag_added": "Tag hinzugefügt",
+      "tag_removed": "Tag entfernt",
+      "tag_updated": "Tag geändert",
+      "tenant_deleted": "Organisation gelöscht",
+      "tenant_subscription_cancelled": "Abonnement der Organisation gekündigt",
+      "tenant_subscription_updated": "Abonnement der Organisation geändert",
+      "user_created": "Benutzer erstellt",
+      "user_deleted": "Benutzer gelöscht",
+      "user_login": "Anmeldung",
+      "user_logout": "Abmeldung",
+      "user_password_set": "Passwort festgelegt",
+      "user_updated": "Benutzer geändert",
+      "version_uploaded": "Neue Dokumentversion hochgeladen",
+      "workflow_task_cancelled": "Workflow-Aufgabe storniert",
+      "workflow_task_completed": "Workflow-Aufgabe erledigt",
+      "workflow_task_created": "Workflow-Aufgabe erstellt"
+    },
     "columns": {
       "action": "Aktion",
       "dateTime": "Datum und Uhrzeit",
@@ -401,7 +490,7 @@
       },
       "lead_sources": {
         "label": "Lead-Quellen",
-        "placeholder": "Website, Empfehlung, Cold Call, LinkedIn, Messen…"
+        "placeholder": "Website, Empfehlung, Kaltakquise, LinkedIn, Messen…"
       },
       "modules": {
         "label": "Welche Module sollen aktiv sein?",
@@ -435,7 +524,7 @@
             "label": "Telefonie (Softphone)"
           },
           "performance": {
-            "hint": "Health Score und Abwanderungsrisiko des Kunden (Churn).",
+            "hint": "Partnerzustand und Abwanderungsrisiko des Kunden.",
             "label": "Performance"
           },
           "prospects": {
@@ -804,67 +893,67 @@
     "catalog": {
       "churn_daily_run_time": {
         "description": "Format HH:MM — zu dieser Uhrzeit berechnet der Server das Scoring neu und versendet E-Mail-Benachrichtigungen",
-        "label": "Churn: Uhrzeit der täglichen Neuberechnung"
+        "label": "Abwanderung: Uhrzeit der täglichen Neuberechnung"
       },
       "churn_days_t1_max": {
         "description": "Max. Tage ohne Bestellung für Schwelle 1",
-        "label": "Churn: Tagesschwelle 1 — max"
+        "label": "Abwanderung: Tagesschwelle 1 — max"
       },
       "churn_days_t1_min": {
         "description": "Min. Tage ohne Bestellung für Schwelle 1",
-        "label": "Churn: Tagesschwelle 1 — min"
+        "label": "Abwanderung: Tagesschwelle 1 — min"
       },
       "churn_days_t1_pts": {
         "description": "Punkte für 10–20 Tage ohne Bestellung",
-        "label": "Churn: Punkte für Tagesschwelle 1"
+        "label": "Abwanderung: Punkte für Tagesschwelle 1"
       },
       "churn_days_t2_max": {
         "description": "Max. Tage ohne Bestellung für Schwelle 2",
-        "label": "Churn: Tagesschwelle 2 — max"
+        "label": "Abwanderung: Tagesschwelle 2 — max"
       },
       "churn_days_t2_min": {
         "description": "Min. Tage ohne Bestellung für Schwelle 2",
-        "label": "Churn: Tagesschwelle 2 — min"
+        "label": "Abwanderung: Tagesschwelle 2 — min"
       },
       "churn_days_t2_pts": {
         "description": "Punkte für 21–30 Tage ohne Bestellung",
-        "label": "Churn: Punkte für Tagesschwelle 2"
+        "label": "Abwanderung: Punkte für Tagesschwelle 2"
       },
       "churn_days_t3_pts": {
         "description": "Punkte für >30 Tage ohne Bestellung",
-        "label": "Churn: Punkte für Tagesschwelle 3"
+        "label": "Abwanderung: Punkte für Tagesschwelle 3"
       },
       "churn_risk_critical": {
         "description": "Min. Punkte für die Risikostufe: Kritisch",
-        "label": "Churn: Schwelle für kritisches Risiko"
+        "label": "Abwanderung: Schwelle für kritisches Risiko"
       },
       "churn_risk_high": {
         "description": "Min. Punkte für die Risikostufe: Hoch",
-        "label": "Churn: Schwelle für hohes Risiko"
+        "label": "Abwanderung: Schwelle für hohes Risiko"
       },
       "churn_risk_low": {
         "description": "Min. Punkte für die Risikostufe: Niedrig",
-        "label": "Churn: Schwelle für niedriges Risiko"
+        "label": "Abwanderung: Schwelle für niedriges Risiko"
       },
       "churn_risk_medium": {
         "description": "Min. Punkte für die Risikostufe: Mittel",
-        "label": "Churn: Schwelle für mittleres Risiko"
+        "label": "Abwanderung: Schwelle für mittleres Risiko"
       },
       "churn_sales_t1_pct": {
         "description": "Min. % Rückgang M-2→M-1 für Schwelle 1",
-        "label": "Churn: Umsatzrückgang Schwelle 1 %"
+        "label": "Abwanderung: Umsatzrückgang Schwelle 1 %"
       },
       "churn_sales_t1_pts": {
         "description": "Punkte für einen Umsatzrückgang von ≥30% M-2→M-1",
-        "label": "Churn: Punkte für Umsatzschwelle 1"
+        "label": "Abwanderung: Punkte für Umsatzschwelle 1"
       },
       "churn_sales_t2_pct": {
         "description": "Min. % Rückgang M-2→M-1 für Schwelle 2",
-        "label": "Churn: Umsatzrückgang Schwelle 2 %"
+        "label": "Abwanderung: Umsatzrückgang Schwelle 2 %"
       },
       "churn_sales_t2_pts": {
         "description": "Punkte für einen Umsatzrückgang von ≥51% M-2→M-1",
-        "label": "Churn: Punkte für Umsatzschwelle 2"
+        "label": "Abwanderung: Punkte für Umsatzschwelle 2"
       },
       "crm_adoption_target_pct": {
         "description": "Angestrebter Prozentsatz aktiver Nutzer beim Partner",
@@ -903,7 +992,7 @@
         "label": "Langer Vertriebszyklus (Tage)"
       },
       "crm_dashboard_win_stages": {
-        "description": "Lead-Phasen, die als Gewinn gewertet werden (sie beeinflussen die Win Rate und den Zähler \"Gewonnen\" im Dashboard). Format: JSON-Array.",
+        "description": "Lead-Phasen, die als Gewinn gewertet werden (sie beeinflussen die Abschlussquote und den Zähler \"Gewonnen\" im Dashboard). Format: JSON-Array.",
         "label": "Lead-Phasen, die als \"gewonnen\" gelten"
       },
       "crm_global_read": {
@@ -911,8 +1000,8 @@
         "label": "Globaler CRM-Lesezugriff"
       },
       "crm_hold_reasons": {
-        "description": "Liste der Hold-Gründe. Wird als Auswahlliste im Feld \"Grund\" angezeigt, wenn Sie den Status Hold für einen Lead setzen.",
-        "label": "Gründe für den Hold eines Leads"
+        "description": "Liste der Gründe für das Zurückstellen. Wird als Auswahlliste im Feld \"Grund\" angezeigt, wenn Sie einen Lead zurückstellen.",
+        "label": "Gründe für das Zurückstellen eines Leads"
       },
       "crm_hot_lead_days": {
         "description": "Tage ohne Kontakt → Lead als kalt markieren",
@@ -1004,79 +1093,79 @@
       },
       "health_act_t1_max_days": {
         "description": "Letzte Bestellung innerhalb von N Tagen → T1-Punkte",
-        "label": "Health: max Tage für Aktivität T1"
+        "label": "Partnerzustand: max Tage für Aktivität T1"
       },
       "health_act_t1_pts": {
         "description": "Punkte für 1 Bestellung bis vor X Tagen",
-        "label": "Health: Punkte für Aktivität T1"
+        "label": "Partnerzustand: Punkte für Aktivität T1"
       },
       "health_act_t2_max_days": {
         "description": "Max. Tage zurück für das T2-Fenster",
-        "label": "Health: max Tage Aktivität T2"
+        "label": "Partnerzustand: max Tage Aktivität T2"
       },
       "health_act_t2_min_days": {
         "description": "Min. Tage zurück für das T2-Fenster (5-10 Tage)",
-        "label": "Health: min Tage Aktivität T2"
+        "label": "Partnerzustand: min Tage Aktivität T2"
       },
       "health_act_t2_pts": {
         "description": "Punkte für 1 Bestellung im Fenster 5-10 Tage",
-        "label": "Health: Punkte für Aktivität T2"
+        "label": "Partnerzustand: Punkte für Aktivität T2"
       },
       "health_act_t3_min_orders": {
         "description": "Min. Bestellungen in 20d für die T3-Schwelle",
-        "label": "Health: min Bestellungen Aktivität T3"
+        "label": "Partnerzustand: min Bestellungen Aktivität T3"
       },
       "health_act_t3_pts": {
         "description": "Punkte für 2–5 Bestellungen in 20 Tagen",
-        "label": "Health: Punkte für Aktivität T3"
+        "label": "Partnerzustand: Punkte für Aktivität T3"
       },
       "health_act_t4_min_orders": {
         "description": ">N Bestellungen in 20d → T4 (höchste Stufe)",
-        "label": "Health: min Bestellungen Aktivität T4"
+        "label": "Partnerzustand: min Bestellungen Aktivität T4"
       },
       "health_act_t4_pts": {
         "description": "Punkte für >5 Bestellungen in 20 Tagen",
-        "label": "Health: Punkte für Aktivität T4"
+        "label": "Partnerzustand: Punkte für Aktivität T4"
       },
       "health_good_min": {
         "description": "Min. Punkte für den Status Gesund",
-        "label": "Health: Schwelle Gesund"
+        "label": "Partnerzustand: Schwelle Gesund"
       },
       "health_rev_t1_pct": {
         "description": "Min. % Wachstum M-2→M-1 für T1",
-        "label": "Health: Wachstum T1 %"
+        "label": "Partnerzustand: Wachstum T1 %"
       },
       "health_rev_t1_pts": {
         "description": "Punkte für Wachstum ≥20%",
-        "label": "Health: Punkte für Wachstum T1"
+        "label": "Partnerzustand: Punkte für Wachstum T1"
       },
       "health_rev_t2_pct": {
         "description": "Min. % Wachstum M-2→M-1 für T2",
-        "label": "Health: Wachstum T2 %"
+        "label": "Partnerzustand: Wachstum T2 %"
       },
       "health_rev_t2_pts": {
         "description": "Punkte für Wachstum ≥30%",
-        "label": "Health: Punkte für Wachstum T2"
+        "label": "Partnerzustand: Punkte für Wachstum T2"
       },
       "health_rev_t3_pct": {
         "description": "Min. % Wachstum M-2→M-1 für T3",
-        "label": "Health: Wachstum T3 %"
+        "label": "Partnerzustand: Wachstum T3 %"
       },
       "health_rev_t3_pts": {
         "description": "Punkte für Wachstum ≥41%",
-        "label": "Health: Punkte für Wachstum T3"
+        "label": "Partnerzustand: Punkte für Wachstum T3"
       },
       "health_rev_t4_pct": {
         "description": "Min. % Wachstum M-2→M-1 für T4",
-        "label": "Health: Wachstum T4 %"
+        "label": "Partnerzustand: Wachstum T4 %"
       },
       "health_rev_t4_pts": {
         "description": "Punkte für Wachstum >50%",
-        "label": "Health: Punkte für Wachstum T4"
+        "label": "Partnerzustand: Punkte für Wachstum T4"
       },
       "health_warn_min": {
         "description": "Min. Punkte für den Status Achtung (darunter = Risiko)",
-        "label": "Health: Schwelle Achtung"
+        "label": "Partnerzustand: Schwelle Achtung"
       },
       "kanban_refresh_interval_sec": {
         "description": "Intervall in Sekunden für die automatische Aktualisierung des Kanban-Boards. Setzen Sie 0, um die automatische Aktualisierung zu deaktivieren.",
@@ -1187,10 +1276,10 @@
       "intro": "— Wörterbücher und Schwellenwerte, die das CRM-Modul verwendet. Listen bearbeiten Sie durch Hinzufügen / Entfernen von Einträgen. Änderungen werden nach dem Speichern wirksam.",
       "scoring": {
         "activityLast20Days": "Aktivität (letzte 20 Tage)",
-        "churnTitle": "Churn-Algorithmus — Bewertungsparameter",
+        "churnTitle": "Abwanderungsalgorithmus — Bewertungsparameter",
         "description": "Beschreibung",
-        "healthLevelThresholds": "Schwellenwerte Health Level (Punkte)",
-        "healthTitle": "Health Score — Bewertungsparameter",
+        "healthLevelThresholds": "Schwellenwerte der Zustandsstufen (Punkte)",
+        "healthTitle": "Partnerzustand — Bewertungsparameter",
         "noOrdersDays": "Keine Bestellungen (Tage)",
         "parameter": "Parameter",
         "revenueGrowth": "Erlöswachstum (M-2→M-1)",
@@ -1261,32 +1350,6 @@
         "noWarning": "Tage → keine Warnung",
         "title": "Vorschau der Fristfarben",
         "urgent": "Tage → rot (dringend)"
-      }
-    },
-    "groupProfiles": {
-      "description": {
-        "accounting": "Abteilung Finanzen und Buchhaltung",
-        "customerService": "Kundenserviceabteilung",
-        "hr": "Personalabteilung",
-        "management": "Vorstand des Unternehmens",
-        "marketing": "Marketingabteilung",
-        "operations": "Betriebsabteilung",
-        "prospects": "Zugang zum Modul Prospekte (CSV-Import, Enrichment, Umwandlung in einen Lead).",
-        "sales": "Vertriebsabteilung",
-        "seo": "Prüfung und Freigabe der SEObot-Inhalte vor der Veröffentlichung.",
-        "seoEditorial": "SEObot-Redaktion: Bearbeiten, Ergänzen und Freigeben von Artikeln vor der Veröffentlichung."
-      },
-      "displayName": {
-        "accounting": "Buchhaltung",
-        "customerService": "Kundenservice",
-        "hr": "Personalwesen",
-        "management": "Vorstand",
-        "marketing": "Marketing",
-        "operations": "Betrieb",
-        "prospects": "Prospekte",
-        "sales": "Vertrieb",
-        "seo": "SEO",
-        "seoEditorial": "SEO-Redaktion"
       }
     },
     "groups": {
@@ -1412,11 +1475,6 @@
         "data_processing_entrustment": "Auftragsverarbeitung",
         "no_gdpr": "Kein DSGVO-Bezug"
       },
-      "holdReasons": {
-        "businessPause": "Betriebspause",
-        "internalSituation": "Interne Unternehmenssituation",
-        "noDecisionMakers": "Keine Entscheidungsträger"
-      },
       "industries": {
         "Education": "Bildung",
         "Finance": "Finanzen",
@@ -1430,7 +1488,7 @@
       },
       "leadSources": {
         "agent": "Agent",
-        "cold_call": "Cold Call",
+        "cold_call": "Kaltakquise",
         "inbound": "Eingehende Anfrage",
         "inne": "Sonstige",
         "kampania": "E-Mail-Kampagne",
@@ -1576,7 +1634,7 @@
         "leadsKpiAvgCycle": "KPI: Ø Vertriebszyklus",
         "leadsKpiBudget": "KPI: Geplantes Budget (PLN)",
         "leadsKpiPipeline": "KPI: Pipeline (PLN)",
-        "leadsKpiWinRate": "KPI: Win Rate",
+        "leadsKpiWinRate": "KPI: Abschlussquote",
         "leadsKpiWon": "KPI: Abgeschlossen / Won (PLN)",
         "leadsLostTitle": "Verlustgründe (Titel)",
         "leadsRepsColLeads": "Vertriebsmitarbeiter: Spalte Leads",
@@ -1585,7 +1643,7 @@
         "leadsRepsColWinRate": "Vertriebsmitarbeiter: Spalte Win%",
         "leadsRepsColWon": "Vertriebsmitarbeiter: Spalte Won",
         "leadsRepsTitle": "Ergebnisse der Vertriebsmitarbeiter (Titel)",
-        "leadsSourcesQuality": "Quellen: Qualität nach Quelle (Win Rate)",
+        "leadsSourcesQuality": "Quellen: Qualität nach Quelle (Abschlussquote)",
         "leadsSourcesTitle": "Lead-Quellen (Titel)",
         "leadsTrendTitle": "Monatstrend (Titel)",
         "leadsVelocityTitle": "Zeit in Phase – Ø Tage (Titel)",
@@ -1594,7 +1652,7 @@
         "partnersKpiGrossTurnover": "Bruttoumsatz (PLN)",
         "partnersKpiRevenue": "Erlös / Marge (PLN)",
         "partnersKpiTransactions": "Transaktionen",
-        "partnersScorecardHealth": "Scorecard: Health",
+        "partnersScorecardHealth": "Scorecard: Zustand",
         "salesActivity": "Panel: Letzte Aktivität",
         "salesChart": "Panel: Vertriebsergebnisse (Diagramm)",
         "salesKpiNewCompanies": "KPI: Neue Firmen",
@@ -1627,7 +1685,7 @@
       "screen": "Bildschirm",
       "screens": {
         "partnerPerformance": "Partnerleistung",
-        "salesDashboard": "Sales Dashboard",
+        "salesDashboard": "Vertriebs-Dashboard",
         "salesReports": "Vertriebsberichte"
       }
     },

@@ -8,8 +8,17 @@ import {
   TaskStatusCategory,
 } from '../../../core/services/projects-api.service';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
+import { TenantDefaultLabels } from '../../../core/i18n/tenant-default-label.pipe';
+import { TenantDictionary } from '../../../core/i18n/tenant-default-labels';
 
 const DEFAULT_COLOR = '#6B7280';
+
+const TENANT_DICTIONARY_OF: Record<ProjectDictionary, TenantDictionary> = {
+  statuses: 'projectStatuses',
+  types: 'projectTypes',
+  priorities: 'projectPriorities',
+  'cost-categories': 'projectCostCategories',
+};
 
 /**
  * Editor of one tenant dictionary: task statuses, types, priorities or cost
@@ -36,6 +45,7 @@ const DEFAULT_COLOR = '#6B7280';
               <input type="color" class="color" [ngModel]="storedColorOf(item)" (change)="update(item, { color: colorOf($event) })">
             }
             <input class="fi name" [ngModel]="item.name" maxlength="80" (change)="rename(item, $event)">
+            @if (translatedDefaultOf(item); as label) { <span class="default-label">{{ label }}</span> }
             @if (hasCategory()) {
               <select class="fsel category" [ngModel]="categoryOf(item)" (ngModelChange)="update(item, { category: $event })">
                 @for (category of categories; track category) {
@@ -77,6 +87,7 @@ const DEFAULT_COLOR = '#6B7280';
     .order-btn:disabled { opacity:.25; cursor:default; }
     .color { width:34px; height:34px; padding:2px; border:1.5px solid var(--gray-200); border-radius:10px; background:var(--surface); cursor:pointer; flex-shrink:0; }
     .name { flex:1; }
+    .default-label { font-size:12px; color:var(--gray-500); white-space:nowrap; }
     .category { width:160px; flex-shrink:0; }
     .active-toggle { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gray-600); white-space:nowrap; }
   `],
@@ -85,6 +96,7 @@ export class ProjectDictionaryEditorComponent {
   private readonly api = inject(ProjectsApiService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
 
   readonly dictionary = input.required<ProjectDictionary>();
   readonly items = input.required<ProjectDictionaryEntry[]>();
@@ -93,11 +105,21 @@ export class ProjectDictionaryEditorComponent {
   readonly categories: TaskStatusCategory[] = ['todo', 'in_progress', 'done'];
   readonly hasCategory = computed(() => this.dictionary() === 'statuses');
   readonly hasColor = computed(() => this.dictionary() !== 'cost-categories');
+  private readonly tenantDictionary = computed(() => TENANT_DICTIONARY_OF[this.dictionary()]);
 
   newName = '';
   isAddSubmitted = false;
   newColor = DEFAULT_COLOR;
   newCategory: TaskStatusCategory = 'todo';
+
+  /**
+   * The input holds the stored name; a seeded default also shows how users
+   * see it in the current language. Nothing when the two are the same.
+   */
+  translatedDefaultOf(item: ProjectDictionaryEntry): string | null {
+    const label = this.tenantLabels.label(this.tenantDictionary(), item.name);
+    return label !== item.name ? label : null;
+  }
 
   categoryOf(item: ProjectDictionaryEntry): TaskStatusCategory {
     return (item as ProjectTaskStatus).category;

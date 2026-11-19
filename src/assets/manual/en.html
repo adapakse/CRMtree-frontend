@@ -1970,7 +1970,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="webfig"><img loading="lazy" src="img/en_a07_settings_projects.jpg?v=20261113" width="1440" height="900" alt="Project settings"><figcaption>“Task statuses” with their categories, and the “Status transitions” matrix for internal participants.</figcaption></figure>
 <div class="tbl"><table>
 <tr><th>Section</th><th>What you set</th></tr>
-<tr><td><b>Task statuses</b></td><td>Name, colour, order (Move up / Move down) and <b>category</b>: “To do”, “In progress”, “Done”. The category tells the system what a status means: tasks in a “Done” status don’t count as open or overdue. The demo company uses Polish status names: “Do zrobienia”, “W toku”, “Do weryfikacji” (for review), “Zakończone”.</td></tr>
+<tr><td><b>Task statuses</b></td><td>Name, colour, order (Move up / Move down) and <b>category</b>: “To do”, “In progress”, “Done”. The category tells the system what a status means: tasks in a “Done” status don’t count as open or overdue. Default status names are shown in each user’s language — here “To do”, “In progress”, “In review”, “Done”; a name the administrator changed is shown exactly as typed.</td></tr>
 <tr><td><b>Status transitions</b></td><td>A “From status ↓ / to status →” matrix, separately for “Internal participant”, “External participant” and “Reviewer”. Save with “Save transitions”.</td></tr>
 <tr><td><b>Task types</b>, <b>Priorities</b></td><td>Dictionaries with colour and order.</td></tr>
 <tr><td><b>Task custom fields</b></td><td>Fields (Text, Number, List of values, Date, Amount with currency) that a PM adds to their project, deciding whether they are required.</td></tr>
@@ -1982,7 +1982,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p>The project PM and the administrator can always set any status. Participants change the status only in tasks assigned to them where they have full access. A reviewer changes the status in any task of the project.</p>
 <div class="example"><span class="lbl">EXAMPLE · TRANSITION MATRIX</span>
 <p>Default settings. Piotr is an internal participant with full access in the “Wdrożenie CRM Atlas” project, and Karol is the reviewer.</p>
-<p class="res">In his own task that is “W toku” (in progress), Piotr can set “Do zrobienia” or “Do weryfikacji”, but not “Zakończone”. Karol takes a task in “Do weryfikacji” to “Zakończone” or sends it back to “W toku”. If the administrator ticks “Do zrobienia → Zakończone” for reviewers, Karol can also close tasks nobody has started.</p></div>
+<p class="res">In his own task that is “In progress”, Piotr can set “To do” or “In review”, but not “Done”. Karol takes a task in “In review” to “Done” or sends it back to “In progress”. If the administrator ticks “To do → Done” for reviewers, Karol can also close tasks nobody has started.</p></div>
 
 <h4 id="p2-ksef">KSeF — cost invoices</h4>
 <p>KSeF is the Polish national e-invoicing system.</p>

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuditService } from '../../core/services/api.services';
 import { AuditLog } from '../../core/models/models';
-import { TranslocoDirective, TranslocoPipe, provideTranslocoScope } from '@jsverse/transloco';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 const ACTION_ICONS: Record<string, string> = {
   document_created:   'file', document_viewed:    'eye', document_downloaded: 'download',
@@ -48,7 +48,7 @@ const ACTION_ICONS: Record<string, string> = {
           <label class="fl">{{ t('logs.filters.actionType') }}</label>
           <select class="sel" [(ngModel)]="filters.action" (change)="load()">
             <option value="">{{ t('logs.filters.allActions') }}</option>
-            @for (a of actions(); track a) { <option [value]="a">{{ a }}</option> }
+            @for (a of actions(); track a) { <option [value]="a">{{ formatAction(a) }}</option> }
           </select>
         </div>
         <div class="fg" style="min-width:160px">
@@ -178,6 +178,7 @@ const ACTION_ICONS: Record<string, string> = {
 })
 export class LogsComponent implements OnInit {
   private auditSvc = inject(AuditService);
+  private transloco = inject(TranslocoService);
 
   logs       = signal<AuditLog[]>([]);
   actions    = signal<string[]>([]);
@@ -222,8 +223,11 @@ export class LogsComponent implements OnInit {
 
   actionIcon(action: string): string { return ACTION_ICONS[action] ?? 'pin'; }
 
+  // An action the backend adds before it gets a label here still reads sensibly.
   formatAction(action: string): string {
-    return action.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const key = `admin.logs.actions.${action}`;
+    const label = this.transloco.translate(key);
+    return label !== key ? label : action.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 
   describeLog(log: AuditLog): string {

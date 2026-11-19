@@ -8,6 +8,7 @@ import {
   GanttProject, GanttTaskRow, MS_PER_DAY, buildGanttRows, ganttRange, toUtcDay, todayIsoDate, utcDayToDate,
 } from './project-gantt.util';
 import { INDENT_PX_PER_LEVEL } from './project-task-tree.util';
+import { TenantDefaultLabels } from '../../core/i18n/tenant-default-label.pipe';
 
 type GanttZoom = 'day' | 'week' | 'month';
 type Translate = (key: string, params?: Record<string, unknown>) => string;
@@ -167,6 +168,7 @@ interface DayTick { label: number; leftPx: number; isWeekend: boolean; }
 })
 export class ProjectGanttComponent {
   readonly format = inject(ProjectFinanceFormatService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
 
   readonly tasks = input.required<ProjectTaskRow[]>();
   /** Projects of the listed tasks; their end dates are drawn as lines. */
@@ -237,7 +239,7 @@ export class ProjectGanttComponent {
   }
 
   barLabel(row: GanttTaskRow, t: Translate): string {
-    const parts = [row.task.name, `${this.format.date(row.bar?.startDate)} – ${this.format.date(row.bar?.endDate)}`, row.task.status_name];
+    const parts = [row.task.name, `${this.format.date(row.bar?.startDate)} – ${this.format.date(row.bar?.endDate)}`, this.tenantLabels.label('projectStatuses', row.task.status_name)];
     if (row.task.timeliness === 'overdue' && row.task.days_overdue) {
       parts.push(t('deadlines.overdueDays', { days: row.task.days_overdue }));
     }

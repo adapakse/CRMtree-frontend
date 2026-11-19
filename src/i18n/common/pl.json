@@ -392,6 +392,110 @@
   "states": {
     "loading": "Ładowanie…"
   },
+  "tenantDefaults": {
+    "consentDescriptions": {
+      "classificationTargeting": "Zgoda na profilowanie, klasyfikację oraz targetowanie na podstawie danych o aktywności i zachowaniach zakupowych partnera, w celu personalizacji ofert handlowych i działań sprzedażowych, zgodnie z art. 6 ust. 1 lit. a RODO.",
+      "marketingComm": "Zgoda na przetwarzanie danych osobowych kontaktu w celu przesyłania materiałów marketingowych, ofert oraz informacji o produktach i usługach drogą elektroniczną i telefoniczną, zgodnie z art. 6 ust. 1 lit. a RODO."
+    },
+    "consentLabels": {
+      "classificationTargeting": "Zgoda na przetwarzanie w celu klasyfikacji oraz targetowania",
+      "marketingComm": "Zgoda na przetwarzanie danych w celu komunikacji marketingowej"
+    },
+    "contractSubjects": {
+      "accommodation": "Zakwaterowanie",
+      "businessTravel": "Podróże służbowe",
+      "conferences": "Konferencje/Spotkania",
+      "other": "Inne",
+      "system": "System"
+    },
+    "countries": {
+      "at": "Austria",
+      "be": "Belgia",
+      "ch": "Szwajcaria",
+      "cz": "Czechy",
+      "de": "Niemcy",
+      "dk": "Dania",
+      "es": "Hiszpania",
+      "fi": "Finlandia",
+      "fr": "Francja",
+      "gb": "Wielka Brytania",
+      "hu": "Węgry",
+      "it": "Włochy",
+      "nl": "Holandia",
+      "no": "Norwegia",
+      "pl": "Polska",
+      "ro": "Rumunia",
+      "ru": "Rosja",
+      "se": "Szwecja",
+      "sk": "Słowacja",
+      "ua": "Ukraina"
+    },
+    "groupDescriptions": {
+      "accounting": "Dział finansów i księgowości",
+      "customerService": "Dział obsługi klienta",
+      "hr": "Dział kadr i zasobów ludzkich",
+      "management": "Zarząd firmy",
+      "marketing": "Dział marketingu",
+      "operations": "Dział operacyjny",
+      "prospects": "Dostęp do modułu Prospektów (import CSV, enrichment, konwersja na lead).",
+      "sales": "Dział sprzedaży",
+      "seo": "Przegląd i akceptacja treści SEObota przed publikacją.",
+      "seoEditorial": "Redaktorzy SEObota: edycja, uzupełnianie i akceptacja artykułów przed publikacją."
+    },
+    "groups": {
+      "accounting": "Accounting",
+      "customerService": "Obsługa Klienta",
+      "hr": "HR",
+      "management": "Zarząd",
+      "marketing": "Marketing",
+      "operations": "Operations",
+      "prospects": "Prospekty",
+      "sales": "Sprzedaż",
+      "seoEditorial": "Redakcja SEO"
+    },
+    "holdReasons": {
+      "businessPause": "Przerwa w działalności",
+      "internalSituation": "Sytuacja wewnątrz firmy",
+      "noDecisionMakers": "Brak osób decyzyjnych"
+    },
+    "languages": {
+      "de": "Niemiecki",
+      "en": "Angielski",
+      "pl": "Polski",
+      "ro": "Rumuński",
+      "ru": "Rosyjski"
+    },
+    "lostReasons": {
+      "highPrice": "Wysoka cena",
+      "incompleteOffer": "Niepełna oferta",
+      "other": "Inne"
+    },
+    "projectCostCategories": {
+      "licences": "Licencje",
+      "materials": "Materiały",
+      "other": "Inne",
+      "ownWork": "Praca własna",
+      "subcontractors": "Podwykonawcy",
+      "travel": "Podróże"
+    },
+    "projectPriorities": {
+      "critical": "Krytyczny",
+      "high": "Wysoki",
+      "low": "Niski",
+      "medium": "Średni"
+    },
+    "projectStatuses": {
+      "done": "Zakończone",
+      "inProgress": "W toku",
+      "review": "Do weryfikacji",
+      "todo": "Do zrobienia"
+    },
+    "projectTypes": {
+      "meeting": "Spotkanie",
+      "milestone": "Kamień milowy",
+      "task": "Zadanie"
+    }
+  },
   "testEnvironmentBanner": {
     "title": "Wersja testowa — to nie jest środowisko produkcyjne"
   },

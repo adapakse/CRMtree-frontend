@@ -154,19 +154,19 @@
     "errors": {
       "bulkFailed": "Eroare la operațiunea în masă",
       "deleteFailed": "Eroare la ștergere",
-      "followUpUpdateFailed": "Eroare la actualizarea follow-up-ului",
+      "followUpUpdateFailed": "Eroare la actualizarea pasului următor",
       "reanalyzeFailed": "Eroare la reanalizare",
       "statusChangeFailed": "Eroare la schimbarea statusului"
     },
     "filters": {
-      "allFollowUps": "Toate follow-up-urile",
+      "allFollowUps": "Toți pașii următori",
       "allLinks": "Toate asocierile",
       "allSalespeople": "Toți agenții de vânzări",
       "allStatuses": "Toate statusurile",
       "firstCall": "Primul apel:",
-      "followUpDate": "Dată follow-up:",
-      "followUpDone": "Follow-up efectuat",
-      "followUpRequired": "Follow-up necesar",
+      "followUpDate": "Data pasului următor:",
+      "followUpDone": "Pas următor efectuat",
+      "followUpRequired": "Pas următor necesar",
       "lastCall": "Ultimul apel:",
       "noLinks": "Fără asocieri",
       "presets": {
@@ -176,7 +176,7 @@
         "today": "Azi",
         "todayTomorrow": "Azi+Mâine"
       },
-      "score": "Score:",
+      "score": "Scor:",
       "scoreMax": "max",
       "scoreMin": "min",
       "searchPlaceholder": "Căutare companie sau cod fiscal...",
@@ -185,11 +185,11 @@
     },
     "followUp": {
       "done": "Efectuat",
-      "label": "Follow-up",
-      "markDoneTitle": "Faceți clic pentru a marca follow-up-ul ca efectuat",
+      "label": "Pas următor",
+      "markDoneTitle": "Faceți clic pentru a marca pasul următor ca efectuat",
       "notRequired": "Nu este necesar",
       "required": "Necesar",
-      "undoTitle": "Follow-up efectuat. Faceți clic pentru a anula."
+      "undoTitle": "Pas următor efectuat. Faceți clic pentru a anula."
     },
     "header": {
       "analyze": "Analizare ({count})",
@@ -341,7 +341,7 @@
     },
     "pipeline": {
       "empty": "Fără date",
-      "title": "Pipeline leaduri"
+      "title": "Pâlnia leadurilor"
     },
     "productMix": {
       "title": "Mix de produse ({period})"
@@ -655,7 +655,7 @@
       "onboarding": "Implementare"
     },
     "priorities": {
-      "asap": "ASAP",
+      "asap": "Urgent",
       "important": "Important",
       "low": "Scăzut",
       "medium": "Mediu"
@@ -797,7 +797,7 @@
       "dateRequired": "Introduceți data",
       "edit": "Editare așteptare",
       "editTooltip": "În așteptare până la {date} — faceți clic pentru a edita",
-      "introAfter": "va fi marcat ca fiind în așteptare — fără impact asupra KPI-urilor active și a pipeline-ului, cât timp durează așteptarea.",
+      "introAfter": "va fi marcat ca fiind în așteptare — fără impact asupra KPI-urilor active și a pâlniei, cât timp durează așteptarea.",
       "introBefore": "Leadul",
       "label": "În așteptare",
       "reason": "Motiv",
@@ -934,7 +934,7 @@
       "noActivities": "Nicio activitate.",
       "note": "Notiță",
       "openDetails": "Deschidere detalii",
-      "pipeline": "Pipeline",
+      "pipeline": "Pâlnie",
       "probability": "Probabilitate",
       "stageValue": "Etapă: {stage}",
       "tabs": {
@@ -1059,7 +1059,7 @@
       "hot": "Fierbinți",
       "lost": "Pierdute",
       "opportunities": "Oportunități de vânzare",
-      "pipeline": "Pipeline (PLN)",
+      "pipeline": "Pâlnie (PLN)",
       "won": "Câștigate"
     },
     "table": {
@@ -1199,21 +1199,21 @@
     "withdraw": {
       "action": "Retrage",
       "confirm": "Confirmă retragerea",
-      "confirmPrompt": "Retragi „{company}” din onboarding în etapa „{stage}”? Partenerul și sarcinile sale de onboarding vor fi șterse, iar leadul revine în pipeline-ul de vânzări.",
-      "detailButton": "Retrage din onboarding în pipeline",
-      "detailHint": "Șterge acest partener și sarcinile sale de onboarding — leadul revine la etapa selectată a pipeline-ului.",
+      "confirmPrompt": "Retragi „{company}” din onboarding în etapa „{stage}”? Partenerul și sarcinile sale de onboarding vor fi șterse, iar leadul revine în pâlnia de vânzări.",
+      "detailButton": "Retrage din onboarding în pâlnie",
+      "detailHint": "Șterge acest partener și sarcinile sale de onboarding — leadul revine la etapa selectată a pâlniei.",
       "detailStagePrompt": "Readu leadul la etapa:",
       "failed": "Retragerea din onboarding nu a reușit",
-      "hint": "Retrage din onboarding într-o etapă a pipeline-ului",
+      "hint": "Retrage din onboarding într-o etapă a pâlniei",
       "inProgress": "Se retrage…",
-      "intro": "{company} va fi eliminată din onboarding (împreună cu sarcinile de onboarding) și revine în pipeline-ul de vânzări la etapa selectată.",
-      "invalidStage": "Această etapă nu mai există în pipeline — reîncarcă pagina și alege alta",
+      "intro": "{company} va fi eliminată din onboarding (împreună cu sarcinile de onboarding) și revine în pâlnia de vânzări la etapa selectată.",
+      "invalidStage": "Această etapă nu mai există în pâlnie — reîncarcă pagina și alege alta",
       "noPermission": "Doar un manager de vânzări sau un administrator poate retrage din onboarding",
       "notFound": "Partenerul nu a fost găsit — poate a fost deja retras sau lansat",
-      "stageLabel": "Etapa pipeline-ului",
+      "stageLabel": "Etapa pâlniei",
       "stagePlaceholder": "— alege o etapă —",
-      "stageRequired": "Alege etapa pipeline-ului în care revine compania",
-      "success": "„{company}” a revenit în pipeline-ul de vânzări",
+      "stageRequired": "Alege etapa pâlniei în care revine compania",
+      "success": "„{company}” a revenit în pâlnia de vânzări",
       "title": "Retrage din onboarding"
     }
   },
@@ -1253,7 +1253,7 @@
       "noRisk": "Fără risc de pierdere a clientului",
       "salesDrop": "Scădere L-2→L-1",
       "score": "{score} pct.",
-      "title": "Risc de churn"
+      "title": "Risc de pierdere"
     },
     "commissionBasis": {
       "bookings": "Număr de rezervări",
@@ -1302,7 +1302,7 @@
         "language": "de ex. ro",
         "notes": "Notițe libere…",
         "partnerId": "de ex. 42",
-        "source": "de ex. târg, recomandare, cold call",
+        "source": "de ex. târg, recomandare, apel la rece",
         "subdomain": "de ex. acme",
         "website": "https://firma.ro"
       },
@@ -1380,7 +1380,7 @@
     "header": {
       "activeSince": "Activ din {date}",
       "backToPartners": "Parteneri",
-      "churn": "Churn: {level}",
+      "churn": "Risc de pierdere: {level}",
       "edit": "Editare",
       "noEditPermission": "Nu aveți permisiunea de a edita acest partener"
     },
@@ -1450,7 +1450,7 @@
         "last12Months": "Ultimele 12 luni",
         "last3Months": "Ultimele 3 luni",
         "last6Months": "Ultimele 6 luni",
-        "ytd": "YTD {year}"
+        "ytd": "De la începutul lui {year}"
       },
       "productBreakdown": "Defalcare pe produse",
       "title": "Date de vânzări DWH"
@@ -1464,7 +1464,7 @@
       "customFields": "Câmpuri suplimentare",
       "extraContacts": "Contacte suplimentare",
       "financialTerms": "Condiții financiare",
-      "partnerAdmin": "Partner Admin"
+      "partnerAdmin": "Administratorul partenerului"
     }
   },
   "partnerGroups": {
@@ -1510,8 +1510,8 @@
         "medium": "Mediu"
       },
       "points": "{score} pct.",
-      "risk": "Risc de churn",
-      "riskWithLevel": "Risc de churn: {level}"
+      "risk": "Risc de pierdere",
+      "riskWithLevel": "Risc de pierdere: {level}"
     },
     "create": {
       "companyPlaceholder": "Denumirea companiei",
@@ -1546,13 +1546,13 @@
       "label": "Filtru din raport:"
     },
     "table": {
-      "churn": "Churn",
+      "churn": "Risc de pierdere",
       "contractUntil": "Contract până la",
       "crmTurnover": "Cifră de afaceri CRM",
       "dwhMargin": "Marjă DWH",
-      "dwhMarginHint": "Marjă YTD din DWH",
+      "dwhMarginHint": "Marjă de la începutul anului din DWH",
       "dwhTurnover": "Cifră de afaceri DWH",
-      "dwhTurnoverHint": "Cifră de afaceri brută YTD din DWH"
+      "dwhTurnoverHint": "Cifră de afaceri brută de la începutul anului din DWH"
     },
     "taxIdErrors": {
       "countryCode": "Începeți cu codul de țară (2 litere), de ex. PL",
@@ -1602,7 +1602,7 @@
       "currentMonth": "Luna curentă",
       "currentQuarter": "Trimestrul curent",
       "currentWeek": "Săptămâna curentă",
-      "currentYear": "Anul curent (YTD {year})",
+      "currentYear": "Anul curent (de la începutul lui {year})",
       "customRange": "Interval personalizat…",
       "previousMonth": "Luna anterioară",
       "previousQuarter": "Trimestrul anterior",
@@ -1640,7 +1640,7 @@
     "common": {
       "columns": {
         "leads": "Leaduri",
-        "pipeline": "Pipeline",
+        "pipeline": "Pâlnie",
         "progress": "Progres",
         "winRatePct": "Câștig %",
         "won": "Câștigate"
@@ -1661,7 +1661,7 @@
       "leadSources": {
         "title": "Surse de leaduri",
         "totalCaption": "leaduri",
-        "winRate": "{value}% win rate"
+        "winRate": "{value}% rata de câștig"
       },
       "leadsShort": "{count} lead.",
       "lostReasons": "Motivele pierderii",
@@ -1669,7 +1669,7 @@
       "periods": {
         "currentMonth": "Luna curentă",
         "currentQuarter": "Trimestrul curent",
-        "currentYear": "Anul curent (YTD {year})",
+        "currentYear": "Anul curent (de la începutul lui {year})",
         "last3Months": "Ultimele 3 luni",
         "last6Months": "Ultimele 6 luni"
       },
@@ -1691,7 +1691,7 @@
       "drilldown": {
         "funnel": "Pâlnie: {stage}",
         "lost": "Pierdute: {reason}",
-        "pipelineAll": "Pipeline – toate cele active",
+        "pipelineAll": "Pâlnie – toate cele active",
         "plannedBudget": "Buget planificat – leaduri din perioadă",
         "plannedInPeriod": "Planificate pentru închidere în perioadă",
         "source": "Sursă: {source}",
@@ -1720,7 +1720,7 @@
         "topReason": "Motiv principal:"
       },
       "sourceQuality": {
-        "title": "Calitate după sursă (win rate)"
+        "title": "Calitate după sursă (rata de câștig)"
       },
       "tooltips": {
         "goToOnboarding": "Faceți clic pentru a accesa secțiunea Onboarding",
@@ -1738,7 +1738,7 @@
         "new": "Noi",
         "title": "Trend lunar",
         "won": "Câștigate",
-        "wonTooltip": "Won: {count}"
+        "wonTooltip": "Câștigate: {count}"
       },
       "velocity": {
         "scale": "Scală: max. {count, plural, one {# zi} few {# zile} other {# de zile}}",
@@ -1755,13 +1755,13 @@
         "product": "produs:"
       },
       "chart": {
-        "pipelineTooltip": "Pipeline: {value}k PLN",
+        "pipelineTooltip": "Pâlnie: {value}k PLN",
         "projectedWeighted": "Valoare estimată (ponderată):",
         "title": "Venituri lunare",
-        "wonTooltip": "Won: {value}k PLN"
+        "wonTooltip": "Câștigate: {value}k PLN"
       },
       "external": {
-        "feeRate": "Fee rate: {value}%",
+        "feeRate": "Rata taxelor: {value}%",
         "feesPln": "Comisioane (PLN)",
         "grossTurnoverPln": "Cifră de afaceri brută (PLN)",
         "margin": "Marjă: {value}%",
@@ -1784,7 +1784,7 @@
       },
       "kpi": {
         "aboveTarget": "Peste obiectiv",
-        "activePipeline": "Pipeline activ",
+        "activePipeline": "Pâlnie activă",
         "avgClosingTime": "Timp mediu de închidere",
         "belowTarget": "Sub obiectiv",
         "hotCount": "{count, plural, one {# fierbinte} few {# fierbinți} other {# de fierbinți}}",
@@ -1795,7 +1795,7 @@
       "lostReasons": {
         "choseCompetitor": "A ales concurența",
         "insight": "{percent}% dintre pierderi se datorează motivului „{reason}”.",
-        "insightLabel": "Insight:",
+        "insightLabel": "Observație:",
         "noBudget": "Lipsă buget",
         "priceTooHigh": "Preț prea mare",
         "projectPostponed": "Proiect amânat"
@@ -1808,7 +1808,7 @@
       },
       "sources": {
         "campaign": "Campanie",
-        "coldOutreach": "Cold outreach",
+        "coldOutreach": "Prospectare la rece",
         "referrals": "Recomandări",
         "socialMedia": "Social media",
         "tradeFairs": "Târguri"
@@ -1906,9 +1906,9 @@
       "churn": {
         "criticalCount": "{count, plural, one {# critic} few {# critice} other {# de critice}}",
         "daysShort": "{days}z",
-        "empty": "Niciun partener cu risc de churn",
-        "showAll": "Afișare toți partenerii cu risc de churn",
-        "title": "Riscul de churn al partenerilor"
+        "empty": "Niciun partener cu risc de pierdere",
+        "showAll": "Afișare toți partenerii cu risc de pierdere",
+        "title": "Riscul de pierdere a partenerilor"
       },
       "columns": {
         "fees": "Comisioane",
@@ -1939,7 +1939,7 @@
       "healthPoints": "{score} pct.",
       "kpi": {
         "activePartners": "Parteneri activi",
-        "feeRateShare": "{percent}% fee rate",
+        "feeRateShare": "{percent}% rata taxelor",
         "feesPln": "Comisioane (PLN)",
         "productsCount": "{count} Produse",
         "revenueMarginPln": "Venit / Marjă (PLN)",
@@ -1966,11 +1966,11 @@
           "medium": "mediu",
           "poor": "slab"
         },
-        "title": "Scorecard parteneri"
+        "title": "Fișa de evaluare a partenerilor"
       },
       "summary": {
-        "feeRate": "Fee rate",
-        "feesCommissions": "Fees / Comisioane",
+        "feeRate": "Rata taxelor",
+        "feesCommissions": "Taxe / Comisioane",
         "marginPct": "% marjă",
         "revenueMargin": "Venit (marjă)",
         "title": "Rezumat financiar"
@@ -2008,14 +2008,14 @@
     "churn": {
       "allLevels": "Toate nivelurile",
       "daysSinceOrder": "zile fără comandă",
-      "empty": "Niciun partener cu risc de churn care să îndeplinească criteriile filtrelor.",
+      "empty": "Niciun partener cu risc de pierdere care să îndeplinească criteriile filtrelor.",
       "generateResult": "{created, plural, one {A fost creată # sarcină} few {Au fost create # sarcini} other {Au fost create # de sarcini}}, omise: {skipped} (există deja).",
       "generateTasks": "Generare sarcini",
       "generating": "Se generează…",
-      "noRisk": "Fără risc de churn",
+      "noRisk": "Fără risc de pierdere",
       "salesDrop": "scădere L-2→L-1",
       "searchPlaceholder": "Căutare partener…",
-      "showAll": "Afișare toți partenerii cu risc de churn →"
+      "showAll": "Afișare toți partenerii cu risc de pierdere →"
     },
     "currency": {
       "billionsPln": "{value} mld. PLN",
@@ -2030,12 +2030,12 @@
     },
     "kpi": {
       "filters": {
-        "activeOpportunities": "Oportunități active în pipeline",
+        "activeOpportunities": "Oportunități active în pâlnie",
         "newLeadsThisWeek": "Leaduri noi – săptămâna curentă",
         "newLeadsValueThisWeek": "Leaduri noi – valoare săptămâna curentă",
-        "pipelineValue": "Valoarea pipeline-ului"
+        "pipelineValue": "Valoarea pâlniei"
       },
-      "inPipeline": "în pipeline",
+      "inPipeline": "în pâlnie",
       "newLeads": "Leaduri noi",
       "newLeadsValue": "Valoare leaduri noi",
       "newOpportunities": "Oportunități noi",
@@ -2061,12 +2061,12 @@
       "title": "Cele mai noi oportunități"
     },
     "pipeline": {
-      "empty": "Nu există date pentru pipeline",
+      "empty": "Nu există date pentru pâlnie",
       "modeCount": "Număr",
       "modeValue": "Valoare",
       "opportunityCount": "{count, plural, one {# oportunitate} few {# oportunități} other {# de oportunități}}",
-      "title": "Pipeline de vânzări",
-      "total": "Valoarea totală a pipeline-ului:"
+      "title": "Pâlnie de vânzări",
+      "total": "Valoarea totală a pâlniei:"
     },
     "stages": {
       "closed_lost": "Pierdute",

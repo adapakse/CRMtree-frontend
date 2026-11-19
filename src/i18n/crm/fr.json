@@ -655,7 +655,7 @@
       "onboarding": "En intégration"
     },
     "priorities": {
-      "asap": "ASAP",
+      "asap": "Urgente",
       "important": "Importante",
       "low": "Basse",
       "medium": "Moyenne"
@@ -1302,7 +1302,7 @@
         "language": "p. ex. fr",
         "notes": "Notes libres…",
         "partnerId": "p. ex. 42",
-        "source": "p. ex. salon, recommandation, cold call",
+        "source": "p. ex. salon, recommandation, appel à froid",
         "subdomain": "p. ex. acme",
         "website": "https://societe.fr"
       },
@@ -1450,7 +1450,7 @@
         "last12Months": "12 derniers mois",
         "last3Months": "3 derniers mois",
         "last6Months": "6 derniers mois",
-        "ytd": "YTD {year}"
+        "ytd": "Depuis le début de {year}"
       },
       "productBreakdown": "Répartition par produit",
       "title": "Données de vente DWH"
@@ -1550,9 +1550,9 @@
       "contractUntil": "Fin du contrat",
       "crmTurnover": "CA CRM",
       "dwhMargin": "Marge DWH",
-      "dwhMarginHint": "Marge YTD issue du DWH",
+      "dwhMarginHint": "Marge depuis le début de l’année issue du DWH",
       "dwhTurnover": "CA DWH",
-      "dwhTurnoverHint": "Chiffre d’affaires brut YTD issu du DWH"
+      "dwhTurnoverHint": "Chiffre d’affaires brut depuis le début de l’année issu du DWH"
     },
     "taxIdErrors": {
       "countryCode": "Commencez par le code pays (2 lettres), p. ex. PL",
@@ -1602,7 +1602,7 @@
       "currentMonth": "Mois en cours",
       "currentQuarter": "Trimestre en cours",
       "currentWeek": "Semaine en cours",
-      "currentYear": "Année en cours (YTD {year})",
+      "currentYear": "Année en cours (depuis le début de {year})",
       "customRange": "Période personnalisée…",
       "previousMonth": "Mois précédent",
       "previousQuarter": "Trimestre précédent",
@@ -1649,7 +1649,7 @@
       "exportPdf": "Export PDF",
       "funnel": {
         "subtitle": "Nombre de leads et valeur en PLN",
-        "title": "Entonnoir de vente"
+        "title": "Pipeline de vente"
       },
       "kpi": {
         "activeLeads": "Leads actifs",
@@ -1661,7 +1661,7 @@
       "leadSources": {
         "title": "Sources des leads",
         "totalCaption": "leads",
-        "winRate": "{value}% win rate"
+        "winRate": "{value}% taux de réussite"
       },
       "leadsShort": "{count} lead.",
       "lostReasons": "Motifs de perte",
@@ -1669,7 +1669,7 @@
       "periods": {
         "currentMonth": "Mois en cours",
         "currentQuarter": "Trimestre en cours",
-        "currentYear": "Année en cours (YTD {year})",
+        "currentYear": "Année en cours (depuis le début de {year})",
         "last3Months": "3 derniers mois",
         "last6Months": "6 derniers mois"
       },
@@ -1720,7 +1720,7 @@
         "topReason": "Motif principal :"
       },
       "sourceQuality": {
-        "title": "Qualité par source (win rate)"
+        "title": "Qualité par source (taux de réussite)"
       },
       "tooltips": {
         "goToOnboarding": "Cliquez pour accéder à la section Onboarding",
@@ -1761,7 +1761,7 @@
         "wonTooltip": "Won : {value}k PLN"
       },
       "external": {
-        "feeRate": "Fee rate : {value}%",
+        "feeRate": "Taux de frais : {value}%",
         "feesPln": "Commissions (PLN)",
         "grossTurnoverPln": "Chiffre d’affaires brut (PLN)",
         "margin": "Marge : {value}%",
@@ -1795,7 +1795,7 @@
       "lostReasons": {
         "choseCompetitor": "A choisi la concurrence",
         "insight": "{percent}% des pertes sont dues à « {reason} ».",
-        "insightLabel": "Insight :",
+        "insightLabel": "Constat :",
         "noBudget": "Pas de budget",
         "priceTooHigh": "Prix trop élevé",
         "projectPostponed": "Projet reporté"
@@ -1808,7 +1808,7 @@
       },
       "sources": {
         "campaign": "Campagne",
-        "coldOutreach": "Cold outreach",
+        "coldOutreach": "Prospection à froid",
         "referrals": "Recommandations",
         "socialMedia": "Réseaux sociaux",
         "tradeFairs": "Salons"
@@ -1939,7 +1939,7 @@
       "healthPoints": "{score} pts",
       "kpi": {
         "activePartners": "Partenaires actifs",
-        "feeRateShare": "{percent}% fee rate",
+        "feeRateShare": "{percent}% de frais",
         "feesPln": "Commissions (PLN)",
         "productsCount": "{count} produits",
         "revenueMarginPln": "Revenu / Marge (PLN)",
@@ -1966,16 +1966,16 @@
           "medium": "moyen",
           "poor": "faible"
         },
-        "title": "Scorecard des partenaires"
+        "title": "Fiche d’évaluation des partenaires"
       },
       "summary": {
-        "feeRate": "Fee rate",
-        "feesCommissions": "Fees / Commissions",
+        "feeRate": "Taux de frais",
+        "feesCommissions": "Frais / Commissions",
         "marginPct": "% de marge",
         "revenueMargin": "Revenu (marge)",
         "title": "Synthèse financière"
       },
-      "title": "Performance des partenaires",
+      "title": "Performances des partenaires",
       "trend": {
         "title": "Tendance du revenu",
         "totalTurnover": "Chiffre d’affaires total"

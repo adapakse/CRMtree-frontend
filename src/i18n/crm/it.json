@@ -176,7 +176,7 @@
         "today": "Oggi",
         "todayTomorrow": "Oggi+Domani"
       },
-      "score": "Score:",
+      "score": "Punteggio:",
       "scoreMax": "max",
       "scoreMin": "min",
       "searchPlaceholder": "Cerca azienda o partita IVA...",
@@ -655,7 +655,7 @@
       "onboarding": "Onboarding"
     },
     "priorities": {
-      "asap": "ASAP",
+      "asap": "Urgente",
       "important": "Importante",
       "low": "Bassa",
       "medium": "Media"
@@ -1302,7 +1302,7 @@
         "language": "es. it",
         "notes": "Note libere…",
         "partnerId": "es. 42",
-        "source": "es. fiera, segnalazione, cold call",
+        "source": "es. fiera, segnalazione, chiamata a freddo",
         "subdomain": "es. acme",
         "website": "https://azienda.it"
       },
@@ -1380,7 +1380,7 @@
     "header": {
       "activeSince": "Attivo dal {date}",
       "backToPartners": "Partner",
-      "churn": "Churn: {level}",
+      "churn": "Abbandono: {level}",
       "edit": "Modifica",
       "noEditPermission": "Non hai i permessi per modificare questo partner"
     },
@@ -1450,7 +1450,7 @@
         "last12Months": "Ultimi 12 mesi",
         "last3Months": "Ultimi 3 mesi",
         "last6Months": "Ultimi 6 mesi",
-        "ytd": "YTD {year}"
+        "ytd": "Da inizio {year}"
       },
       "productBreakdown": "Ripartizione per prodotto",
       "title": "Dati di vendita DWH"
@@ -1464,7 +1464,7 @@
       "customFields": "Campi aggiuntivi",
       "extraContacts": "Contatti aggiuntivi",
       "financialTerms": "Condizioni finanziarie",
-      "partnerAdmin": "Partner Admin"
+      "partnerAdmin": "Amministratore del partner"
     }
   },
   "partnerGroups": {
@@ -1546,13 +1546,13 @@
       "label": "Filtro dal report:"
     },
     "table": {
-      "churn": "Churn",
+      "churn": "Abbandono",
       "contractUntil": "Contratto fino al",
       "crmTurnover": "Fatturato CRM",
       "dwhMargin": "Margine DWH",
-      "dwhMarginHint": "Margine YTD dal DWH",
+      "dwhMarginHint": "Margine da inizio anno dal DWH",
       "dwhTurnover": "Fatturato DWH",
-      "dwhTurnoverHint": "Fatturato lordo YTD dal DWH"
+      "dwhTurnoverHint": "Fatturato lordo da inizio anno dal DWH"
     },
     "taxIdErrors": {
       "countryCode": "Inizia con il codice paese (2 lettere), es. PL",
@@ -1602,7 +1602,7 @@
       "currentMonth": "Mese corrente",
       "currentQuarter": "Trimestre corrente",
       "currentWeek": "Settimana corrente",
-      "currentYear": "Anno corrente (YTD {year})",
+      "currentYear": "Anno corrente (da inizio {year})",
       "customRange": "Intervallo personalizzato…",
       "previousMonth": "Mese precedente",
       "previousQuarter": "Trimestre precedente",
@@ -1661,7 +1661,7 @@
       "leadSources": {
         "title": "Fonti dei lead",
         "totalCaption": "lead",
-        "winRate": "{value}% win rate"
+        "winRate": "{value}% tasso di successo"
       },
       "leadsShort": "{count} lead",
       "lostReasons": "Motivi della perdita",
@@ -1669,7 +1669,7 @@
       "periods": {
         "currentMonth": "Mese corrente",
         "currentQuarter": "Trimestre corrente",
-        "currentYear": "Anno corrente (YTD {year})",
+        "currentYear": "Anno corrente (da inizio {year})",
         "last3Months": "Ultimi 3 mesi",
         "last6Months": "Ultimi 6 mesi"
       },
@@ -1720,7 +1720,7 @@
         "topReason": "Motivo principale:"
       },
       "sourceQuality": {
-        "title": "Qualità per fonte (win rate)"
+        "title": "Qualità per fonte (tasso di successo)"
       },
       "tooltips": {
         "goToOnboarding": "Clicca per andare alla sezione Onboarding",
@@ -1738,7 +1738,7 @@
         "new": "Nuovi",
         "title": "Trend mensile",
         "won": "Vinti",
-        "wonTooltip": "Won: {count}"
+        "wonTooltip": "Vinti: {count}"
       },
       "velocity": {
         "scale": "Scala: max {count, plural, one {# giorno} other {# giorni}}",
@@ -1758,10 +1758,10 @@
         "pipelineTooltip": "Pipeline: {value}k PLN",
         "projectedWeighted": "Valore previsto (ponderato):",
         "title": "Ricavi mensili",
-        "wonTooltip": "Won: {value}k PLN"
+        "wonTooltip": "Vinti: {value}k PLN"
       },
       "external": {
-        "feeRate": "Fee rate: {value}%",
+        "feeRate": "Incidenza compensi: {value}%",
         "feesPln": "Commissioni (PLN)",
         "grossTurnoverPln": "Fatturato lordo (PLN)",
         "margin": "Margine: {value}%",
@@ -1808,7 +1808,7 @@
       },
       "sources": {
         "campaign": "Campagna",
-        "coldOutreach": "Cold outreach",
+        "coldOutreach": "Contatto a freddo",
         "referrals": "Segnalazioni",
         "socialMedia": "Social media",
         "tradeFairs": "Fiere"
@@ -1939,7 +1939,7 @@
       "healthPoints": "{score} pt",
       "kpi": {
         "activePartners": "Partner attivi",
-        "feeRateShare": "{percent}% fee rate",
+        "feeRateShare": "{percent}% di incidenza compensi",
         "feesPln": "Commissioni (PLN)",
         "productsCount": "{count} Prodotti",
         "revenueMarginPln": "Ricavi / Margine (PLN)",
@@ -1966,16 +1966,16 @@
           "medium": "medio",
           "poor": "scarso"
         },
-        "title": "Scorecard dei partner"
+        "title": "Scheda di valutazione dei partner"
       },
       "summary": {
-        "feeRate": "Fee rate",
-        "feesCommissions": "Fees / Commissioni",
+        "feeRate": "Incidenza compensi",
+        "feesCommissions": "Compensi / Commissioni",
         "marginPct": "% di margine",
         "revenueMargin": "Ricavi (margine)",
         "title": "Riepilogo finanziario"
       },
-      "title": "Performance dei partner",
+      "title": "Risultati dei partner",
       "trend": {
         "title": "Trend dei ricavi",
         "totalTurnover": "Fatturato totale"

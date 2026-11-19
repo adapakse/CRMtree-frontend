@@ -154,19 +154,19 @@
     "errors": {
       "bulkFailed": "Pogreška skupne radnje",
       "deleteFailed": "Pogreška pri brisanju",
-      "followUpUpdateFailed": "Pogreška pri ažuriranju follow-upa",
+      "followUpUpdateFailed": "Pogreška pri ažuriranju sljedećeg koraka",
       "reanalyzeFailed": "Pogreška pri ponovnoj analizi",
       "statusChangeFailed": "Pogreška pri promjeni statusa"
     },
     "filters": {
-      "allFollowUps": "Svi follow-upovi",
+      "allFollowUps": "Svi sljedeći koraci",
       "allLinks": "Sve poveznice",
       "allSalespeople": "Svi prodavači",
       "allStatuses": "Svi statusi",
       "firstCall": "Prvi poziv:",
-      "followUpDate": "Datum follow-upa:",
-      "followUpDone": "Follow-up obavljen",
-      "followUpRequired": "Follow-up potreban",
+      "followUpDate": "Datum sljedećeg koraka:",
+      "followUpDone": "Sljedeći korak obavljen",
+      "followUpRequired": "Potreban sljedeći korak",
       "lastCall": "Zadnji poziv:",
       "noLinks": "Bez poveznica",
       "presets": {
@@ -176,7 +176,7 @@
         "today": "Danas",
         "todayTomorrow": "Danas+Sutra"
       },
-      "score": "Score:",
+      "score": "Ocjena:",
       "scoreMax": "maks",
       "scoreMin": "min",
       "searchPlaceholder": "Traži tvrtku ili porezni broj...",
@@ -185,11 +185,11 @@
     },
     "followUp": {
       "done": "Obavljen",
-      "label": "Follow-up",
-      "markDoneTitle": "Kliknite da biste follow-up označili kao obavljen",
+      "label": "Sljedeći korak",
+      "markDoneTitle": "Kliknite da biste sljedeći korak označili kao obavljen",
       "notRequired": "Nije potreban",
       "required": "Potreban",
-      "undoTitle": "Follow-up je obavljen. Kliknite za poništavanje."
+      "undoTitle": "Sljedeći korak je obavljen. Kliknite za poništavanje."
     },
     "header": {
       "analyze": "Analiziraj ({count})",
@@ -341,7 +341,7 @@
     },
     "pipeline": {
       "empty": "Nema podataka",
-      "title": "Pipeline leadova"
+      "title": "Lijevak leadova"
     },
     "productMix": {
       "title": "Miks proizvoda ({period})"
@@ -655,7 +655,7 @@
       "onboarding": "Uvođenje"
     },
     "priorities": {
-      "asap": "ASAP",
+      "asap": "Hitno",
       "important": "Važno",
       "low": "Nisko",
       "medium": "Srednje"
@@ -797,7 +797,7 @@
       "dateRequired": "Unesite datum",
       "edit": "Uredi čekanje",
       "editTooltip": "Na čekanju do {date} — kliknite za uređivanje",
-      "introAfter": "bit će označen kao lead na čekanju — bez utjecaja na aktivne KPI-jeve i pipeline dok čekanje traje.",
+      "introAfter": "bit će označen kao lead na čekanju — bez utjecaja na aktivne KPI-jeve i prodajni lijevak dok čekanje traje.",
       "introBefore": "Lead",
       "label": "Na čekanju",
       "reason": "Razlog",
@@ -934,7 +934,7 @@
       "noActivities": "Nema aktivnosti.",
       "note": "Bilješka",
       "openDetails": "Otvori pojedinosti",
-      "pipeline": "Pipeline",
+      "pipeline": "Prodajni lijevak",
       "probability": "Vjerojatnost",
       "stageValue": "Faza: {stage}",
       "tabs": {
@@ -1059,7 +1059,7 @@
       "hot": "Vrućih",
       "lost": "Izgubljenih",
       "opportunities": "Prodajnih prilika",
-      "pipeline": "Pipeline (PLN)",
+      "pipeline": "Prodajni lijevak (PLN)",
       "won": "Dobivenih"
     },
     "table": {
@@ -1201,18 +1201,18 @@
       "confirm": "Potvrdi povlačenje",
       "confirmPrompt": "Povući „{company}” iz onboardinga u fazu „{stage}”? Partner i njegovi zadaci onboardinga bit će izbrisani, lead se vraća u prodajni pipeline.",
       "detailButton": "Povuci iz onboardinga u pipeline",
-      "detailHint": "Briše ovog partnera i njegove zadatke onboardinga — lead se vraća u odabranu fazu pipelinea.",
+      "detailHint": "Briše ovog partnera i njegove zadatke onboardinga — lead se vraća u odabranu fazu prodajnog lijevka.",
       "detailStagePrompt": "Vrati lead u fazu:",
       "failed": "Povlačenje iz onboardinga nije uspjelo",
-      "hint": "Povuci iz onboardinga u fazu pipelinea",
+      "hint": "Povuci iz onboardinga u fazu prodajnog lijevka",
       "inProgress": "Povlačenje…",
       "intro": "{company} bit će uklonjena iz onboardinga (zajedno sa zadacima onboardinga) i vraća se u prodajni pipeline u odabranoj fazi.",
-      "invalidStage": "Ova faza više ne postoji u pipelineu — osvježite stranicu i odaberite drugu",
+      "invalidStage": "Ova faza više ne postoji u prodajnom lijevku — osvježite stranicu i odaberite drugu",
       "noPermission": "Iz onboardinga može povući samo voditelj prodaje ili administrator",
       "notFound": "Partner nije pronađen — možda je već povučen ili pokrenut",
-      "stageLabel": "Faza pipelinea",
+      "stageLabel": "Faza prodajnog lijevka",
       "stagePlaceholder": "— odaberite fazu —",
-      "stageRequired": "Odaberite fazu pipelinea u koju se tvrtka vraća",
+      "stageRequired": "Odaberite fazu prodajnog lijevka u koju se tvrtka vraća",
       "success": "„{company}” je ponovno u prodajnom pipelineu",
       "title": "Povuci iz onboardinga"
     }
@@ -1250,10 +1250,10 @@
         "low": "Nizak",
         "medium": "Srednji"
       },
-      "noRisk": "Nema rizika odlaska",
+      "noRisk": "Nema rizika odljeva",
       "salesDrop": "Pad M-2→M-1",
       "score": "{score} bod.",
-      "title": "Rizik churna"
+      "title": "Rizik odljeva"
     },
     "commissionBasis": {
       "bookings": "Broj rezervacija",
@@ -1302,7 +1302,7 @@
         "language": "npr. hr",
         "notes": "Bilješke po želji…",
         "partnerId": "npr. 42",
-        "source": "npr. sajam, preporuka, cold call",
+        "source": "npr. sajam, preporuka, hladni poziv",
         "subdomain": "npr. acme",
         "website": "https://tvrtka.hr"
       },
@@ -1380,7 +1380,7 @@
     "header": {
       "activeSince": "Aktivan od {date}",
       "backToPartners": "Partneri",
-      "churn": "Churn: {level}",
+      "churn": "Odljev: {level}",
       "edit": "Uredi",
       "noEditPermission": "Nemate ovlasti za uređivanje ovog partnera"
     },
@@ -1450,7 +1450,7 @@
         "last12Months": "Zadnjih 12 mj.",
         "last3Months": "Zadnja 3 mj.",
         "last6Months": "Zadnjih 6 mj.",
-        "ytd": "YTD {year}"
+        "ytd": "Od početka {year}."
       },
       "productBreakdown": "Raspodjela po proizvodima",
       "title": "Podaci o prodaji iz DWH-a"
@@ -1464,7 +1464,7 @@
       "customFields": "Dodatna polja",
       "extraContacts": "Dodatni kontakti",
       "financialTerms": "Financijski uvjeti",
-      "partnerAdmin": "Partner Admin"
+      "partnerAdmin": "Administrator partnera"
     }
   },
   "partnerGroups": {
@@ -1510,8 +1510,8 @@
         "medium": "Srednji"
       },
       "points": "{score} bod.",
-      "risk": "Rizik churna",
-      "riskWithLevel": "Rizik churna: {level}"
+      "risk": "Rizik odljeva",
+      "riskWithLevel": "Rizik odljeva: {level}"
     },
     "create": {
       "companyPlaceholder": "Naziv tvrtke",
@@ -1546,13 +1546,13 @@
       "label": "Filtar iz izvješća:"
     },
     "table": {
-      "churn": "Churn",
+      "churn": "Odljev",
       "contractUntil": "Ugovor do",
       "crmTurnover": "CRM promet",
       "dwhMargin": "DWH marža",
-      "dwhMarginHint": "Marža YTD iz DWH-a",
+      "dwhMarginHint": "Marža od početka godine iz DWH-a",
       "dwhTurnover": "DWH promet",
-      "dwhTurnoverHint": "Bruto promet YTD iz DWH-a"
+      "dwhTurnoverHint": "Bruto promet od početka godine iz DWH-a"
     },
     "taxIdErrors": {
       "countryCode": "Počnite kodom države (2 slova), npr. PL",
@@ -1602,7 +1602,7 @@
       "currentMonth": "Tekući mjesec",
       "currentQuarter": "Tekući kvartal",
       "currentWeek": "Tekući tjedan",
-      "currentYear": "Tekuća godina (YTD {year})",
+      "currentYear": "Tekuća godina (od početka {year}.)",
       "customRange": "Vlastito razdoblje…",
       "previousMonth": "Prethodni mjesec",
       "previousQuarter": "Prethodni kvartal",
@@ -1640,7 +1640,7 @@
     "common": {
       "columns": {
         "leads": "Leadovi",
-        "pipeline": "Pipeline",
+        "pipeline": "Lijevak",
         "progress": "Napredak",
         "winRatePct": "Uspjeh %",
         "won": "Dobiveni"
@@ -1661,7 +1661,7 @@
       "leadSources": {
         "title": "Izvori leadova",
         "totalCaption": "leadova",
-        "winRate": "{value}% win rate"
+        "winRate": "{value}% stopa uspjeha"
       },
       "leadsShort": "{count} lead.",
       "lostReasons": "Razlozi gubitka",
@@ -1669,7 +1669,7 @@
       "periods": {
         "currentMonth": "Tekući mjesec",
         "currentQuarter": "Tekući kvartal",
-        "currentYear": "Tekuća godina (YTD {year})",
+        "currentYear": "Tekuća godina (od početka {year}.)",
         "last3Months": "Zadnja 3 mjeseca",
         "last6Months": "Zadnjih 6 mjeseci"
       },
@@ -1691,7 +1691,7 @@
       "drilldown": {
         "funnel": "Lijevak: {stage}",
         "lost": "Izgubljeni: {reason}",
-        "pipelineAll": "Pipeline – svi aktivni",
+        "pipelineAll": "Lijevak – svi aktivni",
         "plannedBudget": "Planirani budžet – leadovi u razdoblju",
         "plannedInPeriod": "Planirano za realizaciju u razdoblju",
         "source": "Izvor: {source}",
@@ -1720,7 +1720,7 @@
         "topReason": "Glavni razlog:"
       },
       "sourceQuality": {
-        "title": "Kvaliteta po izvoru (win rate)"
+        "title": "Kvaliteta po izvoru (stopa uspjeha)"
       },
       "tooltips": {
         "goToOnboarding": "Kliknite za prelazak u odjeljak Onboarding",
@@ -1738,7 +1738,7 @@
         "new": "Novi",
         "title": "Mjesečni trend",
         "won": "Dobiveni",
-        "wonTooltip": "Won: {count}"
+        "wonTooltip": "Dobiveni: {count}"
       },
       "velocity": {
         "scale": "Skala: maks. {count, plural, one {# dan} few {# dana} other {# dana}}",
@@ -1755,13 +1755,13 @@
         "product": "proizvod:"
       },
       "chart": {
-        "pipelineTooltip": "Pipeline: {value}k PLN",
+        "pipelineTooltip": "Lijevak: {value}k PLN",
         "projectedWeighted": "Predviđena vrijednost (ponderirana):",
         "title": "Mjesečni prihodi",
-        "wonTooltip": "Won: {value}k PLN"
+        "wonTooltip": "Dobiveni: {value}k PLN"
       },
       "external": {
-        "feeRate": "Fee rate: {value}%",
+        "feeRate": "Udio naknada: {value}%",
         "feesPln": "Provizije (PLN)",
         "grossTurnoverPln": "Bruto promet (PLN)",
         "margin": "Marža: {value}%",
@@ -1784,7 +1784,7 @@
       },
       "kpi": {
         "aboveTarget": "Iznad cilja",
-        "activePipeline": "Aktivni pipeline",
+        "activePipeline": "Aktivni prodajni lijevak",
         "avgClosingTime": "Prosječno vrijeme zatvaranja",
         "belowTarget": "Ispod cilja",
         "hotCount": "{count, plural, one {# vrući} few {# vruća} other {# vrućih}}",
@@ -1808,7 +1808,7 @@
       },
       "sources": {
         "campaign": "Kampanja",
-        "coldOutreach": "Cold outreach",
+        "coldOutreach": "Hladni kontakti",
         "referrals": "Preporuke",
         "socialMedia": "Društvene mreže",
         "tradeFairs": "Sajmovi"
@@ -1906,9 +1906,9 @@
       "churn": {
         "criticalCount": "{count, plural, one {# kritičan} few {# kritična} other {# kritičnih}}",
         "daysShort": "{days}d",
-        "empty": "Nema partnera s rizikom churna",
-        "showAll": "Prikaži sve partnere s rizikom churna",
-        "title": "Rizik churna partnera"
+        "empty": "Nema partnera s rizikom odljeva",
+        "showAll": "Prikaži sve partnere s rizikom odljeva",
+        "title": "Rizik odljeva partnera"
       },
       "columns": {
         "fees": "Provizije",
@@ -1939,7 +1939,7 @@
       "healthPoints": "{score} bod.",
       "kpi": {
         "activePartners": "Aktivnih partnera",
-        "feeRateShare": "{percent}% fee rate",
+        "feeRateShare": "{percent}% udio naknada",
         "feesPln": "Provizije (PLN)",
         "productsCount": "Proizvodi: {count}",
         "revenueMarginPln": "Prihod / Marža (PLN)",
@@ -1966,11 +1966,11 @@
           "medium": "srednje",
           "poor": "slabo"
         },
-        "title": "Scorecard partnera"
+        "title": "Kartica ocjene partnera"
       },
       "summary": {
-        "feeRate": "Fee rate",
-        "feesCommissions": "Fees / Provizije",
+        "feeRate": "Udio naknada",
+        "feesCommissions": "Naknade / Provizije",
         "marginPct": "% marže",
         "revenueMargin": "Prihod (marža)",
         "title": "Financijski sažetak"
@@ -2008,14 +2008,14 @@
     "churn": {
       "allLevels": "Sve razine",
       "daysSinceOrder": "dana bez narudžbe",
-      "empty": "Nema partnera s rizikom churna koji zadovoljavaju kriterije filtara.",
+      "empty": "Nema partnera s rizikom odljeva koji zadovoljavaju kriterije filtara.",
       "generateResult": "Izrađeno: {created, plural, one {# zadatak} few {# zadatka} other {# zadataka}}, preskočeno: {skipped} (već postoje).",
       "generateTasks": "Generiraj zadatke",
       "generating": "Generiranje…",
-      "noRisk": "Nema rizika churna",
+      "noRisk": "Nema rizika odljeva",
       "salesDrop": "pad M-2→M-1",
       "searchPlaceholder": "Traži partnera…",
-      "showAll": "Prikaži sve partnere s rizikom churna →"
+      "showAll": "Prikaži sve partnere s rizikom odljeva →"
     },
     "currency": {
       "billionsPln": "{value} mlrd. PLN",
@@ -2030,12 +2030,12 @@
     },
     "kpi": {
       "filters": {
-        "activeOpportunities": "Aktivne prilike u pipelineu",
+        "activeOpportunities": "Aktivne prilike u prodajnom lijevku",
         "newLeadsThisWeek": "Novi leadovi – tekući tjedan",
         "newLeadsValueThisWeek": "Novi leadovi – vrijednost, tekući tjedan",
-        "pipelineValue": "Vrijednost pipelinea"
+        "pipelineValue": "Vrijednost prodajnog lijevka"
       },
-      "inPipeline": "u pipelineu",
+      "inPipeline": "u prodajnom lijevku",
       "newLeads": "Novi leadovi",
       "newLeadsValue": "Vrijednost novih leadova",
       "newOpportunities": "Nove prilike",
@@ -2061,12 +2061,12 @@
       "title": "Najnovije prilike"
     },
     "pipeline": {
-      "empty": "Nema podataka o pipelineu",
+      "empty": "Nema podataka o prodajnom lijevku",
       "modeCount": "Broj",
       "modeValue": "Vrijednost",
       "opportunityCount": "{count, plural, one {# prilika} few {# prilike} other {# prilika}}",
-      "title": "Prodajni pipeline",
-      "total": "Ukupna vrijednost pipelinea:"
+      "title": "Prodajni lijevak",
+      "total": "Ukupna vrijednost prodajnog lijevka:"
     },
     "stages": {
       "closed_lost": "Izgubljene",

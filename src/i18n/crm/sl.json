@@ -154,19 +154,19 @@
     "errors": {
       "bulkFailed": "Napaka pri množični operaciji",
       "deleteFailed": "Napaka pri brisanju",
-      "followUpUpdateFailed": "Napaka pri posodabljanju follow-upa",
+      "followUpUpdateFailed": "Napaka pri posodabljanju naslednjega koraka",
       "reanalyzeFailed": "Napaka pri ponovni analizi",
       "statusChangeFailed": "Napaka pri spremembi statusa"
     },
     "filters": {
-      "allFollowUps": "Vsi follow-upi",
+      "allFollowUps": "Vsi naslednji koraki",
       "allLinks": "Vse povezave",
       "allSalespeople": "Vsi prodajalci",
       "allStatuses": "Vsi statusi",
       "firstCall": "Prvi klic:",
-      "followUpDate": "Datum follow-upa:",
-      "followUpDone": "Follow-up opravljen",
-      "followUpRequired": "Follow-up potreben",
+      "followUpDate": "Datum naslednjega koraka:",
+      "followUpDone": "Naslednji korak opravljen",
+      "followUpRequired": "Potreben naslednji korak",
       "lastCall": "Zadnji klic:",
       "noLinks": "Brez povezav",
       "presets": {
@@ -176,7 +176,7 @@
         "today": "Danes",
         "todayTomorrow": "Danes+Jutri"
       },
-      "score": "Score:",
+      "score": "Ocena:",
       "scoreMax": "maks",
       "scoreMin": "min",
       "searchPlaceholder": "Iščite podjetje ali davčno št....",
@@ -185,11 +185,11 @@
     },
     "followUp": {
       "done": "Opravljen",
-      "label": "Follow-up",
-      "markDoneTitle": "Kliknite, da follow-up označite kot opravljen",
+      "label": "Naslednji korak",
+      "markDoneTitle": "Kliknite, da naslednji korak označite kot opravljen",
       "notRequired": "Ni potreben",
       "required": "Potreben",
-      "undoTitle": "Follow-up opravljen. Kliknite za razveljavitev."
+      "undoTitle": "Naslednji korak opravljen. Kliknite za razveljavitev."
     },
     "header": {
       "analyze": "Analiziraj ({count})",
@@ -210,7 +210,7 @@
       "promptFailed": "Napaka pri nalaganju prompta.",
       "promptLoading": "Nalaganje prompta…",
       "purchasePotential": "Nakupni potencial",
-      "tabAnalysis": "Analiza AI",
+      "tabAnalysis": "Analiza UI",
       "tabPrompt": "Prompt DeepSeek",
       "title": "Pregled analizatorja"
     },
@@ -223,7 +223,7 @@
     "menu": {
       "delete": "Izbriši",
       "inspect": "Pregled",
-      "putOnHold": "Zadrži (Hold)",
+      "putOnHold": "Zadrži",
       "restoreFromArchive": "Obnovi iz arhiva",
       "restoreFromHold": "Obnovi iz zadržanja"
     },
@@ -655,7 +655,7 @@
       "onboarding": "Uvajanje"
     },
     "priorities": {
-      "asap": "ASAP",
+      "asap": "Nujno",
       "important": "Pomembno",
       "low": "Nizko",
       "medium": "Srednje"
@@ -1302,7 +1302,7 @@
         "language": "npr. sl",
         "notes": "Poljubni zapiski…",
         "partnerId": "npr. 42",
-        "source": "npr. sejem, priporočilo, cold call",
+        "source": "npr. sejem, priporočilo, hladni klic",
         "subdomain": "npr. acme",
         "website": "https://podjetje.si"
       },
@@ -1450,7 +1450,7 @@
         "last12Months": "Zadnjih 12 mes.",
         "last3Months": "Zadnji 3 mes.",
         "last6Months": "Zadnjih 6 mes.",
-        "ytd": "YTD {year}"
+        "ytd": "Od začetka leta {year}"
       },
       "productBreakdown": "Razčlenitev po produktih",
       "title": "Prodajni podatki DWH"
@@ -1464,7 +1464,7 @@
       "customFields": "Dodatna polja",
       "extraContacts": "Dodatni kontakti",
       "financialTerms": "Finančni pogoji",
-      "partnerAdmin": "Partner Admin"
+      "partnerAdmin": "Skrbnik partnerja"
     }
   },
   "partnerGroups": {
@@ -1546,13 +1546,13 @@
       "label": "Filter iz poročila:"
     },
     "table": {
-      "churn": "Churn",
+      "churn": "Odhod",
       "contractUntil": "Pogodba do",
       "crmTurnover": "Promet CRM",
       "dwhMargin": "DWH marža",
-      "dwhMarginHint": "Marža YTD iz DWH",
+      "dwhMarginHint": "Marža od začetka leta iz DWH",
       "dwhTurnover": "DWH promet",
-      "dwhTurnoverHint": "Bruto promet YTD iz DWH"
+      "dwhTurnoverHint": "Bruto promet od začetka leta iz DWH"
     },
     "taxIdErrors": {
       "countryCode": "Začnite s kodo države (2 črki), npr. PL",
@@ -1602,7 +1602,7 @@
       "currentMonth": "Tekoči mesec",
       "currentQuarter": "Tekoče četrtletje",
       "currentWeek": "Tekoči teden",
-      "currentYear": "Tekoče leto (YTD {year})",
+      "currentYear": "Tekoče leto (od začetka leta {year})",
       "customRange": "Obdobje po meri…",
       "previousMonth": "Prejšnji mesec",
       "previousQuarter": "Prejšnje četrtletje",
@@ -1661,7 +1661,7 @@
       "leadSources": {
         "title": "Viri leadov",
         "totalCaption": "leadov",
-        "winRate": "{value}% win rate"
+        "winRate": "{value}% delež uspeha"
       },
       "leadsShort": "{count} lead.",
       "lostReasons": "Razlogi za izgubo",
@@ -1669,7 +1669,7 @@
       "periods": {
         "currentMonth": "Tekoči mesec",
         "currentQuarter": "Tekoče četrtletje",
-        "currentYear": "Tekoče leto (YTD {year})",
+        "currentYear": "Tekoče leto (od začetka leta {year})",
         "last3Months": "Zadnji 3 meseci",
         "last6Months": "Zadnjih 6 mesecev"
       },
@@ -1720,7 +1720,7 @@
         "topReason": "Glavni razlog:"
       },
       "sourceQuality": {
-        "title": "Kakovost po viru (win rate)"
+        "title": "Kakovost po viru (delež uspeha)"
       },
       "tooltips": {
         "goToOnboarding": "Kliknite za prehod v razdelek Uvajanje",
@@ -1738,7 +1738,7 @@
         "new": "Novi",
         "title": "Mesečni trend",
         "won": "Dobljeni",
-        "wonTooltip": "Won: {count}"
+        "wonTooltip": "Dobljeni: {count}"
       },
       "velocity": {
         "scale": "Lestvica: najv. {count, plural, one {# dan} two {# dneva} few {# dni} other {# dni}}",
@@ -1758,10 +1758,10 @@
         "pipelineTooltip": "Lijak: {value}k PLN",
         "projectedWeighted": "Predvidena vrednost (ponderirana):",
         "title": "Mesečni prihodki",
-        "wonTooltip": "Won: {value}k PLN"
+        "wonTooltip": "Dobljeni: {value}k PLN"
       },
       "external": {
-        "feeRate": "Fee rate: {value}%",
+        "feeRate": "Delež pristojbin: {value}%",
         "feesPln": "Provizije (PLN)",
         "grossTurnoverPln": "Bruto promet (PLN)",
         "margin": "Marža: {value}%",
@@ -1808,7 +1808,7 @@
       },
       "sources": {
         "campaign": "Kampanja",
-        "coldOutreach": "Cold outreach",
+        "coldOutreach": "Hladni stiki",
         "referrals": "Priporočila",
         "socialMedia": "Družbena omrežja",
         "tradeFairs": "Sejmi"
@@ -1939,7 +1939,7 @@
       "healthPoints": "{score} tč.",
       "kpi": {
         "activePartners": "Aktivnih partnerjev",
-        "feeRateShare": "{percent}% fee rate",
+        "feeRateShare": "{percent}% delež pristojbin",
         "feesPln": "Provizije (PLN)",
         "productsCount": "Produkti: {count}",
         "revenueMarginPln": "Prihodek / Marža (PLN)",
@@ -1966,11 +1966,11 @@
           "medium": "srednje",
           "poor": "slabo"
         },
-        "title": "Scorecard partnerjev"
+        "title": "Ocenjevalna kartica partnerjev"
       },
       "summary": {
-        "feeRate": "Fee rate",
-        "feesCommissions": "Fees / Provizije",
+        "feeRate": "Delež pristojbin",
+        "feesCommissions": "Pristojbine / Provizije",
         "marginPct": "% marže",
         "revenueMargin": "Prihodek (marža)",
         "title": "Finančni povzetek"

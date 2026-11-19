@@ -154,12 +154,12 @@
       "yes": "Retardés"
     },
     "endDate": "Fin",
-    "manager": "PM",
+    "manager": "Chef de projet",
     "myRole": "Mon rôle",
     "myRoleValues": {
       "controller": "Validateur",
       "participant": "Participant",
-      "pm": "PM"
+      "pm": "Chef de projet"
     },
     "name": "Nom de la tâche",
     "number": "Numéro",
@@ -180,7 +180,7 @@
       "key": "Clé",
       "name": "Nom",
       "overdue": "Tâches en retard",
-      "pm": "PM",
+      "pm": "Chef de projet",
       "progress": "Avancement",
       "revenue": "Revenu",
       "start_date": "Début",
@@ -634,7 +634,7 @@
       "controller": "Validateur",
       "external_participant": "Participant externe",
       "internal_participant": "Participant interne",
-      "pm": "PM"
+      "pm": "Chef de projet"
     },
     "statusCategories": {
       "done": "Terminé",
@@ -722,7 +722,7 @@
       "title": "Champs supplémentaires"
     },
     "endDateChange": {
-      "hint": "Facultatif. Le PM verra le motif dans l’e-mail sur la modification de l’échéance ; il sera aussi enregistré dans l’historique de la tâche.",
+      "hint": "Facultatif. Le chef de projet verra le motif dans l’e-mail sur la modification de l’échéance ; il sera aussi enregistré dans l’historique de la tâche.",
       "placeholder": "p. ex. livraison tardive du client",
       "reason": "Motif de la modification de l’échéance"
     },
@@ -785,12 +785,12 @@
       "overdue": "En retard",
       "progress": "Avancement",
       "project": "Projet",
-      "projectManagers": "PM",
+      "projectManagers": "Chefs de projet",
       "revenue": "Revenu",
       "startDate": "Début"
     },
     "loadFailed": "Impossible d’ouvrir la vue des projets",
-    "noProjects": "Vous n’êtes ni PM ni validateur d’aucun projet ouvert.",
+    "noProjects": "Vous n’êtes ni chef de projet ni validateur d’aucun projet ouvert.",
     "noTasks": "Vos projets ne contiennent aucune tâche.",
     "tabs": {
       "projects": "Projets",
@@ -829,7 +829,7 @@
       "errors": {
         "name": "Saisissez le nom du champ, par ex. Numéro de commande"
       },
-      "hint": "Le PM peut ajouter à son projet les champs définis ici (Fiche projet → Champs supplémentaires des tâches) et décider s’ils sont obligatoires. Le type d’un champ ne peut plus être modifié après sa création.",
+      "hint": "Le chef de projet peut ajouter à son projet les champs définis ici (Fiche projet → Champs supplémentaires des tâches) et décider s’ils sont obligatoires. Le type d’un champ ne peut plus être modifié après sa création.",
       "newNamePlaceholder": "Nom du nouveau champ…",
       "optionsPlaceholder": "Valeurs séparées par des virgules",
       "optionsRequired": "La liste doit contenir au moins une valeur",
@@ -838,7 +838,7 @@
     },
     "finance": {
       "disableConfirm": "Désactiver les finances des projets ? Les données seront conservées, mais disparaîtront de la vue de tous les utilisateurs.",
-      "hint": "Une fois l’option activée, le PM et l’administrateur gèrent dans le projet le budget, les coûts et les revenus, et le validateur peut les consulter. Le récapitulatif des finances du projet est également visible par toute personne ayant accès à la fiche du lead ou du partenaire associé.",
+      "hint": "Une fois l’option activée, le chef de projet et l’administrateur gèrent dans le projet le budget, les coûts et les revenus, et le validateur peut les consulter. Le récapitulatif des finances du projet est également visible par toute personne ayant accès à la fiche du lead ou du partenaire associé.",
       "saveFailed": "Impossible de modifier le paramètre des finances",
       "title": "Finances des projets",
       "toggle": "Activer les finances des projets"
@@ -853,7 +853,7 @@
     },
     "transitions": {
       "discardConfirm": "Vous avez des modifications de transitions non enregistrées. Les abandonner ?",
-      "hint": "Le PM peut toujours passer à n’importe quel statut. Les participants ne changent le statut que des tâches qui leur sont assignées et pour lesquelles ils ont des droits complets. Le validateur change le statut de toutes les tâches du projet.",
+      "hint": "Le chef de projet peut toujours passer à n’importe quel statut. Les participants ne changent le statut que des tâches qui leur sont assignées et pour lesquelles ils ont des droits complets. Le validateur change le statut de toutes les tâches du projet.",
       "matrixCorner": "Du statut ↓ / vers le statut →",
       "saveButton": "Enregistrer les transitions",
       "saveFailed": "Impossible d’enregistrer les transitions",

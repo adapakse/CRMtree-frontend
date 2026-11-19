@@ -392,6 +392,110 @@
   "states": {
     "loading": "Se încarcă…"
   },
+  "tenantDefaults": {
+    "consentDescriptions": {
+      "classificationTargeting": "Consimțământ pentru profilare, clasificare și targetare pe baza datelor privind activitatea și comportamentul de cumpărare al partenerului, în scopul personalizării ofertelor comerciale și a acțiunilor de vânzare, în conformitate cu art. 6 alin. (1) lit. a) din GDPR.",
+      "marketingComm": "Consimțământ pentru prelucrarea datelor cu caracter personal ale contactului în scopul transmiterii de materiale de marketing, oferte și informații despre produse și servicii pe cale electronică și telefonică, în conformitate cu art. 6 alin. (1) lit. a) din GDPR."
+    },
+    "consentLabels": {
+      "classificationTargeting": "Consimțământ pentru prelucrare în scopul clasificării și targetării",
+      "marketingComm": "Consimțământ pentru prelucrarea datelor în scopul comunicării de marketing"
+    },
+    "contractSubjects": {
+      "accommodation": "Cazare",
+      "businessTravel": "Călătorii de afaceri",
+      "conferences": "Conferințe/Întâlniri",
+      "other": "Altele",
+      "system": "Sistem"
+    },
+    "countries": {
+      "at": "Austria",
+      "be": "Belgia",
+      "ch": "Elveția",
+      "cz": "Cehia",
+      "de": "Germania",
+      "dk": "Danemarca",
+      "es": "Spania",
+      "fi": "Finlanda",
+      "fr": "Franța",
+      "gb": "Regatul Unit",
+      "hu": "Ungaria",
+      "it": "Italia",
+      "nl": "Țările de Jos",
+      "no": "Norvegia",
+      "pl": "Polonia",
+      "ro": "România",
+      "ru": "Rusia",
+      "se": "Suedia",
+      "sk": "Slovacia",
+      "ua": "Ucraina"
+    },
+    "groupDescriptions": {
+      "accounting": "Departamentul de finanțe și contabilitate",
+      "customerService": "Departamentul de relații cu clienții",
+      "hr": "Departamentul de resurse umane",
+      "management": "Conducerea companiei",
+      "marketing": "Departamentul de marketing",
+      "operations": "Departamentul de operațiuni",
+      "prospects": "Acces la modulul Prospecți (import CSV, îmbogățire, conversie în lead).",
+      "sales": "Departamentul de vânzări",
+      "seo": "Verificarea și aprobarea conținutului SEObot înainte de publicare.",
+      "seoEditorial": "Redactorii SEObot: editarea, completarea și aprobarea articolelor înainte de publicare."
+    },
+    "groups": {
+      "accounting": "Contabilitate",
+      "customerService": "Relații cu clienții",
+      "hr": "Resurse umane",
+      "management": "Conducere",
+      "marketing": "Marketing",
+      "operations": "Operațiuni",
+      "prospects": "Prospecți",
+      "sales": "Vânzări",
+      "seoEditorial": "Redacția SEO"
+    },
+    "holdReasons": {
+      "businessPause": "Pauză în activitate",
+      "internalSituation": "Situație internă a companiei",
+      "noDecisionMakers": "Lipsa persoanelor decidente"
+    },
+    "languages": {
+      "de": "Germană",
+      "en": "Engleză",
+      "pl": "Poloneză",
+      "ro": "Română",
+      "ru": "Rusă"
+    },
+    "lostReasons": {
+      "highPrice": "Preț ridicat",
+      "incompleteOffer": "Ofertă incompletă",
+      "other": "Altul"
+    },
+    "projectCostCategories": {
+      "licences": "Licențe",
+      "materials": "Materiale",
+      "other": "Altele",
+      "ownWork": "Muncă proprie",
+      "subcontractors": "Subcontractori",
+      "travel": "Deplasări"
+    },
+    "projectPriorities": {
+      "critical": "Critică",
+      "high": "Ridicată",
+      "low": "Scăzută",
+      "medium": "Medie"
+    },
+    "projectStatuses": {
+      "done": "Finalizat",
+      "inProgress": "În lucru",
+      "review": "De verificat",
+      "todo": "De făcut"
+    },
+    "projectTypes": {
+      "meeting": "Întâlnire",
+      "milestone": "Reper",
+      "task": "Sarcină"
+    }
+  },
   "testEnvironmentBanner": {
     "title": "Versiune de test — acesta nu este mediul de producție"
   },

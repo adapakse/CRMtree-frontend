@@ -11,6 +11,7 @@ import { AddToCalendarComponent } from '../../shared/components/add-to-calendar/
 import { CalendarEntry, dueDateCalendarEntry } from '../../shared/utils/calendar-export.util';
 import { AppSettingsService } from '../../core/services/app-settings.service';
 import { environment } from '../../../environments/environment';
+import { TenantDefaultLabelPipe } from '../../core/i18n/tenant-default-label.pipe';
 
 const STATUS_COLUMN: Record<string, 'pending' | 'in_progress' | 'completed' | 'cancelled'> = {
   new:             'pending',
@@ -33,7 +34,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
 @Component({
   selector: 'wt-workflow',
   standalone: true,
-  imports: [CommonModule, RouterLink, StatusBadgeComponent, TaskBadgeComponent, AvatarComponent, AddToCalendarComponent, TranslocoDirective],
+  imports: [CommonModule, RouterLink, StatusBadgeComponent, TaskBadgeComponent, AvatarComponent, AddToCalendarComponent, TranslocoDirective, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -146,7 +147,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
                       <wt-avatar [name]="doc.owner_name ?? ''" [size]="18" />
                       <span style="font-size:12px;color:var(--gray-500)">{{ doc.owner_name }}</span>
                       @if (doc.group_display ?? doc.group_name) {
-                        <span style="margin-left:auto;font-size:10px;color:var(--gray-400)">{{ doc.group_display ?? doc.group_name }}</span>
+                        <span style="margin-left:auto;font-size:10px;color:var(--gray-400)">{{ (doc.group_display ?? doc.group_name) | tenantLabel:'groups' }}</span>
                       }
                     </div>
 

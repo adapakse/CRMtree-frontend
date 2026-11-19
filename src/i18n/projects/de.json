@@ -154,12 +154,12 @@
       "yes": "Verzögert"
     },
     "endDate": "Ende",
-    "manager": "PM",
+    "manager": "Projektleiter",
     "myRole": "Meine Rolle",
     "myRoleValues": {
       "controller": "Prüfer",
       "participant": "Teilnehmer",
-      "pm": "PM"
+      "pm": "Projektleiter"
     },
     "name": "Aufgabenname",
     "number": "Nummer",
@@ -180,7 +180,7 @@
       "key": "Schlüssel",
       "name": "Name",
       "overdue": "Überfällige Aufgaben",
-      "pm": "PM",
+      "pm": "Projektleiter",
       "progress": "Fortschritt",
       "revenue": "Erlös",
       "start_date": "Beginn",
@@ -634,7 +634,7 @@
       "controller": "Prüfer",
       "external_participant": "Externer Teilnehmer",
       "internal_participant": "Interner Teilnehmer",
-      "pm": "PM"
+      "pm": "Projektleiter"
     },
     "statusCategories": {
       "done": "Erledigt",
@@ -722,7 +722,7 @@
       "title": "Zusatzfelder"
     },
     "endDateChange": {
-      "hint": "Optional. Der PM sieht den Grund in der E-Mail über die Änderung des Fälligkeitsdatums; er wird außerdem im Verlauf der Aufgabe gespeichert.",
+      "hint": "Optional. Der Projektleiter sieht den Grund in der E-Mail über die Änderung des Fälligkeitsdatums; er wird außerdem im Verlauf der Aufgabe gespeichert.",
       "placeholder": "z. B. verspätete Lieferung des Kunden",
       "reason": "Grund für die Änderung des Fälligkeitsdatums"
     },
@@ -785,12 +785,12 @@
       "overdue": "Überfällig",
       "progress": "Fortschritt",
       "project": "Projekt",
-      "projectManagers": "PM",
+      "projectManagers": "Projektleiter",
       "revenue": "Erlös",
       "startDate": "Beginn"
     },
     "loadFailed": "Projektübersicht konnte nicht geöffnet werden",
-    "noProjects": "Sie sind bei keinem offenen Projekt PM oder Prüfer.",
+    "noProjects": "Sie sind bei keinem offenen Projekt Projektleiter oder Prüfer.",
     "noTasks": "In Ihren Projekten gibt es keine Aufgaben.",
     "tabs": {
       "projects": "Projekte",
@@ -829,7 +829,7 @@
       "errors": {
         "name": "Geben Sie den Feldnamen ein, z. B. Bestellnummer"
       },
-      "hint": "Die hier definierten Felder kann der PM seinem Projekt hinzufügen (Projektkarte → Zusatzfelder für Aufgaben) und festlegen, ob sie erforderlich sind. Der Feldtyp kann nach dem Erstellen nicht mehr geändert werden.",
+      "hint": "Die hier definierten Felder kann der Projektleiter seinem Projekt hinzufügen (Projektkarte → Zusatzfelder für Aufgaben) und festlegen, ob sie erforderlich sind. Der Feldtyp kann nach dem Erstellen nicht mehr geändert werden.",
       "newNamePlaceholder": "Name des neuen Feldes…",
       "optionsPlaceholder": "Werte, durch Kommas getrennt",
       "optionsRequired": "Die Liste muss mindestens einen Wert enthalten",
@@ -838,7 +838,7 @@
     },
     "finance": {
       "disableConfirm": "Projektfinanzen deaktivieren? Die Daten bleiben erhalten, verschwinden aber aus der Ansicht aller Benutzer.",
-      "hint": "Nach der Aktivierung führen PM und Administrator im Projekt Budget, Kosten und Erlöse, der Prüfer kann sie einsehen. Die Zusammenfassung der Projektfinanzen sieht außerdem jeder, der Zugriff auf die Karte des verknüpften Leads oder Partners hat.",
+      "hint": "Nach der Aktivierung führen Projektleiter und Administrator im Projekt Budget, Kosten und Erlöse, der Prüfer kann sie einsehen. Die Zusammenfassung der Projektfinanzen sieht außerdem jeder, der Zugriff auf die Karte des verknüpften Leads oder Partners hat.",
       "saveFailed": "Einstellung der Projektfinanzen konnte nicht geändert werden",
       "title": "Projektfinanzen",
       "toggle": "Projektfinanzen aktivieren"
@@ -853,7 +853,7 @@
     },
     "transitions": {
       "discardConfirm": "Sie haben nicht gespeicherte Änderungen an den Übergängen. Verwerfen?",
-      "hint": "Der PM kann den Status jederzeit beliebig ändern. Teilnehmer ändern den Status nur bei Aufgaben, denen sie zugewiesen sind und für die sie Vollzugriff haben. Der Prüfer ändert den Status bei jeder Aufgabe des Projekts.",
+      "hint": "Der Projektleiter kann den Status jederzeit beliebig ändern. Teilnehmer ändern den Status nur bei Aufgaben, denen sie zugewiesen sind und für die sie Vollzugriff haben. Der Prüfer ändert den Status bei jeder Aufgabe des Projekts.",
       "matrixCorner": "Von Status ↓ / zu Status →",
       "saveButton": "Übergänge speichern",
       "saveFailed": "Übergänge konnten nicht gespeichert werden",

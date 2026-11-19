@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 import { DocStatus, DocType, GdprType, TaskType } from '../../core/models/models';
 import { STATUS_MAP, DOC_TYPE_MAP, GDPR_MAP, TASK_TYPE_MAP, groupCssClass, initials } from '../../core/services/helpers';
+import { TenantDefaultLabelPipe } from '../../core/i18n/tenant-default-label.pipe';
 
 // Each badge shows a translated label for the values the app knows; any other
 // value (custom entries from App Settings) is shown exactly as stored.
@@ -88,7 +89,8 @@ export class TaskBadgeComponent {
 @Component({
   selector: 'wt-group-pill',
   standalone: true,
-  template: `<span class="pill" [class]="isNeutral ? 'pill-neutral' : cls">{{ name }}</span>`,
+  imports: [TenantDefaultLabelPipe],
+  template: `<span class="pill" [class]="isNeutral ? 'pill-neutral' : cls">{{ name | tenantLabel:'groups' }}</span>`,
 })
 export class GroupPillComponent {
   @Input({ required: true }) name = '';

@@ -11,11 +11,12 @@ import { AuthService } from '../../core/auth/auth.service';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
+import { TenantDefaultLabelPipe, TenantDefaultLabels } from '../../core/i18n/tenant-default-label.pipe';
 
 @Component({
   selector: 'wt-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, AvatarComponent, GroupPillComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, AvatarComponent, GroupPillComponent, TranslocoDirective, TranslocoPipe, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('admin')],
   template: `
 <ng-container *transloco="let t; prefix: 'admin'">
@@ -39,7 +40,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
       <div class="filters">
         <select class="fsel filter-select" [(ngModel)]="filterGroup" (ngModelChange)="load()">
           <option value="">{{ t('users.filters.allGroups') }}</option>
-          @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
+          @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name | tenantLabel:'groups' }}</option> }
         </select>
         <select class="fsel filter-select" [(ngModel)]="filterActive" (ngModelChange)="load()">
           <option value="">{{ t('users.filters.allUsers') }}</option>
@@ -76,7 +77,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
               <div style="display:flex;flex-wrap:wrap;gap:4px">
                 @for (role of rolesPreview(user); track role.role_id) {
                   <span class="pill" [class]="groupCls(role.group_name)" style="font-size:10px">
-                    {{ role.group_display || role.group_name }}
+                    {{ (role.group_display || role.group_name) | tenantLabel:'groups' }}
                     <span style="opacity:.7">{{ role.access_level }}</span>
                   </span>
                 }
@@ -88,7 +89,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 @for (grant of user.visibility_grants ?? []; track grant.id) {
                   <span style="font-size:10px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1e40af max(l, var(--text-min-l)) c h);padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap"
                         [title]="grantTooltip(grant)">
-                    <i class="ei ei-eye"></i> {{ grant.group_display || grant.group_name }}
+                    <i class="ei ei-eye"></i> {{ (grant.group_display || grant.group_name) | tenantLabel:'groups' }}
                     <span style="opacity:.7">{{ grant.access_level }}</span>
                   </span>
                 }
@@ -242,7 +243,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 <label class="fl">{{ t('users.create.assignGroup') }}</label>
                 <select class="fsel" [(ngModel)]="newGroup">
                   <option value="">{{ t('users.create.noGroup') }}</option>
-                  @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
+                  @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name | tenantLabel:'groups' }}</option> }
                 </select>
               </div>
               @if (newGroup) {
@@ -475,7 +476,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                   <label class="fl">{{ t('users.roles.group') }}</label>
                   <select class="fsel" [(ngModel)]="newRoleGroup" [class.fi-err]="roleSubmitted && !newRoleGroup">
                     <option value="">{{ t('users.chooseGroup') }}</option>
-                    @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
+                    @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name | tenantLabel:'groups' }}</option> }
                   </select>
                   @if (roleSubmitted && !newRoleGroup) { <span class="ferr" role="alert">{{ t('users.errors.chooseGroup') }}</span> }
                 </div>
@@ -511,7 +512,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                   <label class="fl">{{ t('users.grants.group') }}</label>
                   <select class="fsel" [(ngModel)]="newGrantGroup" [class.fi-err]="grantSubmitted && !newGrantGroup">
                     <option value="">{{ t('users.chooseGroup') }}</option>
-                    @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
+                    @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name | tenantLabel:'groups' }}</option> }
                   </select>
                   @if (grantSubmitted && !newGrantGroup) { <span class="ferr" role="alert">{{ t('users.errors.chooseGroup') }}</span> }
                 </div>
@@ -643,6 +644,7 @@ export class UsersComponent implements OnInit {
   private cdr         = inject(ChangeDetectorRef);
   private zone        = inject(NgZone);
   private transloco   = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
   private locale      = inject(LocaleService);
 
   isSalesManager = computed(() => {
@@ -1099,7 +1101,7 @@ export class UsersComponent implements OnInit {
 
   grantTooltip(grant: VisibilityGrant): string {
     return this.transloco.translate('admin.users.grants.tooltip', {
-      group: grant.group_display || grant.group_name,
+      group: this.tenantLabels.label('groups', grant.group_display || grant.group_name),
       module: this.moduleLabel(grant.module),
       access: this.transloco.translate(grant.access_level === 'full' ? 'admin.users.grants.tooltipAccess.full' : 'admin.users.grants.tooltipAccess.read'),
     });

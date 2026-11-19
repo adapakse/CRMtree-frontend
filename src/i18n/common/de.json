@@ -392,6 +392,110 @@
   "states": {
     "loading": "Wird geladen…"
   },
+  "tenantDefaults": {
+    "consentDescriptions": {
+      "classificationTargeting": "Einwilligung in Profiling, Klassifizierung und Targeting auf Grundlage von Daten über die Aktivität und das Kaufverhalten des Partners, zur Personalisierung von Angeboten und Vertriebsaktivitäten, gemäß Art. 6 Abs. 1 lit. a DSGVO.",
+      "marketingComm": "Einwilligung in die Verarbeitung personenbezogener Daten des Kontakts zur Zusendung von Marketingmaterialien, Angeboten und Informationen über Produkte und Dienstleistungen auf elektronischem und telefonischem Weg gemäß Art. 6 Abs. 1 lit. a DSGVO."
+    },
+    "consentLabels": {
+      "classificationTargeting": "Einwilligung in die Verarbeitung zur Klassifizierung und zum Targeting",
+      "marketingComm": "Einwilligung in die Datenverarbeitung für Marketingkommunikation"
+    },
+    "contractSubjects": {
+      "accommodation": "Unterkunft",
+      "businessTravel": "Geschäftsreisen",
+      "conferences": "Konferenzen/Meetings",
+      "other": "Sonstiges",
+      "system": "System"
+    },
+    "countries": {
+      "at": "Österreich",
+      "be": "Belgien",
+      "ch": "Schweiz",
+      "cz": "Tschechien",
+      "de": "Deutschland",
+      "dk": "Dänemark",
+      "es": "Spanien",
+      "fi": "Finnland",
+      "fr": "Frankreich",
+      "gb": "Vereinigtes Königreich",
+      "hu": "Ungarn",
+      "it": "Italien",
+      "nl": "Niederlande",
+      "no": "Norwegen",
+      "pl": "Polen",
+      "ro": "Rumänien",
+      "ru": "Russland",
+      "se": "Schweden",
+      "sk": "Slowakei",
+      "ua": "Ukraine"
+    },
+    "groupDescriptions": {
+      "accounting": "Abteilung Finanzen und Buchhaltung",
+      "customerService": "Kundenserviceabteilung",
+      "hr": "Personalabteilung",
+      "management": "Vorstand des Unternehmens",
+      "marketing": "Marketingabteilung",
+      "operations": "Betriebsabteilung",
+      "prospects": "Zugang zum Modul Prospekte (CSV-Import, Enrichment, Umwandlung in einen Lead).",
+      "sales": "Vertriebsabteilung",
+      "seo": "Prüfung und Freigabe der SEObot-Inhalte vor der Veröffentlichung.",
+      "seoEditorial": "SEObot-Redaktion: Bearbeiten, Ergänzen und Freigeben von Artikeln vor der Veröffentlichung."
+    },
+    "groups": {
+      "accounting": "Buchhaltung",
+      "customerService": "Kundenservice",
+      "hr": "Personalwesen",
+      "management": "Vorstand",
+      "marketing": "Marketing",
+      "operations": "Betrieb",
+      "prospects": "Prospekte",
+      "sales": "Vertrieb",
+      "seoEditorial": "SEO-Redaktion"
+    },
+    "holdReasons": {
+      "businessPause": "Betriebspause",
+      "internalSituation": "Interne Unternehmenssituation",
+      "noDecisionMakers": "Keine Entscheidungsträger"
+    },
+    "languages": {
+      "de": "Deutsch",
+      "en": "Englisch",
+      "pl": "Polnisch",
+      "ro": "Rumänisch",
+      "ru": "Russisch"
+    },
+    "lostReasons": {
+      "highPrice": "Hoher Preis",
+      "incompleteOffer": "Unvollständiges Angebot",
+      "other": "Sonstiges"
+    },
+    "projectCostCategories": {
+      "licences": "Lizenzen",
+      "materials": "Material",
+      "other": "Sonstiges",
+      "ownWork": "Eigenleistung",
+      "subcontractors": "Subunternehmer",
+      "travel": "Reisen"
+    },
+    "projectPriorities": {
+      "critical": "Kritisch",
+      "high": "Hoch",
+      "low": "Niedrig",
+      "medium": "Mittel"
+    },
+    "projectStatuses": {
+      "done": "Abgeschlossen",
+      "inProgress": "In Bearbeitung",
+      "review": "Zur Prüfung",
+      "todo": "Zu erledigen"
+    },
+    "projectTypes": {
+      "meeting": "Besprechung",
+      "milestone": "Meilenstein",
+      "task": "Aufgabe"
+    }
+  },
   "testEnvironmentBanner": {
     "title": "Testversion — dies ist keine Produktivumgebung"
   },

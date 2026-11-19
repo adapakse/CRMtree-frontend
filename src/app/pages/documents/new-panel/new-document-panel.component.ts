@@ -14,6 +14,7 @@ import { INVOICE_DOC_TYPE } from '@core/services/helpers';
 import {
   InvoiceFieldsComponent, invoiceFieldsPayload, newInvoiceFieldsDraft, paymentStatusCodes,
 } from '../invoice-fields/invoice-fields.component';
+import { TenantDefaultLabelPipe, TenantDefaultLabels } from '../../../core/i18n/tenant-default-label.pipe';
 
 // Built-in values have translated names; any other value comes from App
 // Settings and is its own display name.
@@ -30,7 +31,7 @@ interface SelectOption { value: string; label: string; }
 @Component({
   selector: 'wt-new-document-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, InvoiceFieldsComponent, FormErrorSummaryComponent],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, InvoiceFieldsComponent, FormErrorSummaryComponent, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -86,7 +87,7 @@ interface SelectOption { value: string; label: string; }
               <select class="fsel" [(ngModel)]="form.group_id" [class.fi-err]="missing('group_id')">
                 <option value="">{{ t('newDocument.chooseGroup') }}</option>
                 @for (g of groups; track g.id) {
-                  <option [value]="g.id">{{ g.display_name }}</option>
+                  <option [value]="g.id">{{ g.display_name | tenantLabel:'groups' }}</option>
                 }
               </select>
               @if (missing('group_id')) { <span class="ferr">{{ t('newDocument.errors.group') }}</span> }
@@ -254,6 +255,7 @@ export class NewDocumentPanelComponent implements OnInit {
   private crmApi      = inject(CrmApiService);
   private host        = inject<ElementRef<HTMLElement>>(ElementRef);
   private transloco   = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
   private locale      = inject(LocaleService);
 
   get docTypeOptions(): SelectOption[] {
@@ -275,7 +277,7 @@ export class NewDocumentPanelComponent implements OnInit {
   get countryOptions(): SelectOption[] {
     try {
       const raw = this.settingsSvc.settings()?.['crm_partner_countries'];
-      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: value }));
+      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: this.tenantLabels.label('countries', value) }));
     } catch { }
     return this.fallbackOptions('countries', FALLBACK_COUNTRY_KEYS);
   }
@@ -283,7 +285,7 @@ export class NewDocumentPanelComponent implements OnInit {
   get contractSubjectOptions(): SelectOption[] {
     try {
       const raw = this.settingsSvc.settings()?.['doc_contract_subjects'];
-      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: value }));
+      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: this.tenantLabels.label('contractSubjects', value) }));
     } catch { }
     return this.fallbackOptions('contractSubjects', FALLBACK_CONTRACT_SUBJECT_KEYS);
   }

@@ -392,6 +392,110 @@
   "states": {
     "loading": "Cargando…"
   },
+  "tenantDefaults": {
+    "consentDescriptions": {
+      "classificationTargeting": "Consentimiento para la elaboración de perfiles, la clasificación y la segmentación a partir de datos sobre la actividad y el comportamiento de compra del socio, con el fin de personalizar ofertas comerciales y acciones de venta, conforme al art. 6.1.a) del RGPD.",
+      "marketingComm": "Consentimiento para el tratamiento de los datos personales del contacto con el fin de enviar materiales de marketing, ofertas e información sobre productos y servicios por medios electrónicos y por teléfono, conforme al art. 6.1.a) del RGPD."
+    },
+    "consentLabels": {
+      "classificationTargeting": "Consentimiento para el tratamiento con fines de clasificación y segmentación",
+      "marketingComm": "Consentimiento para el tratamiento de datos con fines de comunicación de marketing"
+    },
+    "contractSubjects": {
+      "accommodation": "Alojamiento",
+      "businessTravel": "Viajes de negocios",
+      "conferences": "Conferencias/Reuniones",
+      "other": "Otros",
+      "system": "Sistema"
+    },
+    "countries": {
+      "at": "Austria",
+      "be": "Bélgica",
+      "ch": "Suiza",
+      "cz": "Chequia",
+      "de": "Alemania",
+      "dk": "Dinamarca",
+      "es": "España",
+      "fi": "Finlandia",
+      "fr": "Francia",
+      "gb": "Reino Unido",
+      "hu": "Hungría",
+      "it": "Italia",
+      "nl": "Países Bajos",
+      "no": "Noruega",
+      "pl": "Polonia",
+      "ro": "Rumanía",
+      "ru": "Rusia",
+      "se": "Suecia",
+      "sk": "Eslovaquia",
+      "ua": "Ucrania"
+    },
+    "groupDescriptions": {
+      "accounting": "Departamento de finanzas y contabilidad",
+      "customerService": "Departamento de atención al cliente",
+      "hr": "Departamento de recursos humanos",
+      "management": "Dirección de la empresa",
+      "marketing": "Departamento de marketing",
+      "operations": "Departamento de operaciones",
+      "prospects": "Acceso al módulo Prospectos (importación CSV, enriquecimiento, conversión en lead).",
+      "sales": "Departamento de ventas",
+      "seo": "Revisión y aprobación de los contenidos de SEObot antes de publicarlos.",
+      "seoEditorial": "Redactores de SEObot: edición, completado y aprobación de artículos antes de publicarlos."
+    },
+    "groups": {
+      "accounting": "Contabilidad",
+      "customerService": "Atención al cliente",
+      "hr": "Recursos humanos",
+      "management": "Dirección",
+      "marketing": "Marketing",
+      "operations": "Operaciones",
+      "prospects": "Prospectos",
+      "sales": "Ventas",
+      "seoEditorial": "Redacción SEO"
+    },
+    "holdReasons": {
+      "businessPause": "Pausa en la actividad",
+      "internalSituation": "Situación interna de la empresa",
+      "noDecisionMakers": "Sin responsables de decisión"
+    },
+    "languages": {
+      "de": "Alemán",
+      "en": "Inglés",
+      "pl": "Polaco",
+      "ro": "Rumano",
+      "ru": "Ruso"
+    },
+    "lostReasons": {
+      "highPrice": "Precio alto",
+      "incompleteOffer": "Oferta incompleta",
+      "other": "Otro"
+    },
+    "projectCostCategories": {
+      "licences": "Licencias",
+      "materials": "Materiales",
+      "other": "Otros",
+      "ownWork": "Trabajo propio",
+      "subcontractors": "Subcontratistas",
+      "travel": "Viajes"
+    },
+    "projectPriorities": {
+      "critical": "Crítica",
+      "high": "Alta",
+      "low": "Baja",
+      "medium": "Media"
+    },
+    "projectStatuses": {
+      "done": "Completado",
+      "inProgress": "En curso",
+      "review": "En revisión",
+      "todo": "Por hacer"
+    },
+    "projectTypes": {
+      "meeting": "Reunión",
+      "milestone": "Hito",
+      "task": "Tarea"
+    }
+  },
   "testEnvironmentBanner": {
     "title": "Versión de prueba — este no es el entorno de producción"
   },

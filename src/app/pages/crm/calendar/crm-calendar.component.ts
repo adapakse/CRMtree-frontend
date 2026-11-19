@@ -14,6 +14,7 @@ import { EntityAttachmentsComponent } from '../../../shared/components/entity-at
 import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
 import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
 import { LocaleService } from '../../../core/i18n/locale.service';
+import { TenantDefaultLabelPipe } from '../../../core/i18n/tenant-default-label.pipe';
 
 type ViewMode = 'month' | 'week' | 'day' | 'tasks';
 
@@ -30,7 +31,7 @@ interface CalendarDay {
 @Component({
   selector: 'wt-crm-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent, EntityAttachmentsComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
+  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent, EntityAttachmentsComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -259,7 +260,7 @@ interface CalendarDay {
             <strong style="font-size:14px;color:var(--gray-800)">
               <span style="color:var(--gray-500);font-weight:500">{{taskTypeName(task.type)}}:</span> {{task.title}}
             </strong>
-            <span class="task-status-badge task-st-{{task.status}}">{{task.status_label || taskStatusLabel(task.status)}}</span>
+            <span class="task-status-badge task-st-{{task.status}}">{{(task.status_label | tenantLabel:'projectStatuses') || taskStatusLabel(task.status)}}</span>
             <span *ngIf="task.priority" class="priority-badge priority-{{task.priority}}">{{priorityLabel(task.priority)}}</span>
             <span class="task-source-badge task-src-{{task.source_type}}">{{sourceLabel(task.source_type)}}</span>
             <wt-add-to-calendar [entry]="calendarEntryOf(task)" (click)="$event.stopPropagation()"></wt-add-to-calendar>

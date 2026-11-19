@@ -154,12 +154,12 @@
       "yes": "V zamudi"
     },
     "endDate": "Konec",
-    "manager": "PM",
+    "manager": "Vodja projekta",
     "myRole": "Moja vloga",
     "myRoleValues": {
       "controller": "Pregledovalec",
       "participant": "Udeleženec",
-      "pm": "PM"
+      "pm": "Vodja projekta"
     },
     "name": "Naziv naloge",
     "number": "Številka",
@@ -180,7 +180,7 @@
       "key": "Ključ",
       "name": "Naziv",
       "overdue": "Naloge po roku",
-      "pm": "PM",
+      "pm": "Vodja projekta",
       "progress": "Napredek",
       "revenue": "Prihodek",
       "start_date": "Začetek",
@@ -634,7 +634,7 @@
       "controller": "Pregledovalec",
       "external_participant": "Zunanji udeleženec",
       "internal_participant": "Notranji udeleženec",
-      "pm": "PM"
+      "pm": "Vodja projekta"
     },
     "statusCategories": {
       "done": "Končano",
@@ -722,7 +722,7 @@
       "title": "Dodatna polja"
     },
     "endDateChange": {
-      "hint": "Neobvezno. PM bo razlog videl v e-pošti o spremembi roka; shranjen bo tudi v zgodovini naloge.",
+      "hint": "Neobvezno. Vodja projekta bo razlog videl v e-pošti o spremembi roka; shranjen bo tudi v zgodovini naloge.",
       "placeholder": "npr. zamuda pri dobavi s strani stranke",
       "reason": "Razlog za spremembo roka"
     },
@@ -785,7 +785,7 @@
       "overdue": "Po roku",
       "progress": "Napredek",
       "project": "Projekt",
-      "projectManagers": "PM",
+      "projectManagers": "Vodje projektov",
       "revenue": "Prihodek",
       "startDate": "Začetek"
     },
@@ -829,7 +829,7 @@
       "errors": {
         "name": "Vnesite ime polja, npr. Številka naročila"
       },
-      "hint": "Polja, določena tukaj, lahko PM doda v svoj projekt (Kartica projekta → Dodatna polja nalog) in odloči, ali so obvezna. Vrste polja po ustvarjanju ni mogoče spremeniti.",
+      "hint": "Polja, določena tukaj, lahko vodja projekta doda v svoj projekt (Kartica projekta → Dodatna polja nalog) in odloči, ali so obvezna. Vrste polja po ustvarjanju ni mogoče spremeniti.",
       "newNamePlaceholder": "Naziv novega polja…",
       "optionsPlaceholder": "Vrednosti, ločene z vejico",
       "optionsRequired": "Seznam mora imeti vsaj eno vrednost",
@@ -838,7 +838,7 @@
     },
     "finance": {
       "disableConfirm": "Želite izklopiti finance projektov? Podatki bodo ohranjeni, vendar bodo izginili iz pogleda vseh uporabnikov.",
-      "hint": "Po vklopu PM in skrbnik v projektu vodita proračun, stroške in prihodke, pregledovalec pa ima vpogled vanje. Povzetek financ projekta vidi tudi vsak, ki ima dostop do kartice povezanega leada ali partnerja.",
+      "hint": "Po vklopu vodja projekta in skrbnik v projektu vodita proračun, stroške in prihodke, pregledovalec pa ima vpogled vanje. Povzetek financ projekta vidi tudi vsak, ki ima dostop do kartice povezanega leada ali partnerja.",
       "saveFailed": "Nastavitve financ ni bilo mogoče spremeniti",
       "title": "Finance projektov",
       "toggle": "Vklopi finance projektov"
@@ -853,7 +853,7 @@
     },
     "transitions": {
       "discardConfirm": "Imate neshranjene spremembe prehodov. Jih želite zavreči?",
-      "hint": "PM lahko status vedno spremeni v katerega koli. Udeleženci spreminjajo status samo v nalogah, ki so jim dodeljene in v katerih imajo polne pravice. Pregledovalec spreminja status v vsaki nalogi projekta.",
+      "hint": "Vodja projekta lahko status vedno spremeni v katerega koli. Udeleženci spreminjajo status samo v nalogah, ki so jim dodeljene in v katerih imajo polne pravice. Pregledovalec spreminja status v vsaki nalogi projekta.",
       "matrixCorner": "Iz statusa ↓ / v status →",
       "saveButton": "Shrani prehode",
       "saveFailed": "Prehodov ni bilo mogoče shraniti",

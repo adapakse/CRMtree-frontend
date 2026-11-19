@@ -103,8 +103,8 @@
       "importedFrom": "Uvoženo od",
       "importedTo": "Uvoženo do",
       "reset": "Ponastavi filtre",
-      "scoreMax": "Score maks",
-      "scoreMin": "Score min",
+      "scoreMax": "Ocena maks",
+      "scoreMin": "Ocena min",
       "search": "Iskanje",
       "searchPlaceholder": "ime, davčna št. ali baza",
       "showArchived": "Prikaži arhiv",
@@ -255,7 +255,7 @@
       "partner": "Partner",
       "partnerBadgeTooltip": "Partner s to davčno številko že obstaja v CRM — kliknite za odprtje",
       "processing": "Obdelava…",
-      "score": "Score",
+      "score": "Ocena",
       "status": "Status",
       "taxId": "Davčna št."
     },
@@ -351,7 +351,7 @@
     "this_month": "Ta mesec",
     "this_quarter": "To četrtletje",
     "this_week": "Ta teden",
-    "ytd": "To leto (YTD)"
+    "ytd": "Od začetka leta"
   },
   "prospectStatus": {
     "archive": "Arhiv",

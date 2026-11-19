@@ -74,6 +74,10 @@ const MULTI_VALUE_SEPARATOR = ',';
     :host { display:flex; flex-direction:column; gap:8px; min-width:0; }
     .fi, .fsel { padding:6px 8px; font-size:12px; }
     input.fi[type=search] { height:30px !important; width:100%; font-size:12px; }
+    /* In the filter bar: the depth and hover of a secondary button, like the filter pills next to it. */
+    :host(.text-filter) input.fi[type=search] { height:32px !important; box-shadow:0 5px 14px rgba(0,0,0,.081); transition:border-color .15s, box-shadow .15s; }
+    :host(.text-filter) input.fi[type=search]:hover { border-color:var(--orange); box-shadow:0 5px 14px rgba(0,0,0,.081), 0 0 0 3px rgba(59,170,93,.12); }
+    :host(.text-filter) input.fi[type=search]:focus { border-color:var(--orange); box-shadow:0 5px 14px rgba(0,0,0,.081), var(--ring-field); }
     .options { display:flex; flex-direction:column; gap:6px; max-height:260px; overflow-y:auto; }
     .option { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--gray-700); cursor:pointer; text-transform:none; letter-spacing:0; font-weight:400; }
     .bound { display:grid; grid-template-columns:34px 1fr; align-items:center; gap:8px; font-size:12px; color:var(--gray-500); text-transform:none; letter-spacing:0; font-weight:400; }

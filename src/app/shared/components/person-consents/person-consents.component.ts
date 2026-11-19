@@ -5,6 +5,7 @@ import { CrmApiService, PersonConsents } from '../../../core/services/crm-api.se
 import { EmailCampaignsService } from '../../../core/services/email-campaigns.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { describeHttpError } from '../../../core/services/http-error-message';
+import { TenantDefaultLabelPipe } from '../../../core/i18n/tenant-default-label.pipe';
 
 type PersonConsent = PersonConsents['consents'][number];
 type ConsentChoice = 'granted' | 'denied' | 'no_data';
@@ -22,7 +23,7 @@ const EMAIL_CONSENT_PATTERN = /e-?mail|newsletter/i;
 @Component({
   selector: 'wt-person-consents',
   standalone: true,
-  imports: [DatePipe, TranslocoDirective],
+  imports: [DatePipe, TranslocoDirective, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('crm')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -38,8 +39,8 @@ const EMAIL_CONSENT_PATTERN = /e-?mail|newsletter/i;
             <div class="pc-mail">{{ person.email }}</div>
           </div>
           @if (shownConsent(person); as consent) {
-            <div class="pc-label" [title]="consent.description">{{ consent.label }}</div>
-            <div class="pc-opts" role="radiogroup" [attr.aria-label]="consent.label + ' — ' + (person.name || person.email)">
+            <div class="pc-label" [title]="consent.description | tenantLabel:'consentDescriptions'">{{ consent.label | tenantLabel:'consentLabels' }}</div>
+            <div class="pc-opts" role="radiogroup" [attr.aria-label]="(consent.label | tenantLabel:'consentLabels') + ' — ' + (person.name || person.email)">
               @for (option of options; track option.value) {
                 <button type="button" role="radio" [attr.aria-checked]="shownValue(person, consent) === option.value"
                         [class.on]="shownValue(person, consent) === option.value" [style.--c]="option.color"

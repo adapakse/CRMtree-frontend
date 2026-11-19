@@ -17,6 +17,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
 import { LeadStagesService } from '../../../core/services/lead-stages.service';
+import { TenantDefaultLabelPipe, TenantDefaultLabels } from '../../../core/i18n/tenant-default-label.pipe';
 
 function getPeriodDates(preset: string): { from: string; to: string; periodEnd: string } {
   const now = new Date();
@@ -55,7 +56,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
   selector: 'wt-crm-reports-leads',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule, TooltipComponent, TranslocoDirective],
+  imports: [CommonModule, FormsModule, RouterModule, TooltipComponent, TranslocoDirective, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -314,7 +315,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
       <div #lostEl style="display:flex;flex-direction:column;gap:10px"></div>
       <div *ngIf="!lostReasons.length" style="color:var(--gray-400);font-size:12px;text-align:center;padding:12px">{{ t('reports.leads.lostReasons.empty') }}</div>
       <div *ngIf="lostReasons.length" style="margin-top:16px;padding:12px 16px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px;font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
-        <i class="ei ei-bulb"></i><strong>{{ t('reports.leads.lostReasons.topReason') }}</strong> {{ lostReasons[0].reason }} ({{ t('reports.leads.lostReasons.leadsCount', { count: lostReasons[0].count }) }})
+        <i class="ei ei-bulb"></i><strong>{{ t('reports.leads.lostReasons.topReason') }}</strong> {{ lostReasons[0].reason | tenantLabel:'lostReasons' }} ({{ t('reports.leads.lostReasons.leadsCount', { count: lostReasons[0].count }) }})
       </div>
     </div>
   </div>
@@ -349,6 +350,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   private zone   = inject(NgZone);
   private router = inject(Router);
   private transloco = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
   readonly stages = inject(LeadStagesService);
 
   loading      = false;
@@ -835,13 +837,14 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       const pct = Math.round(d.count / max * 100);
       const row = document.createElement('div');
       row.style.cursor = 'pointer';
-      row.title = this.transloco.translate('crm.reports.leads.tooltips.viewLostLeads', { reason: d.reason });
+      const reasonLabel = this.tenantLabels.label('lostReasons', d.reason);
+      row.title = this.transloco.translate('crm.reports.leads.tooltips.viewLostLeads', { reason: reasonLabel });
       const lostReason = d.reason === '— brak powodu —' ? '' : d.reason;
       row.addEventListener('click', () => this.goToLeads(
         lostReason ? { stage: 'closed_lost', lost_reason: lostReason } : { stage: 'closed_lost' },
-        this.transloco.translate('crm.reports.leads.drilldown.lost', { reason: d.reason })
+        this.transloco.translate('crm.reports.leads.drilldown.lost', { reason: reasonLabel })
       ));
-      row.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--gray-600)">${d.reason}</span><span style="font-size:12px;font-weight:700;color:${colors[i]}">${d.count}</span></div><div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${colors[i]};border-radius:4px;opacity:.8"></div></div>`;
+      row.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--gray-600)">${reasonLabel}</span><span style="font-size:12px;font-weight:700;color:${colors[i]}">${d.count}</span></div><div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${colors[i]};border-radius:4px;opacity:.8"></div></div>`;
       el.appendChild(row);
     });
   }

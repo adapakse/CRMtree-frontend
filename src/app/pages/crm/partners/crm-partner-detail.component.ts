@@ -37,6 +37,7 @@ import { LocaleService } from '../../../core/i18n/locale.service';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 import { LeadStagesService } from '../../../core/services/lead-stages.service';
 import { withdrawOnboardingErrorMessage } from '../onboarding/withdraw-onboarding-error.util';
+import { TenantDefaultLabelPipe, TenantDefaultLabels } from '../../../core/i18n/tenant-default-label.pipe';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
 // number. Numbers are never merged into each other's history.
@@ -70,7 +71,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
   selector: 'wt-crm-partner-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, PhoneInputComponent, ActivityCountBadgeComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent, PersonConsentsComponent],
+            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent, PersonConsentsComponent, TenantDefaultLabelPipe],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -330,7 +331,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <span class="lbl">{{ t('partnerDetail.fields.city') }} <span class="dwh-badge" *ngIf="partner.billing_city_from_dwh">DWH</span></span>
           <span>{{partner.billing_city || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.country') }} <span class="dwh-badge" *ngIf="partner.billing_country_from_dwh">DWH</span></span>
-          <span>{{partner.billing_country || '—'}}</span>
+          <span>{{(partner.billing_country | tenantLabel:'countries') || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.email') }} <span class="dwh-badge" *ngIf="partner.billing_email_address_from_dwh">DWH</span></span>
           <span>{{partner.billing_email_address || '—'}}</span>
         </div>
@@ -395,7 +396,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </ng-container>
           <ng-container *ngIf="partner.language || partner.dwh_partner_id">
             <span class="lbl">{{ t('partnerDetail.fields.language') }} <span class="dwh-badge" *ngIf="partner.language_from_dwh">DWH</span></span>
-            <span>{{partner.language || '—'}}</span>
+            <span>{{(partner.language | tenantLabel:'languages') || '—'}}</span>
           </ng-container>
           <ng-container *ngIf="partner.partner_currency || partner.dwh_partner_id">
             <span class="lbl">{{ t('partnerDetail.fields.currency') }} <span class="dwh-badge" *ngIf="partner.partner_currency_from_dwh">DWH</span></span>
@@ -407,7 +408,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </ng-container>
           <ng-container *ngIf="partner.country || partner.dwh_partner_id">
             <span class="lbl">{{ t('partnerDetail.fields.country') }} <span class="dwh-badge" *ngIf="partner.country_from_dwh">DWH</span></span>
-            <span>{{partner.country || '—'}}</span>
+            <span>{{(partner.country | tenantLabel:'countries') || '—'}}</span>
           </ng-container>
           <ng-container *ngIf="partner.max_debit != null">
             <span class="lbl">{{ t('partnerDetail.fields.creditLimit') }} <span class="dwh-badge">DWH</span></span>
@@ -1217,7 +1218,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div *ngIf="consentLoading" style="text-align:center;color:var(--gray-400);font-size:12px;padding:8px 0">{{ 'states.loading' | transloco }}</div>
         <div *ngFor="let ct of consents" style="margin-bottom:12px">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:4px">
-            <div style="font-size:12px;font-weight:600;color:var(--gray-700);line-height:1.4;flex:1">{{ct.label}}</div>
+            <div style="font-size:12px;font-weight:600;color:var(--gray-700);line-height:1.4;flex:1">{{ct.label | tenantLabel:'consentLabels'}}</div>
             <button (click)="toggleConsentExpand(ct.consent_key)"
                     style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--gray-400);white-space:nowrap;padding:0;flex-shrink:0;line-height:1.8">
               {{expandedConsent===ct.consent_key ? '▲ ' + t('consents.collapse') : '▾ ' + t('consents.details')}}
@@ -1225,7 +1226,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </div>
           <div *ngIf="expandedConsent===ct.consent_key"
                style="font-size:12px;color:var(--gray-500);background:var(--gray-50);border-radius:6px;padding:8px 10px;margin-bottom:8px;line-height:1.55;border-left:3px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))">
-            {{ct.description}}
+            {{ct.description | tenantLabel:'consentDescriptions'}}
             <div *ngIf="ct.updated_at" style="margin-top:4px;font-size:10px;color:var(--gray-400)">
               {{ t('consents.lastChange') }} {{ct.updated_at | date:'dd.MM.yyyy HH:mm'}}
               <span *ngIf="ct.updated_by_name"> · {{ct.updated_by_name}}</span>
@@ -1707,7 +1708,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </ng-container>
             <div *ngIf="isDwhFieldReadOnly('language')" class="dwh-readonly-field">
               <label>{{ t('partnerDetail.fields.language') }} <span class="dwh-badge">DWH</span></label>
-              <span class="dwh-readonly-value">{{partner?.language || '—'}}</span>
+              <span class="dwh-readonly-value">{{(partner?.language | tenantLabel:'languages') || '—'}}</span>
             </div>
             <ng-container *ngIf="!isDwhFieldReadOnly('partner_currency')">
               <label>{{ t('partnerDetail.fields.partnerCurrency') }}
@@ -2138,6 +2139,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   protected settings = inject(AppSettingsService);
   private pbx = inject(PbxService);
   private transloco = inject(TranslocoService);
+  private readonly tenantLabels = inject(TenantDefaultLabels);
   private attachmentsApi = inject(EntityAttachmentsApiService);
   private toast = inject(ToastService);
   readonly leadStages = inject(LeadStagesService);
@@ -4658,7 +4660,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (a === 'crm_partner_delete')  return this.transloco.translate('crm.partnerDetail.history.deleted');
     if (a === 'crm_partner_consent_update') {
       const m = h.metadata || {};
-      const lbl = m.consent_label || after.consent_key || '';
+      const lbl = this.tenantLabels.label('consentLabels', m.consent_label) || after.consent_key || '';
       return '✅ ' + this.transloco.translate('crm.history.consentChanged', {
         label: lbl, from: before.label || before.value || '—', to: after.label || after.value || '—',
       });

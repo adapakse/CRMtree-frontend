@@ -543,7 +543,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>Elige la pestaña del tipo de actividad que quieres: <b>“Tareas”</b> (o “Todos”), <b>“Notas”</b>, <b>“Llamadas”</b> o <b>“Reuniones”</b>.</li>
 <li>Haz clic en <b>“+ Añadir actividad”</b>. La pestaña determina el tipo de actividad.</li>
 <li>Establece la <b>“Fecha”</b>: “Hoy”, “Mañana”, “En 2 días laborables”, “En 3 días laborables”, “En una semana”, “En 2 semanas” o <b>“Fecha personalizada…”</b>.</li>
-<li>Elige un <b>“Recordatorio”</b> (por ejemplo “1 h antes”, “1 día antes” o “En la fecha límite de la tarea”), el <b>“Propietario”</b> (tú, por defecto) y, para las tareas, una <b>“Prioridad”</b> (ASAP, Importante, Media, Baja).</li>
+<li>Elige un <b>“Recordatorio”</b> (por ejemplo “1 h antes”, “1 día antes” o “En la fecha límite de la tarea”), el <b>“Propietario”</b> (tú, por defecto) y, para las tareas, una <b>“Prioridad”</b> (Urgente, Importante, Media, Baja).</li>
 <li>Para una reunión, añade el <b>“Título de la reunión”</b>, la <b>“Duración (min)”</b>, el <b>“Lugar”</b> y los <b>“Participantes”</b> (direcciones de correo, con sugerencias).</li>
 <li>Escribe los detalles, adjunta un archivo a una tarea o nota si hace falta y haz clic en <b>“Guardar”</b>.</li>
 </ol>
@@ -1969,7 +1969,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="webfig"><img loading="lazy" src="img/en_a07_settings_projects.jpg?v=20261113" width="1440" height="900" alt="Configuración de proyectos"><figcaption>“Estados de tareas” con sus categorías, y la matriz de “Transiciones entre estados” para los participantes internos.</figcaption></figure>
 <div class="tbl"><table>
 <tr><th>Sección</th><th>Qué estableces</th></tr>
-<tr><td><b>Estados de tareas</b></td><td>Nombre, color, orden (Subir / Bajar) y <b>categoría</b>: “Por hacer”, “En curso”, “Hecho”. La categoría le indica al sistema qué significa un estado: las tareas en un estado “Hecho” no cuentan como abiertas ni vencidas. La empresa de demostración usa nombres de estado en polaco: “Do zrobienia”, “W toku”, “Do weryfikacji” (en revisión), “Zakończone”.</td></tr>
+<tr><td><b>Estados de tareas</b></td><td>Nombre, color, orden (Subir / Bajar) y <b>categoría</b>: “Por hacer”, “En curso”, “Hecho”. La categoría le indica al sistema qué significa un estado: las tareas en un estado “Hecho” no cuentan como abiertas ni vencidas. Los nombres de estado predeterminados se muestran en el idioma de cada usuario, aquí “Por hacer”, “En curso”, “En revisión”, “Completado”; un nombre cambiado por el administrador se muestra tal como se escribió.</td></tr>
 <tr><td><b>Transiciones entre estados</b></td><td>Una matriz “Del estado ↓ / al estado →”, por separado para “Participante interno”, “Participante externo” y “Revisor”. Guarda con “Guardar transiciones”.</td></tr>
 <tr><td><b>Tipos de tareas</b>, <b>Prioridades</b></td><td>Catálogos con color y orden.</td></tr>
 <tr><td><b>Campos adicionales de tareas</b></td><td>Campos (Texto, Número, Lista de valores, Fecha, Importe con moneda) que un PM añade a su proyecto, decidiendo si son obligatorios.</td></tr>
@@ -1981,7 +1981,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p>El PM del proyecto y el administrador siempre pueden establecer cualquier estado. Los participantes cambian el estado solo en las tareas que tienen asignadas y en las que tienen acceso completo. Un revisor cambia el estado en cualquier tarea del proyecto.</p>
 <div class="example"><span class="lbl">EJEMPLO · MATRIZ DE TRANSICIONES</span>
 <p>Configuración predeterminada. Piotr es un participante interno con acceso completo en el proyecto “Wdrożenie CRM Atlas”, y Karol es el revisor.</p>
-<p class="res">En su propia tarea que está “W toku” (en curso), Piotr puede establecer “Do zrobienia” o “Do weryfikacji”, pero no “Zakończone”. Karol lleva una tarea en “Do weryfikacji” a “Zakończone” o la devuelve a “W toku”. Si el administrador marca “Do zrobienia → Zakończone” para los revisores, Karol también puede cerrar tareas que nadie ha iniciado.</p></div>
+<p class="res">En su propia tarea que está “En curso”, Piotr puede establecer “Por hacer” o “En revisión”, pero no “Completado”. Karol lleva una tarea en “En revisión” a “Completado” o la devuelve a “En curso”. Si el administrador marca “Por hacer → Completado” para los revisores, Karol también puede cerrar tareas que nadie ha iniciado.</p></div>
 
 <h4 id="p2-ksef">KSeF — facturas de costes</h4>
 <p>KSeF es el sistema nacional polaco de facturación electrónica.</p>

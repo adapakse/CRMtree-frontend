@@ -8,12 +8,13 @@ import { ProjectFinanceFormatService } from '../../core/services/project-finance
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES, parseMoneyInput } from './project-finance.styles';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
+import { TenantDefaultLabelPipe } from '../../core/i18n/tenant-default-label.pipe';
 
 /** Budget per cost category against what was incurred and what is still planned. */
 @Component({
   selector: 'wt-project-finance-categories',
   standalone: true,
-  imports: [TranslocoDirective],
+  imports: [TranslocoDirective, TenantDefaultLabelPipe],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -37,13 +38,13 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
               @for (row of summary().categories; track row.category_id) {
                 <tr [class.over-budget]="row.is_over_budget">
                   <td>
-                    {{ row.name }}
+                    {{ row.name | tenantLabel:'projectCostCategories' }}
                     @if (!row.is_active) { <span class="muted"> {{ t('finance.categories.inactive') }}</span> }
                   </td>
                   <td class="amount">
                     @if (canEditBudget(row)) {
                       <input class="fi cell-input" type="number" min="0" step="0.01" [value]="row.budget"
-                             [attr.aria-label]="t('finance.categories.budgetOf', { name: row.name })"
+                             [attr.aria-label]="t('finance.categories.budgetOf', { name: (row.name | tenantLabel:'projectCostCategories') })"
                              (change)="changeBudget(row, $event)">
                     } @else { {{ money(row.budget) }} }
                   </td>
