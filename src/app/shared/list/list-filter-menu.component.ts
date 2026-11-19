@@ -72,17 +72,19 @@ export type PickedFilterValue = { text: string; from?: never; to?: never } | { t
     </ng-container>
   `,
   styles: [`
-    :host { display:inline-flex; max-width:100%; min-width:0; }
-    /* In a filter bar: a quiet filled chip; a chosen filter turns green and shows what was picked. */
-    .trigger { display:inline-flex; align-items:center; gap:2px; height:28px; max-width:100%; min-width:0; border:1px solid transparent; background:var(--chip-bg); border-radius:14px; padding:0 6px 0 10px; font-size:12px; font-weight:500; color:var(--chip-text); cursor:pointer; font-family:inherit; white-space:nowrap; transition:background .15s, border-color .15s; }
+    /* Brand green dark enough for AA text on white and on the pale green; light enough on the dark theme. */
+    :host { display:inline-flex; max-width:100%; min-width:0; --green-text-aa:oklch(from var(--orange) max(min(l, 0.52), var(--text-min-l)) c h); }
+    /* In a filter bar: a white pill with the depth and hover of a secondary button; a chosen filter turns green and shows what was picked. */
+    .trigger { display:inline-flex; align-items:center; gap:2px; height:32px; max-width:100%; min-width:0; border:1px solid var(--control-border); background:var(--control-bg); border-radius:16px; padding:0 8px 0 12px; font-size:12px; font-weight:500; color:var(--gray-700); cursor:pointer; font-family:inherit; white-space:nowrap; box-shadow:0 5px 14px rgba(0,0,0,.081); transition:border-color .15s, box-shadow .15s, color .15s; }
     .trigger svg { width:12px; height:12px; flex-shrink:0; }
-    .trigger:hover { background:color-mix(in srgb, var(--chip-bg), var(--chip-text) 10%); }
-    .trigger:focus-visible { outline:none; box-shadow:var(--ring-field); }
+    .trigger:hover { border-color:var(--orange); color:var(--green-text-aa); box-shadow:0 5px 14px rgba(0,0,0,.081), 0 0 0 3px rgba(59,170,93,.12); }
+    .trigger:hover .chevron { color:inherit; }
+    .trigger:focus-visible { outline:none; border-color:var(--orange); box-shadow:0 5px 14px rgba(0,0,0,.081), var(--ring-field); }
     .trigger.active { border-color:var(--orange); color:var(--gray-900); background:var(--orange-pale); }
     .trigger.active .name::after { content:':'; }
     .picked { margin-left:2px; font-weight:600; overflow:hidden; text-overflow:ellipsis; max-width:180px; }
     .chevron { color:var(--gray-500); }
-    .trigger.icon-only { height:auto; border:none; background:none; padding:2px 4px; border-radius:6px; color:var(--gray-400); }
+    .trigger.icon-only { height:auto; border:none; background:none; box-shadow:none; padding:2px 4px; border-radius:6px; color:var(--gray-400); }
     .trigger.icon-only:hover { color:var(--gray-700); background:var(--gray-200); }
     .trigger.icon-only.active { color:var(--orange-dark); background:var(--orange-pale); }
     .backdrop { position:fixed; inset:0; z-index:340; }
@@ -93,7 +95,7 @@ export type PickedFilterValue = { text: string; from?: never; to?: never } | { t
     .sort-option { display:flex; justify-content:space-between; gap:8px; border:1px solid var(--gray-200); background:var(--surface); border-radius:7px; padding:4px 8px; font-size:12px; color:var(--gray-700); cursor:pointer; font-family:inherit; }
     .sort-option.sorted { border-color:var(--orange); color:var(--orange-dark); background:var(--orange-pale); font-weight:600; }
     .popover-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-    .clear { border:none; background:none; padding:0; font-size:12px; color:var(--accent-blue, oklch(from #3b82f6 max(l, var(--text-min-l)) c h)); cursor:pointer; font-family:inherit; }
+    .clear { border:none; background:none; padding:0; font-size:12px; font-weight:600; color:var(--green-text-aa); cursor:pointer; font-family:inherit; }
     .clear:disabled { color:var(--gray-300); cursor:default; }
   `],
 })
