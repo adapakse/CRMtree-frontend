@@ -91,6 +91,8 @@
     "from": "od",
     "noOptions": "Brak pozycji do wyboru.",
     "pager": {
+      "goTo": "Idź do strony",
+      "label": "Strony listy",
       "next": "Następna strona",
       "previous": "Poprzednia strona",
       "range": "{from}–{to} z {total}"

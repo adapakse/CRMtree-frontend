@@ -210,10 +210,6 @@
       "placeholder": "Add a note…",
       "saveFailed": "Could not save the note"
     },
-    "pager": {
-      "next": "Next",
-      "previous": "Previous"
-    },
     "reprocess": {
       "analyzeLinkedin": "Analyse LinkedIn while processing",
       "analyzeLinkedinHint": "(attempts to scrape the company page)",
@@ -234,9 +230,12 @@
       "no_website": "No website",
       "pending": "Pending"
     },
+    "stopEnrichment": "Cancel enrichment",
+    "stopEnrichmentTooltip": "Companies already being processed will finish, the rest stay pending",
+    "stoppingEnrichment": "Cancelling…",
     "summary": {
-      "errorCount": "(errors: {count})",
       "inProgress": "Enrichment in progress: {done}/{total}",
+      "outcomeCounts": "(to review: {needsReview} · no website: {noWebsite} · errors: {errors})",
       "shown": "Shown:"
     },
     "table": {

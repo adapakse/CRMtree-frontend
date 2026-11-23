@@ -1430,7 +1430,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="callout"><b>Duplicati</b>Un'azienda con la stessa partita IVA non viene mai creata due volte. L'importazione aggiorna invece il record esistente: le celle compilate sovrascrivono i vecchi valori e quelle vuote li lasciano invariati. Il file può essere UTF-8 o Windows-1250, separato da punti e virgola o da virgole, fino a 10 MB.</div>
 
 <h4 id="p1-pros-enrich">Arricchimento e stati</h4>
-<p>Le nuove aziende partono come «In attesa». Fai clic su <b>«Avvia arricchimento»</b>. CRMtree elabora ogni azienda in attesa e ogni azienda con un errore, e il pulsante mostra l'avanzamento, ad es. «7/12 aziende…». Per ogni azienda il sistema:</p>
+<p>Le nuove aziende partono come «In attesa». Fai clic su <b>«Avvia arricchimento»</b>. CRMtree elabora ogni azienda in attesa e ogni azienda con un errore, e il pulsante mostra l'avanzamento, ad es. «7/12 aziende…». Accanto compare il pulsante <b>«Interrompi arricchimento»</b>: le aziende già in elaborazione vengono completate, le altre restano con lo stato «In attesa» e ripartono al prossimo avvio. Per ogni azienda il sistema:</p>
 <ol class="steps">
 <li>cerca l'azienda nel registro GUS REGON (per partita IVA) e nel KRS se il file conteneva un numero KRS;</li>
 <li>trova e verifica il sito web dell'azienda (dal file o automaticamente), poi ne legge il contenuto;</li>

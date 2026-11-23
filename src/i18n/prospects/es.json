@@ -210,10 +210,6 @@
       "placeholder": "Añadir una nota…",
       "saveFailed": "No se pudo guardar la nota"
     },
-    "pager": {
-      "next": "Siguiente",
-      "previous": "Anterior"
-    },
     "reprocess": {
       "analyzeLinkedin": "Analizar LinkedIn durante el procesamiento",
       "analyzeLinkedinHint": "(intento de scraping de la página de la empresa)",
@@ -234,9 +230,12 @@
       "no_website": "Sin sitio web",
       "pending": "Pendiente"
     },
+    "stopEnrichment": "Interrumpir enriquecimiento",
+    "stopEnrichmentTooltip": "Las empresas que ya se están procesando terminarán, el resto queda pendiente",
+    "stoppingEnrichment": "Interrumpiendo…",
     "summary": {
-      "errorCount": "(errores: {count})",
       "inProgress": "Enriquecimiento en curso: {done}/{total}",
+      "outcomeCounts": "(por revisar: {needsReview} · sin sitio web: {noWebsite} · errores: {errors})",
       "shown": "Mostrados:"
     },
     "table": {

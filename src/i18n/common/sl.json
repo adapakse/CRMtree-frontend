@@ -91,6 +91,8 @@
     "from": "od",
     "noOptions": "Ni možnosti za izbiro.",
     "pager": {
+      "goTo": "Pojdi na stran",
+      "label": "Strani seznama",
       "next": "Naslednja stran",
       "previous": "Prejšnja stran",
       "range": "{from}–{to} od {total}"

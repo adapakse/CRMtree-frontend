@@ -1429,7 +1429,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="callout"><b>Duplicados</b>Una empresa con el mismo NIF nunca se crea dos veces. La importación actualiza el registro existente: las celdas rellenadas sobrescriben los valores antiguos y las celdas vacías los dejan como están. El archivo puede ser UTF-8 o Windows-1250, separado por punto y coma o por comas, de hasta 10 MB.</div>
 
 <h4 id="p1-pros-enrich">Enriquecimiento y estados</h4>
-<p>Las empresas nuevas empiezan como “Pendiente”. Haz clic en <b>“Iniciar enriquecimiento”</b>. CRMtree procesa todas las empresas pendientes y todas las que tienen un error, y el botón muestra el progreso, p. ej. “7/12 empresas…”. Para cada empresa, el sistema:</p>
+<p>Las empresas nuevas empiezan como “Pendiente”. Haz clic en <b>“Iniciar enriquecimiento”</b>. CRMtree procesa todas las empresas pendientes y todas las que tienen un error, y el botón muestra el progreso, p. ej. “7/12 empresas…”. Al lado aparece el botón <b>“Interrumpir enriquecimiento”</b>: las empresas que ya se están procesando terminan y el resto conserva el estado “Pendiente” y continúa en la siguiente ejecución. Para cada empresa, el sistema:</p>
 <ol class="steps">
 <li>busca la empresa en el registro GUS REGON (por NIF) y en el KRS si el archivo contenía un número de KRS;</li>
 <li>encuentra y verifica el sitio web de la empresa (del archivo o automáticamente) y lee su contenido;</li>

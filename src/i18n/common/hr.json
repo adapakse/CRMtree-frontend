@@ -91,6 +91,8 @@
     "from": "od",
     "noOptions": "Nema stavki za odabir.",
     "pager": {
+      "goTo": "Idi na stranicu",
+      "label": "Stranice popisa",
       "next": "Sljedeća stranica",
       "previous": "Prethodna stranica",
       "range": "{from}–{to} od {total}"
