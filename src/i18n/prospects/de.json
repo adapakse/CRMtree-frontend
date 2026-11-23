@@ -210,10 +210,6 @@
       "placeholder": "Notiz hinzufügen…",
       "saveFailed": "Die Notiz konnte nicht gespeichert werden"
     },
-    "pager": {
-      "next": "Weiter",
-      "previous": "Zurück"
-    },
     "reprocess": {
       "analyzeLinkedin": "LinkedIn beim Verarbeiten analysieren",
       "analyzeLinkedinHint": "(Versuch, die Firmenseite zu scrapen)",
@@ -234,9 +230,12 @@
       "no_website": "Keine Website",
       "pending": "Offen"
     },
+    "stopEnrichment": "Enrichment abbrechen",
+    "stopEnrichmentTooltip": "Bereits laufende Firmen werden abgeschlossen, die übrigen bleiben ausstehend",
+    "stoppingEnrichment": "Wird abgebrochen…",
     "summary": {
-      "errorCount": "(Fehler: {count})",
       "inProgress": "Enrichment läuft: {done}/{total}",
+      "outcomeCounts": "(zu prüfen: {needsReview} · keine Website: {noWebsite} · Fehler: {errors})",
       "shown": "Angezeigt:"
     },
     "table": {

@@ -210,10 +210,6 @@
       "placeholder": "Adaugă o notă…",
       "saveFailed": "Nota nu a putut fi salvată"
     },
-    "pager": {
-      "next": "Următoarea",
-      "previous": "Anterioara"
-    },
     "reprocess": {
       "analyzeLinkedin": "Analizează LinkedIn în timpul procesării",
       "analyzeLinkedinHint": "(încercare de scraping a paginii firmei)",
@@ -234,9 +230,12 @@
       "no_website": "Fără site",
       "pending": "În așteptare"
     },
+    "stopEnrichment": "Întrerupe îmbogățirea",
+    "stopEnrichmentTooltip": "Companiile aflate deja în procesare vor fi finalizate, restul rămân în așteptare",
+    "stoppingEnrichment": "Se întrerupe…",
     "summary": {
-      "errorCount": "(erori: {count})",
       "inProgress": "Îmbogățire în curs: {done}/{total}",
+      "outcomeCounts": "(de verificat: {needsReview} · fără site web: {noWebsite} · erori: {errors})",
       "shown": "Afișate:"
     },
     "table": {
