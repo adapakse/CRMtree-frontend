@@ -91,6 +91,8 @@
     "from": "de la",
     "noOptions": "Nicio opțiune disponibilă.",
     "pager": {
+      "goTo": "Mergi la pagina",
+      "label": "Paginile listei",
       "next": "Pagina următoare",
       "previous": "Pagina anterioară",
       "range": "{from}–{to} din {total}"

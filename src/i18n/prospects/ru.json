@@ -210,10 +210,6 @@
       "placeholder": "Добавить заметку…",
       "saveFailed": "Не удалось сохранить заметку"
     },
-    "pager": {
-      "next": "Вперёд",
-      "previous": "Назад"
-    },
     "reprocess": {
       "analyzeLinkedin": "Анализировать LinkedIn при обработке",
       "analyzeLinkedinHint": "(попытка скрапинга страницы компании)",
@@ -234,9 +230,12 @@
       "no_website": "Нет сайта",
       "pending": "Ожидает"
     },
+    "stopEnrichment": "Прервать обогащение",
+    "stopEnrichmentTooltip": "Компании, которые уже обрабатываются, будут завершены, остальные останутся в ожидании",
+    "stoppingEnrichment": "Прерывание…",
     "summary": {
-      "errorCount": "(ошибок: {count})",
       "inProgress": "Обогащение выполняется: {done}/{total}",
+      "outcomeCounts": "(на проверку: {needsReview} · нет сайта: {noWebsite} · ошибки: {errors})",
       "shown": "Показано:"
     },
     "table": {

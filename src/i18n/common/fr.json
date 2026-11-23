@@ -91,6 +91,8 @@
     "from": "du",
     "noOptions": "Aucun élément à choisir.",
     "pager": {
+      "goTo": "Aller à la page",
+      "label": "Pages de la liste",
       "next": "Page suivante",
       "previous": "Page précédente",
       "range": "{from}–{to} sur {total}"

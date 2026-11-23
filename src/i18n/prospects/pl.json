@@ -210,10 +210,6 @@
       "placeholder": "Dodaj notatkę…",
       "saveFailed": "Błąd zapisu notatki"
     },
-    "pager": {
-      "next": "Następna",
-      "previous": "Poprzednia"
-    },
     "reprocess": {
       "analyzeLinkedin": "Analizuj LinkedIn podczas przetwarzania",
       "analyzeLinkedinHint": "(próba scrapingu strony firmy)",
@@ -234,9 +230,12 @@
       "no_website": "Brak WWW",
       "pending": "Oczekuje"
     },
+    "stopEnrichment": "Przerwij enrichment",
+    "stopEnrichmentTooltip": "Firmy już przetwarzane zostaną dokończone, pozostałe zostaną jako oczekujące",
+    "stoppingEnrichment": "Przerywanie…",
     "summary": {
-      "errorCount": "(błędy: {count})",
       "inProgress": "Enrichment w toku: {done}/{total}",
+      "outcomeCounts": "(do weryfikacji: {needsReview} · brak WWW: {noWebsite} · błędy: {errors})",
       "shown": "Wyświetlono:"
     },
     "table": {

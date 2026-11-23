@@ -1430,7 +1430,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="callout"><b>Doublons</b>Une entreprise avec le même numéro fiscal n’est jamais créée deux fois. L’import met à jour l’enregistrement existant : les cellules renseignées écrasent les anciennes valeurs et les cellules vides les laissent telles quelles. Le fichier peut être en UTF-8 ou Windows-1250, séparé par des points-virgules ou des virgules, jusqu’à 10 Mo.</div>
 
 <h4 id="p1-pros-enrich">Enrichissement et statuts</h4>
-<p>Les nouvelles entreprises démarrent en « En attente ». Cliquez sur <b>« Lancer l’enrichissement »</b>. CRMtree traite chaque entreprise en attente et chaque entreprise en erreur, et le bouton affiche la progression, par ex. « 7/12 entreprises… ». Pour chaque entreprise, le système :</p>
+<p>Les nouvelles entreprises démarrent en « En attente ». Cliquez sur <b>« Lancer l’enrichissement »</b>. CRMtree traite chaque entreprise en attente et chaque entreprise en erreur, et le bouton affiche la progression, par ex. « 7/12 entreprises… ». Un bouton <b>« Interrompre l’enrichissement »</b> apparaît à côté : les entreprises en cours de traitement sont terminées, les autres gardent le statut « En attente » et reprennent au prochain lancement. Pour chaque entreprise, le système :</p>
 <ol class="steps">
 <li>recherche l’entreprise dans le registre GUS REGON (par numéro fiscal), et dans le KRS si le fichier contenait un numéro KRS ;</li>
 <li>trouve et vérifie le site web de l’entreprise (issu du fichier ou automatiquement), puis lit son contenu ;</li>

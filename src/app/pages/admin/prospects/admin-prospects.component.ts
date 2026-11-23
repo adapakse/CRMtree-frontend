@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summary.component';
+import { PageNavComponent } from '../../../shared/list/page-nav.component';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -208,6 +209,8 @@ interface BatchProgress {
   total: number;
   done: number;
   errors: number;
+  needs_review?: number;
+  no_website?: number;
   processing_ids?: number[];
 }
 
@@ -236,7 +239,7 @@ interface DiscoveredCompany {
   selector: 'wt-admin-prospects',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, FormErrorSummaryComponent, PageNavComponent],
   providers: [provideTranslocoScope('prospects')],
   template: `
     <ng-container *transloco="let t; prefix: 'prospects'">
@@ -254,6 +257,11 @@ interface DiscoveredCompany {
           ▶ {{ t('admin.runEnrichment') }}
         }
       </button>
+      @if (batch().running) {
+        <button class="btn btn-d" [disabled]="isStoppingBatch()" (click)="stopBatch()" [title]="t('admin.stopEnrichmentTooltip')">
+          {{ isStoppingBatch() ? t('admin.stoppingEnrichment') : t('admin.stopEnrichment') }}
+        </button>
+      }
     </div>
 
     @if (navBack.ctx(); as ctx) {
@@ -359,6 +367,7 @@ interface DiscoveredCompany {
               <option value="">{{ t('admin.filters.all') }}</option>
               <option value="pending">{{ t('admin.status.pending') }}</option>
               <option value="done">{{ t('admin.status.done') }}</option>
+              <option value="needs_review">{{ t('admin.status.needs_review') }}</option>
               <option value="error">{{ t('admin.status.error') }}</option>
               <option value="no_krs">{{ t('admin.status.no_krs') }}</option>
               <option value="no_website">{{ t('admin.status.no_website') }}</option>
@@ -446,7 +455,7 @@ interface DiscoveredCompany {
         @if (batch().running) {
           &nbsp;|&nbsp; <span style="color: var(--orange-text)">
             <i class="ei ei-hourglass"></i> {{ t('admin.summary.inProgress', { done: batch().done, total: batch().total }) }}
-            {{ t('admin.summary.errorCount', { count: batch().errors }) }}
+            {{ t('admin.summary.outcomeCounts', { needsReview: batch().needs_review ?? 0, noWebsite: batch().no_website ?? 0, errors: batch().errors }) }}
           </span>
         }
       </div>
@@ -1131,19 +1140,7 @@ interface DiscoveredCompany {
       </div>
 
       <!-- Paginacja -->
-      @if (pages() > 1) {
-        <div style="display:flex;justify-content:center;gap:8px;margin-top:16px">
-          <button class="btn btn-g" [disabled]="page() <= 1" (click)="setPage(page() - 1)">
-            ‹ {{ t('admin.pager.previous') }}
-          </button>
-          <span style="line-height:32px;font-size:14px">
-            {{ page() }} / {{ pages() }}
-          </span>
-          <button class="btn btn-g" [disabled]="page() >= pages()" (click)="setPage(page() + 1)">
-            {{ t('admin.pager.next') }} ›
-          </button>
-        </div>
-      }
+      <wt-page-nav style="margin-top:16px" [page]="page()" [total]="total()" (pageChange)="setPage($event)" />
 
     </div>
 
@@ -1935,10 +1932,12 @@ interface DiscoveredCompany {
     /* narrower than the table: it scrolls sideways in its card instead of being cut off */
     @media (max-width: 1279px) { .tbl-card { overflow-x:auto; } }
     .tbl { width:100%; border-collapse:collapse; font-size:12px; }
+    /* top:-20px cancels the 20px top padding of #content (the scroll box): with top:0
+       the header stuck below that padding and rows showed through the gap above it. */
     .tbl th {
       background:var(--gray-50); text-align:left; padding:8px 10px 14px;
       border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); font-size:12px;
-      font-weight:600; color:var(--gray-500); white-space:nowrap; position:sticky; top:0; z-index:1;
+      font-weight:600; color:var(--gray-500); white-space:nowrap; position:sticky; top:-20px; z-index:1;
       vertical-align:bottom;
     }
     .tbl td { padding:8px 10px; border-bottom:1px solid var(--gray-100); vertical-align:top; }
@@ -2382,7 +2381,6 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   rows       = signal<Prospect[]>([]);
   total      = signal(0);
   grandTotal = signal(0);
-  pages    = signal(1);
   page     = signal(1);
   loading  = signal(false);
   expanded = signal<number | null>(null);
@@ -2399,6 +2397,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   } | null>(null);
 
   enriching      = signal(false);
+  isStoppingBatch = signal(false);
   batch          = signal<BatchProgress>({ running: false, total: 0, done: 0, errors: 0 });
   processingIds  = signal<Set<number>>(new Set());
   expandedGusIds = signal<Set<number>>(new Set());
@@ -2822,7 +2821,6 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         this.rows.set(r.rows);
         this.total.set(r.total);
         this.grandTotal.set(r.grand_total ?? this.grandTotal());
-        this.pages.set(r.pages);
         this.loading.set(false);
         this.persistFilters();
       },
@@ -2847,7 +2845,6 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         this.rows.set(r.rows);
         this.total.set(r.total);
         this.grandTotal.set(r.grand_total ?? this.grandTotal());
-        this.pages.set(r.pages);
       },
     });
   }
@@ -2923,6 +2920,13 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     });
   }
 
+  stopBatch() {
+    this.isStoppingBatch.set(true);
+    this.http.post(`${API}/enrich-stop`, {}).subscribe({
+      error: () => this.isStoppingBatch.set(false),
+    });
+  }
+
   pollBatch() {
     this.http.get<BatchProgress>(`${API}/enrich-status`).subscribe({
       next: s => {
@@ -2936,6 +2940,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
           // loadSilent — odświeżenie bez overlay (brak skoku strony)
           this.pollTimer = setTimeout(() => { this.pollBatch(); this.loadSilent(); }, 3000);
         } else {
+          this.isStoppingBatch.set(false);
           // Po zakończeniu wyczyść spinner i odśwież pełny stan
           this.processingIds.set(new Set());
           if (s.total > 0) this.load();

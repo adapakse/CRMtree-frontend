@@ -210,10 +210,6 @@
       "placeholder": "Ajouter une note…",
       "saveFailed": "Impossible d’enregistrer la note"
     },
-    "pager": {
-      "next": "Suivant",
-      "previous": "Précédent"
-    },
     "reprocess": {
       "analyzeLinkedin": "Analyser LinkedIn pendant le traitement",
       "analyzeLinkedinHint": "(tentative de scraping de la page de l’entreprise)",
@@ -234,9 +230,12 @@
       "no_website": "Pas de site web",
       "pending": "En attente"
     },
+    "stopEnrichment": "Interrompre l’enrichissement",
+    "stopEnrichmentTooltip": "Les entreprises en cours de traitement seront terminées, les autres restent en attente",
+    "stoppingEnrichment": "Interruption…",
     "summary": {
-      "errorCount": "(erreurs : {count})",
       "inProgress": "Enrichissement en cours : {done}/{total}",
+      "outcomeCounts": "(à vérifier: {needsReview} · sans site web: {noWebsite} · erreurs: {errors})",
       "shown": "Affichés :"
     },
     "table": {

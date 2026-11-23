@@ -210,10 +210,6 @@
       "placeholder": "Dodajte napomenu…",
       "saveFailed": "Napomenu nije bilo moguće spremiti"
     },
-    "pager": {
-      "next": "Sljedeća",
-      "previous": "Prethodna"
-    },
     "reprocess": {
       "analyzeLinkedin": "Analiziraj LinkedIn tijekom obrade",
       "analyzeLinkedinHint": "(pokušaj scrapinga stranice firme)",
@@ -234,9 +230,12 @@
       "no_website": "Nema web stranice",
       "pending": "Na čekanju"
     },
+    "stopEnrichment": "Prekini obogaćivanje",
+    "stopEnrichmentTooltip": "Tvrtke koje se već obrađuju bit će dovršene, ostale ostaju na čekanju",
+    "stoppingEnrichment": "Prekidanje…",
     "summary": {
-      "errorCount": "(pogreške: {count})",
       "inProgress": "Obogaćivanje u tijeku: {done}/{total}",
+      "outcomeCounts": "(za provjeru: {needsReview} · bez web-stranice: {noWebsite} · pogreške: {errors})",
       "shown": "Prikazano:"
     },
     "table": {
