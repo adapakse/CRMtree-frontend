@@ -225,8 +225,8 @@ interface PbxUserRow {
     .ap-date   { font-size: 12px; color: var(--text-muted, var(--gray-500)); }
 
     .ap-badge      { font-size: 12px; padding: 4px 8px; border-radius: 10px; font-weight: 600; }
-    .ap-badge-ok   { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #166534 max(l, var(--text-min-l)) c h); }
-    .ap-badge-warn { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .ap-badge-ok   { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #166534 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .ap-badge-warn { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); border:var(--pill-border); }
 
     .ap-actions     { white-space: nowrap; text-align: right; }
     .ap-actions-row { display: flex; gap: 8px; justify-content: flex-end; }

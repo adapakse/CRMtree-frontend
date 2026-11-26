@@ -285,7 +285,7 @@ type SortDir = 'asc' | 'desc';
     .pc-company { font-weight:700; font-size:14px; flex:1; color:var(--gray-800); }
     .pc-contact { font-size:12px; color:var(--gray-500); margin-bottom:6px; }
     .pc-meta { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px; }
-    .pc-tag { font-size:10px; color:var(--gray-500); background:var(--gray-100); padding:1px 6px; border-radius:4px; }
+    .pc-tag { font-size:10px; color:var(--gray-500); background:var(--gray-100); padding:1px 6px; border-radius:4px; border:var(--pill-border); }
     .pc-financials { display:flex; gap:8px; align-items:center; }
     .pc-arr { font-size:12px; font-weight:700; color:oklch(from #f97316 max(l, var(--text-min-l)) c h); }
     .pc-online { font-size:10px; font-weight:600; color:oklch(from #3b82f6 max(l, var(--text-min-l)) c h); }
@@ -297,10 +297,10 @@ type SortDir = 'asc' | 'desc';
     .onb-label { font-size:10px; color:var(--gray-500); }
     /* Badges */
     .pbadge { padding:2px 8px; border-radius:8px; font-size:10px; font-weight:700; white-space:nowrap; }
-    .pbadge-active { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
-    .pbadge-onboarding { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
-    .pbadge-inactive { background:var(--gray-100); color:var(--gray-700); }
-    .pbadge-churned { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .pbadge-active { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .pbadge-onboarding { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .pbadge-inactive { background:var(--gray-100); color:var(--gray-700); border:var(--pill-border); }
+    .pbadge-churned { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); border:var(--pill-border); }
     /* Table */
     .table-wrap { flex:1; overflow:auto; }
     .tw-head, .tw-row { display:grid; gap:0; }

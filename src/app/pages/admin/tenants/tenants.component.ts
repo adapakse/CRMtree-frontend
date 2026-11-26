@@ -1183,12 +1183,12 @@ import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summ
     .td-actions { display: flex; gap: 4px; justify-content: flex-end; }
 
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .badge-on    { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); }
-    .badge-off   { background: var(--gray-100); color: var(--gray-500); }
-    .badge-admin { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: oklch(from #2563eb max(l, var(--text-min-l)) c h); }
+    .badge-on    { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .badge-off   { background: var(--gray-100); color: var(--gray-500); border:var(--pill-border); }
+    .badge-admin { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: oklch(from #2563eb max(l, var(--text-min-l)) c h); border:var(--pill-border); }
 
     .feat-pills { display: flex; flex-wrap: wrap; gap: 4px; }
-    .pill { background: var(--orange-pale); color: var(--orange-dark); font-size: 12px; padding: 2px 8px; border-radius: 99px; }
+    .pill { background: var(--orange-pale); color: var(--orange-dark); font-size: 12px; padding: 2px 8px; border-radius: 99px; border:var(--pill-border); }
 
     .btn-icon {
       width: 32px; height: 32px; border-radius: 999px; border: none; background: none;
@@ -1206,7 +1206,7 @@ import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summ
 
     .tabs { padding: 0 20px; background: var(--surface); margin-bottom: 0; overflow-x: auto; }
     .tabs .tab-btn { flex: none; padding: 10px 16px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-    .tab-badge { background: var(--orange-strong); color: white; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    .tab-badge { background: var(--orange-strong); color: white; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; border:var(--pill-border); }
 
     .tab-body { padding: 16px 20px 20px; }
 

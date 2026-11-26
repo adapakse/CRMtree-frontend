@@ -66,7 +66,7 @@ import { ToastService } from '../../../core/services/toast.service';
     .field-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.55rem 0.7rem; font-family: inherit; font-size: 0.85rem; }
     .superadmin-box { border-top: 1px solid var(--gray-200); margin-top: 0.75rem; padding-top: 1rem; }
     .superadmin-box h4 { font-size: 0.88rem; margin: 0 0 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
-    .sa-badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; background: var(--orange-pale); color: var(--orange-dark); border-radius: 999px; padding: 0.15em 0.55em; }
+    .sa-badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; background: var(--orange-pale); color: var(--orange-dark); border-radius: 999px; padding: 0.15em 0.55em; border:var(--pill-border); }
     .mode-row { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.6rem; }
     .radio-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--gray-700); cursor: pointer; }
   `],

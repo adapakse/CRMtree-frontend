@@ -395,7 +395,7 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
     .row-title { font-size: 0.9rem; font-weight: 600; color: var(--gray-900); }
     .row-locale { font-size: 0.72rem; color: var(--gray-500); text-transform: uppercase; }
     .row-metrics { font-size: 0.72rem; color: var(--gray-500); }
-    .refresh-pill { font-size: 0.7rem; font-weight: 600; color: var(--orange-dark); background: var(--orange-pale); border-radius: 999px; padding: 0.1rem 0.5rem; }
+    .refresh-pill { font-size: 0.7rem; font-weight: 600; color: var(--orange-dark); background: var(--orange-pale); border-radius: 999px; padding: 0.1rem 0.5rem; border:var(--pill-border); }
     .refresh-box { border: 1px solid var(--orange-muted, #bfe3c9); background: var(--gray-50); border-radius: var(--radius); margin-top: 1.25rem; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
     .refresh-box h3 { font-size: 0.9rem; margin: 0; color: var(--gray-800); }
     .refresh-reason { font-size: 0.85rem; margin: 0; color: var(--gray-800); }
@@ -405,7 +405,7 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
     .refresh-warnings { font-size: 0.78rem; color: oklch(from #92400e max(l, var(--text-min-l)) c h); background: color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border: 1px solid #FDE68A; border-radius: 8px; padding: 0.5rem 0.75rem; }
     .refresh-warnings ul { margin: 0.3rem 0 0; padding-left: 1.1rem; }
     .refresh-queries { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
-    .query-chip { font-size: 0.75rem; background: var(--gray-100); border-radius: 999px; padding: 0.15rem 0.6rem; color: var(--gray-700); }
+    .query-chip { font-size: 0.75rem; background: var(--gray-100); border-radius: 999px; padding: 0.15rem 0.6rem; color: var(--gray-700); border:var(--pill-border); }
     .query-chip small { color: var(--gray-500); }
     .status-pill {
       font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
@@ -431,7 +431,7 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
     .meta-input, .body-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; margin-top: 0.6rem; font-family: inherit; }
     .internal-links-row { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.75rem; }
     .internal-links-label { font-size: 0.78rem; color: var(--gray-500); }
-    .internal-link-chip { font-size: 0.75rem; background: var(--gray-100); color: var(--gray-700); border-radius: 999px; padding: 0.15rem 0.6rem; }
+    .internal-link-chip { font-size: 0.75rem; background: var(--gray-100); color: var(--gray-700); border-radius: 999px; padding: 0.15rem 0.6rem; border:var(--pill-border); }
     .schedule-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.9rem; font-size: 0.85rem; color: var(--gray-700); }
     .schedule-row input { border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
     .schedule-note { font-size: 0.82rem; color: var(--orange-dark); background: var(--orange-pale); border-radius: 8px; padding: 0.5rem 0.75rem; margin-top: 0.9rem; }

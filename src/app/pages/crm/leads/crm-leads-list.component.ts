@@ -923,16 +923,16 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     .hot-dot { font-size:16px; line-height:1; margin-left:4px; vertical-align:-2px; }
     .lead-card-held { opacity:.55; filter:grayscale(.6); }
     .tr-row-held { opacity:.55; filter:grayscale(.6); }
-    .hold-badge { display:inline-flex; align-items:center; gap:2px; font-size:10px; font-weight:700; background:var(--gray-200); color:var(--gray-700); border-radius:6px; padding:1px 4px; line-height:16px; }
+    .hold-badge { display:inline-flex; align-items:center; gap:2px; font-size:10px; font-weight:700; background:var(--gray-200); color:var(--gray-700); border-radius:6px; padding:1px 4px; line-height:16px; border:var(--pill-border); }
     .tag { display:inline-flex; align-items:center; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:600; }
     /* Lead source: one neutral, readable chip for every source (the colour never meant anything). */
-    .tag-src { background:var(--chip-bg); color:var(--chip-text); }
-    .tag-blue { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
-    .tag-purple { background:var(--gray-50); color:oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
-    .tag-green { background:var(--gray-50); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
-    .tag-orange { background:var(--orange-pale); color:var(--orange-dark); }
-    .tag-red { background:color-mix(in srgb, #FFF1F2 var(--tint-mix), var(--surface)); color:oklch(from #be123c max(l, var(--text-min-l)) c h); }
-    .tag-gray { background:var(--gray-100); color:var(--gray-600); }
+    .tag-src { background:var(--chip-bg); color:var(--chip-text); border:var(--pill-border); }
+    .tag-blue { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .tag-purple { background:var(--gray-50); color:oklch(from #7e22ce max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .tag-green { background:var(--gray-50); color:oklch(from #166534 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .tag-orange { background:var(--orange-pale); color:var(--orange-dark); border:var(--pill-border); }
+    .tag-red { background:color-mix(in srgb, #FFF1F2 var(--tint-mix), var(--surface)); color:oklch(from #be123c max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .tag-gray { background:var(--gray-100); color:var(--gray-600); border:var(--pill-border); }
     .pipe-bar { height:4px; background:var(--gray-100); border-radius:2px; overflow:hidden; margin-top:8px; }
     .pipe-fill { height:100%; background:var(--orange); border-radius:2px; }
     .avatar-sm { width:20px; height:20px; border-radius:50%; background:var(--orange-strong); display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:white; flex-shrink:0; }
@@ -1109,7 +1109,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     .tl-sep-today .tl-sep-line { background: #86EFAC; }
     .tl-sep-today .tl-sep-badge { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); border-color: #86EFAC; color: oklch(from #15803d max(l, var(--text-min-l)) c h); font-size:12px; }
     .tl-today-dot { width:7px; height:7px; background:#22C55E; border-radius:50%; display:inline-block; flex-shrink:0; }
-    .tl-today-tag { background:#22C55E; color:white; font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.5px; }
+    .tl-today-tag { background:#22C55E; color:white; font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.5px; border:var(--pill-border); }
     /* Past separator — muted */
     .tl-sep-past .tl-sep-badge { color: var(--gray-300); border-color: var(--gray-100); }
     .tl-sep-past .tl-sep-line { background: var(--gray-100); }

@@ -224,10 +224,10 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
 
     /* ── Kanban task type badges ── */
     .kbadge { display: inline-flex; align-items: center; font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
-    .kbadge-sign    { background: color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color: oklch(from #5b21b6 max(l, var(--text-min-l)) c h); }
-    .kbadge-edit    { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: oklch(from #1e40af max(l, var(--text-min-l)) c h); }
-    .kbadge-approve { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
-    .kbadge-read    { background: var(--gray-100); color: var(--gray-600); }
+    .kbadge-sign    { background: color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color: oklch(from #5b21b6 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .kbadge-edit    { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: oklch(from #1e40af max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .kbadge-approve { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .kbadge-read    { background: var(--gray-100); color: var(--gray-600); border:var(--pill-border); }
   `],
 })
 export class WorkflowComponent implements OnInit, OnDestroy {

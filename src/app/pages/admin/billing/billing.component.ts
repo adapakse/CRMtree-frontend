@@ -241,8 +241,8 @@ import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summ
     .td-muted { color: var(--gray-500); font-size: 14px; }
 
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .badge-on  { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); }
-    .badge-off { background: var(--gray-100); color: var(--gray-500); }
+    .badge-on  { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .badge-off { background: var(--gray-100); color: var(--gray-500); border:var(--pill-border); }
 
     .btn-icon {
       width: 32px; height: 32px; border-radius: 999px; border: none; background: none;
