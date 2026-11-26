@@ -802,7 +802,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>« Connexion biométrique »</b> : déverrouillez l’application avec votre empreinte digitale ou votre visage au lieu d’un mot de passe. L’application le propose après votre première connexion. Avec la biométrie activée, l’application s’ouvre sur un écran « Déverrouiller CRMtree » ; « Se connecter avec le mot de passe » vous permet d’utiliser votre mot de passe à la place.</li>
 <li><b>« E-mails sur les échéances des projets »</b> : le même réglage que sur le web (uniquement avec le module Projets).</li>
 <li><b>« Mode sombre »</b> : un aspect sombre pour l’application. Tant que vous ne le changez pas, l’application suit le réglage de votre téléphone.</li>
-<li><b>« Langue »</b> : « Langue du téléphone » ou l’une des 10 langues. Le choix ne s’applique qu’à ce téléphone.</li>
+<li><b>« Langue »</b> : « Langue de l’entreprise » ou l’une des 10 langues. Le choix ne s’applique qu’à ce téléphone. Après la connexion, l’application utilise immédiatement la langue définie pour votre entreprise dans CRMtree (ou la vôtre, si vous en avez choisi une dans le navigateur).</li>
 <li><b>« Se déconnecter »</b> : vous déconnecte de l’application.</li>
 </ul>
 <div class="phones">
@@ -1136,6 +1136,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>Tâche parente</b></td><td>Construit l’arborescence des tâches. Seul le PM la modifie.</td></tr>
 <tr><td><b>Date de début</b>, <b>Date de fin</b></td><td>Le calendrier de la tâche. Quand vous modifiez une date de fin existante, le champ <b>« Motif de la modification de l’échéance »</b> apparaît. Le motif est consigné dans l’historique de la tâche et dans l’e-mail au PM.</td></tr>
 <tr><td><b>Rappel par e-mail</b></td><td>À l’échéance, 1 à 3 jours avant, ou à une date personnalisée. Toutes les personnes assignées le reçoivent à 9:00 par e-mail et sous forme de notification sur le téléphone. Il nécessite une date de fin.</td></tr>
+<tr><td><b>Heure</b></td><td>Heure facultative de l’échéance. Avec une heure, la tâche figure dans le calendrier à cette heure et le rappel part à ce moment ; sans heure – à 9:00. Elle se règle dans le navigateur et sur le téléphone. Nécessite une date de fin.</td></tr>
 <tr><td><b>Personnes assignées</b></td><td>Membres du projet. Assignées par le PM. Une personne nouvellement assignée reçoit un e-mail et une notification sur son téléphone.</td></tr>
 <tr><td><b>Champs supplémentaires</b></td><td>Champs de l’entreprise rattachés au projet, par ex. un numéro de contrat obligatoire.</td></tr>
 </table></div>
@@ -1181,6 +1182,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <h4 id="p1-proj-chat">Discussion et pièces jointes</h4>
 <p>L’onglet <b>« Discussion »</b> est la conversation commune du projet ; chaque membre d’un projet ouvert peut y publier. Entrée envoie le message, Maj+Entrée ajoute un saut de ligne. Chaque tâche a aussi sa propre discussion dans le panneau de la tâche.</p>
+<p>Les messages non lus sont signalés par un nombre vert : dans le menu à côté du module Projets, sur la carte du projet dans la liste, sur l’onglet du chat et à côté de la tâche dans la discussion de laquelle quelqu’un a écrit. Le nombre disparaît lorsque vous ouvrez la conversation. Votre propre message porte une marque : une coche – envoyé, deux coches – quelqu’un l’a lu, deux coches vertes – tout le monde l’a lu. Survolez la marque pour voir qui.</p>
 <p>L’onglet <b>« Pièces jointes »</b> rassemble les fichiers du projet : <b>« Ajouter un fichier »</b>, recherche par nom de fichier, filtres par personne et par date d’ajout, <b>« Télécharger »</b> et <b>« Supprimer »</b>. Les PM et les participants internes avec accès complet peuvent ajouter des fichiers. Les formats acceptés comprennent PDF, documents Office, images, CSV et ZIP.</p>
 <div class="twocol">
 <figure><img loading="lazy" src="img/en_p06_chat.jpg?v=20261113" width="1440" height="900" alt="Discussion du projet"><figcaption>Discussion du projet avec Anna, Piotr et Marta Lis.</figcaption></figure>
@@ -1254,6 +1256,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="phone"><img loading="lazy" src="img/en_t43_project_chat.jpg?v=20261113" width="540" height="1083" alt="Discussion du projet sur le téléphone"><figcaption>« Discussion » du projet.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t44_project_finance.jpg?v=20261113" width="540" height="1083" alt="Finances du projet sur le téléphone"><figcaption>« Finances » : lecture seule.</figcaption></figure>
 </div>
+<p>Sur le téléphone, le nombre de messages de chat non lus s’affiche aussi sur l’icône de l’application et à côté de Projets dans la barre du bas. Le téléphone vous avertit d’un nouveau message – touchez la notification pour ouvrir la conversation.</p>
 <p>Appuyez sur une tâche pour voir ses <b>« Détails »</b> : statut, type, priorité, début, échéance, date de fin d’origine, personnes assignées et description. <b>« Changer le statut »</b> ne propose que les statuts autorisés par votre rôle. Le crayon ouvre <b>« Modifier la tâche »</b> (nom, description, type, priorité, dates) ; quand vous déplacez l’échéance, vous pouvez ajouter un <b>« Motif de la modification de l’échéance »</b>. L’onglet <b>« Historique des modifications »</b> montre qui a changé quoi et quand, y compris ce motif. Les PM ajoutent aussi des tâches avec « + » dans l’onglet Tâches et des sous-tâches avec <b>« Ajouter une sous-tâche »</b>.</p>
 <div class="phones">
 <figure class="phone"><img loading="lazy" src="img/en_t45_task_details.jpg?v=20261113" width="540" height="1083" alt="Détails de la tâche"><figcaption>WCA-2 : « Détails » et « Changer le statut ».</figcaption></figure>

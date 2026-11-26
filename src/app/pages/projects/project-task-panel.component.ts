@@ -43,7 +43,7 @@ const HISTORY_FIELD_LABEL_KEYS: Record<string, string> = {
   name: 'panel.history.fields.name', description: 'panel.history.fields.description',
   type_id: 'panel.history.fields.type', status_id: 'panel.history.fields.status',
   priority_id: 'panel.history.fields.priority', start_date: 'panel.history.fields.startDate',
-  end_date: 'panel.history.fields.endDate', parent_task_id: 'panel.history.fields.parentTask',
+  end_date: 'panel.history.fields.endDate', end_time: 'panel.history.fields.endTime', parent_task_id: 'panel.history.fields.parentTask',
   assignee_ids: 'panel.history.fields.assignees', custom_values: 'panel.history.fields.customFields',
   reminder_type: 'panel.history.fields.reminder',
 };
@@ -56,6 +56,7 @@ interface TaskForm {
   priority_id: string | null;
   start_date: string | null;
   end_date: string | null;
+  end_time: string | null;
   parent_task_id: string | null;
   assignee_ids: string[];
   reminder_type: ProjectReminderType | null;
@@ -158,6 +159,12 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
                 <div class="fg">
                   <label class="fl">{{ t('panel.fields.endDate') }}</label>
                   <input class="fi" type="date" [(ngModel)]="form.end_date" [disabled]="!permissions().can_edit_content">
+                </div>
+                <div class="fg">
+                  <label class="fl">{{ t('panel.fields.endTime') }}</label>
+                  <input class="fi" type="time" [(ngModel)]="form.end_time"
+                         [disabled]="!permissions().can_edit_content || !form.end_date">
+                  <span class="field-hint">{{ t('panel.fields.endTimeHint') }}</span>
                 </div>
                 @if (isEndDateChanged()) {
                   <div class="fg full">
@@ -542,7 +549,7 @@ export class ProjectTaskPanelComponent implements OnInit {
   private emptyForm(): TaskForm {
     return {
       name: '', description: '', type_id: null, status_id: null, priority_id: null,
-      start_date: null, end_date: null, parent_task_id: null, assignee_ids: [],
+      start_date: null, end_date: null, end_time: null, parent_task_id: null, assignee_ids: [],
       reminder_type: null, reminder_at: '',
       values: {}, currencies: {},
     };
@@ -569,6 +576,7 @@ export class ProjectTaskPanelComponent implements OnInit {
       priority_id: task.priority_id,
       start_date: task.start_date,
       end_date: task.end_date,
+      end_time: task.end_time,
       parent_task_id: task.parent_task_id,
       assignee_ids: task.assignees.map(assignee => assignee.user_id),
       reminder_type: task.reminder_type,
@@ -590,6 +598,8 @@ export class ProjectTaskPanelComponent implements OnInit {
       payload.priority_id = this.form.priority_id;
       payload.start_date = this.form.start_date || null;
       payload.end_date = this.form.end_date || null;
+      // An hour belongs to a due date; the browser may also hand back seconds.
+      payload.end_time = payload.end_date && this.form.end_time ? this.form.end_time.slice(0, 5) : null;
       if (this.isEndDateChanged()) payload.end_date_change_reason = this.endDateChangeReason.trim() || null;
       payload.custom_values = this.collectCustomValues();
       payload.reminder_type = this.form.reminder_type;

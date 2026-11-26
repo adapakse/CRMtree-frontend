@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, ViewChild, inject, signal, computed, linkedSignal, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, inject, signal, computed, linkedSignal, OnInit, DestroyRef } from '@angular/core';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
@@ -10,6 +10,9 @@ import { initials } from '../../core/services/helpers';
 import { PbxService } from '../../core/services/pbx.service';
 import { SoftphoneOverlayComponent } from '../../shared/components/softphone/softphone-overlay.component';
 import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLayout } from './sidebar-layout';
+import { ProjectUnreadService } from '../../core/services/project-unread.service';
+
+const PROJECT_UNREAD_POLL_MS = 60_000;
 
 @Component({
   selector: 'wt-shell',
@@ -306,10 +309,11 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
     #sidebar.collapsed .nav-label { opacity: 0; flex: 0; width: 0; overflow: hidden; }
 
     /* ── Badge ───────────────────────────────────────────────────────── */
-    /* Soft pill in the brand colour; a solid circle pulled the eye harder than the current page. */
+    /* Soft pill with readable digits (WCAG AA) — the same badge as the unread chat messages (Kacper, 26.11.2026). */
     .nbadge {
       margin-left: auto;
-      background: var(--orange-pale); color: var(--orange-text);
+      background: var(--count-badge-bg); color: var(--count-badge-text);
+      border: 1px solid var(--count-badge-border); box-sizing: border-box;
       font-size: 12px; font-weight: 600; line-height: 1;
       min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
       display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums;
@@ -417,6 +421,8 @@ export class ShellComponent implements OnInit {
 
   isSalesManager = computed(() => (this.auth.user() as any)?.crm_role === 'sales_manager');
   private wf     = inject(WorkflowService);
+  private readonly projectUnread = inject(ProjectUnreadService);
+  private readonly destroyRef = inject(DestroyRef);
   private router = inject(Router);
 
   taskBadge = signal(0);
@@ -462,7 +468,7 @@ export class ShellComponent implements OnInit {
       { id: 'groups', route: '/groups', labelKey: 'nav.groupsAndRoles', isVisible: () => true },
     ] },
     { id: 'projects', labelKey: 'sections.projects', isVisible: () => this.auth.hasFeature('projects'), items: [
-      { id: 'projects', route: '/projects', labelKey: 'nav.projects', isVisible: () => true },
+      { id: 'projects', route: '/projects', labelKey: 'nav.projects', isVisible: () => true, badge: () => this.projectUnread.total() },
     ] },
     { id: 'crm', labelKey: 'sections.crm', isVisible: () => this.hasCrmAccess(), items: [
       { id: 'crmDashboard', route: '/crm/dashboard', labelKey: 'nav.dashboard', isVisible: () => true },
@@ -559,11 +565,13 @@ export class ShellComponent implements OnInit {
       if (!e.matches) this.isNavOpen.set(false);
     });
     this.refreshTaskBadge();
+    this.watchProjectUnread();
     if (this.auth.hasFeature('pbx')) void this.pbx.autoConnect();
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe(() => {
       this.refreshTaskBadge();
+      this.refreshProjectUnread();
       this.currentUrl.set(this.router.url);
       this.closeNav(false);
     });
@@ -592,6 +600,22 @@ export class ShellComponent implements OnInit {
     this.collapsed = !this.collapsed;
     if (this.collapsed) this.isEditingNav.set(false);
     localStorage.setItem('sidebar_collapsed', String(this.collapsed));
+  }
+
+  // The backend has no push channel to the browser, so the chat badge is polled.
+  private watchProjectUnread(): void {
+    this.refreshProjectUnread();
+    const timer = setInterval(() => {
+      if (document.visibilityState === 'visible') this.refreshProjectUnread();
+    }, PROJECT_UNREAD_POLL_MS);
+    this.destroyRef.onDestroy(() => {
+      clearInterval(timer);
+      this.projectUnread.clear();
+    });
+  }
+
+  private refreshProjectUnread(): void {
+    if (this.auth.hasFeature('projects')) this.projectUnread.refresh();
   }
 
   private refreshTaskBadge(): void {

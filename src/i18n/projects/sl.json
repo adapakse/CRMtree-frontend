@@ -69,8 +69,14 @@
     },
     "hint": "Enter pošlje sporočilo, Shift+Enter doda novo vrstico.",
     "placeholder": "Napišite sporočilo…",
+    "read": {
+      "readBy": "Prebrali: {names}",
+      "readByAll": "Prebrali vsi: {names}",
+      "sent": "Poslano"
+    },
     "send": "Pošlji",
-    "sendFailed": "Sporočila ni bilo mogoče poslati"
+    "sendFailed": "Sporočila ni bilo mogoče poslati",
+    "unreadCount": "Neprebrana sporočila: {count}"
   },
   "crmLink": {
     "change": "Spremeni",
@@ -733,6 +739,8 @@
       "assignees": "Dodeljene osebe",
       "description": "Dodatni opis",
       "endDate": "Datum konca",
+      "endTime": "Ura",
+      "endTimeHint": "Neobvezno. Brez ure je naloga v koledarju ob 09:00.",
       "name": "Naziv",
       "noParent": "— brez (nadrejena naloga) —",
       "parentTask": "Nadrejena naloga",
@@ -752,6 +760,7 @@
         "customFields": "dodatna polja",
         "description": "opis",
         "endDate": "datum konca",
+        "endTime": "ura",
         "name": "naziv",
         "parentTask": "nadrejena naloga",
         "priority": "prioriteta",

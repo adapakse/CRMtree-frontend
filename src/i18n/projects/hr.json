@@ -69,8 +69,14 @@
     },
     "hint": "Enter šalje poruku, Shift+Enter dodaje novi redak.",
     "placeholder": "Napišite poruku…",
+    "read": {
+      "readBy": "Pročitali: {names}",
+      "readByAll": "Pročitali svi: {names}",
+      "sent": "Poslano"
+    },
     "send": "Pošalji",
-    "sendFailed": "Slanje poruke nije uspjelo"
+    "sendFailed": "Slanje poruke nije uspjelo",
+    "unreadCount": "Nepročitane poruke: {count}"
   },
   "crmLink": {
     "change": "Promijeni",
@@ -733,6 +739,8 @@
       "assignees": "Dodijeljene osobe",
       "description": "Dodatni opis",
       "endDate": "Datum završetka",
+      "endTime": "Vrijeme",
+      "endTimeHint": "Neobavezno. Bez vremena zadatak je u kalendaru u 09:00.",
       "name": "Naziv",
       "noParent": "— nema (nadređeni zadatak) —",
       "parentTask": "Nadređeni zadatak",
@@ -752,6 +760,7 @@
         "customFields": "dodatna polja",
         "description": "opis",
         "endDate": "datum završetka",
+        "endTime": "vrijeme",
         "name": "naziv",
         "parentTask": "nadređeni zadatak",
         "priority": "prioritet",

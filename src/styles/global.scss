@@ -15,6 +15,14 @@
   /* Brand green everywhere (text, icons, buttons) — same as the primary button, by the owner's choice. */
   --orange-text:   #3BAA5D;
   --orange-strong: #3BAA5D;
+  /* Counter badges (menu, unread chat messages): the soft brand pill with digits in a green
+     dark enough for WCAG AA on it (4.7:1) — the brand green itself gives only 2.6:1 there. */
+  --count-badge-bg:   var(--orange-pale);
+  --count-badge-text: #257A40;
+  --count-badge-border: var(--orange-muted);
+  /* Every pill, badge and chip: a thin outline in a light tint of its own text colour,
+     so it works for any hue without a border colour per variant (Kacper, 26.11.2026). */
+  --pill-border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
   --gray-50:       #FAFAFA;
   --gray-100:      #F4F4F5;
   --gray-200:      #E4E4E7;
@@ -72,6 +80,7 @@
   --orange-muted:  rgba(70,180,103,.38);
   --orange-text:   #5CC67D;
   --orange-strong: #3BAA5D;
+  --count-badge-text: #7ED59A;
   --gray-50:       #2E2E2E;
   --gray-100:      #343434;
   --gray-200:      #474747;
@@ -201,6 +210,7 @@ router-outlet + * {
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
+  border: var(--pill-border);
 }
 .bdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 .s-new       { background: color-mix(in srgb, #F0F9FF var(--tint-mix), var(--surface)); color: oklch(from #0369a1 max(l, var(--text-min-l)) c h);  .bdot { background: #0EA5E9; } }
@@ -213,14 +223,14 @@ router-outlet + * {
 .s-rejected  { background: color-mix(in srgb, #FFF1F2 var(--tint-mix), var(--surface)); color: oklch(from #be123c max(l, var(--text-min-l)) c h);  .bdot { background: #F43F5E; } }
 
 /* ── GDPR Badges ───────────────────────────────────────── */
-.gbadge { padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 500; }
+.gbadge { padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 500; border: var(--pill-border); }
 .gp { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
 .ga { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
 .gn { background: var(--gray-100); color: var(--gray-500); }
 
 /* ── Group Pills ───────────────────────────────────────── */
-.pill { padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
-.pill-neutral { background: var(--gray-100); color: var(--gray-600); }
+.pill { padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; border: var(--pill-border); }
+.pill-neutral { background: var(--gray-100); color: var(--gray-600); border:var(--pill-border); }
 .g-management { background: var(--orange-pale); color: var(--orange-dark); }
 .g-sales      { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
 .g-marketing  { background: color-mix(in srgb, #FDF4FF var(--tint-mix), var(--surface)); color: oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
@@ -464,7 +474,7 @@ router-outlet + * {
 @keyframes toastIn { from { transform: translateX(20px); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* "New" marker next to a label: soft brand pill. */
-.pill-new { display: inline-flex; align-items: center; height: 18px; padding: 0 8px; margin-left: 6px; border-radius: 999px; background: var(--orange-pale); color: var(--orange-text); font-size: 10px; font-weight: 700; letter-spacing: .04em; line-height: 1; vertical-align: middle; text-transform: uppercase; }
+.pill-new { display: inline-flex; align-items: center; height: 18px; padding: 0 8px; margin-left: 6px; border-radius: 999px; background: var(--orange-pale); color: var(--orange-text); font-size: 10px; font-weight: 700; letter-spacing: .04em; line-height: 1; vertical-align: middle; text-transform: uppercase; border:var(--pill-border); }
 
 /* ── Empty State ───────────────────────────────────────── */
 .empty-state {

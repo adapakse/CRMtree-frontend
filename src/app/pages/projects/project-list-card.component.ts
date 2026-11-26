@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, inject, input, output } from '@angu
 import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ProjectListItem } from '../../core/services/projects-api.service';
+import { ProjectUnreadService } from '../../core/services/project-unread.service';
+import { ProjectUnreadBadgeComponent } from './project-unread-badge.component';
 import { ProjectDelayBadgeComponent } from '../../shared/components/project-deadlines/project-delay-badge.component';
 import { ProjectFinanceTotalsComponent } from '../../shared/components/project-finance-totals/project-finance-totals.component';
 
@@ -9,7 +11,7 @@ import { ProjectFinanceTotalsComponent } from '../../shared/components/project-f
 @Component({
   selector: 'wt-project-list-card',
   standalone: true,
-  imports: [TranslocoDirective, ProjectDelayBadgeComponent, ProjectFinanceTotalsComponent],
+  imports: [TranslocoDirective, ProjectDelayBadgeComponent, ProjectFinanceTotalsComponent, ProjectUnreadBadgeComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -19,6 +21,7 @@ import { ProjectFinanceTotalsComponent } from '../../shared/components/project-f
         @if (project().status === 'closed') { <span class="pill closed">{{ t('list.closedBadge') }}</span> }
         @if (project().my_role; as role) { <span class="pill role">{{ t('labels.roles.' + role) }}</span> }
         <wt-project-delay-badge [schedule]="project()" />
+        <wt-project-unread-badge [count]="unread.ofProject(project().id)" [showsIcon]="true" />
       </div>
       <div class="project-name">{{ project().name }}</div>
       @if (project().description) { <div class="project-description">{{ project().description }}</div> }
@@ -63,6 +66,7 @@ import { ProjectFinanceTotalsComponent } from '../../shared/components/project-f
   `],
 })
 export class ProjectListCardComponent {
+  readonly unread = inject(ProjectUnreadService);
   readonly format = inject(ProjectFinanceFormatService);
 
   readonly project = input.required<ProjectListItem>();

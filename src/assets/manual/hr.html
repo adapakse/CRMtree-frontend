@@ -802,7 +802,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„Biometrijska prijava”</b>: otključavajte aplikaciju otiskom prsta ili licem umjesto lozinkom. Aplikacija to nudi nakon prve prijave. Kad je biometrija uključena, aplikacija se otvara na zaslonu „Otključaj CRMtree”; „Prijava lozinkom” omogućuje vam da umjesto toga upotrijebite lozinku.</li>
 <li><b>„E-poruke o rokovima projekata”</b>: ista postavka kao na webu (samo s modulom Projekti).</li>
 <li><b>„Tamni način rada”</b>: tamni izgled aplikacije. Dok ga ne promijenite, aplikacija prati postavku vašeg telefona.</li>
-<li><b>„Jezik”</b>: „Jezik telefona” ili jedan od 10 jezika. Odabir vrijedi samo za ovaj telefon.</li>
+<li><b>„Jezik”</b>: „Jezik tvrtke” ili jedan od 10 jezika. Odabir vrijedi samo za ovaj telefon. Nakon prijave aplikacija odmah koristi jezik postavljen za vašu tvrtku u CRMtreeu (ili vaš vlastiti, ako ste ga odabrali u pregledniku).</li>
 <li><b>„Odjava”</b>: odjavljuje vas iz aplikacije.</li>
 </ul>
 <div class="phones">
@@ -1136,6 +1136,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>Nadređeni zadatak</b></td><td>Gradi stablo zadataka. Mijenja ga samo PM.</td></tr>
 <tr><td><b>Datum početka</b>, <b>Datum završetka</b></td><td>Raspored zadatka. Kad promijenite postojeći datum završetka, pojavljuje se polje <b>„Razlog promjene roka”</b>. Razlog ide u povijest zadatka i u e-poruku PM-u.</td></tr>
 <tr><td><b>Podsjetnik e-poštom</b></td><td>Na datum roka, 1–3 dana prije ili na vlastiti datum. Svi dodijeljeni dobivaju ga u 9:00 e-poštom i kao obavijest na telefonu. Potreban je datum završetka.</td></tr>
+<tr><td><b>Vrijeme</b></td><td>Neobavezno vrijeme roka. S vremenom je zadatak u kalendaru u to vrijeme i tada se šalje podsjetnik; bez vremena – u 9:00. Postavlja se u pregledniku i na telefonu. Zahtijeva datum završetka.</td></tr>
 <tr><td><b>Dodijeljene osobe</b></td><td>Članovi projekta. Dodjeljuje ih PM. Novo dodijeljena osoba dobiva e-poruku i obavijest na telefonu.</td></tr>
 <tr><td><b>Dodatna polja</b></td><td>Polja tvrtke vezana uz projekt, npr. obavezan broj ugovora.</td></tr>
 </table></div>
@@ -1181,6 +1182,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <h4 id="p1-proj-chat">Chat i privici</h4>
 <p>Kartica <b>„Chat”</b> zajednički je razgovor projekta; svaki član otvorenog projekta može objavljivati. Enter šalje poruku, Shift+Enter dodaje novi redak. Svaki zadatak ima i vlastitu raspravu u ploči zadatka.</p>
+<p>Nepročitane poruke prikazuje zeleni broj: u izborniku uz modul Projekti, na kartici projekta na popisu, na kartici chata i uz zadatak u čijem je razgovoru netko pisao. Broj nestaje kada otvorite razgovor. Vaša poruka ima oznaku: jedna kvačica – poslano, dvije kvačice – netko ju je pročitao, dvije zelene kvačice – pročitali su je svi. Prijeđite pokazivačem preko oznake da vidite tko.</p>
 <p>Kartica <b>„Privici”</b> skuplja datoteke projekta: <b>„Dodaj datoteku”</b>, pretraživanje po nazivu datoteke, filtri po osobi i datumu dodavanja, <b>„Preuzmi”</b> i <b>„Izbriši”</b>. Datoteke mogu dodavati PM-ovi i interni sudionici s punim pristupom. Prihvaćeni formati uključuju PDF, Office dokumente, slike, CSV i ZIP.</p>
 <div class="twocol">
 <figure><img loading="lazy" src="img/en_p06_chat.jpg?v=20261113" width="1440" height="900" alt="Chat projekta"><figcaption>Chat projekta s Annom, Piotrom i Martom Lis.</figcaption></figure>
@@ -1254,6 +1256,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="phone"><img loading="lazy" src="img/en_t43_project_chat.jpg?v=20261113" width="540" height="1083" alt="Chat projekta na telefonu"><figcaption>„Chat” projekta.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t44_project_finance.jpg?v=20261113" width="540" height="1083" alt="Financije projekta na telefonu"><figcaption>„Financije”: samo pregled.</figcaption></figure>
 </div>
+<p>Na telefonu je broj nepročitanih poruka chata prikazan i na ikoni aplikacije te uz Projekte na donjoj traci. O novoj poruci obavijestit će vas telefon – dodirnite obavijest da otvorite razgovor.</p>
 <p>Dodirnite zadatak da vidite njegove <b>„Detalje”</b>: status, vrstu, prioritet, početak, rok, izvorni datum završetka, dodijeljene osobe i opis. <b>„Promijeni status”</b> nudi samo statuse koje vaša uloga dopušta. Olovka otvara <b>„Uredi zadatak”</b> (naziv, opis, vrsta, prioritet, datumi); kad pomaknete rok, možete dodati <b>„Razlog promjene roka”</b>. Kartica <b>„Povijest promjena”</b> prikazuje tko je što i kada promijenio, uključujući taj razlog. PM-ovi dodaju zadatke i s „+” na kartici Zadaci, a podzadatke gumbom <b>„Dodaj podzadatak”</b>.</p>
 <div class="phones">
 <figure class="phone"><img loading="lazy" src="img/en_t45_task_details.jpg?v=20261113" width="540" height="1083" alt="Detalji zadatka"><figcaption>WCA-2: „Detalji” i „Promijeni status”.</figcaption></figure>

@@ -802,7 +802,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„Biometrische Anmeldung“</b>: Entsperren Sie die App mit Fingerabdruck oder Gesicht statt mit einem Passwort. Die App bietet dies nach Ihrer ersten Anmeldung an. Bei aktivierter Biometrie öffnet sich die App mit dem Bildschirm „CRMtree entsperren“; mit „Mit Passwort anmelden“ können Sie stattdessen Ihr Passwort verwenden.</li>
 <li><b>„E-Mails zu Terminen in Projekten“</b>: dieselbe Einstellung wie im Web (nur mit dem Modul Projekte).</li>
 <li><b>„Dunkelmodus“</b>: ein dunkles Erscheinungsbild für die App. Solange Sie es nicht ändern, folgt die App der Einstellung Ihres Handys.</li>
-<li><b>„Sprache“</b>: „Sprache des Telefons“ oder eine von 10 Sprachen. Die Auswahl gilt nur für dieses Handy.</li>
+<li><b>„Sprache“</b>: „Sprache des Unternehmens“ oder eine von 10 Sprachen. Die Auswahl gilt nur für dieses Handy. Nach der Anmeldung verwendet die App sofort die Sprache, die für Ihr Unternehmen in CRMtree eingestellt ist (oder Ihre eigene, wenn Sie im Browser eine gewählt haben).</li>
 <li><b>„Abmelden“</b>: meldet Sie von der App ab.</li>
 </ul>
 <div class="phones">
@@ -1136,6 +1136,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>Übergeordnete Aufgabe</b></td><td>Baut den Aufgabenbaum auf. Nur der PM ändert sie.</td></tr>
 <tr><td><b>Startdatum</b>, <b>Enddatum</b></td><td>Der Zeitplan der Aufgabe. Ändern Sie ein bestehendes Enddatum, erscheint das Feld <b>„Grund für die Änderung des Fälligkeitsdatums“</b>. Der Grund geht in den Aufgabenverlauf und in die E-Mail an den PM.</td></tr>
 <tr><td><b>E-Mail-Erinnerung</b></td><td>Am Fälligkeitstag, 1–3 Tage vorher oder an einem eigenen Datum. Alle Zugewiesenen erhalten sie um 9:00 Uhr per E-Mail und als Benachrichtigung auf dem Handy. Sie benötigt ein Enddatum.</td></tr>
+<tr><td><b>Uhrzeit</b></td><td>Optionale Uhrzeit des Termins. Mit Uhrzeit steht die Aufgabe zu dieser Zeit im Kalender und die Erinnerung wird dann gesendet; ohne Uhrzeit – um 9:00. Einstellbar im Browser und auf dem Telefon. Erfordert ein Enddatum.</td></tr>
 <tr><td><b>Zugewiesene Personen</b></td><td>Projektmitglieder. Vom PM zugewiesen. Eine neu zugewiesene Person erhält eine E-Mail und eine Benachrichtigung auf dem Handy.</td></tr>
 <tr><td><b>Zusatzfelder</b></td><td>Dem Projekt zugeordnete Firmenfelder, z. B. eine verpflichtende Vertragsnummer.</td></tr>
 </table></div>
@@ -1181,6 +1182,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <h4 id="p1-proj-chat">Chat und Anhänge</h4>
 <p>Die Registerkarte <b>„Chat“</b> ist die gemeinsame Unterhaltung des Projekts; jedes Mitglied eines offenen Projekts kann schreiben. Enter sendet die Nachricht, Umschalt+Enter fügt einen Zeilenumbruch ein. Jede Aufgabe hat zudem eine eigene Unterhaltung im Aufgabenpanel.</p>
+<p>Ungelesene Nachrichten zeigt eine grüne Zahl: im Menü beim Modul Projekte, auf der Projektkarte in der Liste, auf dem Chat-Reiter und bei der Aufgabe, in deren Unterhaltung jemand geschrieben hat. Die Zahl verschwindet, sobald Sie die Unterhaltung öffnen. Ihre eigene Nachricht trägt ein Zeichen: ein Häkchen – gesendet, zwei Häkchen – jemand hat sie gelesen, zwei grüne Häkchen – alle haben sie gelesen. Wenn Sie mit der Maus darauf zeigen, sehen Sie, wer.</p>
 <p>Die Registerkarte <b>„Anhänge“</b> sammelt die Projektdateien: <b>„Datei hinzufügen“</b>, Suche nach Dateinamen, Filter nach Person und Hinzufügedatum, <b>„Herunterladen“</b> und <b>„Löschen“</b>. PMs und interne Teilnehmer mit Vollzugriff können Dateien hinzufügen. Akzeptierte Formate sind unter anderem PDF, Office-Dokumente, Bilder, CSV und ZIP.</p>
 <div class="twocol">
 <figure><img loading="lazy" src="img/en_p06_chat.jpg?v=20261113" width="1440" height="900" alt="Projekt-Chat"><figcaption>Projekt-Chat mit Anna, Piotr und Marta Lis.</figcaption></figure>
@@ -1254,6 +1256,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="phone"><img loading="lazy" src="img/en_t43_project_chat.jpg?v=20261113" width="540" height="1083" alt="Projekt-Chat auf dem Handy"><figcaption>Projekt-„Chat“.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t44_project_finance.jpg?v=20261113" width="540" height="1083" alt="Projektfinanzen auf dem Handy"><figcaption>„Finanzen“: nur Ansicht.</figcaption></figure>
 </div>
+<p>Auf dem Telefon steht die Zahl der ungelesenen Chat-Nachrichten auch auf dem App-Symbol und bei Projekte in der unteren Leiste. Über eine neue Nachricht benachrichtigt Sie das Telefon – tippen Sie auf die Benachrichtigung, um die Unterhaltung zu öffnen.</p>
 <p>Tippen Sie auf eine Aufgabe, um ihre <b>„Details“</b> zu sehen: Status, Typ, Priorität, Beginn, Fälligkeitsdatum, ursprüngliches Enddatum, Zugewiesene und Beschreibung. <b>„Status ändern“</b> bietet nur die Status an, die Ihre Rolle erlaubt. Der Stift öffnet <b>„Aufgabe bearbeiten“</b> (Name, Beschreibung, Typ, Priorität, Daten); wenn Sie das Fälligkeitsdatum verschieben, können Sie einen <b>„Grund für die Änderung des Fälligkeitsdatums“</b> angeben. Die Registerkarte <b>„Änderungsverlauf“</b> zeigt, wer was wann geändert hat, einschließlich dieses Grundes. PMs fügen außerdem Aufgaben mit „+“ auf der Registerkarte Aufgaben und Unteraufgaben mit <b>„Unteraufgabe hinzufügen“</b> hinzu.</p>
 <div class="phones">
 <figure class="phone"><img loading="lazy" src="img/en_t45_task_details.jpg?v=20261113" width="540" height="1083" alt="Aufgabendetails"><figcaption>WCA-2: „Details“ und „Status ändern“.</figcaption></figure>

@@ -22,7 +22,7 @@ export const PROJECTS_SHARED_STYLES = `
   table.grid td { padding:8px 12px; border-bottom:1px solid var(--gray-100); color:var(--gray-800); vertical-align:middle; }
   table.grid tr:last-child td { border-bottom:none; }
 
-  .chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:12px; font-size:12px; font-weight:600; white-space:nowrap; }
+  .chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:12px; font-size:12px; font-weight:600; white-space:nowrap; border:var(--pill-border); }
   .chip-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
   .muted { color:var(--gray-400); }
 `;

@@ -19,6 +19,12 @@ Obie aplikacje mają ten sam kod stylów; różnią się kolorem marki i tłumac
   menu — `--orange` = `--orange-text` = `--orange-strong`. To świadoma decyzja (13.11.2026):
   mały tekst w kolorze marki ma ok. 3:1 kontrastu, poniżej WCAG AA — nie przyciemniaj go
   „dla kontrastu” bez pytania Kacpra.
+- **Liczniki (menu, nieprzeczytane wiadomości czatu)** — decyzja Kacpra z 26.11.2026: jedna
+  delikatna pastylka wszędzie: jasnozielone tło (`--count-badge-bg` = `--orange-pale`) i cyfra
+  w `--count-badge-text` (`#257A40` — na tym tle 4,7:1, czyli WCAG AA; pełne ciemne kółko
+  gryzło się z sąsiednimi pastylkami). W menu `.nbadge`, w Projektach
+  `wt-project-unread-badge`; na kafelku projektu i w wierszu zadania z ikonką dymka, żeby było
+  wiadomo, co liczy. Ten sam kolor w aplikacji mobilnej (`CrmtreeColors.countBadgeText` na `lightGreen`).
 - **Najciemniejszy tekst to `#333333`** (`--gray-800`, `--gray-900`, `--ink-strong`). Nigdy
   `#000`.
 - **Znaczenie kolorów**: zielony = podpisane / sukces, mocny czerwony `#DC2626` = po terminie /

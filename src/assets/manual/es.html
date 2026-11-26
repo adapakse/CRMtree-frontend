@@ -801,7 +801,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>“Inicio de sesión biométrico”</b>: desbloquea la aplicación con tu huella dactilar o tu rostro en lugar de la contraseña. La aplicación lo ofrece tras tu primer inicio de sesión. Con la biometría activada, la aplicación se abre en una pantalla “Desbloquear CRMtree”; “Iniciar sesión con contraseña” te permite usar tu contraseña en su lugar.</li>
 <li><b>“Correos sobre plazos de proyectos”</b>: el mismo ajuste que en la web (solo con el módulo Proyectos).</li>
 <li><b>“Modo oscuro”</b>: un aspecto oscuro para la aplicación. Hasta que lo cambies, la aplicación sigue el ajuste de tu teléfono.</li>
-<li><b>“Idioma”</b>: “Idioma del teléfono” o uno de los 10 idiomas. La elección se aplica solo a este teléfono.</li>
+<li><b>“Idioma”</b>: “Idioma de la empresa” o uno de los 10 idiomas. La elección se aplica solo a este teléfono. Tras iniciar sesión, la aplicación usa de inmediato el idioma configurado para tu empresa en CRMtree (o el tuyo, si elegiste uno en el navegador).</li>
 <li><b>“Cerrar sesión”</b>: cierra tu sesión en la aplicación.</li>
 </ul>
 <div class="phones">
@@ -1135,6 +1135,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>Tarea principal</b></td><td>Construye el árbol de tareas. Solo lo cambia el PM.</td></tr>
 <tr><td><b>Fecha de inicio</b>, <b>Fecha límite</b></td><td>El calendario de la tarea. Cuando cambias una fecha límite existente, aparece el campo <b>“Motivo del cambio de fecha límite”</b>. El motivo queda en el historial de la tarea y en el correo al PM.</td></tr>
 <tr><td><b>Recordatorio por correo electrónico</b></td><td>El día del vencimiento, 1–3 días antes, o una fecha personalizada. Todas las personas asignadas lo reciben a las 9:00 por correo y como notificación en el móvil. Necesita una fecha límite.</td></tr>
+<tr><td><b>Hora</b></td><td>Hora opcional del vencimiento. Con hora, la tarea aparece en el calendario a esa hora y el recordatorio se envía entonces; sin hora – a las 9:00. Se establece en el navegador y en el teléfono. Requiere fecha de fin.</td></tr>
 <tr><td><b>Personas asignadas</b></td><td>Miembros del proyecto. Las asigna el PM. Una persona recién asignada recibe un correo y una notificación en el móvil.</td></tr>
 <tr><td><b>Campos adicionales</b></td><td>Campos de la empresa asociados al proyecto, p. ej. un número de contrato obligatorio.</td></tr>
 </table></div>
@@ -1180,6 +1181,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <h4 id="p1-proj-chat">Chat y adjuntos</h4>
 <p>La pestaña <b>“Chat”</b> es la conversación compartida del proyecto; cualquier miembro de un proyecto abierto puede escribir. Intro envía el mensaje, Mayús+Intro añade un salto de línea. Cada tarea tiene además su propia conversación en el panel de la tarea.</p>
+<p>Los mensajes no leídos se muestran con un número verde: en el menú junto al módulo Proyectos, en la tarjeta del proyecto en la lista, en la pestaña del chat y junto a la tarea en cuya conversación alguien ha escrito. El número desaparece cuando abres la conversación. Tu propio mensaje lleva una marca: una marca de verificación – enviado, dos – alguien lo ha leído, dos verdes – lo han leído todos. Pasa el cursor por encima para ver quién.</p>
 <p>La pestaña <b>“Adjuntos”</b> reúne los archivos del proyecto: <b>“Añadir archivo”</b>, búsqueda por nombre de archivo, filtros por persona y fecha de alta, <b>“Descargar”</b> y <b>“Eliminar”</b>. Los PM y los participantes internos con acceso completo pueden añadir archivos. Los formatos admitidos incluyen PDF, documentos de Office, imágenes, CSV y ZIP.</p>
 <div class="twocol">
 <figure><img loading="lazy" src="img/en_p06_chat.jpg?v=20261113" width="1440" height="900" alt="Chat del proyecto"><figcaption>Chat del proyecto con Anna, Piotr y Marta Lis.</figcaption></figure>
@@ -1253,6 +1255,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="phone"><img loading="lazy" src="img/en_t43_project_chat.jpg?v=20261113" width="540" height="1083" alt="Chat del proyecto en el móvil"><figcaption>“Chat” del proyecto.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t44_project_finance.jpg?v=20261113" width="540" height="1083" alt="Finanzas del proyecto en el móvil"><figcaption>“Finanzas”: solo lectura.</figcaption></figure>
 </div>
+<p>En el teléfono, el número de mensajes de chat no leídos aparece también en el icono de la aplicación y junto a Proyectos en la barra inferior. El teléfono te avisa de un mensaje nuevo – toca la notificación para abrir la conversación.</p>
 <p>Toca una tarea para ver sus <b>“Detalles”</b>: estado, tipo, prioridad, inicio, fecha límite, fecha límite original, personas asignadas y descripción. <b>“Cambiar estado”</b> ofrece solo los estados que permite tu rol. El lápiz abre <b>“Editar tarea”</b> (nombre, descripción, tipo, prioridad, fechas); cuando mueves la fecha límite puedes añadir un <b>“Motivo del cambio de fecha límite”</b>. La pestaña <b>“Historial de cambios”</b> muestra quién cambió qué y cuándo, incluido ese motivo. Los PM también añaden tareas con “+” en la pestaña Tareas y subtareas con <b>“Añadir subtarea”</b>.</p>
 <div class="phones">
 <figure class="phone"><img loading="lazy" src="img/en_t45_task_details.jpg?v=20261113" width="540" height="1083" alt="Detalles de la tarea"><figcaption>WCA-2: “Detalles” y “Cambiar estado”.</figcaption></figure>

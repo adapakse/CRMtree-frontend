@@ -69,8 +69,14 @@
     },
     "hint": "Enter envía el mensaje, Shift+Enter añade una línea nueva.",
     "placeholder": "Escribe un mensaje…",
+    "read": {
+      "readBy": "Leído por: {names}",
+      "readByAll": "Leído por todos: {names}",
+      "sent": "Enviado"
+    },
     "send": "Enviar",
-    "sendFailed": "No se pudo enviar el mensaje"
+    "sendFailed": "No se pudo enviar el mensaje",
+    "unreadCount": "Mensajes no leídos: {count}"
   },
   "crmLink": {
     "change": "Cambiar",
@@ -733,6 +739,8 @@
       "assignees": "Personas asignadas",
       "description": "Descripción adicional",
       "endDate": "Fecha de finalización",
+      "endTime": "Hora",
+      "endTimeHint": "Opcional. Sin hora, la tarea aparece en el calendario a las 09:00.",
       "name": "Nombre",
       "noParent": "— ninguna (tarea principal) —",
       "parentTask": "Tarea principal",
@@ -752,6 +760,7 @@
         "customFields": "campos adicionales",
         "description": "descripción",
         "endDate": "fecha de finalización",
+        "endTime": "hora",
         "name": "nombre",
         "parentTask": "tarea principal",
         "priority": "prioridad",

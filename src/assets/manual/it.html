@@ -802,7 +802,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>«Accesso biometrico»</b>: sblocca l'app con l'impronta digitale o il volto invece della password. L'app lo propone dopo il primo accesso. Con la biometria attiva, l'app si apre su una schermata «Sblocca CRMtree»; «Accedi con la password» permette di usare invece la password.</li>
 <li><b>«E-mail sulle scadenze nei progetti»</b>: la stessa impostazione del web (solo con il modulo Progetti).</li>
 <li><b>«Modalità scura»</b>: un aspetto scuro per l'app. Finché non lo cambi, l'app segue l'impostazione del telefono.</li>
-<li><b>«Lingua»</b>: «Lingua del telefono» o una delle 10 lingue. La scelta vale solo per questo telefono.</li>
+<li><b>«Lingua»</b>: «Lingua dell’azienda» o una delle 10 lingue. La scelta vale solo per questo telefono. Dopo l’accesso l’app usa subito la lingua impostata per la tua azienda in CRMtree (oppure la tua, se ne hai scelta una nel browser).</li>
 <li><b>«Esci»</b>: ti disconnette dall'app.</li>
 </ul>
 <div class="phones">
@@ -1136,6 +1136,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>Attività principale</b></td><td>Costruisce l'albero delle attività. Solo la PM la modifica.</td></tr>
 <tr><td><b>Data di inizio</b>, <b>Data di fine</b></td><td>Il calendario dell'attività. Quando modifichi una data di fine esistente, compare il campo <b>«Motivo della modifica della scadenza»</b>. Il motivo finisce nella cronologia dell'attività e nell'e-mail alla PM.</td></tr>
 <tr><td><b>Promemoria e-mail</b></td><td>Alla scadenza, 1–3 giorni prima, oppure in una data a scelta. Tutte le persone assegnate lo ricevono alle 9:00 via e-mail e come notifica sul telefono. Richiede una data di fine.</td></tr>
+<tr><td><b>Ora</b></td><td>Ora facoltativa della scadenza. Con l’ora l’attività è nel calendario a quell’ora e il promemoria parte allora; senza ora – alle 9:00. Si imposta nel browser e sul telefono. Richiede una data di fine.</td></tr>
 <tr><td><b>Persone assegnate</b></td><td>Membri del progetto. Assegnate dalla PM. Una persona appena assegnata riceve un'e-mail e una notifica sul telefono.</td></tr>
 <tr><td><b>Campi aggiuntivi</b></td><td>Campi aziendali collegati al progetto, ad es. un numero di contratto obbligatorio.</td></tr>
 </table></div>
@@ -1181,6 +1182,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <h4 id="p1-proj-chat">Chat e allegati</h4>
 <p>La scheda <b>«Chat»</b> è la conversazione condivisa del progetto; ogni membro di un progetto aperto può scrivere. Invio spedisce il messaggio, Maiusc+Invio va a capo. Ogni attività ha anche una propria discussione nel pannello dell'attività.</p>
+<p>I messaggi non letti sono indicati da un numero verde: nel menu accanto al modulo Progetti, sulla scheda del progetto nell’elenco, sulla scheda della chat e accanto all’attività nella cui conversazione qualcuno ha scritto. Il numero scompare quando apri la conversazione. Il tuo messaggio ha un segno: una spunta – inviato, due spunte – qualcuno l’ha letto, due spunte verdi – l’hanno letto tutti. Passa il cursore sul segno per vedere chi.</p>
 <p>La scheda <b>«Allegati»</b> raccoglie i file del progetto: <b>«Aggiungi file»</b>, ricerca per nome del file, filtri per persona e data di aggiunta, <b>«Scarica»</b> ed <b>«Elimina»</b>. Le PM e i partecipanti interni con accesso completo possono aggiungere file. I formati accettati includono PDF, documenti Office, immagini, CSV e ZIP.</p>
 <div class="twocol">
 <figure><img loading="lazy" src="img/en_p06_chat.jpg?v=20261113" width="1440" height="900" alt="Chat del progetto"><figcaption>Chat del progetto con Anna, Piotr e Marta Lis.</figcaption></figure>
@@ -1254,6 +1256,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="phone"><img loading="lazy" src="img/en_t43_project_chat.jpg?v=20261113" width="540" height="1083" alt="Chat del progetto sul telefono"><figcaption>«Chat» del progetto.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t44_project_finance.jpg?v=20261113" width="540" height="1083" alt="Finanze del progetto sul telefono"><figcaption>«Finanza»: sola lettura.</figcaption></figure>
 </div>
+<p>Sul telefono il numero dei messaggi di chat non letti compare anche sull’icona dell’app e accanto a Progetti nella barra in basso. Il telefono ti avvisa di un nuovo messaggio – tocca la notifica per aprire la conversazione.</p>
 <p>Tocca un'attività per vederne i <b>«Dettagli»</b>: stato, tipo, priorità, inizio, scadenza, data di fine originale, persone assegnate e descrizione. <b>«Cambia stato»</b> propone solo gli stati consentiti dal tuo ruolo. La matita apre <b>«Modifica attività»</b> (nome, descrizione, tipo, priorità, date); quando sposti la scadenza puoi aggiungere un <b>«Motivo della modifica della scadenza»</b>. La scheda <b>«Cronologia delle modifiche»</b> mostra chi ha cambiato cosa e quando, compreso quel motivo. Le PM aggiungono attività anche con «+» nella scheda Attività e sottoattività con <b>«Aggiungi sottoattività»</b>.</p>
 <div class="phones">
 <figure class="phone"><img loading="lazy" src="img/en_t45_task_details.jpg?v=20261113" width="540" height="1083" alt="Dettagli dell'attività"><figcaption>WCA-2: «Dettagli» e «Cambia stato».</figcaption></figure>

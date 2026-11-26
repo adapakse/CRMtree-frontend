@@ -210,8 +210,9 @@ Projekty z zespołem, zadaniami, osią czasu i czatem. Osobny moduł poza CRM, z
 - **W listach CRM są tylko do podglądu.** Każde miejsce, które zamyka/edytuje zadanie przez
   `updateLeadActivity` / `updatePartnerActivity`, musi pomijać `source_type === 'project'`
   (kalendarz, dashboard, oś spotkań na liście leadów) — inaczej wyśle żądanie do złego API.
-- Zadanie nie ma godziny: w kalendarzu stoi o **09:00** w dniu zakończenia
-  (`ALL_DAY_ANCHOR_TIME`), a widoki pokazują „termin” zamiast godziny.
+- Godzina zadania jest opcjonalna (`end_time`, pole „Godzina” w panelu zadania). Bez niej
+  zadanie stoi w kalendarzu o **09:00** w dniu zakończenia (`ALL_DAY_ANCHOR_TIME`), a widoki
+  pokazują „termin” zamiast godziny; z godziną trafia na swoją godzinę (`all_day: false`).
 - Kliknięcie przenosi do Projektów przez `ProjectTaskNavigationService.open()`, które
   zapamiętuje miejsce wyjścia w `NavBackService`; `project-detail` pokazuje wtedy przycisk
   powrotu („← Lead X”, „← Kalendarz”).
@@ -271,6 +272,17 @@ w `CRMtree-backend/CLAUDE.md` → „Kontrola terminów”. To decyzje Adama.
 - Widok wielu projektów: `/projects/portfolio` (`project-portfolio*.ts`), tylko gdy
   `config.has_cross_project_view`; wejście przełącznikiem na ekranie Projekty.
 - `GET /api/projects` zwraca `{ items, total, page, page_size, can_create, can_filter_finance }`.
+
+### Czat — nieprzeczytane i znaczniki przeczytania (2026-11-25)
+
+- Jeden stan nieprzeczytanych na całą aplikację: `core/services/project-unread.service.ts`
+  (odświeżany co 60 s i przy każdej nawigacji przez `shell`, oraz po oznaczeniu wątku).
+  Z niego biorą liczbę: menu („Projekty”), kafelek projektu, zakładka „Czat”, wiersz zadania —
+  wszędzie przez `wt-project-unread-badge`.
+- `project-chat` oznacza otwarty wątek jako przeczytany do najnowszej pokazanej wiadomości
+  (tylko gdy karta przeglądarki jest widoczna) i rysuje znaczniki przy własnych wiadomościach
+  z `read_by` / `is_read_by_all`. Reguły: `CRMtree-backend/CLAUDE.md` → „Czat — przeczytane
+  i nieprzeczytane”.
 
 ### Pułapki
 
