@@ -183,7 +183,7 @@ interface InvoiceFilters {
     .sync-bar .hint, .pager .hint { flex:1; }
     .empty { padding:18px 0; text-align:center; }
     .number { overflow-wrap:anywhere; }
-    .linked-pill { display:inline-block; margin-left:4px; background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); white-space:nowrap; }
+    .linked-pill { display:inline-block; margin-left:4px; background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); white-space:nowrap; border:var(--pill-border); }
     tr.linked td { background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); }
     @media (max-width: 900px) { .filters { grid-template-columns:1fr 1fr; } }
   `],

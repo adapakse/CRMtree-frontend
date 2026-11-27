@@ -6,6 +6,8 @@ import { AuthService } from '../../core/auth/auth.service';
 import { NavBackService } from '../../core/services/nav-back.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ProjectConfig, ProjectDetail, ProjectTask, ProjectsApiService } from '../../core/services/projects-api.service';
+import { ProjectUnreadService } from '../../core/services/project-unread.service';
+import { ProjectUnreadBadgeComponent } from './project-unread-badge.component';
 import { ProjectDelayBadgeComponent } from '../../shared/components/project-deadlines/project-delay-badge.component';
 import { ListParams, ListQueryState } from '../../shared/list/list-query';
 import { ProjectCardComponent } from './project-card.component';
@@ -34,7 +36,7 @@ const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
   imports: [
     RouterLink, TranslocoDirective, TranslocoPipe,
     ProjectCardComponent, ProjectChatComponent, ProjectDelayBadgeComponent, ProjectFinanceComponent, ProjectGanttViewComponent,
-    ProjectTaskPanelComponent, ProjectTasksTabComponent, EntityAttachmentsComponent,
+    ProjectTaskPanelComponent, ProjectTasksTabComponent, EntityAttachmentsComponent, ProjectUnreadBadgeComponent,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,24 +64,18 @@ const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
         @if (detail(); as loaded) {
           @if (config(); as loadedConfig) {
             <div class="tab-bar">
-              <div class="tabs" [class.with-finance]="canReadFinance()">
+              <div class="tabs">
                 <button class="tab-btn" [class.active]="activeTab() === 'tasks'" (click)="selectTab('tasks')">
                   {{ t('detail.tabs.tasks', { count: tasks().length }) }}
                 </button>
                 <button class="tab-btn" [class.active]="activeTab() === 'gantt'" (click)="selectTab('gantt')">{{ t('detail.tabs.timeline') }}</button>
-                <button class="tab-btn" [class.active]="activeTab() === 'chat'" (click)="selectTab('chat')">{{ t('detail.tabs.chat') }}</button>
+                <button class="tab-btn" [class.active]="activeTab() === 'chat'" (click)="selectTab('chat')">{{ t('detail.tabs.chat') }} <wt-project-unread-badge [count]="unread.ofGeneralThread(loaded.project.id)" /></button>
                 <button class="tab-btn" [class.active]="activeTab() === 'attachments'" (click)="selectTab('attachments')">{{ 'attachments.title' | transloco }}</button>
                 @if (canReadFinance()) {
                   <button class="tab-btn" [class.active]="activeTab() === 'finance'" (click)="selectTab('finance')">{{ t('detail.tabs.finance') }}</button>
                 }
                 <button class="tab-btn" [class.active]="activeTab() === 'card'" (click)="selectTab('card')">{{ t('detail.tabs.card') }}</button>
               </div>
-              @if (activeTab() === 'tasks' || activeTab() === 'gantt') {
-                <label class="mine-toggle">
-                  <input type="checkbox" [checked]="showsOnlyMyTasks()" (change)="toggleOnlyMyTasks()">
-                  {{ t('detail.showOnlyMyTasks') }}
-                </label>
-              }
             </div>
 
             @if (activeTab() === 'tasks') {
@@ -87,12 +83,13 @@ const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
                 [detail]="loaded" [config]="loadedConfig" [treeTasks]="visibleTasks()" [showsOnlyMyTasks]="showsOnlyMyTasks()"
                 [query]="taskQuery" [filters]="taskFilters()"
                 [emptyMessage]="t(showsOnlyMyTasks() ? 'detail.empty.noAssignedTasks' : 'detail.empty.noTasks')"
-                (taskOpened)="openTask($event)" />
+                (taskOpened)="openTask($event)" (onlyMyTasksToggled)="toggleOnlyMyTasks()" />
             } @else if (activeTab() === 'gantt') {
               <wt-project-gantt-view
                 [query]="taskQuery" [filters]="taskFilters()" [fetch]="fetchGantt" [projects]="ganttProjects()"
                 [extraParams]="ganttExtraParams()" [atRiskThresholdDays]="loadedConfig.at_risk_threshold_days"
                 [emptyMessage]="t(showsOnlyMyTasks() ? 'detail.empty.noAssignedTasks' : 'detail.empty.noTasks')"
+                [showsOnlyMyTasks]="showsOnlyMyTasks()" (onlyMyTasksToggled)="toggleOnlyMyTasks()"
                 (taskOpened)="openTask($event.id)" />
             } @else if (activeTab() === 'attachments') {
               <section class="card">
@@ -131,23 +128,17 @@ const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
     .back { font-size:12px; color:var(--gray-500); text-decoration:none; margin-right:6px; }
     .back:hover { color: var(--orange-text); }
     .pill.closed { background:var(--gray-100); color:var(--gray-500); }
-    .tab-bar { display:flex; align-items:flex-start; gap:16px; }
-    .tabs { width:560px; }
-    .tabs.with-finance { width:700px; }
-    /* narrower than the tab row: one line that scrolls sideways, labels never wrap */
-    @media (max-width: 899px) {
-      .tab-bar { flex-wrap:wrap; gap:0 16px; }
-      .tabs, .tabs.with-finance { width:auto; flex:1 1 100%; max-width:100%; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; }
-      .tabs::-webkit-scrollbar { display:none; }
-      .tabs .tab-btn { flex:0 0 auto; white-space:nowrap; }
-      .mine-toggle { padding-top:0; margin-bottom:12px; }
-    }
+    /* Tabs as wide as their labels, so no label wraps; on a narrow screen the row scrolls sideways. */
+    .tab-bar { display:flex; }
+    .tabs { max-width:100%; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; }
+    .tabs::-webkit-scrollbar { display:none; }
+    .tabs .tab-btn { flex:0 0 auto; white-space:nowrap; padding:10px 16px; display:inline-flex; align-items:center; gap:6px; }
     .chat-card { padding:18px 20px; max-width:900px; }
-    .mine-toggle { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--gray-700); padding-top:8px; cursor:pointer; }
   `],
 })
 export class ProjectDetailComponent implements OnInit {
   private readonly api = inject(ProjectsApiService);
+  readonly unread = inject(ProjectUnreadService);
   private readonly auth = inject(AuthService);
   private readonly filterDefinitions = inject(ProjectListFiltersService);
   private readonly route = inject(ActivatedRoute);

@@ -1511,9 +1511,9 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     .ai-hint-link { font-size:12px; color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); text-decoration:none; white-space:nowrap; }
     .ai-hint-link:hover { text-decoration:underline; }
     .ai-badge { margin-left:auto; font-size:12px; font-weight:700; padding:4px 8px; border-radius:10px; }
-    .ai-badge-ok  { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
-    .ai-badge-bad { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
-    .ai-badge-off { background:var(--gray-100); color:var(--gray-500); }
+    .ai-badge-ok  { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .ai-badge-bad { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .ai-badge-off { background:var(--gray-100); color:var(--gray-500); border:var(--pill-border); }
     .ai-error {
       background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h);
       border-radius:8px; padding:10px 12px; font-size:12px; margin-bottom:14px;
@@ -1527,7 +1527,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     .hint-inline { font-size: 12px; color: var(--gray-400); font-weight: 400; }
     .req { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .badge-off { background: var(--gray-100); color: var(--gray-500); }
+    .badge-off { background: var(--gray-100); color: var(--gray-500); border:var(--pill-border); }
     .panel-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
 
     .icp-tenant-bar {

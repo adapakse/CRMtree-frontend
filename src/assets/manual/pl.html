@@ -804,7 +804,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„Logowanie biometrią”</b>: odblokowanie aplikacji odciskiem palca lub twarzą zamiast hasła. Po pierwszym logowaniu aplikacja sama to proponuje. Gdy biometria jest włączona, przy starcie zobaczysz ekran „Odblokuj CRMtree”. Przycisk „Zaloguj się hasłem” pozwala wejść hasłem.</li>
 <li><b>„E-maile o terminach w projektach”</b>: to samo ustawienie co w wersji web (tylko z modułem Projekty).</li>
 <li><b>„Tryb ciemny”</b>: ciemny wygląd aplikacji. Bez zmiany aplikacja korzysta z ustawienia telefonu.</li>
-<li><b>„Język”</b>: „Język telefonu” albo jeden z 10 języków. Wybór dotyczy tylko tego telefonu.</li>
+<li><b>„Język”</b>: „Język firmy” albo jeden z 10 języków. Wybór dotyczy tylko tego telefonu. Po zalogowaniu aplikacja od razu działa w języku ustawionym dla Twojej firmy w CRMtree (albo w Twoim własnym, jeśli wybrałeś go w przeglądarce).</li>
 <li><b>„Wyloguj”</b>: wylogowanie z aplikacji.</li>
 </ul>
 <div class="phones">
@@ -1138,6 +1138,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>Zadanie nadrzędne</b></td><td>Buduje drzewo zadań. Zmienia je tylko PM.</td></tr>
 <tr><td><b>Data początku</b>, <b>Data zakończenia</b></td><td>Termin zadania. Gdy zmieniasz istniejący termin, pojawia się pole <b>„Powód zmiany terminu”</b>. Powód trafia do historii i do e-maila dla PM-a.</td></tr>
 <tr><td><b>Przypomnienie e-mail</b></td><td>„W dniu terminu”, 1–3 dni przed terminem albo „Własna data”. Przypomnienie dostają wszystkie przypisane osoby o 9:00 (e-mail i powiadomienie w telefonie). Wymaga daty zakończenia.</td></tr>
+<tr><td><b>Godzina</b></td><td>Opcjonalna godzina terminu. Z godziną zadanie stoi w kalendarzu o tej godzinie i o niej wychodzi przypomnienie; bez godziny – o 9:00. Ustawisz ją w przeglądarce i w telefonie. Wymaga daty zakończenia.</td></tr>
 <tr><td><b>Przypisane osoby</b></td><td>Członkowie projektu. Przypisuje PM. Nowa osoba dostaje e-mail i powiadomienie w telefonie.</td></tr>
 <tr><td><b>Pola dodatkowe</b></td><td>Pola firmy dołączone do projektu, np. wymagane „Nr umowy”.</td></tr>
 </table></div>
@@ -1183,6 +1184,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <h4 id="p1-proj-chat">Czat i załączniki</h4>
 <p>Zakładka <b>„Czat”</b> to wspólna rozmowa projektu. Pisze każdy członek otwartego projektu. Enter wysyła wiadomość, Shift+Enter dodaje nową linię. Każde zadanie ma też własną rozmowę w panelu zadania.</p>
+<p>Nieprzeczytane wiadomości pokazuje zielona liczba: w menu przy module Projekty, na karcie projektu na liście, na zakładce czatu i przy zadaniu, w którego rozmowie ktoś napisał. Liczba znika, gdy otworzysz rozmowę. Przy własnej wiadomości widzisz znacznik: jeden ptaszek – wysłano, dwa – ktoś ją przeczytał, dwa zielone – przeczytali wszyscy. Po najechaniu kursorem zobaczysz, kto.</p>
 <p>Zakładka <b>„Załączniki”</b> zbiera pliki projektu: <b>„Dodaj plik”</b>, wyszukiwanie po nazwie, filtr osoby i daty dodania, <b>„Pobierz”</b> i <b>„Usuń”</b>. Pliki dodaje PM i uczestnik wewnętrzny z pełnym dostępem. Dozwolone są m.in. PDF, dokumenty Office, obrazy, CSV i ZIP.</p>
 <div class="twocol">
 <figure><img loading="lazy" src="img/pl_p06_chat.jpg?v=20261113" width="1440" height="900" alt="Czat projektu"><figcaption>Czat projektu: Anna, Piotr i Marta Lis.</figcaption></figure>
@@ -1256,6 +1258,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="phone"><img loading="lazy" src="img/pl_t43_project_chat.jpg?v=20261113" width="540" height="1083" alt="Czat projektu w telefonie"><figcaption>„Czat” projektu.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/pl_t44_project_finance.jpg?v=20261113" width="540" height="1083" alt="Finanse projektu w telefonie"><figcaption>„Finanse”: tylko podgląd.</figcaption></figure>
 </div>
+<p>Liczba nieprzeczytanych wiadomości czatu jest w telefonie także na ikonie aplikacji i przy Projektach na dolnym pasku. O nowej wiadomości powiadomi Cię telefon – dotknij powiadomienia, aby otworzyć rozmowę.</p>
 <p>Dotknij zadania, aby zobaczyć <b>„Dane”</b>: status, typ, priorytet, początek, termin, pierwotny termin, przypisanych i opis. <b>„Zmień status”</b> pokazuje tylko statusy dozwolone dla Twojej roli. Ołówek otwiera <b>„Edytuj zadanie”</b> (nazwa, opis, typ, priorytet, daty). Przy zmianie terminu wpiszesz <b>„Powód zmiany terminu”</b>. Zakładka <b>„Historia zmian”</b> pokazuje, kto, co i kiedy zmienił, razem z powodem zmiany terminu. PM dodaje też nowe zadania przyciskiem „+” na zakładce „Zadania” i podzadania przyciskiem <b>„Dodaj podzadanie”</b>.</p>
 <div class="phones">
 <figure class="phone"><img loading="lazy" src="img/pl_t45_task_details.jpg?v=20261113" width="540" height="1083" alt="Szczegóły zadania"><figcaption>WCA-2: „Dane” i „Zmień status”.</figcaption></figure>

@@ -802,7 +802,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„Conectare biometrică”</b>: deblocați aplicația cu amprenta sau cu fața, în loc de parolă. Aplicația oferă această opțiune după prima conectare. Cu biometria activată, aplicația se deschide pe ecranul „Deblocați CRMtree”; „Conectare cu parola” vă permite să folosiți parola în schimb.</li>
 <li><b>„E-mailuri despre termenele proiectelor”</b>: aceeași setare ca pe web (doar cu modulul Proiecte).</li>
 <li><b>„Mod întunecat”</b>: un aspect întunecat pentru aplicație. Până îl schimbați, aplicația urmează setarea telefonului dumneavoastră.</li>
-<li><b>„Limbă”</b>: „Limba telefonului” sau una dintre cele 10 limbi. Alegerea se aplică doar acestui telefon.</li>
+<li><b>„Limbă”</b>: „Limba companiei” sau una dintre cele 10 limbi. Alegerea se aplică doar acestui telefon. După autentificare, aplicația folosește imediat limba setată pentru compania dumneavoastră în CRMtree (sau pe cea proprie, dacă ați ales una în browser).</li>
 <li><b>„Deconectare”</b>: vă deconectează din aplicație.</li>
 </ul>
 <div class="phones">
@@ -1136,6 +1136,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>Sarcină principală</b></td><td>Construiește arborele sarcinilor. Doar PM-ul o modifică.</td></tr>
 <tr><td><b>Data de început</b>, <b>Termen</b></td><td>Planificarea sarcinii. Când modificați un termen existent, apare câmpul <b>„Motivul modificării termenului”</b>. Motivul ajunge în istoricul sarcinii și în e-mailul către PM.</td></tr>
 <tr><td><b>Memento prin e-mail</b></td><td>La data scadentă, cu 1–3 zile înainte sau la o dată personalizată. Toate persoanele atribuite îl primesc la 9:00 prin e-mail și ca notificare pe telefon. Are nevoie de un termen.</td></tr>
+<tr><td><b>Ora</b></td><td>Ora opțională a termenului. Cu oră, sarcina apare în calendar la acea oră și memento-ul se trimite atunci; fără oră – la 9:00. Se setează în browser și pe telefon. Necesită o dată de sfârșit.</td></tr>
 <tr><td><b>Persoane atribuite</b></td><td>Membrii proiectului. Atribuite de PM. O persoană nou atribuită primește un e-mail și o notificare pe telefon.</td></tr>
 <tr><td><b>Câmpuri suplimentare</b></td><td>Câmpuri ale companiei atașate proiectului, de ex. un număr de contract obligatoriu.</td></tr>
 </table></div>
@@ -1181,6 +1182,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <h4 id="p1-proj-chat">Chat și atașamente</h4>
 <p>Fila <b>„Chat”</b> este conversația comună a proiectului; orice membru al unui proiect deschis poate scrie. Enter trimite mesajul, Shift+Enter adaugă un rând nou. Fiecare sarcină are și propria discuție în panoul sarcinii.</p>
+<p>Mesajele necitite sunt indicate de un număr verde: în meniu lângă modulul Proiecte, pe cardul proiectului din listă, pe fila de chat și lângă sarcina în a cărei conversație a scris cineva. Numărul dispare când deschideți conversația. Mesajul dumneavoastră are un marcaj: o bifă – trimis, două bife – cineva l-a citit, două bife verzi – l-au citit toți. Treceți cu cursorul peste marcaj pentru a vedea cine.</p>
 <p>Fila <b>„Atașamente”</b> adună fișierele proiectului: <b>„Adăugați fișier”</b>, căutare după numele fișierului, filtre după persoană și data adăugării, <b>„Descărcare”</b> și <b>„Ștergere”</b>. PM-ii și participanții interni cu acces complet pot adăuga fișiere. Formatele acceptate includ PDF, documente Office, imagini, CSV și ZIP.</p>
 <div class="twocol">
 <figure><img loading="lazy" src="img/en_p06_chat.jpg?v=20261113" width="1440" height="900" alt="Chatul proiectului"><figcaption>Chatul proiectului cu Anna, Piotr și Marta Lis.</figcaption></figure>
@@ -1254,6 +1256,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="phone"><img loading="lazy" src="img/en_t43_project_chat.jpg?v=20261113" width="540" height="1083" alt="Chatul proiectului pe telefon"><figcaption>„Chat”-ul proiectului.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t44_project_finance.jpg?v=20261113" width="540" height="1083" alt="Finanțele proiectului pe telefon"><figcaption>„Finanțe”: doar vizualizare.</figcaption></figure>
 </div>
+<p>Pe telefon, numărul mesajelor de chat necitite apare și pe pictograma aplicației și lângă Proiecte în bara de jos. Telefonul vă anunță despre un mesaj nou – atingeți notificarea pentru a deschide conversația.</p>
 <p>Atingeți o sarcină pentru a-i vedea <b>„Detalii”</b>: status, tip, prioritate, început, termen, termenul inițial, persoane atribuite și descriere. <b>„Schimbare status”</b> oferă doar statusurile permise de rolul dumneavoastră. Creionul deschide <b>„Editare sarcină”</b> (denumire, descriere, tip, prioritate, date); când mutați termenul, puteți adăuga un <b>„Motiv al modificării termenului”</b>. Fila <b>„Istoricul modificărilor”</b> arată cine ce a modificat și când, inclusiv acel motiv. PM-ii adaugă sarcini și cu „+” în fila Sarcini, iar subsarcini cu <b>„Adăugare subsarcină”</b>.</p>
 <div class="phones">
 <figure class="phone"><img loading="lazy" src="img/en_t45_task_details.jpg?v=20261113" width="540" height="1083" alt="Detaliile sarcinii"><figcaption>WCA-2: „Detalii” și „Schimbare status”.</figcaption></figure>

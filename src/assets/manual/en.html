@@ -802,7 +802,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>“Biometric sign-in”</b>: unlock the app with your fingerprint or face instead of a password. The app offers this after your first sign-in. With biometrics on, the app opens on an “Unlock CRMtree” screen; “Sign in with password” lets you use your password instead.</li>
 <li><b>“E-mails about project deadlines”</b>: the same setting as on the web (only with the Projects module).</li>
 <li><b>“Dark mode”</b>: a dark look for the app. Until you change it, the app follows your phone’s setting.</li>
-<li><b>“Language”</b>: “Phone language” or one of 10 languages. The choice applies to this phone only.</li>
+<li><b>“Language”</b>: “Company language” or one of 10 languages. The choice applies to this phone only. After you sign in, the app immediately uses the language set for your company in CRMtree (or your own, if you picked one in the browser).</li>
 <li><b>“Sign out”</b>: signs you out of the app.</li>
 </ul>
 <div class="phones">
@@ -1136,6 +1136,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>Parent task</b></td><td>Builds the task tree. Only the PM changes it.</td></tr>
 <tr><td><b>Start date</b>, <b>End date</b></td><td>The task’s schedule. When you change an existing end date, the field <b>“Reason for the change of the end date”</b> appears. The reason goes into the task history and into the email to the PM.</td></tr>
 <tr><td><b>Email reminder</b></td><td>On the due date, 1–3 days before, or a custom date. All assignees get it at 9:00 by email and as a phone notification. It needs an end date.</td></tr>
+<tr><td><b>Time</b></td><td>Optional time of the due date. With a time the task sits in the calendar at that time and the reminder goes out then; without one – at 9:00. You can set it in the browser and on the phone. Requires an end date.</td></tr>
 <tr><td><b>Assignees</b></td><td>Project members. Assigned by the PM. A newly assigned person gets an email and a phone notification.</td></tr>
 <tr><td><b>Custom fields</b></td><td>Company fields attached to the project, e.g. a required contract number.</td></tr>
 </table></div>
@@ -1181,6 +1182,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <h4 id="p1-proj-chat">Chat and attachments</h4>
 <p>The <b>“Chat”</b> tab is the project’s shared conversation; every member of an open project can post. Enter sends the message, Shift+Enter adds a new line. Each task also has its own discussion in the task panel.</p>
+<p>Unread messages are shown as a green number: in the menu next to the Projects module, on the project card in the list, on the chat tab and next to the task whose discussion has a new message. The number disappears when you open the conversation. Your own message carries a mark: one tick – sent, two ticks – someone has read it, two green ticks – everyone has read it. Hover over the mark to see who.</p>
 <p>The <b>“Attachments”</b> tab collects project files: <b>“Add file”</b>, search by file name, filters by person and date added, <b>“Download”</b> and <b>“Delete”</b>. PMs and internal participants with full access can add files. Accepted formats include PDF, Office documents, images, CSV and ZIP.</p>
 <div class="twocol">
 <figure><img loading="lazy" src="img/en_p06_chat.jpg?v=20261113" width="1440" height="900" alt="Project chat"><figcaption>Project chat with Anna, Piotr and Marta Lis.</figcaption></figure>
@@ -1254,6 +1256,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="phone"><img loading="lazy" src="img/en_t43_project_chat.jpg?v=20261113" width="540" height="1083" alt="Project chat on the phone"><figcaption>Project “Chat”.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t44_project_finance.jpg?v=20261113" width="540" height="1083" alt="Project finance on the phone"><figcaption>“Finance”: view only.</figcaption></figure>
 </div>
+<p>On the phone the number of unread chat messages is also shown on the app icon and next to Projects on the bottom bar. The phone notifies you about a new message – tap the notification to open the conversation.</p>
 <p>Tap a task to see its <b>“Details”</b>: status, type, priority, start, due date, original end date, assignees and description. <b>“Change status”</b> offers only the statuses your role allows. The pencil opens <b>“Edit task”</b> (name, description, type, priority, dates); when you move the due date you can add a <b>“Reason for the change of the end date”</b>. The <b>“Change history”</b> tab shows who changed what and when, including that reason. PMs also add tasks with “+” on the Tasks tab and subtasks with <b>“Add subtask”</b>.</p>
 <div class="phones">
 <figure class="phone"><img loading="lazy" src="img/en_t45_task_details.jpg?v=20261113" width="540" height="1083" alt="Task details"><figcaption>WCA-2: “Details” and “Change status”.</figcaption></figure>

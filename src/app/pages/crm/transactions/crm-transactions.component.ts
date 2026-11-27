@@ -156,7 +156,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .kpi.accent .kpi-val { color:oklch(from #f97316 max(l, var(--text-min-l)) c h); }
     .kpi.green .kpi-val { color:oklch(from #16a34a max(l, var(--text-min-l)) c h); }
     .product-mix { display:flex; gap:6px; flex-wrap:wrap; }
-    .mix-chip { background:var(--gray-100); border-radius:8px; padding:4px 10px; font-size:12px; font-weight:600; }
+    .mix-chip { background:var(--gray-100); border-radius:8px; padding:4px 10px; font-size:12px; font-weight:600; border:var(--pill-border); }
     .txn-filters { display:flex; gap:10px; padding:10px 20px; border-bottom:1px solid var(--gray-100); align-items:center; flex-wrap:wrap; }
     .filter-input { border:1px solid var(--gray-300); border-radius:8px; padding:6px 10px; font-size:12px; outline:none; }
     .filter-input:focus { border-color:#f97316; }
@@ -176,7 +176,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .row-sub { font-size:10px; color:var(--gray-400); }
     code { font-size:12px; background:var(--gray-100); border-radius:4px; padding:1px 4px; }
     .product-tags { display:flex; flex-wrap:wrap; gap:4px; }
-    .ptag { font-size:10px; background:var(--gray-100); border-radius:6px; padding:1px 6px; }
+    .ptag { font-size:10px; background:var(--gray-100); border-radius:6px; padding:1px 6px; border:var(--pill-border); }
     .ptag.more { background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); color:var(--gray-500); }
     .status-chip { padding:2px 8px; border-radius:8px; font-size:12px; font-weight:600; }
     .status-confirmed { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }

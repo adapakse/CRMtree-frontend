@@ -136,7 +136,7 @@ import { FormErrorSummaryComponent } from '../../../shared/forms/form-error-summ
     .pillar-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
     .pillar-count { font-size: 0.72rem; color: var(--gray-500); white-space: nowrap; }
     .pillar-desc { font-size: 0.78rem; color: var(--gray-600); margin: 0.35rem 0 0; line-height: 1.4; }
-    .pillar-theme { display:inline-block; margin-top: 0.5rem; font-size: 0.7rem; color: var(--orange-dark); background: var(--orange-pale); border-radius: 999px; padding: 0.15rem 0.55rem; }
+    .pillar-theme { display:inline-block; margin-top: 0.5rem; font-size: 0.7rem; color: var(--orange-dark); background: var(--orange-pale); border-radius: 999px; padding: 0.15rem 0.55rem; border:var(--pill-border); }
     .pillar-card-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; margin-top: 0.6rem; }
     .pillar-edit-actions { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
     .pillar-card .field-label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--gray-700); margin: 0.45rem 0 0.2rem; }

@@ -343,7 +343,7 @@ const MAX_CSV_BYTES = 5 * 1024 * 1024;
     .ece-chip i { font-style: normal; color: var(--gray-400); margin-left: 4px; }
     .ece-chip[aria-pressed="true"] { border-color: var(--orange); background: var(--orange-pale); color: var(--orange-dark); }
     .ece-chip[aria-pressed="true"] i { color: var(--orange-text); }
-    .ece-tag { display: inline-flex; align-items: center; gap: 4px; background: var(--chip-bg); color: var(--chip-text); border-radius: 20px; padding: 4px 4px 4px 12px; font-size: 12px; }
+    .ece-tag { display: inline-flex; align-items: center; gap: 4px; background: var(--chip-bg); color: var(--chip-text); border-radius: 20px; padding: 4px 4px 4px 12px; font-size: 12px; border:var(--pill-border); }
     .ece-tag button { display: inline-grid; place-items: center; border: 0; background: transparent; color: inherit; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; padding: 0; }
     .ece-tag button:hover { background: var(--hover-overlay); }
     .ece-pick { max-width: 220px; }

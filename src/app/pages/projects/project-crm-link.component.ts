@@ -57,8 +57,9 @@ const RESULTS_PER_KIND = 10;
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:8px; }
-    .link-row { display:flex; align-items:center; gap:10px; font-size:14px; }
-    .label { font-size:12px; font-weight:600; color:var(--gray-600); }
+    .link-row { display:flex; align-items:baseline; gap:10px; font-size:14px; }
+    /* The same caption as the dates above it on the project card, so the rows read as one block. */
+    .label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-400); margin-right:-2px; }
     .target { color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h); font-weight:600; text-decoration:none; }
     .target.plain { color:var(--gray-800); }
     .none { color:var(--gray-400); }

@@ -802,7 +802,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>»Biometrična prijava«</b>: aplikacijo odklenite s prstnim odtisom ali obrazom namesto z geslom. Aplikacija to ponudi po vaši prvi prijavi. Ko je biometrija vklopljena, se aplikacija odpre na zaslonu »Odkleni CRMtree«; »Prijava z geslom« vam omogoča, da namesto tega uporabite geslo.</li>
 <li><b>»E-pošta o rokih v projektih«</b>: ista nastavitev kot v spletni aplikaciji (samo z modulom Projekti).</li>
 <li><b>»Temni način«</b>: temen videz aplikacije. Dokler ga ne spremenite, aplikacija sledi nastavitvi vašega telefona.</li>
-<li><b>»Jezik«</b>: »Jezik telefona« ali eden od 10 jezikov. Izbira velja samo za ta telefon.</li>
+<li><b>»Jezik«</b>: »Jezik podjetja« ali eden od 10 jezikov. Izbira velja samo za ta telefon. Po prijavi aplikacija takoj uporablja jezik, nastavljen za vaše podjetje v CRMtree (ali vašega, če ste ga izbrali v brskalniku).</li>
 <li><b>»Odjava«</b>: odjavi vas iz aplikacije.</li>
 </ul>
 <div class="phones">
@@ -1136,6 +1136,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>Nadrejena naloga</b></td><td>Gradi drevo nalog. Spreminja jo samo PM.</td></tr>
 <tr><td><b>Datum začetka</b>, <b>Datum konca</b></td><td>Urnik naloge. Ko spremenite obstoječi datum konca, se prikaže polje <b>»Razlog za spremembo roka«</b>. Razlog gre v zgodovino naloge in v e-pošto PM.</td></tr>
 <tr><td><b>Opomnik po e-pošti</b></td><td>Na dan roka, 1–3 dni prej ali na poljuben datum. Vse dodeljene osebe ga prejmejo ob 9:00 po e-pošti in kot obvestilo na telefon. Potrebuje datum konca.</td></tr>
+<tr><td><b>Ura</b></td><td>Neobvezna ura roka. Z uro je naloga v koledarju ob tej uri in takrat je poslan opomnik; brez ure – ob 9:00. Nastavite jo v brskalniku in v telefonu. Zahteva končni datum.</td></tr>
 <tr><td><b>Dodeljene osebe</b></td><td>Člani projekta. Dodeli jih PM. Na novo dodeljena oseba prejme e-pošto in obvestilo na telefon.</td></tr>
 <tr><td><b>Dodatna polja</b></td><td>Polja podjetja, pripeta projektu, npr. obvezna številka pogodbe.</td></tr>
 </table></div>
@@ -1181,6 +1182,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <h4 id="p1-proj-chat">Klepet in priloge</h4>
 <p>Zavihek <b>»Klepet«</b> je skupni pogovor projekta; objavlja lahko vsak član odprtega projekta. Enter pošlje sporočilo, Shift+Enter doda novo vrstico. Vsaka naloga ima tudi svoj pogovor v plošči naloge.</p>
+<p>Neprebrana sporočila prikazuje zelena številka: v meniju pri modulu Projekti, na kartici projekta na seznamu, na zavihku klepeta in pri nalogi, v katere pogovoru je nekdo pisal. Številka izgine, ko odprete pogovor. Vaše sporočilo ima oznako: ena kljukica – poslano, dve kljukici – nekdo ga je prebral, dve zeleni kljukici – prebrali so ga vsi. Z miško se pomaknite na oznako in videli boste, kdo.</p>
 <p>Zavihek <b>»Priloge«</b> zbira projektne datoteke: <b>»Dodaj datoteko«</b>, iskanje po imenu datoteke, filtri po osebi in datumu dodajanja, <b>»Prenesi«</b> in <b>»Izbriši«</b>. Datoteke lahko dodajajo PM in notranji udeleženci s polnim dostopom. Sprejeti formati vključujejo PDF, dokumente Office, slike, CSV in ZIP.</p>
 <div class="twocol">
 <figure><img loading="lazy" src="img/en_p06_chat.jpg?v=20261113" width="1440" height="900" alt="Klepet projekta"><figcaption>Klepet projekta z Anno, Piotrom in Marto Lis.</figcaption></figure>
@@ -1254,6 +1256,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="phone"><img loading="lazy" src="img/en_t43_project_chat.jpg?v=20261113" width="540" height="1083" alt="Klepet projekta na telefonu"><figcaption>»Klepet« projekta.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t44_project_finance.jpg?v=20261113" width="540" height="1083" alt="Finance projekta na telefonu"><figcaption>»Finance«: samo ogled.</figcaption></figure>
 </div>
+<p>V telefonu je število neprebranih sporočil klepeta prikazano tudi na ikoni aplikacije in pri Projektih v spodnji vrstici. O novem sporočilu vas obvesti telefon – tapnite obvestilo, da odprete pogovor.</p>
 <p>Tapnite nalogo, da vidite njene <b>»Podrobnosti«</b>: status, vrsta, prioriteta, začetek, rok, izvirni datum konca, dodeljene osebe in opis. <b>»Spremeni status«</b> ponuja samo statuse, ki jih vaša vloga dovoljuje. Svinčnik odpre <b>»Uredi nalogo«</b> (naziv, opis, vrsta, prioriteta, datumi); ko premaknete rok, lahko dodate <b>»Razlog za spremembo roka«</b>. Zavihek <b>»Zgodovina sprememb«</b> prikazuje, kdo je kaj spremenil in kdaj, vključno s tem razlogom. PM dodajajo naloge tudi z »+« na zavihku Naloge, podnaloge pa z <b>»Dodaj podnalogo«</b>.</p>
 <div class="phones">
 <figure class="phone"><img loading="lazy" src="img/en_t45_task_details.jpg?v=20261113" width="540" height="1083" alt="Podrobnosti naloge"><figcaption>WCA-2: »Podrobnosti« in »Spremeni status«.</figcaption></figure>

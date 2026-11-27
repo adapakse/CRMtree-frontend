@@ -3,6 +3,8 @@ import { NgStyle } from '@angular/common';
 import { TranslocoDirective, TranslocoPipe, provideTranslocoScope } from '@jsverse/transloco';
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ProjectTaskRow } from '../../core/services/projects-api.service';
+import { ProjectUnreadService } from '../../core/services/project-unread.service';
+import { ProjectUnreadBadgeComponent } from './project-unread-badge.component';
 import { AddToCalendarComponent } from '../../shared/components/add-to-calendar/add-to-calendar.component';
 import { ProjectTaskDueDateComponent } from '../../shared/components/project-deadlines/project-task-due-date.component';
 import { ProjectTaskTimelinessComponent } from '../../shared/components/project-deadlines/project-task-timeliness.component';
@@ -27,7 +29,7 @@ const ALWAYS_SHOWN_COLUMN_COUNT = 8;
   imports: [
     NgStyle, TranslocoDirective, TranslocoPipe, AddToCalendarComponent, ListColumnHeaderComponent, ListPagerComponent,
     ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent,
-    TenantDefaultLabelPipe,
+    TenantDefaultLabelPipe, ProjectUnreadBadgeComponent,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,7 +66,7 @@ const ALWAYS_SHOWN_COLUMN_COUNT = 8;
               <tr class="task-row" (click)="taskOpened.emit(task)">
                 <td class="mono">{{ task.project_key }}-{{ task.task_number }}</td>
                 <td>
-                  <div class="task-name">{{ task.name }}</div>
+                  <div class="task-name">{{ task.name }} <wt-project-unread-badge [count]="unread.ofTask(task.id)" [showsIcon]="true" /></div>
                   @if (task.parent_task_number !== null) {
                     <div class="parent" [title]="t('taskList.parentTask')">
                       ↳ <span class="mono">{{ task.project_key }}-{{ task.parent_task_number }}</span> {{ task.parent_task_name }}
@@ -131,6 +133,7 @@ const ALWAYS_SHOWN_COLUMN_COUNT = 8;
   `],
 })
 export class ProjectTaskTableComponent {
+  readonly unread = inject(ProjectUnreadService);
   readonly format = inject(ProjectFinanceFormatService);
   private readonly filterDefinitions = inject(ProjectListFiltersService);
 

@@ -69,8 +69,14 @@
     },
     "hint": "Entrée envoie le message, Maj+Entrée ajoute une nouvelle ligne.",
     "placeholder": "Écrivez un message…",
+    "read": {
+      "readBy": "Lu par : {names}",
+      "readByAll": "Lu par tous : {names}",
+      "sent": "Envoyé"
+    },
     "send": "Envoyer",
-    "sendFailed": "Impossible d’envoyer le message"
+    "sendFailed": "Impossible d’envoyer le message",
+    "unreadCount": "Messages non lus : {count}"
   },
   "crmLink": {
     "change": "Modifier",
@@ -733,6 +739,8 @@
       "assignees": "Personnes assignées",
       "description": "Description complémentaire",
       "endDate": "Date de fin",
+      "endTime": "Heure",
+      "endTimeHint": "Facultative. Sans heure, la tâche figure dans le calendrier à 09:00.",
       "name": "Nom",
       "noParent": "— aucune (tâche parente) —",
       "parentTask": "Tâche parente",
@@ -752,6 +760,7 @@
         "customFields": "champs supplémentaires",
         "description": "description",
         "endDate": "date de fin",
+        "endTime": "heure",
         "name": "nom",
         "parentTask": "tâche parente",
         "priority": "priorité",

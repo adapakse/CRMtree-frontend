@@ -69,8 +69,8 @@ import {
     .survey-status { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--gray-700); margin-bottom: 16px; }
     .survey-updated { margin-left: auto; font-size: 12px; color: var(--gray-500); }
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .badge-on  { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); }
-    .badge-off { background: var(--gray-100); color: var(--gray-500); }
+    .badge-on  { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .badge-off { background: var(--gray-100); color: var(--gray-500); border:var(--pill-border); }
     .answers-card { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm); margin-bottom: 12px; overflow: hidden; }
     .answers-title { padding: 12px 16px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); font-size: 14px; font-weight: 600; color: var(--gray-800); }
     .answer-row { display: grid; grid-template-columns: 300px 1fr; gap: 16px; padding: 8px 16px; border-bottom: 1px solid var(--gray-100); font-size: 14px; }

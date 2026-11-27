@@ -408,7 +408,7 @@ interface CalendarDay {
       .cal-period { font-size: 14px !important; flex: 1 1 0 !important; }
     }
     
-    .tasks-badge { display:inline-flex;min-width:16px;height:16px;background:#dc2626;color:white;border-radius:10px;font-size:10px;font-weight:700;align-items:center;justify-content:center;padding:0 4px;line-height:1;margin-left:4px;vertical-align:middle }
+    .tasks-badge { display:inline-flex;min-width:16px;height:16px;background:#dc2626;color:white;border-radius:10px;font-size:10px;font-weight:700;align-items:center;justify-content:center;padding:0 4px;line-height:1;margin-left:4px;vertical-align:middle; border:var(--pill-border); }
 
     /* Month */
     /* minmax(0,1fr): long event titles never widen their day column */
@@ -423,8 +423,8 @@ interface CalendarDay {
     .month-cell.other-month .day-num { color:#d1d5db }
     .day-events { display:flex;flex-direction:column;gap:2px }
     .event-chip { display:flex;gap:4px;align-items:center;border-radius:4px;padding:2px 4px;font-size:10px;cursor:pointer;overflow:hidden }
-    .lead-chip { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h) }
-    .partner-chip { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h) }
+    .lead-chip { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .partner-chip { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
     .event-chip:hover { opacity:.8 }
     .event-time { font-weight:700;flex-shrink:0 }
     .event-title { overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
@@ -463,8 +463,8 @@ interface CalendarDay {
     .de-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:2px }
     .de-time { font-size:12px;font-weight:700;color:var(--gray-700) }
     .de-badge { font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px }
-    .lead-badge { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h) }
-    .partner-badge { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h) }
+    .lead-badge { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .partner-badge { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
     .de-title { font-size:14px;font-weight:700;color:var(--gray-800) }
     .de-source { font-size:12px;color:var(--gray-500);margin-top:1px }
     .de-meta { font-size:12px;color:var(--gray-500);margin-top:4px }

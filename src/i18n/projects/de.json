@@ -69,8 +69,14 @@
     },
     "hint": "Enter sendet die Nachricht, Shift+Enter fügt eine neue Zeile ein.",
     "placeholder": "Nachricht schreiben…",
+    "read": {
+      "readBy": "Gelesen von: {names}",
+      "readByAll": "Von allen gelesen: {names}",
+      "sent": "Gesendet"
+    },
     "send": "Senden",
-    "sendFailed": "Nachricht konnte nicht gesendet werden"
+    "sendFailed": "Nachricht konnte nicht gesendet werden",
+    "unreadCount": "Ungelesene Nachrichten: {count}"
   },
   "crmLink": {
     "change": "Ändern",
@@ -733,6 +739,8 @@
       "assignees": "Zugewiesene Personen",
       "description": "Zusätzliche Beschreibung",
       "endDate": "Enddatum",
+      "endTime": "Uhrzeit",
+      "endTimeHint": "Optional. Ohne Uhrzeit steht die Aufgabe im Kalender um 09:00.",
       "name": "Name",
       "noParent": "— keine (Hauptaufgabe) —",
       "parentTask": "Übergeordnete Aufgabe",
@@ -752,6 +760,7 @@
         "customFields": "Zusatzfelder",
         "description": "Beschreibung",
         "endDate": "Enddatum",
+        "endTime": "Uhrzeit",
         "name": "Name",
         "parentTask": "Übergeordnete Aufgabe",
         "priority": "Priorität",

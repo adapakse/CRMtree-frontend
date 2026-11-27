@@ -69,8 +69,14 @@
     },
     "hint": "Enter trimite mesajul, Shift+Enter adaugă o linie nouă.",
     "placeholder": "Scrieți un mesaj…",
+    "read": {
+      "readBy": "Citit de: {names}",
+      "readByAll": "Citit de toți: {names}",
+      "sent": "Trimis"
+    },
     "send": "Trimitere",
-    "sendFailed": "Mesajul nu a putut fi trimis"
+    "sendFailed": "Mesajul nu a putut fi trimis",
+    "unreadCount": "Mesaje necitite: {count}"
   },
   "crmLink": {
     "change": "Modificare",
@@ -733,6 +739,8 @@
       "assignees": "Persoane atribuite",
       "description": "Descriere suplimentară",
       "endDate": "Data de finalizare",
+      "endTime": "Ora",
+      "endTimeHint": "Opțională. Fără oră, sarcina apare în calendar la 09:00.",
       "name": "Denumire",
       "noParent": "— niciuna (sarcină principală) —",
       "parentTask": "Sarcină principală",
@@ -752,6 +760,7 @@
         "customFields": "câmpuri suplimentare",
         "description": "descriere",
         "endDate": "data de finalizare",
+        "endTime": "ora",
         "name": "denumire",
         "parentTask": "sarcină principală",
         "priority": "prioritate",

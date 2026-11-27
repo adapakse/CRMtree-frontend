@@ -207,10 +207,10 @@ import { LocaleService } from '../../core/i18n/locale.service';
 
     /* ── Task type badges ── */
     .tbadge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 1px 4px; border-radius: 3px; }
-    .tbadge-sign    { background: color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color: oklch(from #5b21b6 max(l, var(--text-min-l)) c h); }
-    .tbadge-edit    { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: oklch(from #1e40af max(l, var(--text-min-l)) c h); }
-    .tbadge-approve { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
-    .tbadge-read    { background: var(--gray-100); color: var(--gray-600); }
+    .tbadge-sign    { background: color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color: oklch(from #5b21b6 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .tbadge-edit    { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: oklch(from #1e40af max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .tbadge-approve { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .tbadge-read    { background: var(--gray-100); color: var(--gray-600); border:var(--pill-border); }
   `],
 })
 export class DashboardComponent implements OnInit {

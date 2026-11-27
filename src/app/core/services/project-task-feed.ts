@@ -1,13 +1,13 @@
 import type { ActivityTask, CalendarMeeting } from './crm-api.service';
 import type { AssignedProjectTask } from './projects-api.service';
 
-// A project task has a due date but no due time. In the CRM calendar grid and
-// task lists it is placed at this local hour and flagged `all_day`, so views
-// can show "termin" instead of a clock time.
-const ALL_DAY_ANCHOR_TIME = '09:00:00';
+// The hour of a project task is optional. Without one, the task is placed in
+// the CRM calendar grid and task lists at this local hour and flagged
+// `all_day`, so views can show "termin" instead of a clock time.
+const ALL_DAY_ANCHOR_TIME = '09:00';
 
-function dueDateAsIso(endDate: string): string {
-  return new Date(`${endDate}T${ALL_DAY_ANCHOR_TIME}`).toISOString();
+function dueMomentAsIso(task: { end_date: string; end_time: string | null }): string {
+  return new Date(`${task.end_date}T${task.end_time ?? ALL_DAY_ANCHOR_TIME}:00`).toISOString();
 }
 
 // CRM task lists key their rows by a numeric id; project tasks have UUIDs.
@@ -31,8 +31,8 @@ export function projectTaskToActivityTask(task: AssignedProjectTask): ActivityTa
     type: 'task',
     title: titleOf(task),
     body: null,
-    activity_at: task.end_date ? dueDateAsIso(task.end_date) : null,
-    all_day: true,
+    activity_at: hasDueDate(task) ? dueMomentAsIso(task) : null,
+    all_day: !task.end_time,
     duration_min: null,
     participants: null,
     meeting_location: null,
@@ -63,8 +63,8 @@ export function projectTaskToCalendarMeeting(task: AssignedProjectTask & { end_d
     type: 'task',
     title: titleOf(task),
     body: null,
-    activity_at: dueDateAsIso(task.end_date),
-    all_day: true,
+    activity_at: dueMomentAsIso(task),
+    all_day: !task.end_time,
     duration_min: null,
     participants: null,
     meeting_location: null,

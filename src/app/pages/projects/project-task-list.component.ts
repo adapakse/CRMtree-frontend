@@ -3,6 +3,8 @@ import { NgStyle } from '@angular/common';
 import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ProjectConfig, ProjectDictionaryItem, ProjectTask } from '../../core/services/projects-api.service';
+import { ProjectUnreadService } from '../../core/services/project-unread.service';
+import { ProjectUnreadBadgeComponent } from './project-unread-badge.component';
 import { ProjectTaskDueDateComponent } from '../../shared/components/project-deadlines/project-task-due-date.component';
 import { ProjectTaskTimelinessComponent } from '../../shared/components/project-deadlines/project-task-timeliness.component';
 import { ListColumnHeaderComponent } from '../../shared/list/list-column-header.component';
@@ -21,7 +23,7 @@ import { TenantDefaultLabelPipe } from '../../core/i18n/tenant-default-label.pip
 @Component({
   selector: 'wt-project-task-list',
   standalone: true,
-  imports: [NgStyle, TranslocoDirective, ListColumnHeaderComponent, ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent, TenantDefaultLabelPipe],
+  imports: [NgStyle, TranslocoDirective, ListColumnHeaderComponent, ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent, TenantDefaultLabelPipe, ProjectUnreadBadgeComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -69,6 +71,7 @@ import { TenantDefaultLabelPipe } from '../../core/i18n/tenant-default-label.pip
                         </svg>
                       }
                       <span [class.root-name]="row.task.parent_task_id === null">{{ row.task.name }}</span>
+                      <wt-project-unread-badge [count]="unread.ofTask(row.task.id)" [showsIcon]="true" />
                     </div>
                   </td>
                   <td>
@@ -112,6 +115,7 @@ import { TenantDefaultLabelPipe } from '../../core/i18n/tenant-default-label.pip
   `],
 })
 export class ProjectTaskListComponent {
+  readonly unread = inject(ProjectUnreadService);
   readonly format = inject(ProjectFinanceFormatService);
   private readonly filterDefinitions = inject(ProjectListFiltersService);
 

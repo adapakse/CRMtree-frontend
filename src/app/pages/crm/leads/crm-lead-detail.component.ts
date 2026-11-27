@@ -1721,7 +1721,7 @@ interface WhatsappConvUiState {
     .lead-note-warn { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .lead-note-err { background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .lead-note-ok { background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface)); color:oklch(from #15803d max(l, var(--text-min-l)) c h); }
-    .file-chip { display:inline-flex; align-items:center; gap:4px; background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border-radius:12px; padding:2px 8px; font-size:12px; }
+    .file-chip { display:inline-flex; align-items:center; gap:4px; background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border-radius:12px; padding:2px 8px; font-size:12px; border:var(--pill-border); }
     .file-chip button { background:none; border:none; cursor:pointer; color:var(--gray-400); font-size:12px; padding:0; }
     .file-chip button:hover { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     button.info-icon-btn:not([data-n1]):not([data-n2]) { width:24px; height:24px; padding:0; margin-left:2px; border:none; border-radius:6px; background:none; box-shadow:none; color:var(--gray-500); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
@@ -1732,8 +1732,8 @@ interface WhatsappConvUiState {
     .act-modal-lbl { color:var(--gray-400); font-size:12px; min-width:100px; flex-shrink:0; display:inline-flex; align-items:center; gap:4px; }
     .ic-spin { animation:lead-spin 1s linear infinite; }
     @keyframes lead-spin { to { transform:rotate(360deg); } }
-    .ta-badge-ok { background:#16a34a; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:15px; display:inline-block; margin-left:2px; }
-    .ta-badge-err { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:15px; display:inline-block; margin-left:2px; }
+    .ta-badge-ok { background:#16a34a; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:15px; display:inline-block; margin-left:2px; border:var(--pill-border); }
+    .ta-badge-err { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:15px; display:inline-block; margin-left:2px; border:var(--pill-border); }
     .ta-section { display:flex; flex-direction:column; gap:12px; }
     .ta-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--gray-400); padding-bottom:4px; border-bottom:1px solid var(--gray-100); }
     .ta-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -1743,7 +1743,7 @@ interface WhatsappConvUiState {
     .ta-row label input:focus, .ta-row label select:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
     .ta-status-ok  { background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface)); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
     .ta-status-err { background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
-    .email-badge { background:color-mix(in srgb, #FEE2E2 var(--tint-mix), var(--surface)); color:oklch(from #B91C1C max(l, var(--text-min-l)) c h); border-radius:999px; font-size:12px; font-weight:600; min-width:20px; height:20px; padding:0 6px; line-height:1; display:inline-flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums; }
+    .email-badge { background:color-mix(in srgb, #FEE2E2 var(--tint-mix), var(--surface)); color:oklch(from #B91C1C max(l, var(--text-min-l)) c h); border-radius:999px; font-size:12px; font-weight:600; min-width:20px; height:20px; padding:0 6px; line-height:1; display:inline-flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums; border:var(--pill-border); }
     .info-section { margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--gray-100); }
     .info-section:last-child { border-bottom:none; }
     .info-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--gray-400); margin-bottom:8px; display:flex; align-items:center; gap:4px; }
@@ -1825,7 +1825,7 @@ interface WhatsappConvUiState {
     .suggest-dropdown { position:absolute; background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; box-shadow:0 7px 22px rgba(0,0,0,0.108); z-index:100; min-width:240px; max-height:180px; overflow-y:auto; }
     .suggest-item { padding:8px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; }
     .suggest-item:hover { background:var(--gray-100); }
-    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:1px 8px;font-size:12px; }
+    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:1px 8px;font-size:12px; border:var(--pill-border); }
     .participant-chip button { background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px;padding:0;line-height:1; }
     .participant-input { border:none;outline:none;font-size:12px;min-width:100px;flex:1;font-family:inherit; }
     .suggestions-dropdown { position:absolute;top:100%;left:0;right:0;z-index:100;background:var(--surface);border:1px solid var(--gray-200);border-radius:12px;box-shadow:0 7px 22px rgba(0,0,0,0.108);max-height:160px;overflow-y:auto;margin-top:4px; }

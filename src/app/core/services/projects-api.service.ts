@@ -139,6 +139,8 @@ export interface ProjectTaskSummary extends TaskDeadlineInfo {
   name: string;
   start_date: string | null;
   end_date: string | null;
+  /** Hour the task is due, "HH:MM"; null = no hour. */
+  end_time: string | null;
   parent_task_id: string | null;
   status_id: string;
   status_name: string;
@@ -291,6 +293,8 @@ export interface ProjectTask extends TaskDeadlineInfo {
   priority_id: string | null;
   start_date: string | null;
   end_date: string | null;
+  /** Hour the task is due, "HH:MM"; null = no hour. */
+  end_time: string | null;
   parent_task_id: string | null;
   custom_values: Record<string, ProjectCustomValue>;
   assignees: ProjectTaskAssignee[];
@@ -313,6 +317,8 @@ export interface ProjectTaskRow extends TaskDeadlineInfo {
   name: string;
   start_date: string | null;
   end_date: string | null;
+  /** Hour the task is due, "HH:MM"; null = no hour. */
+  end_time: string | null;
   parent_task_id: string | null;
   parent_task_number: number | null;
   parent_task_name: string | null;
@@ -373,6 +379,8 @@ export interface ProjectTaskPayload {
   priority_id?: string | null;
   start_date?: string | null;
   end_date?: string | null;
+  /** Hour the task is due, "HH:MM"; null = no hour. */
+  end_time?: string | null;
   parent_task_id?: string | null;
   assignee_ids?: string[];
   custom_values?: Record<string, ProjectCustomValue>;
@@ -398,6 +406,21 @@ export interface ProjectMessage {
   created_at: string;
   author_id: string | null;
   author_name: string | null;
+  /** The other people of the thread who have read the message. */
+  read_by?: { user_id: string; display_name: string | null }[];
+  is_read_by_all?: boolean;
+}
+
+export interface ProjectUnreadMessages {
+  total: number;
+  /** Only projects with something unread. */
+  projects: {
+    project_id: string;
+    /** The general thread and the task threads together. */
+    unread: number;
+    general_unread: number;
+    tasks: { task_id: string; unread: number }[];
+  }[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -544,6 +567,15 @@ export class ProjectsApiService {
 
   postMessage(projectId: string, taskId: string | null, body: string): Observable<ProjectMessage> {
     return this.http.post<ProjectMessage>(this.messagesUrl(projectId, taskId), { body });
+  }
+
+  /** Tells the server how far the user has read the thread (the newest message shown). */
+  markMessagesRead(projectId: string, taskId: string | null, lastMessageId: string): Observable<void> {
+    return this.http.put<void>(`${this.messagesUrl(projectId, taskId)}/read`, { last_message_id: lastMessageId });
+  }
+
+  getUnreadMessages(): Observable<ProjectUnreadMessages> {
+    return this.http.get<ProjectUnreadMessages>(`${this.base}/unread-messages`);
   }
 
   private messagesUrl(projectId: string, taskId: string | null): string {

@@ -2081,15 +2081,15 @@ interface DiscoveredCompany {
     }
 
     .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:500; }
-    .badge-pending   { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
-    .badge-done      { background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color:oklch(from #065f46 max(l, var(--text-min-l)) c h); }
-    .badge-error     { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .badge-pending   { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .badge-done      { background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color:oklch(from #065f46 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .badge-error     { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); border:var(--pill-border); }
     .badge-no_website { background:var(--gray-100); color:var(--gray-500); }
     .badge-no_krs    { background:var(--gray-100); color:var(--gray-500); }
-    .badge-hold      { background:color-mix(in srgb, #e0e7ff var(--tint-mix), var(--surface)); color:oklch(from #3730a3 max(l, var(--text-min-l)) c h); }
-    .badge-archived  { background:var(--gray-100); color:var(--gray-500); }
-    .badge-lead      { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
-    .badge-db        { background:color-mix(in srgb, #fef0e9 var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); font-size:10px; padding:1px 6px; border-radius:8px; }
+    .badge-hold      { background:color-mix(in srgb, #e0e7ff var(--tint-mix), var(--surface)); color:oklch(from #3730a3 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .badge-archived  { background:var(--gray-100); color:var(--gray-500); border:var(--pill-border); }
+    .badge-lead      { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .badge-db        { background:color-mix(in srgb, #fef0e9 var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); font-size:10px; padding:1px 6px; border-radius:8px; border:var(--pill-border); }
 
     .btn-menu {
       width:28px; height:28px; border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:10px;
@@ -2144,8 +2144,8 @@ interface DiscoveredCompany {
       display: flex; align-items: center; justify-content: center;
       background: var(--gray-100); color: var(--gray-500);
     }
-    .log-badge-ok  { background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: oklch(from #065f46 max(l, var(--text-min-l)) c h); }
-    .log-badge-err { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .log-badge-ok  { background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: oklch(from #065f46 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .log-badge-err { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); border:var(--pill-border); }
     .log-step-body { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; flex: 1; }
     .log-ok   { color: oklch(from #065f46 max(l, var(--text-min-l)) c h); font-weight: 500; }
     .log-err  { color: oklch(from #991b1b max(l, var(--text-min-l)) c h); font-weight: 500; }
@@ -2255,8 +2255,8 @@ interface DiscoveredCompany {
       padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700;
       background: var(--gray-100); color: var(--gray-500); flex-shrink: 0;
     }
-    .inspect-badge-ok  { background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: oklch(from #065f46 max(l, var(--text-min-l)) c h); }
-    .inspect-badge-err { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .inspect-badge-ok  { background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: oklch(from #065f46 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .inspect-badge-err { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); border:var(--pill-border); }
     .inspect-kv { display: flex; flex-direction: column; gap: 4px; }
     .inspect-row { display: flex; gap: 6px; font-size: 12px; line-height: 1.4; }
     .ik { color: var(--gray-500); flex-shrink: 0; min-width: 84px; }

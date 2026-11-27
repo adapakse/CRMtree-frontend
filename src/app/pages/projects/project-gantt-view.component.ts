@@ -24,7 +24,14 @@ import { FilterSet, TaskFilterId } from './project-list-filters.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <ng-container *transloco="let t; prefix: 'projects'">
-      <wt-list-filter-bar [filters]="filters().all" [query]="query()" />
+      <wt-list-filter-bar [filters]="filters().all" [query]="query()">
+        @if (showsOnlyMyTasks() !== null) {
+          <label class="toggle">
+            <input type="checkbox" [checked]="showsOnlyMyTasks()" (change)="onlyMyTasksToggled.emit()">
+            {{ t('detail.showOnlyMyTasks') }}
+          </label>
+        }
+      </wt-list-filter-bar>
       <wt-project-deadline-legend [atRiskThresholdDays]="atRiskThresholdDays()" [showsTimelineMarks]="true" />
       @if (loader.result(); as result) {
         @if (result.truncated) {
@@ -44,6 +51,7 @@ import { FilterSet, TaskFilterId } from './project-list-filters.service';
     :host { display:flex; flex-direction:column; gap:12px; }
     .notice { padding:8px 14px; border-radius:9px; background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); font-size:12px; }
     .is-loading { opacity:.55; }
+    .toggle { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--gray-700); cursor:pointer; white-space:nowrap; }
   `],
 })
 export class ProjectGanttViewComponent {
@@ -61,6 +69,9 @@ export class ProjectGanttViewComponent {
   readonly emptyMessage = input('');
 
   readonly taskOpened = output<ProjectTaskRow>();
+  /** Null where the view has no "only my tasks" switch (the overview of several projects). */
+  readonly showsOnlyMyTasks = input<boolean | null>(null);
+  readonly onlyMyTasksToggled = output<void>();
 
   // Sorting and paging of the shared query state do not apply to a timeline.
   private readonly requestParams = computed<ListParams>(() => ({ ...this.query().filters(), ...this.extraParams() }));

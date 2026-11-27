@@ -802,7 +802,7 @@ const TODAY_CALLS_GOAL = 37;
     /* Tabs */
     .tabs { margin-bottom: 4px; }
     .tab-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; }
-    .tab-badge-red { background: #EF4444; color: white; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 6px; }
+    .tab-badge-red { background: #EF4444; color: white; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 6px; border:var(--pill-border); }
 
     /* Churn Section */
     .churn-section { display: flex; flex-direction: column; gap: 14px; }
@@ -832,10 +832,10 @@ const TODAY_CALLS_GOAL = 37;
     .churn-stat-lbl { font-size: 10px; color: var(--gray-400); white-space: nowrap; }
     .churn-score-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 90px; flex-shrink: 0; }
     .churn-badge { padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 700; white-space: nowrap; }
-    .risk-badge-critical { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
-    .risk-badge-high     { background: color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface)); color: oklch(from #9a3412 max(l, var(--text-min-l)) c h); }
-    .risk-badge-medium   { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
-    .risk-badge-low      { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: oklch(from #1e40af max(l, var(--text-min-l)) c h); }
+    .risk-badge-critical { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .risk-badge-high     { background: color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface)); color: oklch(from #9a3412 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .risk-badge-medium   { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .risk-badge-low      { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: oklch(from #1e40af max(l, var(--text-min-l)) c h); border:var(--pill-border); }
     .churn-score { font-size: 12px; color: var(--gray-500); }
     .churn-chevron { color: #D1D5DB; flex-shrink: 0; }
   `],

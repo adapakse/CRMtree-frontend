@@ -3,7 +3,7 @@ import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 import { ProjectFinanceFormatService } from '../../../core/services/project-finance-format.service';
 import { TaskDeadlineInfo } from '../../../core/services/projects-api.service';
 
-type DueDateFacts = { end_date: string | null } & Pick<TaskDeadlineInfo, 'original_end_date' | 'slip_days' | 'timeliness'>;
+type DueDateFacts = { end_date: string | null; end_time?: string | null } & Pick<TaskDeadlineInfo, 'original_end_date' | 'slip_days' | 'timeliness'>;
 
 /**
  * The end date of a task. When the date was moved, the original date is shown
@@ -19,6 +19,7 @@ type DueDateFacts = { end_date: string | null } & Pick<TaskDeadlineInfo, 'origin
     <ng-container *transloco="let t; prefix: 'projects'">
       <span class="current" [class.overdue]="task().timeliness === 'overdue'" [class.at-risk]="task().timeliness === 'at_risk'">
         {{ task().end_date ? format.date(task().end_date) : (emptyLabel() || '—') }}
+        @if (task().end_date && task().end_time; as time) { {{ time }} }
       </span>
       @if (slip(); as moved) {
         <span class="original" [title]="t('deadlines.originalEndDateHint')">

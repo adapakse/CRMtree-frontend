@@ -69,8 +69,14 @@
     },
     "hint": "Invio manda il messaggio, Maiusc+Invio aggiunge una nuova riga.",
     "placeholder": "Scrivi un messaggio…",
+    "read": {
+      "readBy": "Letto da: {names}",
+      "readByAll": "Letto da tutti: {names}",
+      "sent": "Inviato"
+    },
     "send": "Invia",
-    "sendFailed": "Impossibile inviare il messaggio"
+    "sendFailed": "Impossibile inviare il messaggio",
+    "unreadCount": "Messaggi non letti: {count}"
   },
   "crmLink": {
     "change": "Cambia",
@@ -733,6 +739,8 @@
       "assignees": "Persone assegnate",
       "description": "Descrizione aggiuntiva",
       "endDate": "Data di fine",
+      "endTime": "Ora",
+      "endTimeHint": "Facoltativa. Senza ora l’attività è nel calendario alle 09:00.",
       "name": "Nome",
       "noParent": "— nessuna (attività principale) —",
       "parentTask": "Attività principale",
@@ -752,6 +760,7 @@
         "customFields": "campi aggiuntivi",
         "description": "descrizione",
         "endDate": "data di fine",
+        "endTime": "ora",
         "name": "nome",
         "parentTask": "attività principale",
         "priority": "priorità",

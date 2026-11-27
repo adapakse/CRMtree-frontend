@@ -564,7 +564,7 @@ const TYPE_LABELS: Record<string, string> = {
     .kb-del-btn { background:none;border:none;font-size:12px;cursor:pointer;opacity:.3;padding:2px 4px;border-radius:4px }
     .kb-del-btn:hover { opacity:1;background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)) }
     .kb-add:hover { border-color:var(--orange);color: var(--orange-text) }
-    .done-badge { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);border-radius:4px;padding:1px 4px;font-size:10px;font-weight:700 }
+    .done-badge { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);border-radius:4px;padding:1px 4px;font-size:10px;font-weight:700; border:var(--pill-border); }
 
     /* Timeline */
     .timeline-wrap { max-width:720px;margin:0 auto;padding-bottom:40px }
@@ -574,7 +574,7 @@ const TYPE_LABELS: Record<string, string> = {
     .tl-date-label.tl-past  { color:var(--gray-300) }
     .tl-dot { width:10px;height:10px;border-radius:50%;background:var(--gray-300);flex-shrink:0 }
     .tl-today .tl-dot { background:var(--orange) }
-    .today-tag { background:var(--orange-strong);color:white;border-radius:4px;padding:1px 6px;font-size:10px }
+    .today-tag { background:var(--orange-strong);color:white;border-radius:4px;padding:1px 6px;font-size:10px; border:var(--pill-border); }
     .tl-item { display:flex;gap:12px;padding:12px;background:var(--surface);border-radius:10px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .12s }
     .tl-item:hover { box-shadow:var(--shadow) }
     .tl-item.tl-done { opacity:.6 }

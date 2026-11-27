@@ -82,7 +82,7 @@ const EMAIL_CONSENT_PATTERN = /e-?mail|newsletter/i;
     .pc-person { padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
     .pc-person:last-child { border-bottom: none; padding-bottom: 0; }
     .pc-who b { font-size: 12px; color: var(--gray-700); font-weight: 600; }
-    .pc-tag { margin-left: 6px; font-size: 10px; font-weight: 600; color: var(--chip-text); background: var(--chip-bg); border-radius: 4px; padding: 0 6px; }
+    .pc-tag { margin-left: 6px; font-size: 10px; font-weight: 600; color: var(--chip-text); background: var(--chip-bg); border-radius: 4px; padding: 0 6px; border:var(--pill-border); }
     .pc-mail { font-size: 12px; color: var(--gray-500); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .pc-label { display: block; font-size: 10px; color: var(--gray-400); margin: 6px 0 4px; }
     .pc-opts { display: flex; gap: 4px; }

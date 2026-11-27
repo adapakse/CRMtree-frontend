@@ -69,8 +69,14 @@
     },
     "hint": "Enter sends the message, Shift+Enter adds a new line.",
     "placeholder": "Write a message…",
+    "read": {
+      "readBy": "Read by: {names}",
+      "readByAll": "Read by everyone: {names}",
+      "sent": "Sent"
+    },
     "send": "Send",
-    "sendFailed": "Couldn't send the message"
+    "sendFailed": "Couldn't send the message",
+    "unreadCount": "Unread messages: {count}"
   },
   "crmLink": {
     "change": "Change",
@@ -733,6 +739,8 @@
       "assignees": "Assignees",
       "description": "Additional description",
       "endDate": "End date",
+      "endTime": "Time",
+      "endTimeHint": "Optional. Without a time the task sits in the calendar at 09:00.",
       "name": "Name",
       "noParent": "— none (top-level task) —",
       "parentTask": "Parent task",
@@ -752,6 +760,7 @@
         "customFields": "custom fields",
         "description": "description",
         "endDate": "end date",
+        "endTime": "time",
         "name": "name",
         "parentTask": "parent task",
         "priority": "priority",

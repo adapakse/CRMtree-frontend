@@ -35,6 +35,10 @@ import { ProjectTaskTableComponent } from './project-task-table.component';
           <input type="checkbox" [checked]="showsFlatList()" [disabled]="!query().isDefault()" (change)="prefersFlatList.set(!prefersFlatList())">
           {{ t('taskList.flatList') }}
         </label>
+        <label class="toggle">
+          <input type="checkbox" [checked]="showsOnlyMyTasks()" (change)="onlyMyTasksToggled.emit()">
+          {{ t('detail.showOnlyMyTasks') }}
+        </label>
       </wt-list-filter-bar>
       <wt-project-deadline-legend [atRiskThresholdDays]="config().at_risk_threshold_days" />
 
@@ -65,6 +69,7 @@ export class ProjectTasksTabComponent {
   /** The whole project (already narrowed to "my tasks" when that switch is on), for the tree. */
   readonly treeTasks = input.required<ProjectTask[]>();
   readonly showsOnlyMyTasks = input(false);
+  readonly onlyMyTasksToggled = output<void>();
   readonly query = input.required<ListQueryState>();
   readonly filters = input.required<FilterSet<TaskFilterId>>();
   readonly emptyMessage = input('');

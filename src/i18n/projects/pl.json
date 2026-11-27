@@ -69,8 +69,14 @@
     },
     "hint": "Enter wysyła wiadomość, Shift+Enter dodaje nową linię.",
     "placeholder": "Napisz wiadomość…",
+    "read": {
+      "readBy": "Przeczytali: {names}",
+      "readByAll": "Przeczytali wszyscy: {names}",
+      "sent": "Wysłano"
+    },
     "send": "Wyślij",
-    "sendFailed": "Nie udało się wysłać wiadomości"
+    "sendFailed": "Nie udało się wysłać wiadomości",
+    "unreadCount": "Nieprzeczytane wiadomości: {count}"
   },
   "crmLink": {
     "change": "Zmień",
@@ -733,6 +739,8 @@
       "assignees": "Przypisane osoby",
       "description": "Opis dodatkowy",
       "endDate": "Data zakończenia",
+      "endTime": "Godzina",
+      "endTimeHint": "Opcjonalna. Bez godziny zadanie stoi w kalendarzu o 09:00.",
       "name": "Nazwa",
       "noParent": "— brak (zadanie nadrzędne) —",
       "parentTask": "Zadanie nadrzędne",
@@ -752,6 +760,7 @@
         "customFields": "pola dodatkowe",
         "description": "opis",
         "endDate": "data zakończenia",
+        "endTime": "godzina",
         "name": "nazwa",
         "parentTask": "zadanie nadrzędne",
         "priority": "priorytet",

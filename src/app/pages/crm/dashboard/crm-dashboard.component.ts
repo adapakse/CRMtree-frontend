@@ -178,10 +178,10 @@ const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
     .link { color: var(--orange-text); text-decoration:none; font-weight:600; }
     .link:hover { text-decoration:underline; }
     .sbadge { padding:1px 8px; border-radius:8px; font-size:10px; font-weight:700; }
-    .sbadge-active { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
-    .sbadge-onboarding { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
-    .sbadge-inactive { background:var(--gray-100); color:var(--gray-700); }
-    .sbadge-churned { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .sbadge-active { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .sbadge-onboarding { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); border:var(--pill-border); }
+    .sbadge-inactive { background:var(--gray-100); color:var(--gray-700); border:var(--pill-border); }
+    .sbadge-churned { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); border:var(--pill-border); }
     .low-adoption { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); font-weight:700; }
     /* Activity feed */
     .activity-feed { display:flex; flex-direction:column; gap:10px; }

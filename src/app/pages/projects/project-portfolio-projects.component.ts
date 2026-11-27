@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output } f
 import { TranslocoDirective, TranslocoPipe, provideTranslocoScope } from '@jsverse/transloco';
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ProjectListItem } from '../../core/services/projects-api.service';
+import { ProjectUnreadService } from '../../core/services/project-unread.service';
+import { ProjectUnreadBadgeComponent } from './project-unread-badge.component';
 import { ProjectDelayBadgeComponent } from '../../shared/components/project-deadlines/project-delay-badge.component';
 import { ListColumnHeaderComponent } from '../../shared/list/list-column-header.component';
 import { ListPagerComponent } from '../../shared/list/list-pager.component';
@@ -16,7 +18,7 @@ const FINANCE_COLUMN_COUNT = 2;
 @Component({
   selector: 'wt-project-portfolio-projects',
   standalone: true,
-  imports: [TranslocoDirective, TranslocoPipe, ListColumnHeaderComponent, ListPagerComponent, ProjectDelayBadgeComponent],
+  imports: [TranslocoDirective, TranslocoPipe, ListColumnHeaderComponent, ListPagerComponent, ProjectDelayBadgeComponent, ProjectUnreadBadgeComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -43,7 +45,7 @@ const FINANCE_COLUMN_COUNT = 2;
           <tbody>
             @for (project of rows(); track project.id) {
               <tr class="project-row" (click)="projectOpened.emit(project)">
-                <td><span class="mono">{{ project.key }}</span> <span class="project-name">{{ project.name }}</span></td>
+                <td><span class="mono">{{ project.key }}</span> <span class="project-name">{{ project.name }}</span> <wt-project-unread-badge [count]="unread.ofProject(project.id)" [showsIcon]="true" /></td>
                 <td class="secondary-cell">{{ managerNames(project) }}</td>
                 <td class="date">{{ format.date(project.start_date) }}</td>
                 <td class="date">{{ format.date(project.end_date) }}</td>
@@ -101,6 +103,7 @@ const FINANCE_COLUMN_COUNT = 2;
   `],
 })
 export class ProjectPortfolioProjectsComponent {
+  readonly unread = inject(ProjectUnreadService);
   readonly format = inject(ProjectFinanceFormatService);
 
   readonly rows = input.required<ProjectListItem[]>();
